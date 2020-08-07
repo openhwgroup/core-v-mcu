@@ -1,4 +1,10 @@
-# PULPissimo
+# PULPissimo - CV32E40P
+
+This repo contains modifications and instructions to implement the CV32E40P processor
+(formerly RI5CY) in the PULPissimo platform on the Digilent Genesys2 FPGA board (or
+Digilent NexysA7-100T). It assumes the user follow the instructions below to install 
+PULPissimo first, and then modify the installation to replace the RI5CY core and other
+files to build the FPGA platform.
 
 ![](doc/pulpissimo_archi.png)
 
