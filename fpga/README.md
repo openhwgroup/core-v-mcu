@@ -1,6 +1,6 @@
 Instructions to build the core-v-mcu platform:
 
-1. Install PULPissimo platform as detailed [here](https://github.com/hpollittsmith/core-v-mcu); assume $PULPISSIMO is the top-level of the project
+1. Install PULPissimo platform as detailed [here](https://github.com/hpollittsmith/core-v-mcu); the following instructions assume $PULPISSIMO is the top-level of the project.
 2. Download the cv32e40p project from [here](https://github.com/openhwgroup/cv32e40p) and copy to $PULPISSIMO/ips/
 3. Replace the "riscv" directory with the "cv32e40p":
       cd $PULPISSIMO/ips
