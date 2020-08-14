@@ -60,9 +60,37 @@ $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
 ## Instructions to download the pre-built bitstream
+1. Start Vivado and program the FPGA
 ```
+$ vivado  (note: if using Labtools Edition, use vivado_lab)
+```
+Open the Hardware Manager
+Open Target
+Program Device (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory)
 
+2. Connect to the serial/UART. In a terminal window:
 ```
+$ sudo screen /dev/ttyUSB0 115200
+```
+(note, your USB port number may be different)
+
+3. In another terminal window, start OpenOCD
+```
+$ cd $PULP/fpga/pulpissimo-genesys2
+$ $OPENOCD/bin/openocd -f openocd-genesys2.cfg
+```
+4. In yet another terminal window start gdb
+```
+$ cd pulp-runtime-examples/hello
+$ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/test/test
+```
+5. Connect and debug your program in gdb
+```
+target remote localhost:3333
+load
+continue
+```
+You should see the "Hello!" message in the serial terminal window.
 
 ## Modifications to Pulpissimo to instantiate CV32E40P
 
