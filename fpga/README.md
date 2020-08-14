@@ -46,15 +46,16 @@ $ sudo /opt/Xilinx/Vivado/2018.2/data/xicom/cable_drivers/lin64/install_script/i
 ```
 $ source /opt/Xilinx/Vivado/2018.2/settings64.sh
 ```
-8. Install the simple Pulp runtime:
+8. Install the PULP simple runtime:
 ```
+$ git clone https://github.com/pulp-platform/pulp-runtime.git
 $ cd pulp-runtime
 $ source configs/pulpissimo.sh
 $ source configs/fpgas/pulpissimo/nexysA7.sh
 ```
 9. Download the pulp-runtime-examples:
 ```
-$ git clone https://pulp-platform/pulp-runtime-examples.git
+$ git clone https://github.com/pulp-platform/pulp-runtime-examples.git
 $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
@@ -77,7 +78,7 @@ $ git clone https://github.com/openhwgroup/cv32e40p
 $ cp -Rf cv32e40p $PULP/ips/.
 $ cd $PULP/ips
 $ rm -Rf riscv
-$ mv cv32e40p riscv
+$ ln -s riscv cv32e40p
 ```
 
 3. Modify the $PULP/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file, line 155 to replace the clock gate module. Replace the text:
