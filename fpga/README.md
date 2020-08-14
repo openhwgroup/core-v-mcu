@@ -1,4 +1,4 @@
-## Instructions to build the core-v-mcu platform:
+## Instructions to build the core-v-mcu environment:
 
 The following instructions start from a clean Ubuntu 18.04 installation.
 
@@ -49,7 +49,7 @@ $ source /opt/Xilinx/Vivado/2018.2/settings64.sh
 
 ## Modifications to Pulpissimo to instantiate CV32E40P
 
-The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made:
+The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $PULP variable refers to your location of the core-v-mcu source directory):
 
 1. Download the cv32e40p source: project from [here](https://github.com/openhwgroup/cv32e40p) and copy to $PULPISSIMO/ips/
 ``` 
