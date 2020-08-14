@@ -8,7 +8,7 @@ The following instructions start from a clean Ubuntu 18.04 installation.
 $ cp ~/Downloads/corev-openhw-gcc-ubuntu1804-20200705.tar.gz /opt/.
 $ tar xvfz corev-openhw-gcc-ubuntu1804-20200705.tar.gz
 $ export PULP_RISCV_GCC_TOOLCHAIN=/opt/corev-openhw-gcc-ubuntu1804-20200705
-$ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH ```
+$ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
 2. Install the PULP SDK
 ```
