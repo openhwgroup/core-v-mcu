@@ -68,7 +68,7 @@ $ make clean all
 
 The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $PULP variable refers to your location of the core-v-mcu source directory):
 
-1. Download the cv32e40p source: project from [here](https://github.com/openhwgroup/cv32e40p) and copy to $PULPISSIMO/ips/
+1. Download the cv32e40p source: project from [here](https://github.com/openhwgroup/cv32e40p) and copy to $PULP/ips/
 ``` 
 $ git clone https://github.com/openhwgroup/cv32e40p
 ```
@@ -78,7 +78,7 @@ $ git clone https://github.com/openhwgroup/cv32e40p
 $ cp -Rf cv32e40p $PULP/ips/.
 $ cd $PULP/ips
 $ rm -Rf riscv
-$ ln -s riscv cv32e40p
+$ ln -s cv32e40p riscv
 ```
 
 3. Modify the $PULP/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file, line 155 to replace the clock gate module. Replace the text:
