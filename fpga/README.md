@@ -51,7 +51,7 @@ $ source /opt/Xilinx/Vivado/2018.2/settings64.sh
 $ git clone https://github.com/pulp-platform/pulp-runtime.git
 $ cd pulp-runtime
 $ source configs/pulpissimo.sh
-$ source configs/fpgas/pulpissimo/nexysA7.sh
+$ source configs/fpgas/pulpissimo/genesys2.sh (or nexysA7.sh)
 ```
 9. Download the pulp-runtime-examples:
 ```
@@ -60,15 +60,45 @@ $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
 ## Instructions to download the pre-built bitstream
+1. Start Vivado and program the FPGA
 ```
+$ vivado  (note: if using Labtools Edition, use vivado_lab)
+```
+Open the Hardware Manager
+Open Target
+Program Device (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory)
 
+Once the bitstream has been programmed, quit Vivado.
+
+2. Connect to the serial/UART. In a terminal window:
 ```
+$ sudo screen /dev/ttyUSB0 115200
+```
+(note, your USB port number may be different)
+
+3. In another terminal window, start OpenOCD
+```
+$ cd $PULP/fpga/pulpissimo-genesys2
+$ $OPENOCD/bin/openocd -f openocd-genesys2.cfg
+```
+4. In yet another terminal window start gdb
+```
+$ cd pulp-runtime-examples/hello
+$ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/test/test
+```
+5. Connect and debug your program in gdb
+```
+target remote localhost:3333
+load
+continue
+```
+You should see the "Hello!" message in the serial terminal window.
 
 ## Modifications to Pulpissimo to instantiate CV32E40P
 
 The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $PULP variable refers to your location of the core-v-mcu source directory):
 
-1. Download the cv32e40p source: project from [here](https://github.com/openhwgroup/cv32e40p) and copy to $PULP/ips/
+1. Download the cv32e40p source
 ``` 
 $ git clone https://github.com/openhwgroup/cv32e40p
 ```
@@ -88,24 +118,24 @@ cv32e40p_clock_gate core_clock_gate_i
 with
 ```
 tc_clk_gating (core_clock_gate_i) //this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
-```            
-4. Replace the pulp_soc module with a modified version that instantiates cv32e40p:
 ```
-$ cd $PULP/ips
-$ rm -Rf $PULP/ips/pulp_soc
-$ git clone https://github.com/hpollittsmith/pulp_soc
+
+4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
+```
+$ cp $PULP/fpga/cv32e40p_modified_files/fc_subsystem.sv $PULP/ips/pulp_soc/rtl/fc/fc_subsystem.sv
 ```
 
 5. Replace the tcl files in $PULP/tcl with modified files:
 ```
 $ cp $PULP/fpga/tcl_files/*.tcl $PULP/tcl/.
 ```
-7. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
+
+6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
 ```
 $ cd $PULP/fpga
 $ make clean_genesys2
 $ make genesys2
 ```
-8. Download
+7. Download
 
 Pre-built FPGA bitstreams for the Genesys2 and NexsyA7-100T boards are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga/bitstreams)
