@@ -68,6 +68,8 @@ Open the Hardware Manager
 Open Target
 Program Device (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory)
 
+Once the bitstream has been programmed, quit Vivado.
+
 2. Connect to the serial/UART. In a terminal window:
 ```
 $ sudo screen /dev/ttyUSB0 115200
