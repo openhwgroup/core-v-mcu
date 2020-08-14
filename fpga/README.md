@@ -46,6 +46,22 @@ $ sudo /opt/Xilinx/Vivado/2018.2/data/xicom/cable_drivers/lin64/install_script/i
 ```
 $ source /opt/Xilinx/Vivado/2018.2/settings64.sh
 ```
+8. Install the simple Pulp runtime:
+```
+$ cd pulp-runtime
+$ source configs/pulpissimo.sh
+$ source configs/fpgas/pulpissimo/nexysA7.sh
+```
+9. Download the pulp-runtime-examples:
+```
+$ git clone https://pulp-platform/pulp-runtime-examples.git
+$ cd pulp-runtime-examples/hello
+$ make clean all
+```
+## Instructions to download the pre-built bitstream
+```
+
+```
 
 ## Modifications to Pulpissimo to instantiate CV32E40P
 
@@ -89,5 +105,6 @@ $ cd $PULP/fpga
 $ make clean_genesys2
 $ make genesys2
 ```
+8. Download
 
 Pre-built FPGA bitstreams for the Genesys2 and NexsyA7-100T boards are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga/bitstreams)
