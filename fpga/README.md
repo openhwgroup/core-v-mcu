@@ -117,7 +117,7 @@ cv32e40p_clock_gate core_clock_gate_i
 ```
 with
 ```
-tc_clk_gating (core_clock_gate_i) //this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+tc_clk_gating core_clock_gate_i //this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
 ```
 
 4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
