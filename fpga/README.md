@@ -127,14 +127,14 @@ $ cp $PULP/fpga/cv32e40p_modified_files/fc_subsystem.sv $PULP/ips/pulp_soc/rtl/f
 
 5. Replace the tcl files in $PULP/tcl with modified files:
 ```
-$ cp $PULP/fpga/tcl_files/*.tcl $PULP/tcl/.
+$ cp $PULP/fpga/cv32e40p_modified_files/*.tcl $PULP/fpga/pulpissimo/tcl/.
 ```
 
 6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
 ```
 $ cd $PULP/fpga
-$ make clean_genesys2
-$ make genesys2
+$ make clean_genesys2. [or make clean_nexys rev=nexysA7-100T]
+$ make genesys2 [or make nexys rev=nexysA7-100T]
 ```
 7. Download
 
