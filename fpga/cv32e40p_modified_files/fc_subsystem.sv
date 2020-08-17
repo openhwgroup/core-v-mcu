@@ -324,7 +324,7 @@ module fc_subsystem #(
 
     generate
     // Use similar technique as Ibex to convert ID to interrupt lines
-    if ( USE_IBEX == 0) begin : convert_irqs
+	    if ( USE_IBEX == 0) begin : convert_cv32_irqs
     always_comb begin : gen_core_irq
 	core_irq_x = '0;
 	if (core_irq_req) begin
@@ -335,7 +335,7 @@ module fc_subsystem #(
     endgenerate
 
     generate
-    if ( USE_IBEX == 1) begin : convert_irqs
+	    if ( USE_IBEX == 1) begin : convert_ibex_irqs
     // Ibex supports 32 additional fast interrupts and reads the interrupt lines directly.
     // Convert ID back to interrupt lines
     always_comb begin : gen_core_irq_x
