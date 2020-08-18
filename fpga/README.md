@@ -78,11 +78,12 @@ Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](htt
 ```
 $ vivado  (note: if using Labtools Edition, use vivado_lab)
 ```
-Open the Hardware Manager
-Open Target
-Program Device (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory)
+Select `Open the Hardware Manager`
+Click `Open Target`-->`Auto Connect`
+Click `Program Device` (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory
 
-Once the bitstream has been programmed, quit Vivado.
+Once the bitstream has been programmed, the `Done` LED on the board should turn green. 
+Quit Vivado.
 
 2. Connect to the serial/UART. In a terminal window:
 ```
