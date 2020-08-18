@@ -38,28 +38,42 @@ $ cd core-v-mcu
 $ ./update-ips
 ```
 5. Install Xilinx Vivado (currently we've been using 2018.2 to match original Pulpissimo build). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient. If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
-6. Install Xilinx cable drivers (make sure any download cables are not connected when you do this):
+6. Install the Digilent board files. Vivado does not install the board definition files for NexysA7. Board definition files are typically installed here:
+```
+/opt/Xilinx/Vivado/2018.2/data/boards/board_files
+```
+You can add these files to your installation by downloading the Digilent board files archive [here](https://github.com/Digilent/vivado-boards/archive/master.zip?_ga=2.131969359.177444068.1597675206-2125281860.1520869899) and then:
+```
+$ cd ~/Downloads
+$ unzip vivado-boards-master.zip
+$ cd vivado-boards-master/new/board_files
+$ cp -Rf nexys-a7-100t /opt/Xilinx/Vivado/2019.2/data/boards/board_files/.
+```
+
+7. Install Xilinx cable drivers (make sure any download cables are not connected when you do this):
 ``` 
 $ sudo /opt/Xilinx/Vivado/2018.2/data/xicom/cable_drivers/lin64/install_script/install_drivers
 ```
-7. Setup the Vivado environment:
+8. Setup the Vivado environment:
 ```
 $ source /opt/Xilinx/Vivado/2018.2/settings64.sh
 ```
-8. Install the PULP simple runtime:
+9. Install the PULP simple runtime:
 ```
 $ git clone https://github.com/pulp-platform/pulp-runtime.git
 $ cd pulp-runtime
 $ source configs/pulpissimo.sh
 $ source configs/fpgas/pulpissimo/genesys2.sh (or nexysA7.sh)
 ```
-9. Download the pulp-runtime-examples:
+10. Download the pulp-runtime-examples:
 ```
 $ git clone https://github.com/pulp-platform/pulp-runtime-examples.git
 $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
 ## Instructions to download the pre-built bitstream
+Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
+
 1. Start Vivado and program the FPGA
 ```
 $ vivado  (note: if using Labtools Edition, use vivado_lab)
@@ -94,7 +108,7 @@ continue
 ```
 You should see the "Hello!" message in the serial terminal window.
 
-## Modifications to Pulpissimo to instantiate CV32E40P
+## Instructions to modify Pulpissimo to instantiate CV32E40P and build the FPGA bitstream
 
 The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $PULP variable refers to your location of the core-v-mcu source directory):
 
