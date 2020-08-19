@@ -126,13 +126,17 @@ $ rm -Rf riscv
 $ ln -s cv32e40p riscv
 ```
 
-3. Modify the $PULP/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file, line 155 to replace the clock gate module. Replace the text:
+3. Modify the $PULP/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file; starting at line 155 replace the clock gate module `cv32e40p_clock_gate` with
 ```
-cv32e40p_clock_gate core_clock_gate_i
-```
-with
-```
-tc_clk_gating core_clock_gate_i //this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+tc_clk_gating core_clock_gate_i 
+//this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+(
+   .clk_i     ( clk_i       ),
+   .en_i      ( clock_en    ),
+   .test_en_i ( scan_cg_en  ),
+   .clk_o     ( clk_o       )
+
+);
 ```
 
 4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
