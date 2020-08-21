@@ -308,10 +308,6 @@ module fc_subsystem #(
         .irq_fast_i            ( 15'b0	           ),
         .irq_nm_i              ( 1'b0              ),
 
-	.irq_x_i               ( core_irq_x        ),
-        .irq_x_ack_o           ( core_irq_ack      ),
-        .irq_x_ack_id_o        ( core_irq_ack_id   ),
-
         .debug_req_i           ( debug_req_i       ),
 
         .fetch_enable_i        ( fetch_en_int      ),
@@ -331,20 +327,6 @@ module fc_subsystem #(
 		core_irq_x[core_irq_id] = 1'b1;
 	end
     end
-    end
-    endgenerate
-
-    generate
-	    if ( USE_IBEX == 1) begin : convert_ibex_irqs
-    // Ibex supports 32 additional fast interrupts and reads the interrupt lines directly.
-    // Convert ID back to interrupt lines
-    always_comb begin : gen_core_irq_x
-        core_irq_x = '0;
-        if (core_irq_req) begin
-            core_irq_x[core_irq_id] = 1'b1;
-        end
-    end
-
     end
     endgenerate
    
