@@ -1,6 +1,17 @@
-# PULPissimo
+# PULPissimo - CV32E40P
+
+This repo contains modifications and instructions to implement the CV32E40P processor
+(formerly RI5CY) in the PULPissimo platform on the Digilent Genesys2 FPGA board (or
+Digilent NexysA7-100T). Instructions to install the original (RI5CY) PULPissimo platform
+are below; instructions to install PULPissimo and instantiate the CV32E40P processor, and
+build on the FPGA platform are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga).
+
+
+
 
 ![](doc/pulpissimo_archi.png)
+
+# PULPissimo
 
 PULPissimo is the microcontroller architecture of the more recent PULP chips,
 part of the ongoing "PULP platform" collaboration between ETH Zurich and the
