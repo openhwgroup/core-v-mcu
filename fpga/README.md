@@ -26,6 +26,8 @@ $ source sourceme.sh
 ```
 3. Install patched version of OpenOCD:
 ```
+$ git config --global user.email “your email address”
+$ git config --global user.name “your name”
 $ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build -—p openocd -—stdout
 ```
 4. Install the Core-v-mcu repo:
