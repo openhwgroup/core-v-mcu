@@ -36,6 +36,7 @@ $ cd ..
 $ sudo apt install curl
 $ git clone https://github.com/openhwgroup/core-v-mcu.git
 $ cd core-v-mcu
+$ export COREVMCU=$(pwd)
 $ ./update-ips
 ```
 5. Install Xilinx Vivado (currently we've been using 2019.2). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient. If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
@@ -65,7 +66,7 @@ $ source /opt/Xilinx/Vivado/2019.2/settings64.sh
 $ git clone https://github.com/pulp-platform/pulp-runtime.git
 $ cd pulp-runtime
 $ source configs/pulpissimo.sh
-$ source configs/fpgas/pulpissimo/genesys2.sh (or nexysA7.sh)
+$ source configs/fpgas/pulpissimo/nexys_video.sh (or genesys2.sh)
 ```
 10. Download the pulp-runtime-examples:
 ```
@@ -74,31 +75,39 @@ $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
 ## Instructions to download the pre-built bitstream
+
 Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
 
-1. Start Vivado and program the FPGA
+### If you are using the Digilent NexysA7-100T board
+1. Connect microUSB cable to PROG/UART (J12) port on NexysA7
+2. Connect Digilent JTAG-HS2 cable to Pmod JA port (top row); ensure GND and VDD ports on JTAG-HS2 cable align with GND and VDD pins on Pmod JA
+3. To program through USB cable, ensure jumper on MODE pins JP1 is across pins 2-3 (JTAG)
+4. Power on the board (note that power is from the microUSB cable connected to J12)
+
+Your board setup should look similar to the image below:
+![alt text](https://github.com/hpollittsmith/core-v-mcu/blob/master/fpga/images/NexysA7.png "NexysA7-100T setup")
+
+5. In your VM window, click on the USB icon along the bottom and ensure that the Digilent USB Device [0700] is checked, and that the Digilent USB Device [0900] is un-checked (this will cause a conflict otherwise)
+6. Start Xilinx Vivado
 ```
 $ vivado  (note: if using Labtools Edition, use vivado_lab)
 ```
-Select `Open the Hardware Manager`
-Click `Open Target`-->`Auto Connect`
-Click `Program Device` (use one of the pre-built bitstream files in the `$PULP/fpga/cv32e40p_bitstreams` directory
+7. In the Vivado window, click `Open Hardware Manager >`
+8. In the Hardware Manager window, click `Open Target` and select `Auto Connect`. In the Hardware pane, you should see the xc7a100t_0 part. Click `Program device`. In the Program Device window, select the bitstream file you wish to use and click `Program`. When programmed, the DONE LED should be green. Exit Vivado. The FPGA is now programmed with the CV32E40P based Pulpissimo platform.
+9. In your VM window, click on the USB icon along he bottom and ensure that the `Digilent USB Device [0900]` is now checked. You may leave Digilent USB Device [0700] checked, but if you wish to re-program the FPGA, you should un-check Digilent USB Device [0900] again. 
 
-Once the bitstream has been programmed, the `Done` LED on the board should turn green. 
-Quit Vivado.
-
-2. Connect to the serial/UART. In a terminal window:
+10. Connect to the serial/UART. In a terminal window:
 ```
 $ sudo screen /dev/ttyUSB0 115200
 ```
 (note, your USB port number may be different)
 
-3. In another terminal window, start OpenOCD
+11. In another terminal window, start OpenOCD
 ```
-$ cd $PULP/fpga/pulpissimo-genesys2
-$ $OPENOCD/bin/openocd -f openocd-genesys2.cfg
+$ cd $COREVMCU/fpga/pulpissimo-nexys
+$ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
 ```
-4. In yet another terminal window start gdb
+12. In yet another terminal window start gdb
 ```
 $ cd pulp-runtime-examples/hello
 $ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/test/test
@@ -122,16 +131,16 @@ $ git clone https://github.com/openhwgroup/cv32e40p
 
 2. Replace the RI5CY source directory:
 ```
-$ cp -Rf cv32e40p $PULP/ips/.
-$ cd $PULP/ips
+$ cp -Rf cv32e40p $COREVMCU/ips/.
+$ cd $COREVMCU/ips
 $ rm -Rf riscv
 $ ln -s cv32e40p riscv
 ```
 
-3. Modify the $PULP/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file; starting at line 155 replace the clock gate module `cv32e40p_clock_gate` with
+3. Modify the $COREVMCU/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file; starting at line 155 replace the clock gate module `cv32e40p_clock_gate` with
 ```
 tc_clk_gating core_clock_gate_i 
-//this module is found in $PULPISSIMO/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+//this module is found in $COREVMCU/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
 (
    .clk_i     ( clk_i       ),
    .en_i      ( clock_en    ),
@@ -143,20 +152,20 @@ tc_clk_gating core_clock_gate_i
 
 4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
 ```
-$ cp $PULP/fpga/cv32e40p_modified_files/fc_subsystem.sv $PULP/ips/pulp_soc/rtl/fc/fc_subsystem.sv
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
 ```
 
-5. Replace the tcl files in $PULP/tcl with modified files:
+5. Replace the tcl files in $COREVMCU/tcl with modified files:
 ```
-$ cp $PULP/fpga/cv32e40p_modified_files/*.tcl $PULP/fpga/pulpissimo/tcl/.
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/*.tcl $COREVMCU/fpga/pulpissimo/tcl/.
 ```
 
 6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
 ```
-$ cd $PULP/fpga
-$ make clean_genesys2. [or make clean_nexys rev=nexysA7-100T]
+$ cd $COREVMCU/fpga
+$ make clean_genesys2 [or make clean_nexys rev=nexysA7-100T]
 $ make genesys2 [or make nexys rev=nexysA7-100T]
 ```
-7. Download
+A bitstream file will be create, for example pulpissimo_nexys.bit.
+7. Download using earlier instructions.
 
-Pre-built FPGA bitstreams for the Genesys2 and NexsyA7-100T boards are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga/bitstreams)
