@@ -53,7 +53,10 @@ $ cd core-v-mcu
 $ export COREVMCU=$(pwd)
 $ ./update-ips
 ```
-5. Download and install Xilinx Vivado (currently we've been using 2019.2). You will need to register for a Xilinx account to download the [installer](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2019.2_1106_2127_Lin64.bin). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient (this can be selected during the installation). If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
+5. Download and install Xilinx Vivado (currently procedure has been tested using 2019.2). You will need to register for a Xilinx account to download the [installer](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2019.2_1106_2127_Lin64.bin). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient (this can be selected during the installation). If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
+
+More detail on installing Vivado can be found [here](https://reference.digilentinc.com/vivado/installing-vivado/start ).
+
 6. Install the Digilent board files. Vivado does not install the board definition files for Genesys 2 or NexysA7. Board definition files are typically installed here:
 ```
 /opt/Xilinx/Vivado/2019.2/data/boards/board_files
@@ -185,4 +188,34 @@ load
 continue
 ```
 You should see the "Hello!" message in the serial terminal window.
+
+## Instructions to simulate Pulpissimo with CV32E40P using Mentor Graphics Questasim/Modelsim
+1. Install Questasim (current procedure has been tested with 10.7g) and Questasim license.
+
+2. Replace the RI5CY simulation file with CV32E40P:
+```
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/riscv.mk $COREVMCU/sim/vcompile/ips/.
+```
+3. Ensure you have TCL installed on your system:
+```
+$ sudo apt-get install -y tcl-dev
+```
+4. Build the simulation libaries:
+```
+$ cd $COREVMCU
+$ source setup/vsim.sh
+$ make build
+```
+5. Build an example application:
+```
+$ cd location_of_pulp-runtime
+$ source configs/pulpissimo.sh
+$ source configs/rtl.sh
+$ cd location_of_pulp-runtime-examples/hello
+$ make clean all run
+```
+Output will be in the terminal window. To launch the VSIM GUI to view signals, use:
+```
+$ make run gui=1
+```
 
