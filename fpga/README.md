@@ -6,7 +6,7 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 
 [Instructions to download a pre-built FPGA bitstream](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-download-the-pre-built-bitstream)
 
-[Instructions to run Questasim simulation of the platform] (https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-simulate-pulpissimo-with-cv32e40p-using-mentor-graphics-questasimmodelsim)
+[Instructions to run Questasim simulation of the platform](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-simulate-pulpissimo-with-cv32e40p-using-mentor-graphics-questasimmodelsim)
 
 
 ## Instructions to install the core-v-mcu environment:
