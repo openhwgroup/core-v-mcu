@@ -1,3 +1,10 @@
+The instructions below describe how to install and use the core-v-mcu FPGA environment:
+[Instructions to install the core-v-mcu environment](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-install-the-core-v-mcu-environment)
+[Instructions to modify Pulpissimo to instantiate CV32E40P and build the FPGA bitstream](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-modify-pulpissimo-to-instantiate-cv32e40p-and-build-the-fpga-bitstream)
+[Instructions to download a pre-built FPGA bitstream](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-download-the-pre-built-bitstream)
+Instructions to run Questasim simulation of the platform (coming soon)
+
+
 ## Instructions to install the core-v-mcu environment:
 
 The following instructions start from a clean Ubuntu 18.04 installation.
@@ -78,6 +85,57 @@ $ git clone https://github.com/pulp-platform/pulp-runtime-examples.git
 $ cd pulp-runtime-examples/hello
 $ make clean all
 ```
+
+
+## Instructions to modify Pulpissimo to instantiate CV32E40P and build the FPGA bitstream
+
+The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $COREVMCU variable refers to your location of the core-v-mcu source directory):
+
+1. Download the cv32e40p source
+```
+$ git clone https://github.com/openhwgroup/cv32e40p
+```
+
+2. Replace the RI5CY source directory:
+```
+$ cp -Rf cv32e40p $COREVMCU/ips/.
+$ cd $COREVMCU/ips
+$ rm -Rf riscv
+$ ln -s cv32e40p riscv
+```
+
+3. Modify the $COREVMCU/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file; starting at line 155 replace the clock gate module `cv32e40p_clock_gate` with
+```
+tc_clk_gating core_clock_gate_i
+//this module is found in $COREVMCU/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+(
+   .clk_i     ( clk_i       ),
+   .en_i      ( clock_en    ),
+   .test_en_i ( scan_cg_en  ),
+   .clk_o     ( clk_o       )
+
+);
+```
+
+4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
+```
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
+```
+
+5. Replace the tcl files in $COREVMCU/tcl with modified files:
+```
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/*.tcl $COREVMCU/fpga/pulpissimo/tcl/.
+```
+6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
+```
+$ cd $COREVMCU/fpga
+$ make clean_genesys2 [or make clean_nexys rev=nexysA7-100T]
+$ make genesys2 [or make nexys rev=nexysA7-100T]
+```
+A bitstream file will be created, for example, `pulpissimo_nexys.bit`.
+
+
+
 ## Instructions to download the pre-built bitstream
 
 Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
@@ -116,60 +174,11 @@ $ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
 $ cd pulp-runtime-examples/hello
 $ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/test/test
 ```
-5. Connect and debug your program in gdb
+13. Connect and debug your program in gdb
 ```
 target remote localhost:3333
 load
 continue
 ```
 You should see the "Hello!" message in the serial terminal window.
-
-## Instructions to modify Pulpissimo to instantiate CV32E40P and build the FPGA bitstream
-
-The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $COREVMCU variable refers to your location of the core-v-mcu source directory):
-
-1. Download the cv32e40p source
-``` 
-$ git clone https://github.com/openhwgroup/cv32e40p
-```
-
-2. Replace the RI5CY source directory:
-```
-$ cp -Rf cv32e40p $COREVMCU/ips/.
-$ cd $COREVMCU/ips
-$ rm -Rf riscv
-$ ln -s cv32e40p riscv
-```
-
-3. Modify the $COREVMCU/ips/riscv/rtl/cv32e40p_sleep_unit.sv source file; starting at line 155 replace the clock gate module `cv32e40p_clock_gate` with
-```
-tc_clk_gating core_clock_gate_i 
-//this module is found in $COREVMCU/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
-(
-   .clk_i     ( clk_i       ),
-   .en_i      ( clock_en    ),
-   .test_en_i ( scan_cg_en  ),
-   .clk_o     ( clk_o       )
-
-);
-```
-
-4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
-```
-$ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
-```
-
-5. Replace the tcl files in $COREVMCU/tcl with modified files:
-```
-$ cp $COREVMCU/fpga/cv32e40p_modified_files/*.tcl $COREVMCU/fpga/pulpissimo/tcl/.
-```
-
-6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
-```
-$ cd $COREVMCU/fpga
-$ make clean_genesys2 [or make clean_nexys rev=nexysA7-100T]
-$ make genesys2 [or make nexys rev=nexysA7-100T]
-```
-A bitstream file will be create, for example pulpissimo_nexys.bit.
-7. Download using earlier instructions.
 
