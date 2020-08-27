@@ -1,4 +1,4 @@
-## Instructions to build the core-v-mcu environment:
+## Instructions to install the core-v-mcu environment:
 
 The following instructions start from a clean Ubuntu 18.04 installation.
 
@@ -11,12 +11,15 @@ $ export PULP_RISCV_GCC_TOOLCHAIN=/opt/corev-openhw-gcc-ubuntu1804-20200705
 $ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
 2. Install the PULP SDK
+
+Install the Linux dependencies:
 ```
-Install the dependencies:
   $ sudo apt install git python3-pip python-pip gawk texinfo libgmp-dev libmpfr-dev libmpc-dev swig3.0 libjpeg-dev lsb-core doxygen python-sphinx sox graphicsmagick-libmagick-dev-compat libsdl2-dev libswitch-perl libftdi1-dev cmake scons libsndfile1-dev
   $ sudo pip3 install artifactory twisted prettytable sqlalchemy pyelftools 'openpyxl==2.6.4' xlsxwriter pyyaml numpy configparser pyvcd
   $ sudo pip2 install configparser
-
+```
+Install the PULP SDK:
+```
 $ git clone https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
 $ source configs/pulpissimo.sh
@@ -31,7 +34,7 @@ $ git config --global user.name “your name”
 $ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build --p openocd --stdout
 $ cd ..
 ```
-4. Install the Core-v-mcu repo:
+4. Install the core-v-mcu repo:
 ```
 $ sudo apt install curl
 $ git clone https://github.com/openhwgroup/core-v-mcu.git
@@ -39,8 +42,8 @@ $ cd core-v-mcu
 $ export COREVMCU=$(pwd)
 $ ./update-ips
 ```
-5. Install Xilinx Vivado (currently we've been using 2019.2). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient. If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
-6. Install the Digilent board files. Vivado does not install the board definition files for NexysA7. Board definition files are typically installed here:
+5. Download and install Xilinx Vivado (currently we've been using 2019.2). You will need to register for a Xilinx account to download the [installer](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2019.2_1106_2127_Lin64.bin). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient (this can be selected during the installation). If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
+6. Install the Digilent board files. Vivado does not install the board definition files for Genesys 2 or NexysA7. Board definition files are typically installed here:
 ```
 /opt/Xilinx/Vivado/2019.2/data/boards/board_files
 ```
@@ -50,6 +53,7 @@ $ cd ~/Downloads
 $ unzip vivado-boards-master.zip
 $ cd vivado-boards-master/new/board_files
 $ sudo cp -Rf nexys-a7-100t /opt/Xilinx/Vivado/2019.2/data/boards/board_files/.
+$ sudo cp -Rf genesys2 /opt/Xilinx/Vivado/2019.2/data/boards/board_files/.
 ```
 
 7. Install Xilinx cable drivers (make sure any download cables are not connected when you do this):
@@ -57,7 +61,7 @@ $ sudo cp -Rf nexys-a7-100t /opt/Xilinx/Vivado/2019.2/data/boards/board_files/.
 $ cd /opt/Xilinx/Vivado/2019.2/data/xicom/cable_drivers/lin64/install_script/install_drivers
 $ sudo ./install_drivers
 ```
-8. Setup the Vivado environment:
+8. Setup the Vivado user environment:
 ```
 $ source /opt/Xilinx/Vivado/2019.2/settings64.sh
 ```
@@ -122,7 +126,7 @@ You should see the "Hello!" message in the serial terminal window.
 
 ## Instructions to modify Pulpissimo to instantiate CV32E40P and build the FPGA bitstream
 
-The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $PULP variable refers to your location of the core-v-mcu source directory):
+The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $COREVMCU variable refers to your location of the core-v-mcu source directory):
 
 1. Download the cv32e40p source
 ``` 
