@@ -1,6 +1,6 @@
 if ![info exists PULP_FPGA_SIM] {
-    set RTL /home/vhugh/mydata/PULP/core-v-mcu/rtl
-    set IPS /home/vhugh/mydata/PULP/core-v-mcu/ips
+    set RTL $::env(COREVMCU)/rtl
+    set IPS $::env(COREVMCU)/ips
     set FPGA_IPS ../ips
     set FPGA_RTL ../rtl
 }
