@@ -1,14 +1,15 @@
 # Core-v-mcu 
 
-This repo contains modifications and instructions to implement the CV32E40P processor
-(formerly RI5CY) in the PULPissimo platform on the Digilent Genesys2 FPGA board or
-Digilent NexysA7-100T. Instructions to install the original (RI5CY) PULPissimo platform
-are provided [here](https://github.com/pulp-platform/pulpissimo).
+This repo contains instructions to implement the CV32E40P processor within the PULPissimo platform
+architecture. The initial implementation target is an FPGA; current supported boards are the Digilent 
+Genesys2 FPGA board and Digilent NexysA7-100T. Future implementations will target ASIC technologies.
 
-Instructions to install the Core-v-mcu environment and instantiate the CV32E40P processor, and
-build FPGA platform are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga).
+Instructions to install the Core-v-mcu environment, instantiate the CV32E40P processor, and
+build the FPGA platform are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga).
 
-
+The original PULPissimo project (with RI5CY core)  is [here](https://github.com/pulp-platform/pulpissimo).
+As the Core-v-mcu and PULPissimo platforms share many IP blocks in common, you may wish to refer to
+this repo for additional information.
 
 
 ![](doc/core-v-mcu_architecture.png)
@@ -72,5 +73,5 @@ When contributing SystemVerilog source code, please try to be consistent and adh
 
 ## Issues and Troubleshooting
 
-If you find any problems or issues with CV32E40P or the documentation, please check out the issue tracker and create a new issue if your problem is not yet tracked.
+If you find any problems or issues with CV32E40P or the documentation, please check out the issue tracker and create a new issue if your problem is not yet tracked. You may also wish to consult the PULPissimo project [issues](https://github.com/pulp-platform/pulpissimo/issues) in case your problem has been detected (and solved) in the original platform.
 

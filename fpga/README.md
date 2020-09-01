@@ -1,3 +1,5 @@
+# Setup and build instructions for the FPGA Platform
+
 The instructions below describe how to install and use the core-v-mcu FPGA environment:
 
 [Instructions to install the core-v-mcu environment](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-install-the-core-v-mcu-environment)
