@@ -100,7 +100,7 @@ $ make clean all
 
 The procedure above will install the Pulpissimo environment with the RI5CY core. To replace RI5CY with CV32E40P, the following modifications should be made (the $COREVMCU variable refers to your location of the core-v-mcu source directory):
 
-1. Download the cv32e40p source (note: due to changes in cv32e40p source files, we will termporarily use an older version of the core so we don't break the FPGA scripts):
+1. Download the cv32e40p source (note: due to changes in cv32e40p source files, we will temporarily use an older version of the core so we don't break the FPGA scripts):
 ```
 $ git clone https://github.com/openhwgroup/cv32e40p
 $ cd cv32e40p
