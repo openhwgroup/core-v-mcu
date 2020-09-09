@@ -105,6 +105,7 @@ The procedure above will install the Pulpissimo environment with the RI5CY core.
 $ git clone https://github.com/openhwgroup/cv32e40p
 $ cd cv32e40p
 $ git checkout 916d92a
+$ cd ..
 ```
 
 2. Replace the RI5CY source directory:
