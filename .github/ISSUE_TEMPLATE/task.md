@@ -1,4 +1,4 @@
-# Template for CORE-V-VERIF Task Issues
+# Template for CORE-V-MCU Task Issues
 Tasks are defined, assigned and tracked as GitHub Issues.  For obvious reasons,
 the template for a task is very different from the template for a bug.
 
