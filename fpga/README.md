@@ -8,6 +8,8 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 
 [Instructions to download a pre-built FPGA bitstream](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-download-the-pre-built-bitstream)
 
+[Instructions to build and run an application](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-build-and-run-an-application)
+
 [Instructions to run Questasim simulation of the platform](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-simulate-pulpissimo-with-cv32e40p-using-mentor-graphics-questasimmodelsim)
 
 
@@ -170,29 +172,52 @@ $ vivado  (note: if using Labtools Edition, use vivado_lab)
 8. In the Hardware Manager window, click `Open Target` and select `Auto Connect`. In the Hardware pane, you should see the xc7a100t_0 part. Click `Program device`. In the Program Device window, select the bitstream file you wish to use and click `Program`. When programmed, the DONE LED should be green. Exit Vivado. The FPGA is now programmed with the CV32E40P based Pulpissimo platform.
 9. In your VM window, click on the USB icon along he bottom and ensure that the `Digilent USB Device [0900]` is now checked. You may leave Digilent USB Device [0700] checked, but if you wish to re-program the FPGA, you should un-check Digilent USB Device [0900] again. 
 
-10. Connect to the serial/UART. In a terminal window:
+
+## Instructions to build and run an application
+
+1. Download and extract the sort application [here](https://github.com/openhwgroup/core-v-mcu/blob/master/fpga/cv32e40p_modified_files/cv32e40p_sort.tar.gz)
+```
+tar xvfz cv32e40p_sort.tar.gz
+```
+2. Compile the application using PULP simple runtime. In a terminal window:
+```
+$ cd sort
+$ make clean all
+```
+3. In the same terminal, start gdb
+```
+$ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/bubble/bubble
+```
+4. In another terminal window, start OpenOCD
+```
+$ cd $COREVMCU/fpga/pulpissimo-nexys
+$ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
+```
+5. Connect to the serial/UART. In another terminal window:
 ```
 $ sudo screen /dev/ttyUSB0 115200
 ```
 (note, your USB port number may be different)
 
-11. In another terminal window, start OpenOCD
+6. In your gdb session terminal, connect and load your program
 ```
-$ cd $COREVMCU/fpga/pulpissimo-nexys
-$ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
+(gdb) target remote localhost:3333
+(gdb) load
 ```
-12. In yet another terminal window start gdb
+7. Debug your program in gdb. For example:
 ```
-$ cd pulp-runtime-examples/hello
-$ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/test/test
+(gdb) monitor reg		(list all registers)
+(gdb) monitor reg mhartid	(print a specfic register's value)
+(gdb) list			(list program code and line numbers)
+(gdb) b 39			(set breakpoint at line #)
+(gdb) b 42
+(gdb) continue			(resume execution)
+(gdb) disas			(disassemble current function)
+(gdb) info locals		(print local variables)
+(gdb) continue
 ```
-13. Connect and debug your program in gdb
-```
-target remote localhost:3333
-load
-continue
-```
-You should see the "Hello!" message in the serial terminal window.
+You should see the unsorted and sorted lists printed in the serial terminal window.
+
 
 ## Instructions to simulate Pulpissimo with CV32E40P using Mentor Graphics Questasim/Modelsim
 1. Install Questasim (current procedure has been tested with 10.7g) and Questasim license.
