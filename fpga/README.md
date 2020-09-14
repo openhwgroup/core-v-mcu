@@ -18,11 +18,11 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 The following instructions start from a clean Ubuntu 18.04 installation.
 
 
-1. Download and install the [pre-built Core-V GCC toolchain from Embecosm](https://buildbot.embecosm.com/job/corev-gcc-ubuntu1804/2/artifact/corev-openhw-gcc-ubuntu1804-20200705.tar.gz)
+1. Download and install the [pre-built Core-V GCC toolchain from Embecosm](https://buildbot.embecosm.com/job/pulp-gcc-ubuntu1804/5/artifact/pulp-gcc-ubuntu1804-20200913.tar.gz)
 ``` 
-$ cp ~/Downloads/corev-openhw-gcc-ubuntu1804-20200705.tar.gz /opt/.
-$ tar xvfz corev-openhw-gcc-ubuntu1804-20200705.tar.gz
-$ export PULP_RISCV_GCC_TOOLCHAIN=/opt/corev-openhw-gcc-ubuntu1804-20200705
+$ cp ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz /opt/.
+$ tar xvfz pulp-gcc-ubuntu1804-20200913.tar.gz
+$ export PULP_RISCV_GCC_TOOLCHAIN=/opt/pulp-gcc-ubuntu1804-20200913
 $ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
 2. Install the PULP SDK
