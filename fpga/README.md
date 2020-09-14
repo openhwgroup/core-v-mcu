@@ -8,7 +8,7 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 
 [Instructions to download a pre-built FPGA bitstream](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-download-the-pre-built-bitstream)
 
-Instructions to build and run an application
+[Instructions to build and run an application](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-build-and-run-an-application)
 
 [Instructions to run Questasim simulation of the platform](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga#instructions-to-simulate-pulpissimo-with-cv32e40p-using-mentor-graphics-questasimmodelsim)
 
@@ -181,10 +181,7 @@ tar xvfz cv32e40p_sort.tar.gz
 ```
 2. Compile the application using PULP simple runtime. In a terminal window:
 ```
-$ cd pulp-runtime	(use the location where you cloned the pulp-runtime repo)
-$ source configs/pulpissimo.sh
-$ source configs/fpgas/pulpissimo/nexys_video.sh
-$ cd sort		(use the location where you extracted the sort application files)
+$ cd sort
 $ make clean all
 ```
 3. In the same terminal, start gdb
@@ -212,7 +209,7 @@ $ sudo screen /dev/ttyUSB0 115200
 (gdb) monitor reg		(list all registers)
 (gdb) monitor reg mhartid	(print a specfic register's value)
 (gdb) list			(list program code and line numbers)
-(gdb) b 39			(set breakpoint a line #)
+(gdb) b 39			(set breakpoint at line #)
 (gdb) b 42
 (gdb) continue			(resume execution)
 (gdb) disas			(disassemble current function)
