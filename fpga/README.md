@@ -85,6 +85,8 @@ $ ./update-ips
 ```
 5. Download and install Xilinx Vivado (currently procedure has been tested using 2019.2). You will need to register for a Xilinx account to download the [installer](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2019.2_1106_2127_Lin64.bin). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient (this can be selected during the installation). If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
 
+If you are only using the pre-built bitstreams and want to avoid downloading Xilinx tools, a third option is to copy them on to a SD card or USB thumb drive. For the SD card format it as FAT32. Ensure there is just one file ending `.bit` on the drive and switch jumper on the MODE pins (see below) to be on the rightmost setting (USB/SD).
+
 More detail on installing Vivado can be found [here](https://reference.digilentinc.com/vivado/installing-vivado/start ).
 
 6. Install the Digilent board files. Vivado does not install the board definition files for Genesys 2 or NexysA7. Board definition files are typically installed here:
@@ -178,7 +180,7 @@ A bitstream file will be created, for example, `pulpissimo_nexys.bit`.
 
 ## Instructions to download the pre-built bitstream
 
-Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
+Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/cv32e40p_bitstreams)
 
 Note: if you are using a VirtualBox VM, you may need to enable the 2 USB ports from the USB Settings icon at the bottom of your VM's window. You should see 2 Digilent USB Devices ([0900] and [0700]). Ensure there are check marks beside both.
 
