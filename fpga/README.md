@@ -34,7 +34,7 @@ Install the Linux dependencies:
   $ sudo pip3 install artifactory twisted prettytable sqlalchemy pyelftools 'openpyxl==2.6.4' xlsxwriter pyyaml numpy configparser pyvcd
   $ sudo pip2 install configparser
 ```
-Install the PULP SDK (this should be done in a directory in which you have write permissions, such as your home account):
+Install the PULP SDK:
 ```
 $ git clone https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
