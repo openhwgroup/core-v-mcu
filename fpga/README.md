@@ -15,14 +15,13 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 
 ## Instructions to install the core-v-mcu environment:
 
-The following instructions start from a clean Ubuntu 18.04 installation.
+The following instructions start from a clean Ubuntu 18.04 installation. Note
+that to build the PULP environment, we use the old PULP GNU tool chain. The
+new CORE-V GNU tool chain can be downloaded later.
 
-
-1. Download and install the [pre-built Core-V GCC toolchain from Embecosm](https://buildbot.embecosm.com/job/pulp-gcc-ubuntu1804/5/artifact/pulp-gcc-ubuntu1804-20200913.tar.gz)
-``` 
-$ sudo cp ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz /opt/.
-$ cd /opt
-$ sudo tar xvfz pulp-gcc-ubuntu1804-20200913.tar.gz
+1. Download and install the [pre-built PULP GCC toolchain from Embecosm](https://www.embecosm.com/resources/tool-chain-downloads/#pulp). In this case select the `tar.gz` file for Ubuntu 18.04. We shall assume the tool chain is to be installed in `/opt`, but it can be any writable directory on your machine, including in your home directory. Just replace `/opt` by the directory you have chosen in the following instructions. The actual name of the downloaded file will vary, and you should adjust the following commands accordingly. In this case, we are using `pulp-gcc-ubuntu1804-20200913.tar.gz` and assume you have downloaded it into your `Downloads` directory.
+```
+$ tar xf ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz
 $ export PULP_RISCV_GCC_TOOLCHAIN=/opt/pulp-gcc-ubuntu1804-20200913
 $ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
@@ -39,17 +38,43 @@ Install the PULP SDK:
 $ git clone https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
 $ source configs/pulpissimo.sh
-$ source configs/platform_fpga.sh
+$ source configs/platform-fpga.sh
 $ make all
 $ source sourceme.sh
 ```
 3. Install patched version of OpenOCD:
+
+If you have not previously configured git, then you need to configure your
+name and email address:
 ```
 $ git config --global user.email “your email address”
 $ git config --global user.name “your name”
+```
+
+Then install the patched version of OpenOCD:
+
+```
 $ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build --p openocd --stdout
 $ cd ..
 ```
+
+If you have a slightly newer version of the compiler, the build may fail (one of the newer checkers identifies a potential issue). To resolve this you need to edit the file `./pulp-sdk/scripts/build-openocd`. Change it from
+```bash
+#!/bin/bash -ex
+
+./bootstrap
+./configure --prefix=$OPENOCD_INSTALL_DIR
+make install
+```
+to
+```bash
+#!/bin/bash -ex
+
+./bootstrap
+./configure --disable-werror --prefix=$OPENOCD_INSTALL_DIR
+make install
+```
+
 4. Install the core-v-mcu repo (this should be done in a directory in which you have write permssions, such as in your home directory):
 ```
 $ sudo apt install curl
