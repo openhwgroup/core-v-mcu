@@ -34,7 +34,7 @@ Install the Linux dependencies:
   $ sudo pip3 install artifactory twisted prettytable sqlalchemy pyelftools 'openpyxl==2.6.4' xlsxwriter pyyaml numpy configparser pyvcd
   $ sudo pip2 install configparser
 ```
-Install the PULP SDK:
+Install the PULP SDK (this should be done in a directory in which you have write permissions, such as your home account):
 ```
 $ git clone https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
@@ -50,7 +50,7 @@ $ git config --global user.name “your name”
 $ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build --p openocd --stdout
 $ cd ..
 ```
-4. Install the core-v-mcu repo:
+4. Install the core-v-mcu repo (this should be done in a directory in which you have write permssions, such as in your home directory):
 ```
 $ sudo apt install curl
 $ git clone https://github.com/openhwgroup/core-v-mcu.git
@@ -91,7 +91,7 @@ $ cd pulp-runtime
 $ source configs/pulpissimo.sh
 $ source configs/fpgas/pulpissimo/nexys_video.sh (or genesys2.sh)
 ```
-10. Download the pulp-runtime-examples:
+10. Download the pulp-runtime-examples (this should be done in a directory for which you have write permission such as your home directory):
 ```
 $ git clone https://github.com/pulp-platform/pulp-runtime-examples.git
 $ cd pulp-runtime-examples/hello
@@ -155,23 +155,31 @@ A bitstream file will be created, for example, `pulpissimo_nexys.bit`.
 
 Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
 
+Note: if you are using a VirtualBox VM, you may need to enable the 2 USB ports from the USB Settings icon at the bottom of your VM's window. You should see 2 Digilent USB Devices ([0900] and [0700]). Ensure there are check marks beside both.
+
 ### If you are using the Digilent NexysA7-100T board
 1. Connect microUSB cable to PROG/UART (J12) port on NexysA7
+
 2. Connect Digilent JTAG-HS2 cable to Pmod JA port (top row); ensure GND and VDD ports on JTAG-HS2 cable align with GND and VDD pins on Pmod JA
+
 3. To program through USB cable, ensure jumper on MODE pins JP1 is across pins 2-3 (JTAG)
+
 4. Power on the board (note that power is from the microUSB cable connected to J12)
 
 Your board setup should look similar to the image below:
 ![alt text](https://github.com/hpollittsmith/core-v-mcu/blob/master/fpga/images/NexysA7.png "NexysA7-100T setup")
 
-5. In your VM window, click on the USB icon along the bottom and ensure that the Digilent USB Device [0700] is checked, and that the Digilent USB Device [0900] is un-checked (this will cause a conflict otherwise)
-6. Start Xilinx Vivado
+5. Start Xilinx Vivado
 ```
 $ vivado  (note: if using Labtools Edition, use vivado_lab)
 ```
-7. In the Vivado window, click `Open Hardware Manager >`
-8. In the Hardware Manager window, click `Open Target` and select `Auto Connect`. In the Hardware pane, you should see the xc7a100t_0 part. Click `Program device`. In the Program Device window, select the bitstream file you wish to use and click `Program`. When programmed, the DONE LED should be green. Exit Vivado. The FPGA is now programmed with the CV32E40P based Pulpissimo platform.
-9. In your VM window, click on the USB icon along he bottom and ensure that the `Digilent USB Device [0900]` is now checked. You may leave Digilent USB Device [0700] checked, but if you wish to re-program the FPGA, you should un-check Digilent USB Device [0900] again. 
+6. In the Vivado window, click `Open Hardware Manager >`
+
+7. In the Hardware Manager window, click `Open Target` and select `Auto Connect`. If successful, you should see a xc7z100t_0 target in the Hardware pane. 
+
+The connection to the target may fail with `ERROR: [Labtools 27-2269]`. If so, you should see two hardware targets in the Hardware pan in Hardware Manager--one marked `Open` and one marked `Closed`. Right-click on the Open target and select `Close Target`. Right-click on the second Closed target and select `Open Target`. Under the second target, you should now see the `xc7a100t_0` FPGA.
+
+Once you have opened the xc7a100t_0 target. Click `Program device`. In the Program Device window, select the bitstream file you wish to use and click `Program`. When programmed, the DONE LED should be green. Exit Vivado. The FPGA is now programmed with the CV32E40P based Pulpissimo platform.
 
 
 ## Instructions to build and run an application
