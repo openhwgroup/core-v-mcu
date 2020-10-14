@@ -6,6 +6,7 @@
 - Duncan Bees, OpenHW Group
 - Rick O'Connor, OpenHW Group
 - Mike Thompson, OpenHW Group
+- Jeremy Bennett, Embecosm
 - Olive Zhao, CMC Microsystems
 - Ary Bhattacharya, University of Southampton
 - John Holden, University of Southampton
