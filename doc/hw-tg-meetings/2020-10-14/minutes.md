@@ -1,8 +1,8 @@
 # Hardware TG: October 14, 2020 Meeting Notes
 
 ## Attendees
-- Hugh Pollitt-Smith, CMC Microsystems (chair)
-- Tim Saxe, Quicklogic (co-chair)
+- Hugh Pollitt-Smith, CMC Microsystems (Chair)
+- Tim Saxe, Quicklogic (Vice Chair)
 - Duncan Bees, OpenHW Group
 - Rick O'Connor, OpenHW Group
 - Mike Thompson, OpenHW Group
@@ -35,7 +35,7 @@
     - Based on Agenda Item 1, it would make sense to switch planned OS support from Zephyr to FreeRTOS
     - Our intent is to ensure compatibility between FPGA and SOC platforms, make seamless going from the FPGA platform to SoC
         - Code that runs on the FPGA will still run on the SOC (eFPGA would be invisible in this case)
-    - How does eFPGA meet OpenSource model?
+    - How does eFPGA meet open source model?
         - eFPGA is not open source IP that would be contributed to OpenHW Group, and we’re not trying to build open source SoC; once to start to take RTL through the silicon flow, you start adding proprietary IP (tools, libraries, PDKs)
         - eFPGA provides a means to plug open source IP into a basic structure (CPU, peripherals); our intent is to provide a platform to add/demonstrate open source  IP and differentiation
         - Other aspects of the ecosystem will be open source (RTL, software toolchain)
