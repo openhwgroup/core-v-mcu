@@ -1,8 +1,16 @@
-HW TG August 4 notes:
+# HW TG August 4 notes:
 
-Attendees: Joe Stoy, Charlie Hauck, Davide Schiavone, Hugh Pollitt-Smith, Olive Zhao, Jeremy Bennett, Jerry Zeng, Duncan Bees
+## Attendees: 
+- Joe Stoy (Bluespec)
+- Charlie Hauck (Bluespec)
+- Davide Schiavone (OpenHW Group)
+- Hugh Pollitt-Smith (CMC Microsystems) 
+- Olive Zhao (CMC Microsystems) 
+- Jeremy Bennett (Embecosm)
+- Jerry Zeng (NXP)
+-  Duncan Bees (OpenHW Group)
 
-Notes:
+## Notes:
 - Bluespec is also implementing the CV32E40P core on an FPGA
     - First target is VCU118 board but plan to move RISC-V work onto smaller/lower-cost board (Digilent Arty-7, which shares same FPGA as NexysA7)
     - Plan to port FreeRTOS as well
