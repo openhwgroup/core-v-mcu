@@ -34,9 +34,8 @@ The PULPissimo core-v-mcu architecture includes:
 - New SDK (currently not verified with CV32E40P)
 
 CV32E40P is a small and efficient 32-bit, in-order RISC-V core with a 4-stage
-pipeline that implements the RV32IM[F]C instruction set architecture and the
-Xpulp custom extensions. CV32E40P is maintained by OpenHW Group in this [repository](https://github.com/openhwgroup/cv32e40p0).
-The CV32E40P user manual can be found [here](https://github.com/openhwgroup/core-v-docs/tree/master/cores/cv32e40p).
+pipeline that implements the RV32IMC instruction set architecture. CV32E40P is maintained by OpenHW Group in this [repository](https://github.com/openhwgroup/cv32e40p).
+The CV32E40P user manual can be found [here](https://core-v-docs-verif-strat.readthedocs.io/projects/cv32e40p_um/en/latest/index.html).
  
 PULPissimo core-v-mcu includes an efficient I/O subsystem via a uDMA (micro-DMA) which
 communicates with the peripherals autonomously. The core just needs to program
