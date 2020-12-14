@@ -5,7 +5,7 @@ architecture. The initial implementation target is an FPGA; current supported bo
 Genesys2 FPGA board and Digilent NexysA7-100T. Future implementations will target ASIC technologies.
 
 Instructions to install the Core-v-mcu environment, instantiate the CV32E40P processor, and
-build the FPGA platform are [here](https://github.com/hpollittsmith/core-v-mcu/tree/master/fpga).
+build the FPGA platform are [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga).
 
 The original PULPissimo project (with RI5CY core)  is [here](https://github.com/pulp-platform/pulpissimo).
 As the Core-v-mcu and PULPissimo platforms share many IP blocks in common, you may wish to refer to
