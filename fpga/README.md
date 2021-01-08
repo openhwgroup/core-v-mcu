@@ -107,7 +107,6 @@ The procedure above will install the Pulpissimo environment with the RI5CY core.
 ```
 $ git clone https://github.com/openhwgroup/cv32e40p
 $ cd cv32e40p
-$ git checkout 916d92a
 $ cd ..
 ```
 
@@ -124,10 +123,10 @@ $ ln -s cv32e40p riscv
 tc_clk_gating core_clock_gate_i
 //this module is found in $COREVMCU/ips/tech_cells_generic/src/fpga/tc_clk_xilinx.sv
 (
-   .clk_i     ( clk_i       ),
-   .en_i      ( clock_en    ),
-   .test_en_i ( scan_cg_en  ),
-   .clk_o     ( clk_o       )
+   .clk_i     ( clk_ungated_i     ),
+   .en_i      ( clock_en  	  ),
+   .test_en_i ( scan_cg_en_i  	  ),
+   .clk_o     ( clk_gated_o       )
 
 );
 ```
