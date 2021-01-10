@@ -36,7 +36,7 @@ Install the Linux dependencies:
 ```
 Install the PULP SDK (SDK has seen a recent major update, so we will use the previous v1 branch):
 ```
-$ git clone -branch v1 https://github.com/pulp-platform/pulp-sdk
+$ git clone --branch v1 https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
 $ source configs/pulpissimo.sh
 $ source configs/platform_fpga.sh
