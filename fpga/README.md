@@ -152,7 +152,7 @@ A bitstream file will be created, for example, `pulpissimo_nexys.bit`.
 
 ## Instructions to download the pre-built bitstream
 
-Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/bitstreams)
+Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/cv32e40p_bitstreams)
 
 Note: if you are using a VirtualBox VM, you may need to enable the 2 USB ports from the USB Settings icon at the bottom of your VM's window. You should see 2 Digilent USB Devices ([0900] and [0700]). Ensure there are check marks beside both.
 
