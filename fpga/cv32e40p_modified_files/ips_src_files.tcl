@@ -293,18 +293,19 @@ set INC_JTAG_PULP " \
 set SRC_RISCV " \
     $IPS/riscv/./rtl/include/cv32e40p_apu_core_pkg.sv \
     $IPS/riscv/./rtl/include/cv32e40p_pkg.sv \
+    $IPS/riscv/./rtl/include/cv32e40p_fpu_pkg.sv \
+    $IPS/riscv/./rtl/cv32e40p_aligner.sv \
+    $IPS/riscv/./rtl/cv32e40p_alu_div.sv \
     $IPS/riscv/./rtl/cv32e40p_alu.sv \
     $IPS/riscv/./rtl/cv32e40p_apu_disp.sv \
-    $IPS/riscv/./rtl/cv32e40p_alu_div.sv \
     $IPS/riscv/./rtl/cv32e40p_compressed_decoder.sv \
     $IPS/riscv/./rtl/cv32e40p_controller.sv \
     $IPS/riscv/./rtl/cv32e40p_core.sv \
     $IPS/riscv/./rtl/cv32e40p_cs_registers.sv \
     $IPS/riscv/./rtl/cv32e40p_decoder.sv \
     $IPS/riscv/./rtl/cv32e40p_ex_stage.sv \
-    $IPS/riscv/./rtl/cv32e40p_fetch_fifo.sv \
+    $IPS/riscv/./rtl/cv32e40p_fifo.sv \
     $IPS/riscv/./rtl/cv32e40p_ff_one.sv \
-    $IPS/riscv/./rtl/cv32e40p_hwloop_controller.sv \
     $IPS/riscv/./rtl/cv32e40p_hwloop_regs.sv \
     $IPS/riscv/./rtl/cv32e40p_id_stage.sv \
     $IPS/riscv/./rtl/cv32e40p_if_stage.sv \
@@ -328,7 +329,6 @@ set INC_RISCV " \
 
 # riscv_regfile_fpga
 set SRC_RISCV_REGFILE_FPGA " \
-    $IPS/riscv/./rtl/cv32e40p_register_file_test_wrap.sv \
     $IPS/riscv/./rtl/cv32e40p_register_file_ff.sv \
 "
 set INC_RISCV_REGFILE_FPGA " \

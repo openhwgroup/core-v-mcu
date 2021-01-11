@@ -40,15 +40,17 @@ INCDIR_RISCV=+incdir+$(IP_PATH)/./rtl/include+$(IP_PATH)/../../rtl/includes
 SRC_SVLOG_RISCV=\
 	$(IP_PATH)/./rtl/include/cv32e40p_apu_core_pkg.sv\
 	$(IP_PATH)/./rtl/include/cv32e40p_pkg.sv\
-	$(IP_PATH)/./rtl/cv32e40p_alu.sv\
+	$(IP_PATH)/./rtl/include/cv32e40p_fpu_pkg.sv\
+	$(IP_PATH)/./rtl/cv32e40p_aligner.sv\
 	$(IP_PATH)/./rtl/cv32e40p_alu_div.sv\
+	$(IP_PATH)/./rtl/cv32e40p_alu.sv\
+	$(IP_PATH)/./rtl/cv32e40p_apu_disp.sv\
 	$(IP_PATH)/./rtl/cv32e40p_compressed_decoder.sv\
 	$(IP_PATH)/./rtl/cv32e40p_controller.sv\
 	$(IP_PATH)/./rtl/cv32e40p_cs_registers.sv\
 	$(IP_PATH)/./rtl/cv32e40p_decoder.sv\
 	$(IP_PATH)/./rtl/cv32e40p_int_controller.sv\
 	$(IP_PATH)/./rtl/cv32e40p_ex_stage.sv\
-	$(IP_PATH)/./rtl/cv32e40p_hwloop_controller.sv\
 	$(IP_PATH)/./rtl/cv32e40p_hwloop_regs.sv\
 	$(IP_PATH)/./rtl/cv32e40p_id_stage.sv\
 	$(IP_PATH)/./rtl/cv32e40p_if_stage.sv\
@@ -59,10 +61,11 @@ SRC_SVLOG_RISCV=\
 	$(IP_PATH)/./rtl/cv32e40p_core.sv\
 	$(IP_PATH)/./rtl/cv32e40p_apu_disp.sv\
 	$(IP_PATH)/./rtl/cv32e40p_ff_one.sv\
-	$(IP_PATH)/./rtl/cv32e40p_fetch_fifo.sv\
+	$(IP_PATH)/./rtl/cv32e40p_fifo.sv\
 	$(IP_PATH)/./rtl/cv32e40p_pmp.sv\
 	$(IP_PATH)/./rtl/cv32e40p_popcnt.sv\
 	$(IP_PATH)/./rtl/cv32e40p_obi_interface.sv\
+	$(IP_PATH)/./rtl/cv32e40p_register_file_ff.sv\
     	$(IP_PATH)/./rtl/cv32e40p_sleep_unit.sv
 SRC_VHDL_RISCV=
 

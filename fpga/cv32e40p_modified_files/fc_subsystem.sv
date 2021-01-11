@@ -193,13 +193,8 @@ module fc_subsystem #(
 	.PULP_XPULP	( 1	), //not in riscy         
 	.PULP_ZFINX	( 0	), //not in riscy
 	.NUM_MHPMCOUNTERS	( 1	), //not in riscy
-//	.N_EXT_PERF_COUNTERS ( N_EXT_PERF_COUNTERS ), //not used in cv32 (=NUM_MHPMCOUNTERS?)
-//        .PULP_SECURE         ( 1                   ), //not used in cv32
         .PULP_CLUSTER        ( 0                   ), //riscy=cv32
         .FPU                 ( 0             ) //riscy=cv32
-//        .FP_DIVSQRT          ( USE_FPU             ), //not used in cv32
-//        .SHARED_FP           ( 0                   ), //not used in cv32
-//        .SHARED_FP_DIVSQRT   ( 2                   ) //not used in cv32
     ) lFC_CORE (
         .clk_i                 ( clk_i             ), //riscy=cv32
         .rst_ni                ( rst_ni            ),//riscy=cv32
@@ -230,18 +225,18 @@ module fc_subsystem #(
 
         // apu-interconnect
         // handshake signals
-        .apu_master_req_o      (                   ), //riscy=cv32
-        .apu_master_ready_o    (                   ), //riscy=cv32
-        .apu_master_gnt_i      ( 1'b1              ), //riscy=cv32
+        .apu_req_o      	(                   ), //riscy=cv32
+  //      .apu_master_ready_o    (                   ), //not in freeze version
+        .apu_gnt_i      	( 1'b1              ), //riscy=cv32
         // request channel
-        .apu_master_operands_o (                   ), //riscy=cv32
-        .apu_master_op_o       (                   ), //riscy=cv32
-        .apu_master_type_o     (                   ), //riscy=cv32
-        .apu_master_flags_o    (                   ), //riscy=cv32
+        .apu_operands_o 	(                   ), //riscy=cv32
+        .apu_op_o       	(                   ), //riscy=cv32
+ //       .apu_master_type_o     (                   ), //not in freeze version
+        .apu_flags_o    	(                   ), //riscy=cv32
         // response channel
-        .apu_master_valid_i    ( '0                ), //riscy=cv32
-        .apu_master_result_i   ( '0                ), //riscy=cv32
-        .apu_master_flags_i    ( '0                ), //riscy=cv32
+        .apu_rvalid_i    	( '0                ), //riscy=cv32
+        .apu_result_i   	( '0                ), //riscy=cv32
+        .apu_flags_i    	( '0                ), //riscy=cv32
 
         .irq_i                 ( core_irq_x ), //only single bit wide in riscy
  //       .irq_id_i              ( core_irq_id       ), //not used in cv32
@@ -251,6 +246,9 @@ module fc_subsystem #(
  //       .sec_lvl_o             (                   ), //not used in cv32
 
         .debug_req_i           ( debug_req_i       ), //riscy=cv32
+	.debug_havereset_o	(		), //added to freeze version
+	.debug_running_o	(		), //added to freeze version
+	.debug_halted_o		(		), //added to freeze version
 
         .fetch_enable_i        ( fetch_en_int      ), //riscy=cv32
 //	.core_busy_o	       (		   ), //not used in cv32
