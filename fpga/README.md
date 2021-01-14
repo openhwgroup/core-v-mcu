@@ -43,12 +43,15 @@ $ source configs/platform_fpga.sh
 $ make all
 $ source sourceme.sh
 ```
-3. Install patched version of OpenOCD:
+3. Install OpenOCD:
+  * Note: The PULPissimo instructions install a patched version of OpenOCD that allows for more than 32 harts (by default, PULPissimo uses hartid=992; however, since we are using hartid=0, "regular" OpenOCD will work.
 ```
-$ git config --global user.email “your email address”
-$ git config --global user.name “your name”
-$ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build --p openocd --stdout
-$ cd ..
+$ git clone https://github.com/riscv/riscv-openocd.git
+$ cd riscv-openocd
+$ ./bootstrap
+$ ./configure
+$ make
+$ sudo make install
 ```
 4. Install the core-v-mcu repo (this should be done in a directory in which you have write permssions, such as in your home directory):
 ```
@@ -131,12 +134,12 @@ tc_clk_gating core_clock_gate_i
 );
 ```
 
-4. Replace source files that instantiate RISCY with modified versions that instantiates cv32e40p and set hartid=0:
+4. Replace source files that instantiate cv32e40p and set hartid=0:
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/pulp_socsv $COREVMCU/ips/pulp_soc/rtl/pulp_soc/pulp_soc.sv
 ```
-  * Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, we will use of hartid 0.
+  * Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, CORE-V-MCU will use hartid=0.
 
 
 5. Replace the tcl files in $COREVMCU/tcl with modified files:
@@ -203,7 +206,7 @@ $ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/bubble/bubble
 4. In another terminal window, start OpenOCD
 ```
 $ cd $COREVMCU/fpga/pulpissimo-nexys
-$ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
+$ openocd -f openocd-nexys-hs2.cfg
 ```
 5. Connect to the serial/UART. In another terminal window:
 ```
