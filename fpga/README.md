@@ -135,9 +135,8 @@ tc_clk_gating core_clock_gate_i
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/pulp_socsv $COREVMCU/ips/pulp_soc/rtl/pulp_soc/pulp_soc.sv
-
 ```
-Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, we will use of hartid 0.
+  * Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, we will use of hartid 0.
 
 
 5. Replace the tcl files in $COREVMCU/tcl with modified files:
