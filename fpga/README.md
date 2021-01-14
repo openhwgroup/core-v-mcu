@@ -163,6 +163,8 @@ Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](htt
 
 Note: if you are using a VirtualBox VM, you may need to enable the 2 USB ports from the USB Settings icon at the bottom of your VM's window. You should see 2 Digilent USB Devices ([0900] and [0700]). Ensure there are check marks beside both.
 
+Note2: if you have a microSD card, you may skip the step of downloading the pre-built bitstream every time you power on the board by copying the *.bit file to the card and inserting it in your board's microSD card slot. You must also switch the `MODE` jumper on your board to the `USB/SD` setting for the board to program from microSD card.
+
 ### If you are using the Digilent NexysA7-100T board
 1. Connect microUSB cable to PROG/UART (J12) port on NexysA7
 
