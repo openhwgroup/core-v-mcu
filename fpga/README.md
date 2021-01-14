@@ -131,15 +131,20 @@ tc_clk_gating core_clock_gate_i
 );
 ```
 
-4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
+4. Replace source files that instantiate RISCY with modified versions that instantiates cv32e40p and set hartid=0:
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/pulp_socsv $COREVMCU/ips/pulp_soc/rtl/pulp_soc/pulp_soc.sv
+
 ```
+Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, we will use of hartid 0.
+
 
 5. Replace the tcl files in $COREVMCU/tcl with modified files:
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/*.tcl $COREVMCU/fpga/pulpissimo/tcl/.
 ```
+
 6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
 ```
 $ cd $COREVMCU/fpga
