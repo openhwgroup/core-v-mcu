@@ -44,7 +44,7 @@ $ make all
 $ source sourceme.sh
 ```
 3. Install OpenOCD:
-  * Note: The PULPissimo instructions install a patched version of OpenOCD that allows for more than 32 harts (by default, PULPissimo uses hartid=992; however, since we are using hartid=0, "regular" OpenOCD will work.
+  * Note: The PULPissimo instructions install a patched version of OpenOCD that allows for more than 32 harts (by default, PULPissimo uses hartid=992; however, since we are using hartid=0, standard OpenOCD will work.
 ```
 $ git clone https://github.com/riscv/riscv-openocd.git
 $ cd riscv-openocd
