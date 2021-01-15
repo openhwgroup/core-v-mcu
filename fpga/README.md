@@ -15,14 +15,13 @@ The instructions below describe how to install and use the core-v-mcu FPGA envir
 
 ## Instructions to install the core-v-mcu environment:
 
-The following instructions start from a clean Ubuntu 18.04 installation.
+The following instructions start from a clean Ubuntu 18.04 installation. Note
+that to build the PULP environment, we use the old PULP GNU tool chain. The
+new CORE-V GNU tool chain can be downloaded later.
 
-
-1. Download and install the [pre-built Core-V GCC toolchain from Embecosm](https://buildbot.embecosm.com/job/pulp-gcc-ubuntu1804/5/artifact/pulp-gcc-ubuntu1804-20200913.tar.gz)
-``` 
-$ sudo cp ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz /opt/.
-$ cd /opt
-$ sudo tar xvfz pulp-gcc-ubuntu1804-20200913.tar.gz
+1. Download and install the [pre-built PULP GCC toolchain from Embecosm](https://www.embecosm.com/resources/tool-chain-downloads/#pulp). In this case select the `tar.gz` file for Ubuntu 18.04. We shall assume the tool chain is to be installed in `/opt`, but it can be any writable directory on your machine, including in your home directory. Just replace `/opt` by the directory you have chosen in the following instructions. The actual name of the downloaded file will vary, and you should adjust the following commands accordingly. In this case, we are using `pulp-gcc-ubuntu1804-20200913.tar.gz` and assume you have downloaded it into your `Downloads` directory.
+```
+$ tar xf ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz
 $ export PULP_RISCV_GCC_TOOLCHAIN=/opt/pulp-gcc-ubuntu1804-20200913
 $ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
@@ -39,10 +38,11 @@ Install the PULP SDK (SDK has seen a recent major update, so we will use the pre
 $ git clone --branch v1 https://github.com/pulp-platform/pulp-sdk
 $ cd pulp-sdk
 $ source configs/pulpissimo.sh
-$ source configs/platform_fpga.sh
+$ source configs/platform-fpga.sh
 $ make all
 $ source sourceme.sh
 ```
+
 3. Install OpenOCD:
   * Note: The PULPissimo instructions install a patched version of OpenOCD that allows for more than 32 harts (by default, PULPissimo uses hartid=992; however, since we are using hartid=0, standard OpenOCD will work.
 ```
@@ -53,6 +53,7 @@ $ ./configure
 $ make
 $ sudo make install
 ```
+
 4. Install the core-v-mcu repo (this should be done in a directory in which you have write permssions, such as in your home directory):
 ```
 $ sudo apt install curl
@@ -62,6 +63,8 @@ $ export COREVMCU=$(pwd)
 $ ./update-ips
 ```
 5. Download and install Xilinx Vivado (currently procedure has been tested using 2019.2). You will need to register for a Xilinx account to download the [installer](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2019.2_1106_2127_Lin64.bin). To build for the Genesys2 board, you will need the full Vivado Design Suite and a license (Genesys2 board should include a voucher for a device-locked license). To build for the NexysA7-100T, the free Xilinx Vivado WebPack is sufficient (this can be selected during the installation). If you are only using Xilinx tools to download pre-generated bitstreams, you only need to install Vivado Lab Edition (this does not include any design tools). Install Vivado in the default location `/opt/Xilinx`.
+
+If you are only using the pre-built bitstreams and want to avoid downloading Xilinx tools, a third option is to copy them on to a SD card or USB thumb drive. For the SD card format it as FAT32. Ensure there is just one file ending `.bit` on the drive and switch jumper on the MODE pins (see below) to be on the rightmost setting (USB/SD).
 
 More detail on installing Vivado can be found [here](https://reference.digilentinc.com/vivado/installing-vivado/start ).
 
