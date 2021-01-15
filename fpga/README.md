@@ -42,37 +42,16 @@ $ source configs/platform-fpga.sh
 $ make all
 $ source sourceme.sh
 ```
-3. Install patched version of OpenOCD:
 
-If you have not previously configured git, then you need to configure your
-name and email address:
+3. Install OpenOCD:
+  * Note: The PULPissimo instructions install a patched version of OpenOCD that allows for more than 32 harts (by default, PULPissimo uses hartid=992; however, since we are using hartid=0, standard OpenOCD will work.
 ```
-$ git config --global user.email “your email address”
-$ git config --global user.name “your name”
-```
-
-Then install the patched version of OpenOCD:
-
-```
-$ source sourceme.sh && ./pulp-tools/bin/plpbuild checkout build --p openocd --stdout
-$ cd ..
-```
-
-If you have a slightly newer version of the compiler, the build may fail (one of the newer checkers identifies a potential issue). To resolve this you need to edit the file `./pulp-sdk/scripts/build-openocd`. Change it from
-```bash
-#!/bin/bash -ex
-
-./bootstrap
-./configure --prefix=$OPENOCD_INSTALL_DIR
-make install
-```
-to
-```bash
-#!/bin/bash -ex
-
-./bootstrap
-./configure --disable-werror --prefix=$OPENOCD_INSTALL_DIR
-make install
+$ git clone https://github.com/riscv/riscv-openocd.git
+$ cd riscv-openocd
+$ ./bootstrap
+$ ./configure
+$ make
+$ sudo make install
 ```
 
 4. Install the core-v-mcu repo (this should be done in a directory in which you have write permssions, such as in your home directory):
@@ -158,15 +137,19 @@ tc_clk_gating core_clock_gate_i
 );
 ```
 
-4. Replace the source file that instantiates RISCY with a modified version that instantiates cv32e40p:
+4. Replace source files that instantiate cv32e40p and set hartid=0:
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/fc_subsystem.sv $COREVMCU/ips/pulp_soc/rtl/fc/fc_subsystem.sv
+$ cp $COREVMCU/fpga/cv32e40p_modified_files/pulp_socsv $COREVMCU/ips/pulp_soc/rtl/pulp_soc/pulp_soc.sv
 ```
+  * Note: Pulpissimo's default hartid is set to 992; however, for compatibility with the RISC-V Privileged Architecture and operating systems such as FreeRTOS, CORE-V-MCU will use hartid=0.
+
 
 5. Replace the tcl files in $COREVMCU/tcl with modified files:
 ```
 $ cp $COREVMCU/fpga/cv32e40p_modified_files/*.tcl $COREVMCU/fpga/pulpissimo/tcl/.
 ```
+
 6. Follow the regular PULPissimo instructions to build the FPGA platform, for example:
 ```
 $ cd $COREVMCU/fpga
@@ -182,6 +165,8 @@ A bitstream file will be created, for example, `pulpissimo_nexys.bit`.
 Pre-built FPGA bitstreams for Genesys2 and NexysA7-100T are available [here](https://github.com/openhwgroup/core-v-mcu/tree/master/fpga/cv32e40p_bitstreams)
 
 Note: if you are using a VirtualBox VM, you may need to enable the 2 USB ports from the USB Settings icon at the bottom of your VM's window. You should see 2 Digilent USB Devices ([0900] and [0700]). Ensure there are check marks beside both.
+
+Note2: if you have a microSD card, you may skip the step of downloading the pre-built bitstream every time you power on the board by copying the *.bit file to the card and inserting it in your board's microSD card slot. You must also switch the `MODE` jumper on your board to the `USB/SD` setting for the board to program from microSD card.
 
 ### If you are using the Digilent NexysA7-100T board
 1. Connect microUSB cable to PROG/UART (J12) port on NexysA7
@@ -226,7 +211,7 @@ $ $PULP_RISCV_GCC_TOOLCHAIN/bin/riscv32-unknown-elf-gdb build/bubble/bubble
 4. In another terminal window, start OpenOCD
 ```
 $ cd $COREVMCU/fpga/pulpissimo-nexys
-$ $OPENOCD/bin/openocd -f openocd-nexys-hs2.cfg
+$ openocd -f openocd-nexys-hs2.cfg
 ```
 5. Connect to the serial/UART. In another terminal window:
 ```

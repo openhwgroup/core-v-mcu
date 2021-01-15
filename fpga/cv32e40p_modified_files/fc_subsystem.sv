@@ -23,7 +23,7 @@ module fc_subsystem #(
     parameter PULP_SECURE         = 1,
     parameter TB_RISCV            = 0,
     parameter CORE_ID             = 4'h0,
-    parameter CLUSTER_ID          = 6'h1F
+    parameter CLUSTER_ID          = 6'h00 //set for hartid=0; by default, PULPissimo uses 6'h1F for hartid=992
 )
 (
     input  logic                      clk_i,
