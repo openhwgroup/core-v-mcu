@@ -115,3 +115,22 @@ ipdb.generate_vivado_add_files("fpga/pulpissimo/tcl/rtl_add_files.tcl", domain='
 ipdb.generate_vivado_inc_dirs("fpga/pulpissimo/tcl/ips_inc_dirs.tcl", domain='soc')
 
 print(tcolors.OK + "Generated new scripts for IPs!" + tcolors.ENDC)
+
+##################################
+#
+# SYNTHESIS WITH DC
+#
+#################################
+execute("mkdir -p gf22fdx/synopsys/scripts/analyze_auto/ips")
+execute("mkdir -p gf22fdx/synopsys/scripts/analyze_auto/rtl")
+ipdb.export_synopsys(script_path="gf22fdx/synopsys/scripts/analyze_auto/ips",  target_tech='gf22', domain='soc', source='ips' )
+ipdb.export_synopsys(script_path="gf22fdx/synopsys/scripts/analyze_auto/rtl",  target_tech='gf22', domain='soc', source='rtl' )
+ipdb.generate_synopsys_list("gf22fdx/synopsys/scripts/analyze_auto/ips_add_files.tcl", source='ips', analyze_path='scripts/analyze_auto/ips', domain='soc')
+ipdb.generate_synopsys_list("gf22fdx/synopsys/scripts/analyze_auto/rtl_add_files.tcl", source='rtl', analyze_path='scripts/analyze_auto/rtl', domain='soc')
+
+
+print(tcolors.OK + "###########################################" + tcolors.ENDC)
+print(tcolors.OK + "#                                         #" + tcolors.ENDC)
+print(tcolors.OK + "# Generated new synthesis scripts for IPs #!" + tcolors.ENDC)
+print(tcolors.OK + "#                                         #" + tcolors.ENDC)
+print(tcolors.OK + "###########################################" + tcolors.ENDC)
