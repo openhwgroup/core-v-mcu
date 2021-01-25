@@ -19,9 +19,9 @@
 #
 
 pulp_soc:
-  commit: v2.0.1
+  commit: master
   server: https://github.com
-  group:  pulp-platform
+  group:  openhwgroup
 
 tbtools:
   commit: v0.1
