@@ -229,21 +229,26 @@ module pulpissimo #(
   logic [191:0]                s_gpio_cfg;
   
   // FPGA
-  logic [1:0]                 s_selected_mode_i;
-  logic [N_FPGAIO-1:0]        s_fpga_out_i;
-  logic [N_FPGAIO-1:0]        s_fpga_in_hw_i;
-  logic [N_FPGAIO-1:0]        s_fpga_in_o;
-  logic [N_FPGAIO-1:0]         s_fpga_oe_i;
+  logic [1:0]                   s_selected_mode_i;
+  logic [N_FPGAIO-1:0]          s_fpga_out_i;
+  logic [N_FPGAIO-1:0]          s_fpga_in_hw_i;
+  logic [N_FPGAIO-1:0]          s_fpga_in_o;
+  logic [N_FPGAIO-1:0]          s_fpga_oe_i;
+  input  logic                  s_fpga_clk_1_i;
+  input  logic                  s_fpga_clk_2_i;
+  input  logic                  s_fpga_clk_3_i;
+  input  logic                  s_fpga_clk_4_i;
+  input  logic                  s_fpga_clk_5_i;
 
-  logic                        s_rf_tx_clk;
-  logic                        s_rf_tx_oeb;
-  logic                        s_rf_tx_enb;
-  logic                        s_rf_tx_mode;
-  logic                        s_rf_tx_vsel;
-  logic                        s_rf_tx_data;
-  logic                        s_rf_rx_clk;
-  logic                        s_rf_rx_enb;
-  logic                        s_rf_rx_data;
+  logic                         s_rf_tx_clk;
+  logic                         s_rf_tx_oeb;
+  logic                         s_rf_tx_enb;
+  logic                         s_rf_tx_mode;
+  logic                         s_rf_tx_vsel;
+  logic                         s_rf_tx_data;
+  logic                         s_rf_rx_clk;
+  logic                         s_rf_rx_enb;
+  logic                         s_rf_rx_data;
 
   logic                        s_uart_tx;
   logic                        s_uart_rx;
@@ -606,6 +611,13 @@ logic [1:0]                  s_selected_pad_mode;
         .gpio_in_o                  ( s_gpio_in                   ),
         .gpio_dir_i                 ( s_gpio_dir                  ),
         .gpio_cfg_i                 ( s_gpio_cfg                  ),
+        
+        // FPGA
+        .selected_mode_i            ( s_selected_mode_i           ),
+        .fpga_out_i                 ( s_fpga_out_i                ),
+        .fpga_in_hw_i               ( s_fpga_in_hw_i              ),
+        .fpga_in_o                  ( s_fpga_in_o                 ),
+        .fpga_oe_i                  ( s_fpga_oe_i                 ),
 
         .uart_tx_i                  ( s_uart_tx                   ),
         .uart_rx_o                  ( s_uart_rx                   ),
@@ -757,9 +769,7 @@ logic [1:0]                  s_selected_pad_mode;
         .oe_i2s0_sck_o              ( s_oe_i2s0_sck               ),
         .oe_i2s0_ws_o               ( s_oe_i2s0_ws                ),
         .oe_i2s0_sdi_o              ( s_oe_i2s0_sdi               ),
-        .oe_i2s1_sdi_o              ( s_oe_i2s1_sdi               ),
-
-        .*
+        .oe_i2s1_sdi_o              ( s_oe_i2s1_sdi               )
    );
 
    //
@@ -813,12 +823,20 @@ logic [1:0]                  s_selected_pad_mode;
         .gpio_out_o                   ( s_gpio_out                       ),
         .gpio_dir_o                   ( s_gpio_dir                       ),
         .gpio_cfg_o                   ( s_gpio_cfg                       ),
-        .fpga_out_o                   ( s_fpga_out                       ),
-        .fpga_in_i                    ( s_fpga_sw_in                     ),
-        .fpga_oe_o                    ( s_fpga_oe                        ),
+        
+        // FPAG
+        .fpga_out_o                   ( s_fpga_out                      ),
+        .fpga_in_i                    ( s_fpga_sw_in                    ),
+        .fpga_oe_o                    ( s_fpga_oe                       ),
+        .selected_mode_i              ( s_selected_mode_i               ),
+        .fpga_clk_1_i                 ( s_fpga_clk_1_i                  ),
+        .fpga_clk_2_i                 ( s_fpga_clk_2_i                  ),
+        .fpga_clk_3_i                 ( s_fpga_clk_3_i                  ),
+        .fpga_clk_4_i                 ( s_fpga_clk_4_i                  ),
+        .fpga_clk_5_i                 ( s_fpga_clk_5_i                  ),
 
-        .uart_tx_o                    ( s_uart_tx                        ),
-        .uart_rx_i                    ( s_uart_rx                        ),
+        .uart_tx_o                    ( s_uart_tx                       ),
+        .uart_rx_i                    ( s_uart_rx                       ),
 
         .cam_clk_i                    ( s_cam_pclk                       ),
         .cam_data_i                   ( s_cam_data                       ),
