@@ -234,11 +234,11 @@ module pulpissimo #(
   logic [N_FPGAIO-1:0]          s_fpga_in_hw_i;
   logic [N_FPGAIO-1:0]          s_fpga_in_o;
   logic [N_FPGAIO-1:0]          s_fpga_oe_i;
-  input  logic                  s_fpga_clk_1_i;
-  input  logic                  s_fpga_clk_2_i;
-  input  logic                  s_fpga_clk_3_i;
-  input  logic                  s_fpga_clk_4_i;
-  input  logic                  s_fpga_clk_5_i;
+  logic                         s_fpga_clk_1_i;
+  logic                         s_fpga_clk_2_i;
+  logic                         s_fpga_clk_3_i;
+  logic                         s_fpga_clk_4_i;
+  logic                         s_fpga_clk_5_i;
 
   logic                         s_rf_tx_clk;
   logic                         s_rf_tx_oeb;
