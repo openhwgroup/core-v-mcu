@@ -79,8 +79,6 @@ module pulpissimo #(
 
   localparam CVP_ADDR_WIDTH             = 32;
   localparam CVP_DATA_WIDTH             = 32;
-  
-  localparam int unsigned N_FPGAIO      = `N_FPGAIO;
 
   //
   // PAD FRAME TO PAD CONTROL SIGNALS
@@ -585,7 +583,7 @@ logic [1:0]                  s_selected_pad_mode;
    safe_domain #(
         .FLL_DATA_WIDTH ( 32        ),
         .FLL_ADDR_WIDTH ( 2         ),
-        .N_FPGAIO       ( N_FPGAIO  ),
+        .N_FPGAIO       ( `N_FPGAIO ),
         .N_UART         ( 1         ),
         .N_SPI          ( 1         ),
         .N_I2C          ( 2         )
@@ -824,9 +822,9 @@ logic [1:0]                  s_selected_pad_mode;
         .gpio_dir_o                   ( s_gpio_dir                       ),
         .gpio_cfg_o                   ( s_gpio_cfg                       ),
         
-        // FPAG
+        // FPGA
         .fpga_out_o                   ( s_fpga_out                      ),
-        .fpga_in_i                    ( s_fpga_sw_in                    ),
+        .fpga_in_i                    ( s_fpga_in                       ),
         .fpga_oe_o                    ( s_fpga_oe                       ),
         .selected_mode_i              ( s_selected_mode_i               ),
         .fpga_clk_1_i                 ( s_fpga_clk_1_i                  ),
@@ -892,7 +890,8 @@ logic [1:0]                  s_selected_pad_mode;
         .dma_pe_irq_valid_i           ( s_dma_pe_irq_valid               ),
         .pf_evt_ack_o                 ( s_pf_evt_ack                     ),
         .pf_evt_valid_i               ( s_pf_evt_valid                   ),
-//eFPGA SPIS
+        
+        //eFPGA SPIS
         .efpga_fcb_spis_rst_n_i       ( efpga_fcb_spis_rst_n             ),
         .efpga_fcb_spis_mosi_i        ( efpga_fcb_spis_mosi              ),
         .efpga_fcb_spis_cs_n_i        ( efpga_fcb_spis_cs_n              ),

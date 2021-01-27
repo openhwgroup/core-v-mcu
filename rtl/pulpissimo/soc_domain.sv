@@ -299,7 +299,6 @@ module soc_domain #(
     input  logic [AXI_USER_WIDTH-1:0]        data_master_b_user_i,
     output logic [7:0]                       data_master_b_readpointer_o
 );
-    localparam int unsigned N_FPGAIO  = `N_FPGAIO;
 
     pulp_soc #(/*AUTOINSTPARAM*/
       // Parameters

@@ -126,7 +126,11 @@
 // Peripherals
 //
 //--------------------------------------
-`define N_GPIO  63
+`define N_IO    47    // Number of IO in pad frame
+`define N_SYSIO 3     // Number of IO used for system functions like reset
+`define N_GPIO  32    // Number of IO the GPIO block can potentially control
+`define N_PERIO 17    // Number of IO the peripherals can potentially control
+
 `define N_UART  1
 `define N_I2C   2
 `define N_SPI   1
