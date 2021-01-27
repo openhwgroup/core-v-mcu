@@ -233,7 +233,7 @@ module pulpissimo #(
   logic [N_FPGAIO-1:0]        s_fpga_out_i;
   logic [N_FPGAIO-1:0]        s_fpga_in_hw_i;
   logic [N_FPGAIO-1:0]        s_fpga_in_o;
-  ogic [N_FPGAIO-1:0]         s_fpga_oe_i;
+  logic [N_FPGAIO-1:0]         s_fpga_oe_i;
 
   logic                        s_rf_tx_clk;
   logic                        s_rf_tx_oeb;
