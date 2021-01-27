@@ -41,17 +41,17 @@ module pad_control #(
         input  logic [3:0]       sdio_data_oen_i,
 
         // GPIOS
-        input  logic [31:0]      gpio_out_i           ,
-        output logic [31:0]      gpio_in_o            ,
-        input  logic [31:0]      gpio_dir_i           ,
-        input  logic [31:0][5:0] gpio_cfg_i           ,
+        input  logic [`N_GPIO:0]      gpio_out_i           ,
+        output logic [`N_GPIO:0]      gpio_in_o            ,
+        input  logic [`N_GPIO:0]      gpio_dir_i           ,
+        input  logic [`N_GPIO:0][5:0] gpio_cfg_i           ,
         
-        //eFPGA GPIOs
-        input  logic [1:0]                selected_mode_i      ,
-        input  logic [`N_GPIO-1:0]        fpga_out_i           ,
-        input  logic [`N_GPIO-1:0]        fpga_in_hw_i         ,
-        output logic [`N_GPIO-1:0]        fpga_in_o            ,
-        input  logic [`N_GPIO-1:0]        fpga_oe_i            ,
+        // FPGA IOs
+        //input  logic [1:0]                selected_mode_i      ,
+        input  logic [`N_FPGAIO-1:0]        fpga_out_i           ,
+        //input  logic [`N_GPIO-1:0]        fpga_in_hw_i         ,
+        output logic [`N_FPGAIO-1:0]        fpga_in_o            ,
+        input  logic [`N_FPGAIO-1:0]        fpga_oe_i            ,
 
         // UART
         input  logic             uart_tx_i            ,
@@ -431,7 +431,8 @@ module pad_control #(
     --> fpga_in_hw_i is the signal that arrives to pad_control because of the MODE_FUNCTIONAL_FPGA_SPIS, it has priority over the SW eFPGA GPIO
   */
 
-   assign  fpga_in_o   = (selected_mode_i != MODE_FUNCTIONAL_ASIC) ? fpga_in_hw_i : fpga_in_sw_int;
+   //assign  fpga_in_o   = (selected_mode_i != MODE_FUNCTIONAL_ASIC) ? fpga_in_hw_i : fpga_in_sw_int; // TODO: do we need modes? Or a general snoop?
+   assign  fpga_in_o   = fpga_in_sw_int;
 
 
    // PAD CFG mux between default and GPIO
