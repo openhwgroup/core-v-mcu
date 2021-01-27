@@ -229,11 +229,11 @@ module pulpissimo #(
   logic [191:0]                s_gpio_cfg;
   
   // FPGA
-  input  logic [1:0]            selected_mode_i;
-  input  logic [N_FPGAIO-1:0]   fpga_out_i;
-  input  logic [N_FPGAIO-1:0]   fpga_in_hw_i;
-  output logic [N_FPGAIO-1:0]   fpga_in_o;
-  input  logic [N_FPGAIO-1:0]   fpga_oe_i;
+  logic [1:0]                 s_selected_mode_i;
+  logic [N_FPGAIO-1:0]        s_fpga_out_i;
+  logic [N_FPGAIO-1:0]        s_fpga_in_hw_i;
+  logic [N_FPGAIO-1:0]        s_fpga_in_o;
+  ogic [N_FPGAIO-1:0]         s_fpga_oe_i;
 
   logic                        s_rf_tx_clk;
   logic                        s_rf_tx_oeb;

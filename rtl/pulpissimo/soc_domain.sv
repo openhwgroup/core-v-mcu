@@ -36,7 +36,7 @@ module soc_domain #(
     parameter int unsigned N_I2C  = 2
 
 )(
-    localparam int unsigned N_I2C  = `N_FPGAIO;
+    localparam int unsigned N_FPGAIO  = `N_FPGAIO;
     
     input logic                              ref_clk_i,
     input logic                              slow_clk_i,
