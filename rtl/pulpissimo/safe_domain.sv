@@ -12,6 +12,7 @@
 module safe_domain #(
         parameter int unsigned FLL_DATA_WIDTH = 32,
         parameter int unsigned FLL_ADDR_WIDTH = 32,
+        parameter int unsigned N_FPGAIO,
         parameter int unsigned N_UART = 1,
         parameter int unsigned N_SPI = 1,
         parameter int unsigned N_I2C = 2
@@ -41,16 +42,17 @@ module safe_domain #(
         output logic [31:0]      gpio_in_o            ,
         input  logic [31:0]      gpio_dir_i           ,
         input  logic [191:0]     gpio_cfg_i           ,
-// FPGA
-        input  logic [1:0]        selected_mode_i     ,
-        input  logic [NGPIO-1:0]  fpga_out_i          ,
-        input  logic [NGPIO-1:0]  fpga_in_hw_i        ,
-        output logic [NGPIO-1:0]  fpga_in_o           ,
-        input  logic [NGPIO-1:0]  fpga_oe_i           ,
+        
+        // FPGA
+        input  logic [1:0]            selected_mode_i     ,
+        input  logic [N_FPGAIO-1:0]   fpga_out_i          ,
+        input  logic [N_FPGAIO-1:0]   fpga_in_hw_i        ,
+        output logic [N_FPGAIO-1:0]   fpga_in_o           ,
+        input  logic [N_FPGAIO-1:0]   fpga_oe_i           ,
 
         // UART
-        input  logic             uart_tx_i            ,
-        output logic             uart_rx_o            ,
+        input  logic                  uart_tx_i            ,
+        output logic                  uart_rx_o            ,
 
         input  logic [N_I2C-1:0] i2c_scl_out_i,
         output logic [N_I2C-1:0] i2c_scl_in_o,
@@ -239,7 +241,7 @@ module safe_domain #(
         .gpio_dir_i            ( gpio_dir_i            ),
         .gpio_cfg_i            ( s_gpio_cfg            ),
 
-		.selected_mode_i       ( selected_mode_i       ),
+        .selected_mode_i       ( selected_mode_i       ),
         .fpga_out_i            ( fpga_out_i            ),
         .fpga_in_hw_i          ( fpga_in_hw_i          ),
         .fpga_in_o             ( fpga_in_o             ),

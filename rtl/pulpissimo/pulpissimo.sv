@@ -79,6 +79,8 @@ module pulpissimo #(
 
   localparam CVP_ADDR_WIDTH             = 32;
   localparam CVP_DATA_WIDTH             = 32;
+  
+  localparam int unsigned N_FPGAIO      = `N_FPGAIO;
 
   //
   // PAD FRAME TO PAD CONTROL SIGNALS
@@ -225,6 +227,13 @@ module pulpissimo #(
   logic [31:0]                 s_gpio_in;
   logic [31:0]                 s_gpio_dir;
   logic [191:0]                s_gpio_cfg;
+  
+  // FPGA
+  input  logic [1:0]            selected_mode_i     ,
+  input  logic [N_FPGAIO-1:0]   fpga_out_i          ,
+  input  logic [N_FPGAIO-1:0]   fpga_in_hw_i        ,
+  output logic [N_FPGAIO-1:0]   fpga_in_o           ,
+  input  logic [N_FPGAIO-1:0]   fpga_oe_i           ,
 
   logic                        s_rf_tx_clk;
   logic                        s_rf_tx_oeb;
@@ -568,7 +577,14 @@ logic [1:0]                  s_selected_pad_mode;
   //
   // SAFE DOMAIN
   //
-   safe_domain safe_domain_i (
+   safe_domain #(
+        .FLL_DATA_WIDTH ( 32        ),
+        .FLL_ADDR_WIDTH ( 2         ),
+        .N_FPGAIO       ( N_FPGAIO  ),
+        .N_UART         ( 1         ),
+        .N_SPI          ( 1         ),
+        .N_I2C          ( 2         )
+   ) i_safe_domain (
 
         .ref_clk_i                  ( s_ref_clk                   ),
         .slow_clk_o                 ( s_slow_clk                  ),
