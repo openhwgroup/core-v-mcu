@@ -4,3 +4,4 @@ sim/
 .cached_ipdb.json
 __pycache__/
 ipstools/
+*.bak

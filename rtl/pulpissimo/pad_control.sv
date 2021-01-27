@@ -41,6 +41,12 @@ module pad_control #(
         output logic [31:0]      gpio_in_o            ,
         input  logic [31:0]      gpio_dir_i           ,
         input  logic [31:0][5:0] gpio_cfg_i           ,
+//eFPGA GPIOs
+        input  logic [1:0]                selected_mode_i      ,
+        input  logic [NGPIO-1:0]          fpga_out_i           ,
+        input  logic [NGPIO-1:0]          fpga_in_hw_i         ,
+        output logic [NGPIO-1:0]          fpga_in_o            ,
+        input  logic [NGPIO-1:0]          fpga_oe_i            ,
 
         // UART
         input  logic             uart_tx_i            ,
@@ -192,6 +198,7 @@ module pad_control #(
 
 
    logic s_alt0,s_alt1,s_alt2,s_alt3;
+   logic [NGPIO-1:0] fpga_in_sw_int;
 
    // check invariants
    if (N_SPI  <  1 || N_SPI  >  2) $error("The current verion of Pad control supports only 1 or 2 SPI peripherals");
@@ -358,6 +365,61 @@ module pad_control #(
    assign gpio_in_o[29] = (pad_mux_i[36] == 2'b01) ? in_i2s0_ws_i    : 1'b0 ;
    assign gpio_in_o[30] = (pad_mux_i[37] == 2'b01) ? in_i2s0_sdi_i   : 1'b0 ;
    assign gpio_in_o[31] = (pad_mux_i[38] == 2'b01) ? in_i2s1_sdi_i   : 1'b0 ;
+   
+   //    FPGA GPIO
+   assign fpga_in_sw_int[PAD_CFG_spim_sdio0 ]      = pad_mux_i[PAD_CFG_spim_sdio0]  == PAD_EFPGA ? in_spim_sdio0_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_sdio1 ]      = pad_mux_i[PAD_CFG_spim_sdio1]  == PAD_EFPGA ? in_spim_sdio1_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_sdio2 ]      = pad_mux_i[PAD_CFG_spim_sdio2]  == PAD_EFPGA ? in_spim_sdio2_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_sdio3 ]      = pad_mux_i[PAD_CFG_spim_sdio3]  == PAD_EFPGA ? in_spim_sdio3_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_csn0  ]      = pad_mux_i[PAD_CFG_spim_csn0 ]  == PAD_EFPGA ? in_spim_csn0_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_csn1  ]      = pad_mux_i[PAD_CFG_spim_csn1 ]  == PAD_EFPGA ? in_spim_csn1_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_spim_sck   ]      = pad_mux_i[PAD_CFG_spim_sck  ]  == PAD_EFPGA ? in_spim_sck_i    : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_uart_rx    ]      = pad_mux_i[PAD_CFG_uart_rx   ]  == PAD_EFPGA ? in_uart_rx_i     : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_uart_tx    ]      = pad_mux_i[PAD_CFG_uart_tx   ]  == PAD_EFPGA ? in_uart_tx_i     : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_pclk   ]      = pad_mux_i[PAD_CFG_cam_pclk  ]  == PAD_EFPGA ? in_cam_pclk_i    : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_hsync  ]      = pad_mux_i[PAD_CFG_cam_hsync ]  == PAD_EFPGA ? in_cam_hsync_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data0  ]      = pad_mux_i[PAD_CFG_cam_data0 ]  == PAD_EFPGA ? in_cam_data0_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data1  ]      = pad_mux_i[PAD_CFG_cam_data1 ]  == PAD_EFPGA ? in_cam_data1_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data2  ]      = pad_mux_i[PAD_CFG_cam_data2 ]  == PAD_EFPGA ? in_cam_data2_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data3  ]      = pad_mux_i[PAD_CFG_cam_data3 ]  == PAD_EFPGA ? in_cam_data3_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data4  ]      = pad_mux_i[PAD_CFG_cam_data4 ]  == PAD_EFPGA ? in_cam_data4_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data5  ]      = pad_mux_i[PAD_CFG_cam_data5 ]  == PAD_EFPGA ? in_cam_data5_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data6  ]      = pad_mux_i[PAD_CFG_cam_data6 ]  == PAD_EFPGA ? in_cam_data6_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_data7  ]      = pad_mux_i[PAD_CFG_cam_data7 ]  == PAD_EFPGA ? in_cam_data7_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_cam_vsync  ]      = pad_mux_i[PAD_CFG_cam_vsync ]  == PAD_EFPGA ? in_cam_vsync_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_ckn  ]      = pad_mux_i[PAD_CFG_hyper_ckn ]  == PAD_EFPGA ? in_hyper_ckn_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_ck   ]      = pad_mux_i[PAD_CFG_hyper_ck  ]  == PAD_EFPGA ? in_hyper_ck_i    : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq0  ]      = pad_mux_i[PAD_CFG_hyper_dq0 ]  == PAD_EFPGA ? in_hyper_dq0_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq1  ]      = pad_mux_i[PAD_CFG_hyper_dq1 ]  == PAD_EFPGA ? in_hyper_dq1_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq2  ]      = pad_mux_i[PAD_CFG_hyper_dq2 ]  == PAD_EFPGA ? in_hyper_dq2_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq3  ]      = pad_mux_i[PAD_CFG_hyper_dq3 ]  == PAD_EFPGA ? in_hyper_dq3_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq4  ]      = pad_mux_i[PAD_CFG_hyper_dq4 ]  == PAD_EFPGA ? in_hyper_dq4_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq5  ]      = pad_mux_i[PAD_CFG_hyper_dq5 ]  == PAD_EFPGA ? in_hyper_dq5_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq6  ]      = pad_mux_i[PAD_CFG_hyper_dq6 ]  == PAD_EFPGA ? in_hyper_dq6_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_dq7  ]      = pad_mux_i[PAD_CFG_hyper_dq7 ]  == PAD_EFPGA ? in_hyper_dq7_i   : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_csn0 ]      = pad_mux_i[PAD_CFG_hyper_csn0]  == PAD_EFPGA ? in_hyper_csn0_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_csn1 ]      = pad_mux_i[PAD_CFG_hyper_csn1]  == PAD_EFPGA ? in_hyper_csn1_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_hyper_rwds ]      = pad_mux_i[PAD_CFG_hyper_rwds]  == PAD_EFPGA ? in_hyper_rwds_i  : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_i2c0_sda   ]      = pad_mux_i[PAD_CFG_i2c0_sda   ] == PAD_EFPGA ? in_i2c0_sda_i    : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_i2c0_scl   ]      = pad_mux_i[PAD_CFG_i2c0_scl   ] == PAD_EFPGA ? in_i2c0_scl_i    : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_mlatch     ]      = pad_mux_i[PAD_CFG_mlatch     ] == PAD_EFPGA ? in_mlatch_i      : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_fpga_gpio36]      = pad_mux_i[PAD_CFG_fpga_gpio36] == PAD_EFPGA ? in_fpga_gpio36_i : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_fpga_gpio37]      = pad_mux_i[PAD_CFG_fpga_gpio37] == PAD_EFPGA ? in_fpga_gpio37_i : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_fpga_gpio38]      = pad_mux_i[PAD_CFG_fpga_gpio38] == PAD_EFPGA ? in_fpga_gpio38_i : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_fpga_gpio39]      = pad_mux_i[PAD_CFG_fpga_gpio39] == PAD_EFPGA ? in_fpga_gpio39_i : 1'b0 ;
+   assign fpga_in_sw_int[PAD_CFG_fpga_gpio40]      = pad_mux_i[PAD_CFG_fpga_gpio40] == PAD_EFPGA ? in_fpga_gpio40_i : 1'b0 ;
+
+  /*
+    Extra MUX as fpga_gpio signals goes to the eFPGA
+    either because the selected_mode is MODE_FUNCTIONAL_ASIC and in pad_control the pad_mux is set to PAD_EFPGA
+    or because the selected_mode is MODE_FUNCTIONAL_FPGA_SPIS
+
+    --> fpga_in_sw_int is the signal that arrives to pad_control because of MODE_FUNCTIONAL_ASIC and pad_mux set to PAD_eFPGA
+    --> fpga_in_hw_i is the signal that arrives to pad_control because of the MODE_FUNCTIONAL_FPGA_SPIS, it has priority over the SW eFPGA GPIO
+  */
+
+   assign  fpga_in_o   = (selected_mode_i != MODE_FUNCTIONAL_ASIC) ? fpga_in_hw_i : fpga_in_sw_int;
+
 
    // PAD CFG mux between default and GPIO
    assign pad_cfg_o[0]  = (pad_mux_i[0]  == 2'b01) ? gpio_cfg_i[0]  : pad_cfg_i[0];

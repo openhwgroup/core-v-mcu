@@ -41,6 +41,12 @@ module safe_domain #(
         output logic [31:0]      gpio_in_o            ,
         input  logic [31:0]      gpio_dir_i           ,
         input  logic [191:0]     gpio_cfg_i           ,
+// FPGA
+        input  logic [1:0]        selected_mode_i     ,
+        input  logic [NGPIO-1:0]  fpga_out_i          ,
+        input  logic [NGPIO-1:0]  fpga_in_hw_i        ,
+        output logic [NGPIO-1:0]  fpga_in_o           ,
+        input  logic [NGPIO-1:0]  fpga_oe_i           ,
 
         // UART
         input  logic             uart_tx_i            ,
@@ -233,6 +239,11 @@ module safe_domain #(
         .gpio_dir_i            ( gpio_dir_i            ),
         .gpio_cfg_i            ( s_gpio_cfg            ),
 
+		.selected_mode_i       ( selected_mode_i       ),
+        .fpga_out_i            ( fpga_out_i            ),
+        .fpga_in_hw_i          ( fpga_in_hw_i          ),
+        .fpga_in_o             ( fpga_in_o             ),
+        .fpga_oe_i             ( fpga_oe_i             ),
         .uart_tx_i             ( uart_tx_i             ),
         .uart_rx_o             ( uart_rx_o             ),
 

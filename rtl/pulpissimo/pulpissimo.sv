@@ -324,6 +324,44 @@ module pulpissimo #(
 
   logic [127:0]                s_pad_mux_soc;
   logic [383:0]                s_pad_cfg_soc;
+logic [1:0]                  s_selected_pad_mode;
+
+  logic                        efpga_test_fcb_pif_vldi;
+  logic                        efpga_test_fcb_pif_di_l_0;
+  logic                        efpga_test_fcb_pif_di_l_1;
+  logic                        efpga_test_fcb_pif_di_l_2;
+  logic                        efpga_test_fcb_pif_di_l_3;
+  logic                        efpga_test_fcb_pif_di_h_0;
+  logic                        efpga_test_fcb_pif_di_h_1;
+  logic                        efpga_test_fcb_pif_di_h_2;
+  logic                        efpga_test_fcb_pif_di_h_3;
+  logic                        efpga_test_fcb_pif_vldo_en;
+  logic                        efpga_test_fcb_pif_vldo;
+  logic                        efpga_test_fcb_pif_do_l_en;
+  logic                        efpga_test_fcb_pif_do_l_0;
+  logic                        efpga_test_fcb_pif_do_l_1;
+  logic                        efpga_test_fcb_pif_do_l_2;
+  logic                        efpga_test_fcb_pif_do_l_3;
+  logic                        efpga_test_fcb_pif_do_h_en;
+  logic                        efpga_test_fcb_pif_do_h_0;
+  logic                        efpga_test_fcb_pif_do_h_1;
+  logic                        efpga_test_fcb_pif_do_h_2;
+  logic                        efpga_test_fcb_pif_do_h_3;
+  logic                        efpga_test_FB_SPE_OUT_0;
+  logic                        efpga_test_FB_SPE_OUT_1;
+  logic                        efpga_test_FB_SPE_OUT_2;
+  logic                        efpga_test_FB_SPE_OUT_3;
+  logic                        efpga_test_FB_SPE_IN_0;
+  logic                        efpga_test_FB_SPE_IN_1;
+  logic                        efpga_test_FB_SPE_IN_2;
+  logic                        efpga_test_FB_SPE_IN_3;
+  logic                        efpga_test_M_0;
+  logic                        efpga_test_M_1;
+  logic                        efpga_test_M_2;
+  logic                        efpga_test_M_3;
+  logic                        efpga_test_M_4;
+  logic                        efpga_test_M_5;
+  logic                        efpga_test_MLATCH;
 
   // due to the pad frame these numbers are fixed. Adjust the padframe
   // accordingly if you change these.
@@ -759,6 +797,9 @@ module pulpissimo #(
         .gpio_out_o                   ( s_gpio_out                       ),
         .gpio_dir_o                   ( s_gpio_dir                       ),
         .gpio_cfg_o                   ( s_gpio_cfg                       ),
+        .fpga_out_o                   ( s_fpga_out                       ),
+        .fpga_in_i                    ( s_fpga_sw_in                     ),
+        .fpga_oe_o                    ( s_fpga_oe                        ),
 
         .uart_tx_o                    ( s_uart_tx                        ),
         .uart_rx_i                    ( s_uart_rx                        ),
@@ -817,6 +858,54 @@ module pulpissimo #(
         .dma_pe_irq_valid_i           ( s_dma_pe_irq_valid               ),
         .pf_evt_ack_o                 ( s_pf_evt_ack                     ),
         .pf_evt_valid_i               ( s_pf_evt_valid                   ),
+//eFPGA SPIS
+        .efpga_fcb_spis_rst_n_i       ( efpga_fcb_spis_rst_n             ),
+        .efpga_fcb_spis_mosi_i        ( efpga_fcb_spis_mosi              ),
+        .efpga_fcb_spis_cs_n_i        ( efpga_fcb_spis_cs_n              ),
+        .efpga_fcb_spis_clk_i         ( efpga_fcb_spis_clk               ),
+        .efpga_fcb_spi_mode_en_bo_i   ( efpga_fcb_spi_mode_en_bo         ),
+        .efpga_fcb_spis_miso_en_o     ( efpga_fcb_spis_miso_en           ),
+        .efpga_fcb_spis_miso_o        ( efpga_fcb_spis_miso              ),
+
+        //eFPGA TEST MODE
+        .efpga_STM_i                  ( s_in_stm                        ),
+        .efpga_test_fcb_pif_vldo_en_o ( efpga_test_fcb_pif_vldo_en      ),
+        .efpga_test_fcb_pif_vldo_o    ( efpga_test_fcb_pif_vldo         ),
+        .efpga_test_fcb_pif_do_l_en_o ( efpga_test_fcb_pif_do_l_en      ),
+        .efpga_test_fcb_pif_do_l_0_o  ( efpga_test_fcb_pif_do_l_0       ),
+        .efpga_test_fcb_pif_do_l_1_o  ( efpga_test_fcb_pif_do_l_1       ),
+        .efpga_test_fcb_pif_do_l_2_o  ( efpga_test_fcb_pif_do_l_2       ),
+        .efpga_test_fcb_pif_do_l_3_o  ( efpga_test_fcb_pif_do_l_3       ),
+        .efpga_test_fcb_pif_do_h_en_o ( efpga_test_fcb_pif_do_h_en      ),
+        .efpga_test_fcb_pif_do_h_0_o  ( efpga_test_fcb_pif_do_h_0       ),
+        .efpga_test_fcb_pif_do_h_1_o  ( efpga_test_fcb_pif_do_h_1       ),
+        .efpga_test_fcb_pif_do_h_2_o  ( efpga_test_fcb_pif_do_h_2       ),
+        .efpga_test_fcb_pif_do_h_3_o  ( efpga_test_fcb_pif_do_h_3       ),
+        .efpga_test_FB_SPE_OUT_0_o    ( efpga_test_FB_SPE_OUT_0         ),
+        .efpga_test_FB_SPE_OUT_1_o    ( efpga_test_FB_SPE_OUT_1         ),
+        .efpga_test_FB_SPE_OUT_2_o    ( efpga_test_FB_SPE_OUT_2         ),
+        .efpga_test_FB_SPE_OUT_3_o    ( efpga_test_FB_SPE_OUT_3         ),
+
+        .efpga_test_fcb_pif_vldi_i    ( efpga_test_fcb_pif_vldi         ),
+        .efpga_test_fcb_pif_di_l_0_i  ( efpga_test_fcb_pif_di_l_0       ),
+        .efpga_test_fcb_pif_di_l_1_i  ( efpga_test_fcb_pif_di_l_1       ),
+        .efpga_test_fcb_pif_di_l_2_i  ( efpga_test_fcb_pif_di_l_2       ),
+        .efpga_test_fcb_pif_di_l_3_i  ( efpga_test_fcb_pif_di_l_3       ),
+        .efpga_test_fcb_pif_di_h_0_i  ( efpga_test_fcb_pif_di_h_0       ),
+        .efpga_test_fcb_pif_di_h_1_i  ( efpga_test_fcb_pif_di_h_1       ),
+        .efpga_test_fcb_pif_di_h_2_i  ( efpga_test_fcb_pif_di_h_2       ),
+        .efpga_test_fcb_pif_di_h_3_i  ( efpga_test_fcb_pif_di_h_3       ),
+        .efpga_test_FB_SPE_IN_0_i     ( efpga_test_FB_SPE_IN_0          ),
+        .efpga_test_FB_SPE_IN_1_i     ( efpga_test_FB_SPE_IN_1          ),
+        .efpga_test_FB_SPE_IN_2_i     ( efpga_test_FB_SPE_IN_2          ),
+        .efpga_test_FB_SPE_IN_3_i     ( efpga_test_FB_SPE_IN_3          ),
+        .efpga_test_M_0_i             ( efpga_test_M_0                  ),
+        .efpga_test_M_1_i             ( efpga_test_M_1                  ),
+        .efpga_test_M_2_i             ( efpga_test_M_2                  ),
+        .efpga_test_M_3_i             ( efpga_test_M_3                  ),
+        .efpga_test_M_4_i             ( efpga_test_M_4                  ),
+        .efpga_test_M_5_i             ( efpga_test_M_5                  ),
+        .efpga_test_MLATCH_i          ( efpga_test_MLATCH               ),
 
         .cluster_pow_o                ( s_cluster_pow                    ),
         .cluster_byp_o                ( s_cluster_byp                    ),

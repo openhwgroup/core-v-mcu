@@ -19,7 +19,7 @@
 #
 
 core-v-mcu2-soc:
-  commit: master
+  commit: efpga_integration
   server: git@github.com
   group:  QuickLogic-Corp
 
