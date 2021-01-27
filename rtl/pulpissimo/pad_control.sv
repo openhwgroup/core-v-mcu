@@ -16,7 +16,9 @@
 module pad_control #(
     parameter int unsigned N_UART = 1,
     parameter int unsigned N_SPI = 1,
-    parameter int unsigned N_I2C = 2
+    parameter int unsigned N_I2C = 2,
+    
+    parameter int unsigned N_GPIO
 ) (
 
         //********************************************************************//
@@ -41,12 +43,13 @@ module pad_control #(
         output logic [31:0]      gpio_in_o            ,
         input  logic [31:0]      gpio_dir_i           ,
         input  logic [31:0][5:0] gpio_cfg_i           ,
-//eFPGA GPIOs
+        
+        //eFPGA GPIOs
         input  logic [1:0]                selected_mode_i      ,
-        input  logic [NGPIO-1:0]          fpga_out_i           ,
-        input  logic [NGPIO-1:0]          fpga_in_hw_i         ,
-        output logic [NGPIO-1:0]          fpga_in_o            ,
-        input  logic [NGPIO-1:0]          fpga_oe_i            ,
+        input  logic [N_GPIO-1:0]         fpga_out_i           ,
+        input  logic [N_GPIO-1:0]         fpga_in_hw_i         ,
+        output logic [N_GPIO-1:0]         fpga_in_o            ,
+        input  logic [N_GPIO-1:0]         fpga_oe_i            ,
 
         // UART
         input  logic             uart_tx_i            ,
@@ -198,7 +201,7 @@ module pad_control #(
 
 
    logic s_alt0,s_alt1,s_alt2,s_alt3;
-   logic [NGPIO-1:0] fpga_in_sw_int;
+   logic [N_GPIO-1:0] fpga_in_sw_int;
 
    // check invariants
    if (N_SPI  <  1 || N_SPI  >  2) $error("The current verion of Pad control supports only 1 or 2 SPI peripherals");
