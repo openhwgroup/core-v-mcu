@@ -103,7 +103,7 @@
   `define LEVEL_SHIFTER
 `endif
 
-// Comment to use bheavioral memories, uncomment to use stdcell latches. If uncommented, simulations slowdown occuor
+// Comment to use behavioral memories, uncomment to use stdcell latches. If uncommented, simulations slowdown occuor
 `ifdef SYNTHESIS
  `define SCM_IMPLEMENTED
  `define SCM_BASED_ICACHE
@@ -120,6 +120,14 @@
 //`define MMU_LOCAL_COPY_REGS
 //
 //////////////////////
+
+//--------------------------------------
+//
+// EFPGA
+//
+//--------------------------------------
+`define N_EFPGA_TCDM_PORTS  4     // Number of TCDM ports connected to eFPGA
+`define N_FPGAIO            43    // Number of GPIO ports on eFPGA (may not all be connected to GPIO)
 
 // Width of byte enable for a given data width
 `define EVAL_BE_WIDTH(DATAWIDTH) (DATAWIDTH/8)
