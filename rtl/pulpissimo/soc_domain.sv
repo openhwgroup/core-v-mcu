@@ -36,7 +36,7 @@ module soc_domain #(
     parameter int unsigned N_I2C  = 2
 
 )(
-    localparam int unsigned N_FPGAIO  = `N_FPGAIO;
+
     
     input logic                              ref_clk_i,
     input logic                              slow_clk_i,
@@ -299,7 +299,7 @@ module soc_domain #(
     input  logic [AXI_USER_WIDTH-1:0]        data_master_b_user_i,
     output logic [7:0]                       data_master_b_readpointer_o
 );
-
+    localparam int unsigned N_FPGAIO  = `N_FPGAIO;
 
     pulp_soc #(/*AUTOINSTPARAM*/
       // Parameters
