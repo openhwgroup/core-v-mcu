@@ -8,6 +8,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+`include "pulp_soc_defines.sv"
+
 `define SPI_STD_TX  2'b00
 `define SPI_STD_RX  2'b01
 `define SPI_QUAD_TX 2'b10
