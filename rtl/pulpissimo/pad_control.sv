@@ -216,7 +216,7 @@ module pad_control #(
 
 
    logic s_alt0,s_alt1,s_alt2,s_alt3;
-   logic [N_GPIO-1:0] fpga_in_sw_int;
+   logic [`N_FPGAIO-1:0] fpga_in_sw_int;
 
    // DEFINE DEFAULT FOR NOT USED ALTERNATIVES
    assign s_alt0 = 1'b0;
