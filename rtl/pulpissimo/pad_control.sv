@@ -13,6 +13,8 @@
 `define SPI_QUAD_TX 2'b10
 `define SPI_QUAD_RX 2'b11
 
+import arnold_pad_config::*;
+
 module pad_control #(
     parameter int unsigned N_UART = 1,
     parameter int unsigned N_SPI = 1,
@@ -198,15 +200,23 @@ module pad_control #(
         output logic             oe_i2s0_sdi_o    ,
         output logic             oe_i2s1_sdi_o
     );
+    
+    // check invariants
+    generate  
+    if (N_SPI  <  1 || N_SPI  >  2) begin : assert_invalid_nspi
+      $fatal( 1, "The current verion of Pad control supports only 1 or 2 SPI peripherals" );
+    end
+    if (N_I2C  != 2)) begin : assert_invalid_ni2c
+      $fatal( 1, "The current version of Pad control only supports exactly 2 I2C peripherals" );
+    end
+    if (N_UART != 1) begin : assert_invalid_nuart
+      $fatal( 1, "The current version of Pad control only supports exactly 1 UART peripherals" );
+    end
+    endgenerate
 
 
    logic s_alt0,s_alt1,s_alt2,s_alt3;
    logic [N_GPIO-1:0] fpga_in_sw_int;
-
-   // check invariants
-   if (N_SPI  <  1 || N_SPI  >  2) $error("The current verion of Pad control supports only 1 or 2 SPI peripherals");
-   if (N_I2C  != 2) $error("The current version of Pad control only supports exactly 2 I2C peripherals");
-   if (N_UART != 1) $error("The current version of Pad control only supports exactly 1 UART peripherals");
 
    // DEFINE DEFAULT FOR NOT USED ALTERNATIVES
    assign s_alt0 = 1'b0;
