@@ -36,7 +36,8 @@ module soc_domain #(
     parameter int unsigned N_I2C  = 2
 
 )(
-
+    localparam int unsigned N_I2C  = `N_FPGAIO;
+    
     input logic                              ref_clk_i,
     input logic                              slow_clk_i,
     input logic                              test_clk_i,
@@ -65,9 +66,9 @@ module soc_domain #(
     output logic [31:0]                      gpio_out_o,
     output logic [31:0]                      gpio_dir_o,
     output logic [191:0]                     gpio_cfg_o,
-    output logic [NGPIO-1:0]                 fpga_out_o,
-    input  logic [NGPIO-1:0]                 fpga_in_i,
-    output logic [NGPIO-1:0]                 fpga_oe_o,
+    output logic [N_FPGAIO-1:0]                 fpga_out_o,
+    input  logic [N_FPGAIO-1:0]                 fpga_in_i,
+    output logic [N_FPGAIO-1:0]                 fpga_oe_o,
 
     output logic [127:0]                     pad_mux_o,
     output logic [383:0]                     pad_cfg_o,
