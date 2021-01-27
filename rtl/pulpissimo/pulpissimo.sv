@@ -230,10 +230,10 @@ module pulpissimo #(
   
   // FPGA
   logic [1:0]                   s_selected_mode_i;
-  logic [N_FPGAIO-1:0]          s_fpga_out_i;
-  logic [N_FPGAIO-1:0]          s_fpga_in_hw_i;
-  logic [N_FPGAIO-1:0]          s_fpga_in_o;
-  logic [N_FPGAIO-1:0]          s_fpga_oe_i;
+  logic [`N_FPGAIO-1:0]         s_fpga_out_i;
+  logic [`N_FPGAIO-1:0]         s_fpga_in_hw_i;
+  logic [`N_FPGAIO-1:0]         s_fpga_in_o;
+  logic [`N_FPGAIO-1:0]         s_fpga_oe_i;
   logic                         s_fpga_clk_1_i;
   logic                         s_fpga_clk_2_i;
   logic                         s_fpga_clk_3_i;

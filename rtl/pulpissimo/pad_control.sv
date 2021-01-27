@@ -18,9 +18,7 @@ import arnold_pad_config::*;
 module pad_control #(
     parameter int unsigned N_UART = 1,
     parameter int unsigned N_SPI = 1,
-    parameter int unsigned N_I2C = 2,
-    
-    parameter int unsigned N_GPIO
+    parameter int unsigned N_I2C = 2
 ) (
 
         //********************************************************************//
@@ -48,10 +46,10 @@ module pad_control #(
         
         //eFPGA GPIOs
         input  logic [1:0]                selected_mode_i      ,
-        input  logic [N_GPIO-1:0]         fpga_out_i           ,
-        input  logic [N_GPIO-1:0]         fpga_in_hw_i         ,
-        output logic [N_GPIO-1:0]         fpga_in_o            ,
-        input  logic [N_GPIO-1:0]         fpga_oe_i            ,
+        input  logic [`N_GPIO-1:0]        fpga_out_i           ,
+        input  logic [`N_GPIO-1:0]        fpga_in_hw_i         ,
+        output logic [`N_GPIO-1:0]        fpga_in_o            ,
+        input  logic [`N_GPIO-1:0]        fpga_oe_i            ,
 
         // UART
         input  logic             uart_tx_i            ,
