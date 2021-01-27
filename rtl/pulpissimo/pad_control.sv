@@ -206,7 +206,7 @@ module pad_control #(
     if (N_SPI  <  1 || N_SPI  >  2) begin : assert_invalid_nspi
       $fatal( 1, "The current verion of Pad control supports only 1 or 2 SPI peripherals" );
     end
-    if (N_I2C  != 2)) begin : assert_invalid_ni2c
+    if (N_I2C  != 2) begin : assert_invalid_ni2c
       $fatal( 1, "The current version of Pad control only supports exactly 2 I2C peripherals" );
     end
     if (N_UART != 1) begin : assert_invalid_nuart
