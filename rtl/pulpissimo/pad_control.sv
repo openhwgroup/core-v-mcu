@@ -48,10 +48,10 @@ module pad_control #(
         
         // FPGA IOs
         //input  logic [1:0]                selected_mode_i      ,
-        input  logic [`N_FPGAIO-1:0]        fpga_out_i           ,
+        input  logic [`N_FPGAIO-1:0]        fpgaio_out_i           ,
         //input  logic [`N_GPIO-1:0]        fpga_in_hw_i         ,
-        output logic [`N_FPGAIO-1:0]        fpga_in_o            ,
-        input  logic [`N_FPGAIO-1:0]        fpga_oe_i            ,
+        output logic [`N_FPGAIO-1:0]        fpgaio_in_o            ,
+        input  logic [`N_FPGAIO-1:0]        fpgaio_oe_i            ,
 
         // UART
         input  logic             uart_tx_i            ,
