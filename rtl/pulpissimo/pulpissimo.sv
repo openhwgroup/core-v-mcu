@@ -228,10 +228,10 @@ module pulpissimo #(
   
   // FPGA
   logic [1:0]                   s_selected_mode_i;
-  logic [`N_FPGAIO-1:0]         s_fpga_out;
-  logic [`N_FPGAIO-1:0]         s_fpga_in_hw_i;
-  logic [`N_FPGAIO-1:0]         s_fpga_in;
-  logic [`N_FPGAIO-1:0]         s_fpga_oe;
+  logic [`N_FPGAIO-1:0]         s_fpgaio_out;
+  //logic [`N_FPGAIO-1:0]         s_fpga_in_hw_i;
+  logic [`N_FPGAIO-1:0]         s_fpgaio_in;
+  logic [`N_FPGAIO-1:0]         s_fpgaio_oe;
   logic                         s_fpga_clk_1_i;
   logic                         s_fpga_clk_2_i;
   logic                         s_fpga_clk_3_i;
@@ -610,11 +610,11 @@ logic [1:0]                  s_selected_pad_mode;
         .gpio_cfg_i                 ( s_gpio_cfg                  ),
         
         // FPGA
-        .selected_mode_i            ( s_selected_mode_i           ),
-        .fpga_out_i                 ( s_fpga_out                  ),
-        .fpga_in_hw_i               ( s_fpga_in_hw_i              ),
-        .fpga_in_o                  ( s_fpga_in                   ),
-        .fpga_oe_i                  ( s_fpga_oe                   ),
+        //.selected_mode_i            ( s_selected_mode_i           ),
+        .fpgaio_out_i               ( s_fpgaio_out                ),
+        //.fpga_in_hw_i               ( s_fpga_in_hw_i              ),
+        .fpgaio_in_o                ( s_fpgaio_in                 ),
+        .fpgaio_oe_i                ( s_fpgaio_oe                 ),
 
         .uart_tx_i                  ( s_uart_tx                   ),
         .uart_rx_o                  ( s_uart_rx                   ),
@@ -822,9 +822,9 @@ logic [1:0]                  s_selected_pad_mode;
         .gpio_cfg_o                   ( s_gpio_cfg                       ),
         
         // FPGA
-        .fpga_out_o                   ( s_fpga_out                      ),
-        .fpga_in_i                    ( s_fpga_in                       ),
-        .fpga_oe_o                    ( s_fpga_oe                       ),
+        .fpgaio_out_o                 ( s_fpgaio_out                    ),
+        .fpgaio_in_i                  ( s_fpgaio_in                     ),
+        .fpgaio_oe_o                  ( s_fpgaio_oe                     ),
         .selected_mode_i              ( s_selected_mode_i               ),
         .fpga_clk_1_i                 ( s_fpga_clk_1_i                  ),
         .fpga_clk_2_i                 ( s_fpga_clk_2_i                  ),
