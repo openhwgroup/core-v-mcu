@@ -41,10 +41,10 @@ module pad_control #(
         input  logic [3:0]       sdio_data_oen_i,
 
         // GPIOS
-        input  logic [`N_GPIO:0]      gpio_out_i           ,
-        output logic [`N_GPIO:0]      gpio_in_o            ,
-        input  logic [`N_GPIO:0]      gpio_dir_i           ,
-        input  logic [`N_GPIO:0][5:0] gpio_cfg_i           ,
+        input  logic [`N_GPIO-1:0]      gpio_out_i           ,
+        output logic [`N_GPIO-1:0]      gpio_in_o            ,
+        input  logic [`N_GPIO-1:0]      gpio_dir_i           ,
+        input  logic [`N_GPIO-1:0][5:0] gpio_cfg_i           ,
         
         // FPGA IOs
         //input  logic [1:0]                selected_mode_i      ,

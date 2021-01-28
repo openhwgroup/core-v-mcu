@@ -240,9 +240,9 @@ module safe_domain #(
         .gpio_dir_i            ( gpio_dir_i            ),
         .gpio_cfg_i            ( s_gpio_cfg            ),
 
-        .selected_mode_i       ( selected_mode_i       ),
+        //.selected_mode_i       ( selected_mode_i       ),
         .fpga_out_i            ( fpga_out_i            ),
-        .fpga_in_hw_i          ( fpga_in_hw_i          ),
+        //.fpga_in_hw_i          ( fpga_in_hw_i          ),
         .fpga_in_o             ( fpga_in_o             ),
         .fpga_oe_i             ( fpga_oe_i             ),
         .uart_tx_i             ( uart_tx_i             ),
