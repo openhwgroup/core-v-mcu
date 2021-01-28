@@ -583,7 +583,6 @@ logic [1:0]                  s_selected_pad_mode;
    safe_domain #(
         .FLL_DATA_WIDTH ( 32        ),
         .FLL_ADDR_WIDTH ( 2         ),
-        .N_FPGAIO       ( `N_FPGAIO ),
         .N_UART         ( 1         ),
         .N_SPI          ( 1         ),
         .N_I2C          ( 2         )
@@ -614,8 +613,8 @@ logic [1:0]                  s_selected_pad_mode;
         .selected_mode_i            ( s_selected_mode_i           ),
         .fpga_out_i                 ( s_fpga_out                  ),
         .fpga_in_hw_i               ( s_fpga_in_hw_i              ),
-        .fpga_in_o                  ( s_fpga_in_o                 ),
-        .fpga_oe_i                  ( s_fpga_oe_i                 ),
+        .fpga_in_o                  ( s_fpga_in                   ),
+        .fpga_oe_i                  ( s_fpga_oe                   ),
 
         .uart_tx_i                  ( s_uart_tx                   ),
         .uart_rx_o                  ( s_uart_rx                   ),
