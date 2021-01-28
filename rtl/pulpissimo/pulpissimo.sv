@@ -221,17 +221,17 @@ module pulpissimo #(
   logic                        s_dft_cg_enable;
   logic                        s_mode_select;
 
-  logic [31:0]                 s_gpio_out;
-  logic [31:0]                 s_gpio_in;
-  logic [31:0]                 s_gpio_dir;
-  logic [191:0]                s_gpio_cfg;
+  logic [`N_GPIO-1:0]           s_gpio_out;
+  logic [`N_GPIO-1:0]           s_gpio_in;
+  logic [`N_GPIO-1:0]           s_gpio_dir;
+  logic [191:0]                 s_gpio_cfg;
   
   // FPGA
   logic [1:0]                   s_selected_mode_i;
-  logic [`N_FPGAIO-1:0]         s_fpga_out_i;
+  logic [`N_FPGAIO-1:0]         s_fpga_out;
   logic [`N_FPGAIO-1:0]         s_fpga_in_hw_i;
-  logic [`N_FPGAIO-1:0]         s_fpga_in_o;
-  logic [`N_FPGAIO-1:0]         s_fpga_oe_i;
+  logic [`N_FPGAIO-1:0]         s_fpga_in;
+  logic [`N_FPGAIO-1:0]         s_fpga_oe;
   logic                         s_fpga_clk_1_i;
   logic                         s_fpga_clk_2_i;
   logic                         s_fpga_clk_3_i;
@@ -612,7 +612,7 @@ logic [1:0]                  s_selected_pad_mode;
         
         // FPGA
         .selected_mode_i            ( s_selected_mode_i           ),
-        .fpga_out_i                 ( s_fpga_out_i                ),
+        .fpga_out_i                 ( s_fpga_out                  ),
         .fpga_in_hw_i               ( s_fpga_in_hw_i              ),
         .fpga_in_o                  ( s_fpga_in_o                 ),
         .fpga_oe_i                  ( s_fpga_oe_i                 ),
