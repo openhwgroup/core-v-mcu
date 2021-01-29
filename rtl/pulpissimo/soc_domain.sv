@@ -29,12 +29,7 @@ module soc_domain #(
     parameter AXI_STRB_OUT_WIDTH   = AXI_DATA_OUT_WIDTH/8,
 
     parameter BUFFER_WIDTH         = 8,
-    parameter EVNT_WIDTH           = 8,
-
-    parameter int unsigned N_UART = 1,
-    parameter int unsigned N_SPI  = 1,
-    parameter int unsigned N_I2C  = 2
-
+    parameter EVNT_WIDTH           = 8
 )(
 
     
@@ -86,12 +81,12 @@ module soc_domain #(
     output logic [3:0]                       timer_ch2_o,
     output logic [3:0]                       timer_ch3_o,
 
-    input  logic [N_I2C-1:0]                 i2c_scl_i,
-    output logic [N_I2C-1:0]                 i2c_scl_o,
-    output logic [N_I2C-1:0]                 i2c_scl_oe_o,
-    input  logic [N_I2C-1:0]                 i2c_sda_i,
-    output logic [N_I2C-1:0]                 i2c_sda_o,
-    output logic [N_I2C-1:0]                 i2c_sda_oe_o,
+    input  logic [`N_I2C-1:0]                 i2c_scl_i,
+    output logic [`N_I2C-1:0]                 i2c_scl_o,
+    output logic [`N_I2C-1:0]                 i2c_scl_oe_o,
+    input  logic [`N_I2C-1:0]                 i2c_sda_i,
+    output logic [`N_I2C-1:0]                 i2c_sda_o,
+    output logic [`N_I2C-1:0]                 i2c_sda_oe_o,
 
     input  logic                             i2s_slave_sd0_i,
     input  logic                             i2s_slave_sd1_i,
@@ -102,11 +97,11 @@ module soc_domain #(
     output logic                             i2s_slave_sck_o,
     output logic                             i2s_slave_sck_oe,
 
-    output logic [N_SPI-1:0]                 spi_clk_o,
-    output logic [N_SPI-1:0][3:0]            spi_csn_o,
-    output logic [N_SPI-1:0][3:0]            spi_oen_o,
-    output logic [N_SPI-1:0][3:0]            spi_sdo_o,
-    input  logic [N_SPI-1:0][3:0]            spi_sdi_i,
+    output logic [`N_SPI-1:0]                 spi_clk_o,
+    output logic [`N_SPI-1:0][3:0]            spi_csn_o,
+    output logic [`N_SPI-1:0][3:0]            spi_oen_o,
+    output logic [`N_SPI-1:0][3:0]            spi_sdo_o,
+    input  logic [`N_SPI-1:0][3:0]            spi_sdi_i,
 
     output logic                             sdio_clk_o,
     output logic                             sdio_cmd_o,
@@ -321,9 +316,6 @@ module soc_domain #(
       .NPAD                             ( 64                  ),
       .NBIT_PADCFG                      ( 6                  ),
       .NBIT_PADMUX                      ( 2                  ),
-      .N_UART                           ( N_UART             ),
-      .N_SPI                            ( N_SPI              ),
-      .N_I2C                            ( N_I2C              ),
       .ISOLATE_CLUSTER_CDC              ( 1                  ),
       .USE_ZFINX                        ( 0                  )
     ) pulp_soc_i (
@@ -400,18 +392,18 @@ module soc_domain #(
         .timer_ch1_o                 (timer_ch1_o[3:0]),
         .timer_ch2_o                 (timer_ch2_o[3:0]),
         .timer_ch3_o                 (timer_ch3_o[3:0]),
-        .i2c_scl_o                   (i2c_scl_o[N_I2C-1:0]),
-        .i2c_scl_oe_o                (i2c_scl_oe_o[N_I2C-1:0]),
-        .i2c_sda_o                   (i2c_sda_o[N_I2C-1:0]),
-        .i2c_sda_oe_o                (i2c_sda_oe_o[N_I2C-1:0]),
+        .i2c_scl_o                   (i2c_scl_o[`N_I2C-1:0]),
+        .i2c_scl_oe_o                (i2c_scl_oe_o[`N_I2C-1:0]),
+        .i2c_sda_o                   (i2c_sda_o[`N_I2C-1:0]),
+        .i2c_sda_oe_o                (i2c_sda_oe_o[`N_I2C-1:0]),
         .i2s_slave_ws_o              (i2s_slave_ws_o),
         .i2s_slave_ws_oe             (i2s_slave_ws_oe),
         .i2s_slave_sck_o             (i2s_slave_sck_o),
         .i2s_slave_sck_oe            (i2s_slave_sck_oe),
-        .spi_clk_o                   (spi_clk_o[N_SPI-1:0]),
-        .spi_csn_o                   (spi_csn_o/*[N_SPI-1:0][3:0]*/),
-        .spi_oen_o                   (spi_oen_o/*[N_SPI-1:0][3:0]*/),
-        .spi_sdo_o                   (spi_sdo_o/*[N_SPI-1:0][3:0]*/),
+        .spi_clk_o                   (spi_clk_o[`N_SPI-1:0]),
+        .spi_csn_o                   (spi_csn_o/*[`N_SPI-1:0][3:0]*/),
+        .spi_oen_o                   (spi_oen_o/*[`N_SPI-1:0][3:0]*/),
+        .spi_sdo_o                   (spi_sdo_o/*[`N_SPI-1:0][3:0]*/),
         .sdio_clk_o                  (sdio_clk_o),
         .sdio_cmd_o                  (sdio_cmd_o),
         .sdio_cmd_oen_o              (sdio_cmd_oen_o),
@@ -485,13 +477,13 @@ module soc_domain #(
         .cam_data_i                  (cam_data_i[7:0]),
         .cam_hsync_i                 (cam_hsync_i),
         .cam_vsync_i                 (cam_vsync_i),
-        .i2c_scl_i                   (i2c_scl_i[N_I2C-1:0]),
-        .i2c_sda_i                   (i2c_sda_i[N_I2C-1:0]),
+        .i2c_scl_i                   (i2c_scl_i[`N_I2C-1:0]),
+        .i2c_sda_i                   (i2c_sda_i[`N_I2C-1:0]),
         .i2s_slave_sd0_i             (i2s_slave_sd0_i),
         .i2s_slave_sd1_i             (i2s_slave_sd1_i),
         .i2s_slave_ws_i              (i2s_slave_ws_i),
         .i2s_slave_sck_i             (i2s_slave_sck_i),
-        .spi_sdi_i                   (spi_sdi_i/*[N_SPI-1:0][3:0]*/),
+        .spi_sdi_i                   (spi_sdi_i/*[`N_SPI-1:0][3:0]*/),
         .sdio_cmd_i                  (sdio_cmd_i),
         .sdio_data_i                 (sdio_data_i[3:0]),
         .jtag_tck_i                  (jtag_tck_i),

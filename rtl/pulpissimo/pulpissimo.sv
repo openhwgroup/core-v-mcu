@@ -375,24 +375,18 @@ logic [1:0]                  s_selected_pad_mode;
   logic                        efpga_test_M_5;
   logic                        efpga_test_MLATCH;
 
-  // due to the pad frame these numbers are fixed. Adjust the padframe
-  // accordingly if you change these.
-  localparam int unsigned N_UART = 1;
-  localparam int unsigned N_SPI = 1;
-  localparam int unsigned N_I2C = 2;
+  logic [`N_SPI-1:0]            s_spi_clk;
+  logic [`N_SPI-1:0][3:0]       s_spi_csn;
+  logic [`N_SPI-1:0][3:0]       s_spi_oen;
+  logic [`N_SPI-1:0][3:0]       s_spi_sdo;
+  logic [`N_SPI-1:0][3:0]       s_spi_sdi;
 
-  logic [N_SPI-1:0]            s_spi_clk;
-  logic [N_SPI-1:0][3:0]       s_spi_csn;
-  logic [N_SPI-1:0][3:0]       s_spi_oen;
-  logic [N_SPI-1:0][3:0]       s_spi_sdo;
-  logic [N_SPI-1:0][3:0]       s_spi_sdi;
-
-  logic [N_I2C-1:0]            s_i2c_scl_in;
-  logic [N_I2C-1:0]            s_i2c_scl_out;
-  logic [N_I2C-1:0]            s_i2c_scl_oe;
-  logic [N_I2C-1:0]            s_i2c_sda_in;
-  logic [N_I2C-1:0]            s_i2c_sda_out;
-  logic [N_I2C-1:0]            s_i2c_sda_oe;
+  logic [`N_I2C-1:0]            s_i2c_scl_in;
+  logic [`N_I2C-1:0]            s_i2c_scl_out;
+  logic [`N_I2C-1:0]            s_i2c_scl_oe;
+  logic [`N_I2C-1:0]            s_i2c_sda_in;
+  logic [`N_I2C-1:0]            s_i2c_sda_out;
+  logic [`N_I2C-1:0]            s_i2c_sda_oe;
 
 
   //
@@ -583,9 +577,9 @@ logic [1:0]                  s_selected_pad_mode;
    safe_domain #(
         .FLL_DATA_WIDTH ( 32        ),
         .FLL_ADDR_WIDTH ( 2         ),
-        .N_UART         ( 1         ),
-        .N_SPI          ( 1         ),
-        .N_I2C          ( 2         )
+        .`N_UART         ( 1         ),
+        .`N_SPI          ( 1         ),
+        .`N_I2C          ( 2         )
    ) i_safe_domain (
 
         .ref_clk_i                  ( s_ref_clk                   ),
@@ -785,10 +779,7 @@ logic [1:0]                  s_selected_pad_mode;
       .AXI_STRB_OUT_WIDTH ( AXI_SOC_CLUSTER_STRB_WIDTH ),
       .BUFFER_WIDTH       ( BUFFER_WIDTH               ),
       .EVNT_WIDTH         ( EVENT_WIDTH                ),
-      .NB_CL_CORES        ( 0                          ),
-      .N_UART             ( N_UART                     ),
-      .N_SPI              ( N_SPI                      ),
-      .N_I2C              ( N_I2C                      )
+      .NB_CL_CORES        ( 0                          )
    ) soc_domain_i (
 
         .ref_clk_i                    ( s_ref_clk                        ),

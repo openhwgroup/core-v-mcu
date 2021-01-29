@@ -131,9 +131,19 @@
 `define N_GPIO  32    // Number of IO the GPIO block can potentially control
 `define N_PERIO 17    // Number of IO the peripherals can potentially control
 
-`define N_UART  1
-`define N_I2C   2
-`define N_SPI   1
+// At this time fixed by padframe
+`define N_UART    1
+`define N_I2C     2
+`define N_SPI     1
+`define N_I2S     0
+`define N_CAM     1
+`define N_CSI2    0
+`define N_HYPER   0
+`define N_SDIO    0
+`define N_JTAG    0
+`define N_MRAM    0
+`define N_FILTER  1
+`define N_FPGA    1
 
 //--------------------------------------
 //
