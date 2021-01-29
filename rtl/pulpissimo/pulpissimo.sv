@@ -576,10 +576,7 @@ logic [1:0]                  s_selected_pad_mode;
   //
    safe_domain #(
         .FLL_DATA_WIDTH ( 32        ),
-        .FLL_ADDR_WIDTH ( 2         ),
-        .`N_UART         ( 1         ),
-        .`N_SPI          ( 1         ),
-        .`N_I2C          ( 2         )
+        .FLL_ADDR_WIDTH ( 2         )
    ) i_safe_domain (
 
         .ref_clk_i                  ( s_ref_clk                   ),
