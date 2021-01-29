@@ -1,0 +1,5 @@
+quicklogic:
+  files: [
+    eFPGA_wrapper.v,
+  ]
+
