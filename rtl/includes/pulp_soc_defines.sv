@@ -155,6 +155,7 @@
 //--------------------------------------
 `define N_EFPGA_TCDM_PORTS  4     // Number of TCDM ports connected to eFPGA
 `define N_FPGAIO            43    // Number of GPIO ports on eFPGA (may not all be connected to GPIO)
+`define N_EFPGA_EVENTS      16    // Number of events from EFPGA
 
 // Width of byte enable for a given data width
 `define EVAL_BE_WIDTH(DATAWIDTH) (DATAWIDTH/8)
