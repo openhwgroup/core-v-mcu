@@ -126,10 +126,13 @@
 // Peripherals
 //
 //--------------------------------------
-`define N_IO    47    // Number of IO in pad frame
-`define N_SYSIO 3     // Number of IO used for system functions like reset
-`define N_GPIO  32    // Number of IO the GPIO block can potentially control
-`define N_PERIO 17    // Number of IO the peripherals can potentially control
+`define N_IO        48    // Number of IO in pad frame
+`define N_SYSIO     3     // Number of IO used for system functions like reset
+`define N_GPIO      32    // Number of IO the GPIO block can potentially control
+`define N_PERIO     17    // Number of IO the peripherals can potentially control
+
+`define NBIT_PADCFG 6     // Number of pad configuration signals
+`define NBIT_PADMUX 4     // Number of bits in the pad mux select, which means there are 2^NBIT_PADMUX possible configurations
 
 // At this time fixed by padframe
 `define N_UART    1
