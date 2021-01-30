@@ -417,7 +417,11 @@ logic [1:0]                  s_selected_pad_mode;
   //
   // PAD FRAME
   //
-  pad_frame pad_frame_i (
+`ifndef PULP_FPGA_EMUL
+  pad_frame_gf22 i_pad_frame (
+`else
+  pad_frame i_pad_frame (
+`endif
     .pad_cfg_i             ( s_pad_cfg              ),
     .ref_clk_o             ( s_ref_clk              ),
     .rstn_o                ( s_rstn                 ),
