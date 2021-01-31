@@ -12,4 +12,6 @@ vip:
   path: vip
 pulpissimo:
   path: pulpissimo
+quicklogic:
+  path: quicklogic
 
