@@ -14,4 +14,6 @@ pulpissimo:
   path: pulpissimo
 quicklogic:
   path: quicklogic
+ql_fcb:
+  path: ql_fcb
 
