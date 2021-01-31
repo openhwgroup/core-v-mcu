@@ -92,6 +92,9 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins i_pulpis
 ## Sys clock
 set_property -dict {PACKAGE_PIN E3  IOSTANDARD LVCMOS33} [get_ports sys_clk]
 
+##Switches
+set_property -dict { PACKAGE_PIN J15   IOSTANDARD LVCMOS33 } [get_ports { bootsel }]; #IO_L24N_T3_RS0_15 Sch=sw[0]
+
 ## Buttons
 set_property -dict {PACKAGE_PIN C12  IOSTANDARD LVCMOS33} [get_ports pad_reset_n]
 set_property -dict {PACKAGE_PIN N17 IOSTANDARD LVCMOS33} [get_ports btnc_i]
