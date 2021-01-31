@@ -13,7 +13,7 @@ module eFPGA_wrapper (
    fcb_apbm_psel, fcb_apbm_penable, fcb_apbm_paddr, fcb_apbm_mclk,
    FB_SPE_OUT_3_, FB_SPE_OUT_2_, FB_SPE_OUT_1_, FB_SPE_OUT_0_,
 
-   gpio_oe_0_o, gpio_data_0_o, gpio_oe_1_o, gpio_data_1_o, gpio_oe_2_o, gpio_data_2_o, gpio_oe_3_o, gpio_data_3_o, gpio_oe_4_o, gpio_data_4_o, gpio_oe_5_o, gpio_data_5_o, gpio_oe_6_o, gpio_data_6_o, gpio_oe_7_o, gpio_data_7_o, gpio_oe_20_o, gpio_data_20_o, gpio_oe_25_o, gpio_data_25_o, gpio_oe_26_o, gpio_data_26_o, gpio_oe_27_o, gpio_data_27_o, gpio_oe_21_o, gpio_data_21_o, gpio_oe_22_o, gpio_data_22_o, gpio_oe_23_o, gpio_data_23_o, gpio_oe_24_o, gpio_data_24_o, events_12_o, events_13_o, gpio_oe_19_o, gpio_data_19_o, events_14_o, events_15_o, gpio_oe_16_o, gpio_data_16_o, gpio_oe_17_o, gpio_data_17_o, gpio_oe_18_o, gpio_data_18_o, udma_cfg_data_26_o, udma_cfg_data_27_o, events_4_o, events_5_o, events_6_o, events_7_o, events_8_o, events_9_o, events_10_o, events_11_o, udma_cfg_data_28_o, udma_cfg_data_29_o, udma_cfg_data_30_o, udma_cfg_data_31_o, events_0_o, events_1_o, events_2_o, events_3_o, udma_cfg_data_14_o, udma_cfg_data_15_o, udma_cfg_data_24_o, udma_cfg_data_25_o, udma_cfg_data_16_o, udma_cfg_data_17_o, udma_cfg_data_18_o, udma_cfg_data_19_o, udma_cfg_data_20_o, udma_cfg_data_21_o, udma_cfg_data_22_o, udma_cfg_data_23_o, udma_rx_lin_data_28_o, udma_rx_lin_data_29_o, udma_cfg_data_6_o, udma_cfg_data_7_o, udma_cfg_data_8_o, udma_cfg_data_9_o, udma_cfg_data_10_o, udma_cfg_data_11_o, udma_cfg_data_12_o, udma_cfg_data_13_o, udma_rx_lin_data_30_o, udma_rx_lin_data_31_o, udma_cfg_data_0_o, udma_cfg_data_1_o, udma_cfg_data_2_o, udma_cfg_data_3_o, udma_cfg_data_4_o, udma_cfg_data_5_o, udma_rx_lin_data_16_o, udma_rx_lin_data_17_o, udma_rx_lin_data_26_o, udma_rx_lin_data_27_o, udma_rx_lin_data_18_o, udma_rx_lin_data_19_o, udma_rx_lin_data_20_o, udma_rx_lin_data_21_o, udma_rx_lin_data_22_o, udma_rx_lin_data_23_o, udma_rx_lin_data_24_o, udma_rx_lin_data_25_o, udma_tx_lin_ready_o, udma_rx_lin_valid_o, udma_rx_lin_data_8_o, udma_rx_lin_data_9_o, udma_rx_lin_data_10_o, udma_rx_lin_data_11_o, udma_rx_lin_data_12_o, udma_rx_lin_data_13_o, udma_rx_lin_data_14_o, udma_rx_lin_data_15_o, udma_rx_lin_data_0_o, udma_rx_lin_data_1_o, udma_rx_lin_data_2_o, udma_rx_lin_data_3_o, udma_rx_lin_data_4_o, udma_rx_lin_data_5_o, udma_rx_lin_data_6_o, udma_rx_lin_data_7_o, apb_hwce_prdata_0_o, apb_hwce_prdata_1_o, apb_hwce_prdata_10_o, apb_hwce_prdata_11_o, apb_hwce_prdata_2_o, apb_hwce_prdata_3_o, apb_hwce_prdata_4_o, apb_hwce_prdata_5_o, apb_hwce_prdata_6_o, apb_hwce_prdata_7_o, apb_hwce_prdata_8_o, apb_hwce_prdata_9_o, apb_hwce_prdata_12_o, apb_hwce_prdata_13_o, apb_hwce_prdata_22_o, apb_hwce_prdata_23_o, apb_hwce_prdata_24_o, apb_hwce_prdata_25_o, apb_hwce_prdata_26_o, apb_hwce_prdata_27_o, apb_hwce_prdata_28_o, apb_hwce_prdata_29_o, apb_hwce_prdata_14_o, apb_hwce_prdata_15_o, apb_hwce_prdata_16_o, apb_hwce_prdata_17_o, apb_hwce_prdata_18_o, apb_hwce_prdata_19_o, apb_hwce_prdata_20_o, apb_hwce_prdata_21_o, apb_hwce_prdata_30_o, apb_hwce_prdata_31_o, gpio_oe_31_o, gpio_data_31_o, apb_hwce_ready_o, apb_hwce_pslverr_o, gpio_oe_28_o, gpio_data_28_o, gpio_oe_29_o, gpio_data_29_o, gpio_oe_30_o, gpio_data_30_o, gpio_oe_32_o, gpio_data_32_o, gpio_oe_37_o, gpio_data_37_o, gpio_oe_38_o, gpio_data_38_o, gpio_oe_39_o, gpio_data_39_o, gpio_oe_40_o, gpio_data_40_o, gpio_oe_33_o, gpio_data_33_o, gpio_oe_34_o, gpio_data_34_o, gpio_oe_35_o, gpio_data_35_o, gpio_oe_36_o, gpio_data_36_o, tcdm_addr_p3_16_o, tcdm_wdata_p3_16_o, tcdm_wdata_p3_22_o, tcdm_wdata_p3_23_o, tcdm_wdata_p3_24_o, tcdm_wdata_p3_25_o, tcdm_wdata_p3_26_o, tcdm_wdata_p3_27_o, tcdm_wdata_p3_28_o, tcdm_wdata_p3_29_o, tcdm_addr_p3_17_o, tcdm_wdata_p3_17_o, tcdm_addr_p3_18_o, tcdm_wdata_p3_18_o, tcdm_addr_p3_19_o, tcdm_wdata_p3_19_o, tcdm_wdata_p3_20_o, tcdm_wdata_p3_21_o, tcdm_addr_p3_10_o, tcdm_wdata_p3_10_o, tcdm_addr_p3_15_o, tcdm_wdata_p3_15_o, tcdm_addr_p3_11_o, tcdm_wdata_p3_11_o, tcdm_addr_p3_12_o, tcdm_wdata_p3_12_o, tcdm_addr_p3_13_o, tcdm_wdata_p3_13_o, tcdm_addr_p3_14_o, tcdm_wdata_p3_14_o, tcdm_addr_p3_1_o, tcdm_wdata_p3_1_o, tcdm_addr_p3_6_o, tcdm_wdata_p3_6_o, tcdm_addr_p3_7_o, tcdm_wdata_p3_7_o, tcdm_addr_p3_8_o, tcdm_wdata_p3_8_o, tcdm_addr_p3_9_o, tcdm_wdata_p3_9_o, tcdm_addr_p3_2_o, tcdm_wdata_p3_2_o, tcdm_addr_p3_3_o, tcdm_wdata_p3_3_o, tcdm_addr_p3_4_o, tcdm_wdata_p3_4_o, tcdm_addr_p3_5_o, tcdm_wdata_p3_5_o, tcdm_wdata_p2_28_o, tcdm_wdata_p2_29_o, tcdm_addr_p3_0_o, tcdm_wdata_p3_0_o, tcdm_wdata_p2_30_o, tcdm_wdata_p2_31_o, tcdm_req_p2_o, tcdm_wen_p2_o, tcdm_be_p2_0_o, tcdm_be_p2_1_o, tcdm_be_p2_2_o, tcdm_be_p2_3_o, tcdm_addr_p2_15_o, tcdm_wdata_p2_15_o, tcdm_wdata_p2_20_o, tcdm_wdata_p2_21_o, tcdm_wdata_p2_22_o, tcdm_wdata_p2_23_o, tcdm_wdata_p2_24_o, tcdm_wdata_p2_25_o, tcdm_wdata_p2_26_o, tcdm_wdata_p2_27_o, tcdm_addr_p2_16_o, tcdm_wdata_p2_16_o, tcdm_addr_p2_17_o, tcdm_wdata_p2_17_o, tcdm_addr_p2_18_o, tcdm_wdata_p2_18_o, tcdm_addr_p2_19_o, tcdm_wdata_p2_19_o, tcdm_addr_p2_9_o, tcdm_wdata_p2_9_o, tcdm_addr_p2_14_o, tcdm_wdata_p2_14_o, tcdm_addr_p2_10_o, tcdm_wdata_p2_10_o, tcdm_addr_p2_11_o, tcdm_wdata_p2_11_o, tcdm_addr_p2_12_o, tcdm_wdata_p2_12_o, tcdm_addr_p2_13_o, tcdm_wdata_p2_13_o, tcdm_addr_p2_0_o, tcdm_wdata_p2_0_o, tcdm_addr_p2_5_o, tcdm_wdata_p2_5_o, tcdm_addr_p2_6_o, tcdm_wdata_p2_6_o, tcdm_addr_p2_7_o, tcdm_wdata_p2_7_o, tcdm_addr_p2_8_o, tcdm_wdata_p2_8_o, tcdm_addr_p2_1_o, tcdm_wdata_p2_1_o, tcdm_addr_p2_2_o, tcdm_wdata_p2_2_o, tcdm_addr_p2_3_o, tcdm_wdata_p2_3_o, tcdm_addr_p2_4_o, tcdm_wdata_p2_4_o, tcdm_addr_p0_0_o, tcdm_wdata_p0_0_o, tcdm_addr_p0_5_o, tcdm_wdata_p0_5_o, tcdm_addr_p0_1_o, tcdm_wdata_p0_1_o, tcdm_addr_p0_2_o, tcdm_wdata_p0_2_o, tcdm_addr_p0_3_o, tcdm_wdata_p0_3_o, tcdm_addr_p0_4_o, tcdm_wdata_p0_4_o, tcdm_addr_p0_6_o, tcdm_wdata_p0_6_o, tcdm_addr_p0_11_o, tcdm_wdata_p0_11_o, tcdm_addr_p0_12_o, tcdm_wdata_p0_12_o, tcdm_addr_p0_13_o, tcdm_wdata_p0_13_o, tcdm_addr_p0_14_o, tcdm_wdata_p0_14_o, tcdm_addr_p0_7_o, tcdm_wdata_p0_7_o, tcdm_addr_p0_8_o, tcdm_wdata_p0_8_o, tcdm_addr_p0_9_o, tcdm_wdata_p0_9_o, tcdm_addr_p0_10_o, tcdm_wdata_p0_10_o, tcdm_addr_p0_15_o, tcdm_wdata_p0_15_o, tcdm_wdata_p0_20_o, tcdm_wdata_p0_21_o, tcdm_addr_p0_16_o, tcdm_wdata_p0_16_o, tcdm_addr_p0_17_o, tcdm_wdata_p0_17_o, tcdm_addr_p0_18_o, tcdm_wdata_p0_18_o, tcdm_addr_p0_19_o, tcdm_wdata_p0_19_o, tcdm_wdata_p0_22_o, tcdm_wdata_p0_23_o, tcdm_req_p0_o, tcdm_wen_p0_o, tcdm_be_p0_0_o, tcdm_be_p0_1_o, tcdm_be_p0_2_o, tcdm_be_p0_3_o, tcdm_addr_p1_0_o, tcdm_wdata_p1_0_o, tcdm_wdata_p0_24_o, tcdm_wdata_p0_25_o, tcdm_wdata_p0_26_o, tcdm_wdata_p0_27_o, tcdm_wdata_p0_28_o, tcdm_wdata_p0_29_o, tcdm_wdata_p0_30_o, tcdm_wdata_p0_31_o, tcdm_addr_p1_1_o, tcdm_wdata_p1_1_o, tcdm_addr_p1_6_o, tcdm_wdata_p1_6_o, tcdm_addr_p1_2_o, tcdm_wdata_p1_2_o, tcdm_addr_p1_3_o, tcdm_wdata_p1_3_o, tcdm_addr_p1_4_o, tcdm_wdata_p1_4_o, tcdm_addr_p1_5_o, tcdm_wdata_p1_5_o, tcdm_addr_p1_7_o, tcdm_wdata_p1_7_o, tcdm_addr_p1_12_o, tcdm_wdata_p1_12_o, tcdm_addr_p1_13_o, tcdm_wdata_p1_13_o, tcdm_addr_p1_14_o, tcdm_wdata_p1_14_o, tcdm_addr_p1_15_o, tcdm_wdata_p1_15_o, tcdm_addr_p1_8_o, tcdm_wdata_p1_8_o, tcdm_addr_p1_9_o, tcdm_wdata_p1_9_o, tcdm_addr_p1_10_o, tcdm_wdata_p1_10_o, tcdm_addr_p1_11_o, tcdm_wdata_p1_11_o, tcdm_addr_p1_16_o, tcdm_wdata_p1_16_o, tcdm_wdata_p1_22_o, tcdm_wdata_p1_23_o, tcdm_addr_p1_17_o, tcdm_wdata_p1_17_o, tcdm_addr_p1_18_o, tcdm_wdata_p1_18_o, tcdm_addr_p1_19_o, tcdm_wdata_p1_19_o, tcdm_wdata_p1_20_o, tcdm_wdata_p1_21_o, tcdm_wdata_p1_24_o, tcdm_wdata_p1_25_o, tcdm_be_p1_0_o, tcdm_be_p1_1_o, tcdm_be_p1_2_o, tcdm_be_p1_3_o, gpio_oe_8_o, gpio_data_8_o, gpio_oe_9_o, gpio_data_9_o, tcdm_wdata_p1_26_o, tcdm_wdata_p1_27_o, tcdm_wdata_p1_28_o, tcdm_wdata_p1_29_o, tcdm_wdata_p1_30_o, tcdm_wdata_p1_31_o, tcdm_req_p1_o, tcdm_wen_p1_o, gpio_oe_10_o, gpio_data_10_o, gpio_oe_11_o, gpio_data_11_o, gpio_oe_14_o, gpio_data_14_o, gpio_oe_15_o, gpio_data_15_o, tcdm_wdata_p3_30_o, tcdm_wdata_p3_31_o, gpio_oe_13_o, gpio_data_13_o, tcdm_req_p3_o, tcdm_wen_p3_o, tcdm_be_p3_0_o, tcdm_be_p3_1_o, tcdm_be_p3_2_o, tcdm_be_p3_3_o, gpio_oe_12_o, gpio_data_12_o,
+   fpgaio_oe_0_o, fpgaio_data_0_o, fpgaio_oe_1_o, fpgaio_data_1_o, fpgaio_oe_2_o, fpgaio_data_2_o, fpgaio_oe_3_o, fpgaio_data_3_o, fpgaio_oe_4_o, fpgaio_data_4_o, fpgaio_oe_5_o, fpgaio_data_5_o, fpgaio_oe_6_o, fpgaio_data_6_o, fpgaio_oe_7_o, fpgaio_data_7_o, fpgaio_oe_20_o, fpgaio_data_20_o, fpgaio_oe_25_o, fpgaio_data_25_o, fpgaio_oe_26_o, fpgaio_data_26_o, fpgaio_oe_27_o, fpgaio_data_27_o, fpgaio_oe_21_o, fpgaio_data_21_o, fpgaio_oe_22_o, fpgaio_data_22_o, fpgaio_oe_23_o, fpgaio_data_23_o, fpgaio_oe_24_o, fpgaio_data_24_o, events_12_o, events_13_o, fpgaio_oe_19_o, fpgaio_data_19_o, events_14_o, events_15_o, fpgaio_oe_16_o, fpgaio_data_16_o, fpgaio_oe_17_o, fpgaio_data_17_o, fpgaio_oe_18_o, fpgaio_data_18_o, udma_cfg_data_26_o, udma_cfg_data_27_o, events_4_o, events_5_o, events_6_o, events_7_o, events_8_o, events_9_o, events_10_o, events_11_o, udma_cfg_data_28_o, udma_cfg_data_29_o, udma_cfg_data_30_o, udma_cfg_data_31_o, events_0_o, events_1_o, events_2_o, events_3_o, udma_cfg_data_14_o, udma_cfg_data_15_o, udma_cfg_data_24_o, udma_cfg_data_25_o, udma_cfg_data_16_o, udma_cfg_data_17_o, udma_cfg_data_18_o, udma_cfg_data_19_o, udma_cfg_data_20_o, udma_cfg_data_21_o, udma_cfg_data_22_o, udma_cfg_data_23_o, udma_rx_lin_data_28_o, udma_rx_lin_data_29_o, udma_cfg_data_6_o, udma_cfg_data_7_o, udma_cfg_data_8_o, udma_cfg_data_9_o, udma_cfg_data_10_o, udma_cfg_data_11_o, udma_cfg_data_12_o, udma_cfg_data_13_o, udma_rx_lin_data_30_o, udma_rx_lin_data_31_o, udma_cfg_data_0_o, udma_cfg_data_1_o, udma_cfg_data_2_o, udma_cfg_data_3_o, udma_cfg_data_4_o, udma_cfg_data_5_o, udma_rx_lin_data_16_o, udma_rx_lin_data_17_o, udma_rx_lin_data_26_o, udma_rx_lin_data_27_o, udma_rx_lin_data_18_o, udma_rx_lin_data_19_o, udma_rx_lin_data_20_o, udma_rx_lin_data_21_o, udma_rx_lin_data_22_o, udma_rx_lin_data_23_o, udma_rx_lin_data_24_o, udma_rx_lin_data_25_o, udma_tx_lin_ready_o, udma_rx_lin_valid_o, udma_rx_lin_data_8_o, udma_rx_lin_data_9_o, udma_rx_lin_data_10_o, udma_rx_lin_data_11_o, udma_rx_lin_data_12_o, udma_rx_lin_data_13_o, udma_rx_lin_data_14_o, udma_rx_lin_data_15_o, udma_rx_lin_data_0_o, udma_rx_lin_data_1_o, udma_rx_lin_data_2_o, udma_rx_lin_data_3_o, udma_rx_lin_data_4_o, udma_rx_lin_data_5_o, udma_rx_lin_data_6_o, udma_rx_lin_data_7_o, apb_hwce_prdata_0_o, apb_hwce_prdata_1_o, apb_hwce_prdata_10_o, apb_hwce_prdata_11_o, apb_hwce_prdata_2_o, apb_hwce_prdata_3_o, apb_hwce_prdata_4_o, apb_hwce_prdata_5_o, apb_hwce_prdata_6_o, apb_hwce_prdata_7_o, apb_hwce_prdata_8_o, apb_hwce_prdata_9_o, apb_hwce_prdata_12_o, apb_hwce_prdata_13_o, apb_hwce_prdata_22_o, apb_hwce_prdata_23_o, apb_hwce_prdata_24_o, apb_hwce_prdata_25_o, apb_hwce_prdata_26_o, apb_hwce_prdata_27_o, apb_hwce_prdata_28_o, apb_hwce_prdata_29_o, apb_hwce_prdata_14_o, apb_hwce_prdata_15_o, apb_hwce_prdata_16_o, apb_hwce_prdata_17_o, apb_hwce_prdata_18_o, apb_hwce_prdata_19_o, apb_hwce_prdata_20_o, apb_hwce_prdata_21_o, apb_hwce_prdata_30_o, apb_hwce_prdata_31_o, fpgaio_oe_31_o, fpgaio_data_31_o, apb_hwce_ready_o, apb_hwce_pslverr_o, fpgaio_oe_28_o, fpgaio_data_28_o, fpgaio_oe_29_o, fpgaio_data_29_o, fpgaio_oe_30_o, fpgaio_data_30_o, fpgaio_oe_32_o, fpgaio_data_32_o, fpgaio_oe_37_o, fpgaio_data_37_o, fpgaio_oe_38_o, fpgaio_data_38_o, fpgaio_oe_39_o, fpgaio_data_39_o, fpgaio_oe_40_o, fpgaio_data_40_o, fpgaio_oe_33_o, fpgaio_data_33_o, fpgaio_oe_34_o, fpgaio_data_34_o, fpgaio_oe_35_o, fpgaio_data_35_o, fpgaio_oe_36_o, fpgaio_data_36_o, tcdm_addr_p3_16_o, tcdm_wdata_p3_16_o, tcdm_wdata_p3_22_o, tcdm_wdata_p3_23_o, tcdm_wdata_p3_24_o, tcdm_wdata_p3_25_o, tcdm_wdata_p3_26_o, tcdm_wdata_p3_27_o, tcdm_wdata_p3_28_o, tcdm_wdata_p3_29_o, tcdm_addr_p3_17_o, tcdm_wdata_p3_17_o, tcdm_addr_p3_18_o, tcdm_wdata_p3_18_o, tcdm_addr_p3_19_o, tcdm_wdata_p3_19_o, tcdm_wdata_p3_20_o, tcdm_wdata_p3_21_o, tcdm_addr_p3_10_o, tcdm_wdata_p3_10_o, tcdm_addr_p3_15_o, tcdm_wdata_p3_15_o, tcdm_addr_p3_11_o, tcdm_wdata_p3_11_o, tcdm_addr_p3_12_o, tcdm_wdata_p3_12_o, tcdm_addr_p3_13_o, tcdm_wdata_p3_13_o, tcdm_addr_p3_14_o, tcdm_wdata_p3_14_o, tcdm_addr_p3_1_o, tcdm_wdata_p3_1_o, tcdm_addr_p3_6_o, tcdm_wdata_p3_6_o, tcdm_addr_p3_7_o, tcdm_wdata_p3_7_o, tcdm_addr_p3_8_o, tcdm_wdata_p3_8_o, tcdm_addr_p3_9_o, tcdm_wdata_p3_9_o, tcdm_addr_p3_2_o, tcdm_wdata_p3_2_o, tcdm_addr_p3_3_o, tcdm_wdata_p3_3_o, tcdm_addr_p3_4_o, tcdm_wdata_p3_4_o, tcdm_addr_p3_5_o, tcdm_wdata_p3_5_o, tcdm_wdata_p2_28_o, tcdm_wdata_p2_29_o, tcdm_addr_p3_0_o, tcdm_wdata_p3_0_o, tcdm_wdata_p2_30_o, tcdm_wdata_p2_31_o, tcdm_req_p2_o, tcdm_wen_p2_o, tcdm_be_p2_0_o, tcdm_be_p2_1_o, tcdm_be_p2_2_o, tcdm_be_p2_3_o, tcdm_addr_p2_15_o, tcdm_wdata_p2_15_o, tcdm_wdata_p2_20_o, tcdm_wdata_p2_21_o, tcdm_wdata_p2_22_o, tcdm_wdata_p2_23_o, tcdm_wdata_p2_24_o, tcdm_wdata_p2_25_o, tcdm_wdata_p2_26_o, tcdm_wdata_p2_27_o, tcdm_addr_p2_16_o, tcdm_wdata_p2_16_o, tcdm_addr_p2_17_o, tcdm_wdata_p2_17_o, tcdm_addr_p2_18_o, tcdm_wdata_p2_18_o, tcdm_addr_p2_19_o, tcdm_wdata_p2_19_o, tcdm_addr_p2_9_o, tcdm_wdata_p2_9_o, tcdm_addr_p2_14_o, tcdm_wdata_p2_14_o, tcdm_addr_p2_10_o, tcdm_wdata_p2_10_o, tcdm_addr_p2_11_o, tcdm_wdata_p2_11_o, tcdm_addr_p2_12_o, tcdm_wdata_p2_12_o, tcdm_addr_p2_13_o, tcdm_wdata_p2_13_o, tcdm_addr_p2_0_o, tcdm_wdata_p2_0_o, tcdm_addr_p2_5_o, tcdm_wdata_p2_5_o, tcdm_addr_p2_6_o, tcdm_wdata_p2_6_o, tcdm_addr_p2_7_o, tcdm_wdata_p2_7_o, tcdm_addr_p2_8_o, tcdm_wdata_p2_8_o, tcdm_addr_p2_1_o, tcdm_wdata_p2_1_o, tcdm_addr_p2_2_o, tcdm_wdata_p2_2_o, tcdm_addr_p2_3_o, tcdm_wdata_p2_3_o, tcdm_addr_p2_4_o, tcdm_wdata_p2_4_o, tcdm_addr_p0_0_o, tcdm_wdata_p0_0_o, tcdm_addr_p0_5_o, tcdm_wdata_p0_5_o, tcdm_addr_p0_1_o, tcdm_wdata_p0_1_o, tcdm_addr_p0_2_o, tcdm_wdata_p0_2_o, tcdm_addr_p0_3_o, tcdm_wdata_p0_3_o, tcdm_addr_p0_4_o, tcdm_wdata_p0_4_o, tcdm_addr_p0_6_o, tcdm_wdata_p0_6_o, tcdm_addr_p0_11_o, tcdm_wdata_p0_11_o, tcdm_addr_p0_12_o, tcdm_wdata_p0_12_o, tcdm_addr_p0_13_o, tcdm_wdata_p0_13_o, tcdm_addr_p0_14_o, tcdm_wdata_p0_14_o, tcdm_addr_p0_7_o, tcdm_wdata_p0_7_o, tcdm_addr_p0_8_o, tcdm_wdata_p0_8_o, tcdm_addr_p0_9_o, tcdm_wdata_p0_9_o, tcdm_addr_p0_10_o, tcdm_wdata_p0_10_o, tcdm_addr_p0_15_o, tcdm_wdata_p0_15_o, tcdm_wdata_p0_20_o, tcdm_wdata_p0_21_o, tcdm_addr_p0_16_o, tcdm_wdata_p0_16_o, tcdm_addr_p0_17_o, tcdm_wdata_p0_17_o, tcdm_addr_p0_18_o, tcdm_wdata_p0_18_o, tcdm_addr_p0_19_o, tcdm_wdata_p0_19_o, tcdm_wdata_p0_22_o, tcdm_wdata_p0_23_o, tcdm_req_p0_o, tcdm_wen_p0_o, tcdm_be_p0_0_o, tcdm_be_p0_1_o, tcdm_be_p0_2_o, tcdm_be_p0_3_o, tcdm_addr_p1_0_o, tcdm_wdata_p1_0_o, tcdm_wdata_p0_24_o, tcdm_wdata_p0_25_o, tcdm_wdata_p0_26_o, tcdm_wdata_p0_27_o, tcdm_wdata_p0_28_o, tcdm_wdata_p0_29_o, tcdm_wdata_p0_30_o, tcdm_wdata_p0_31_o, tcdm_addr_p1_1_o, tcdm_wdata_p1_1_o, tcdm_addr_p1_6_o, tcdm_wdata_p1_6_o, tcdm_addr_p1_2_o, tcdm_wdata_p1_2_o, tcdm_addr_p1_3_o, tcdm_wdata_p1_3_o, tcdm_addr_p1_4_o, tcdm_wdata_p1_4_o, tcdm_addr_p1_5_o, tcdm_wdata_p1_5_o, tcdm_addr_p1_7_o, tcdm_wdata_p1_7_o, tcdm_addr_p1_12_o, tcdm_wdata_p1_12_o, tcdm_addr_p1_13_o, tcdm_wdata_p1_13_o, tcdm_addr_p1_14_o, tcdm_wdata_p1_14_o, tcdm_addr_p1_15_o, tcdm_wdata_p1_15_o, tcdm_addr_p1_8_o, tcdm_wdata_p1_8_o, tcdm_addr_p1_9_o, tcdm_wdata_p1_9_o, tcdm_addr_p1_10_o, tcdm_wdata_p1_10_o, tcdm_addr_p1_11_o, tcdm_wdata_p1_11_o, tcdm_addr_p1_16_o, tcdm_wdata_p1_16_o, tcdm_wdata_p1_22_o, tcdm_wdata_p1_23_o, tcdm_addr_p1_17_o, tcdm_wdata_p1_17_o, tcdm_addr_p1_18_o, tcdm_wdata_p1_18_o, tcdm_addr_p1_19_o, tcdm_wdata_p1_19_o, tcdm_wdata_p1_20_o, tcdm_wdata_p1_21_o, tcdm_wdata_p1_24_o, tcdm_wdata_p1_25_o, tcdm_be_p1_0_o, tcdm_be_p1_1_o, tcdm_be_p1_2_o, tcdm_be_p1_3_o, fpgaio_oe_8_o, fpgaio_data_8_o, fpgaio_oe_9_o, fpgaio_data_9_o, tcdm_wdata_p1_26_o, tcdm_wdata_p1_27_o, tcdm_wdata_p1_28_o, tcdm_wdata_p1_29_o, tcdm_wdata_p1_30_o, tcdm_wdata_p1_31_o, tcdm_req_p1_o, tcdm_wen_p1_o, fpgaio_oe_10_o, fpgaio_data_10_o, fpgaio_oe_11_o, fpgaio_data_11_o, fpgaio_oe_14_o, fpgaio_data_14_o, fpgaio_oe_15_o, fpgaio_data_15_o, tcdm_wdata_p3_30_o, tcdm_wdata_p3_31_o, fpgaio_oe_13_o, fpgaio_data_13_o, tcdm_req_p3_o, tcdm_wen_p3_o, tcdm_be_p3_0_o, tcdm_be_p3_1_o, tcdm_be_p3_2_o, tcdm_be_p3_3_o, fpgaio_oe_12_o, fpgaio_data_12_o,
    // Inputs
    fcb_sys_stm, fcb_sys_rst_n, fcb_sys_clk, fcb_spis_rst_n,
    fcb_spis_mosi, fcb_spis_cs_n, fcb_spis_clk, fcb_spim_miso,
@@ -25,7 +25,7 @@ module eFPGA_wrapper (
    M_2_, M_1_, M_0_, MLATCH, FB_SPE_IN_3_, FB_SPE_IN_2_, FB_SPE_IN_1_,
    FB_SPE_IN_0_,
    supplyBus,
-   CLK0, CLK1, CLK2, CLK3, CLK4, CLK5, gpio_data_0_i, gpio_data_1_i, gpio_data_2_i, gpio_data_3_i, gpio_data_4_i, gpio_data_5_i, gpio_data_6_i, gpio_data_7_i, udma_cfg_data_8_i, udma_cfg_data_9_i, udma_cfg_data_10_i, udma_cfg_data_11_i, udma_cfg_data_12_i, udma_cfg_data_13_i, udma_cfg_data_14_i, udma_cfg_data_15_i, udma_cfg_data_2_i, udma_cfg_data_3_i, udma_cfg_data_4_i, udma_cfg_data_5_i, udma_cfg_data_6_i, udma_cfg_data_7_i, udma_tx_lin_data_27_i, udma_tx_lin_data_28_i, udma_tx_lin_data_29_i, udma_tx_lin_data_30_i, udma_tx_lin_data_31_i, udma_rx_lin_ready_i, udma_cfg_data_0_i, udma_cfg_data_1_i, udma_tx_lin_data_21_i, udma_tx_lin_data_22_i, udma_tx_lin_data_23_i, udma_tx_lin_data_24_i, udma_tx_lin_data_25_i, udma_tx_lin_data_26_i, udma_tx_lin_data_13_i, udma_tx_lin_data_14_i, udma_tx_lin_data_15_i, udma_tx_lin_data_16_i, udma_tx_lin_data_17_i, udma_tx_lin_data_18_i, udma_tx_lin_data_19_i, udma_tx_lin_data_20_i, udma_tx_lin_data_7_i, udma_tx_lin_data_8_i, udma_tx_lin_data_9_i, udma_tx_lin_data_10_i, udma_tx_lin_data_11_i, udma_tx_lin_data_12_i, udma_tx_lin_valid_i, udma_tx_lin_data_0_i, udma_tx_lin_data_1_i, udma_tx_lin_data_2_i, udma_tx_lin_data_3_i, udma_tx_lin_data_4_i, udma_tx_lin_data_5_i, udma_tx_lin_data_6_i, apb_hwce_pwdata_0_i, apb_hwce_pwdata_1_i, apb_hwce_pwdata_2_i, apb_hwce_pwdata_3_i, apb_hwce_pwdata_4_i, apb_hwce_pwdata_5_i, apb_hwce_pwdata_6_i, apb_hwce_pwdata_7_i, apb_hwce_pwdata_8_i, apb_hwce_pwdata_9_i, apb_hwce_pwdata_10_i, apb_hwce_pwdata_11_i, apb_hwce_pwdata_12_i, apb_hwce_pwdata_13_i, apb_hwce_pwdata_14_i, apb_hwce_pwdata_15_i, apb_hwce_pwdata_16_i, apb_hwce_pwdata_17_i, apb_hwce_pwdata_18_i, apb_hwce_pwdata_19_i, apb_hwce_pwdata_20_i, apb_hwce_pwdata_21_i, apb_hwce_pwdata_22_i, apb_hwce_pwdata_23_i, apb_hwce_pwdata_24_i, apb_hwce_pwdata_25_i, apb_hwce_pwdata_26_i, apb_hwce_pwdata_27_i, apb_hwce_pwdata_28_i, apb_hwce_pwdata_29_i, apb_hwce_pwdata_30_i, apb_hwce_pwdata_31_i, apb_hwce_addr_0_i, apb_hwce_addr_1_i, apb_hwce_addr_2_i, apb_hwce_addr_3_i, apb_hwce_addr_4_i, apb_hwce_addr_5_i, apb_hwce_addr_6_i, apb_hwce_enable_i, apb_hwce_psel_i, apb_hwce_pwrite_i, gpio_data_28_i, gpio_data_29_i, gpio_data_30_i, gpio_data_31_i, gpio_data_32_i, gpio_data_33_i, gpio_data_34_i, gpio_data_35_i, gpio_data_36_i, gpio_data_37_i, gpio_data_38_i, gpio_data_39_i, gpio_data_40_i, RESET_LB, RESET_LT, gpio_data_20_i, gpio_data_21_i, gpio_data_22_i, gpio_data_23_i, gpio_data_24_i, gpio_data_25_i, gpio_data_26_i, gpio_data_27_i, udma_cfg_data_30_i, udma_cfg_data_31_i, gpio_data_16_i, gpio_data_17_i, gpio_data_18_i, gpio_data_19_i, udma_cfg_data_22_i, udma_cfg_data_23_i, udma_cfg_data_24_i, udma_cfg_data_25_i, udma_cfg_data_26_i, udma_cfg_data_27_i, udma_cfg_data_28_i, udma_cfg_data_29_i, udma_cfg_data_16_i, udma_cfg_data_17_i, udma_cfg_data_18_i, udma_cfg_data_19_i, udma_cfg_data_20_i, udma_cfg_data_21_i, tcdm_r_rdata_p3_8_i, tcdm_r_rdata_p3_9_i, tcdm_r_rdata_p3_10_i, tcdm_r_rdata_p3_11_i, tcdm_r_rdata_p3_12_i, tcdm_r_rdata_p3_13_i, tcdm_r_rdata_p3_14_i, tcdm_r_rdata_p3_15_i, tcdm_r_rdata_p3_2_i, tcdm_r_rdata_p3_3_i, tcdm_r_rdata_p3_4_i, tcdm_r_rdata_p3_5_i, tcdm_r_rdata_p3_6_i, tcdm_r_rdata_p3_7_i, tcdm_r_rdata_p2_28_i, tcdm_r_rdata_p2_29_i, tcdm_r_rdata_p2_30_i, tcdm_r_rdata_p2_31_i, tcdm_gnt_p2_i, tcdm_r_valid_p2_i, tcdm_r_rdata_p3_0_i, tcdm_r_rdata_p3_1_i, tcdm_r_rdata_p2_22_i, tcdm_r_rdata_p2_23_i, tcdm_r_rdata_p2_24_i, tcdm_r_rdata_p2_25_i, tcdm_r_rdata_p2_26_i, tcdm_r_rdata_p2_27_i, tcdm_r_rdata_p2_14_i, tcdm_r_rdata_p2_15_i, tcdm_r_rdata_p2_16_i, tcdm_r_rdata_p2_17_i, tcdm_r_rdata_p2_18_i, tcdm_r_rdata_p2_19_i, tcdm_r_rdata_p2_20_i, tcdm_r_rdata_p2_21_i, tcdm_r_rdata_p2_8_i, tcdm_r_rdata_p2_9_i, tcdm_r_rdata_p2_10_i, tcdm_r_rdata_p2_11_i, tcdm_r_rdata_p2_12_i, tcdm_r_rdata_p2_13_i, tcdm_r_rdata_p2_0_i, tcdm_r_rdata_p2_1_i, tcdm_r_rdata_p2_2_i, tcdm_r_rdata_p2_3_i, tcdm_r_rdata_p2_4_i, tcdm_r_rdata_p2_5_i, tcdm_r_rdata_p2_6_i, tcdm_r_rdata_p2_7_i, tcdm_r_rdata_p0_0_i, tcdm_r_rdata_p0_1_i, tcdm_r_rdata_p0_2_i, tcdm_r_rdata_p0_3_i, tcdm_r_rdata_p0_4_i, tcdm_r_rdata_p0_5_i, tcdm_r_rdata_p0_6_i, tcdm_r_rdata_p0_7_i, tcdm_r_rdata_p0_8_i, tcdm_r_rdata_p0_9_i, tcdm_r_rdata_p0_10_i, tcdm_r_rdata_p0_11_i, tcdm_r_rdata_p0_12_i, tcdm_r_rdata_p0_13_i, tcdm_r_rdata_p0_14_i, tcdm_r_rdata_p0_15_i, tcdm_r_rdata_p0_16_i, tcdm_r_rdata_p0_17_i, tcdm_r_rdata_p0_18_i, tcdm_r_rdata_p0_19_i, tcdm_r_rdata_p0_20_i, tcdm_r_rdata_p0_21_i, tcdm_r_rdata_p0_22_i, tcdm_r_rdata_p0_23_i, tcdm_r_rdata_p0_24_i, tcdm_r_rdata_p0_25_i, tcdm_r_rdata_p0_26_i, tcdm_r_rdata_p0_27_i, tcdm_r_rdata_p0_28_i, tcdm_r_rdata_p0_29_i, tcdm_r_rdata_p0_30_i, tcdm_r_rdata_p0_31_i, tcdm_gnt_p0_i, tcdm_r_valid_p0_i, tcdm_r_rdata_p1_0_i, tcdm_r_rdata_p1_1_i, tcdm_r_rdata_p1_2_i, tcdm_r_rdata_p1_3_i, tcdm_r_rdata_p1_4_i, tcdm_r_rdata_p1_5_i, tcdm_r_rdata_p1_6_i, tcdm_r_rdata_p1_7_i, tcdm_r_rdata_p1_8_i, tcdm_r_rdata_p1_9_i, tcdm_r_rdata_p1_10_i, tcdm_r_rdata_p1_11_i, tcdm_r_rdata_p1_12_i, tcdm_r_rdata_p1_13_i, tcdm_r_rdata_p1_14_i, tcdm_r_rdata_p1_15_i, tcdm_r_rdata_p1_16_i, tcdm_r_rdata_p1_17_i, tcdm_r_rdata_p1_18_i, tcdm_r_rdata_p1_19_i, tcdm_r_rdata_p1_20_i, tcdm_r_rdata_p1_21_i, tcdm_r_rdata_p1_22_i, tcdm_r_rdata_p1_23_i, tcdm_r_rdata_p1_24_i, tcdm_r_rdata_p1_25_i, tcdm_r_rdata_p1_26_i, tcdm_r_rdata_p1_27_i, tcdm_r_rdata_p1_28_i, tcdm_r_rdata_p1_29_i, tcdm_r_rdata_p1_30_i, tcdm_r_rdata_p1_31_i, tcdm_gnt_p1_i, tcdm_r_valid_p1_i, gpio_data_8_i, gpio_data_9_i, gpio_data_10_i, gpio_data_11_i, RESET_RB, gpio_data_14_i, gpio_data_15_i, RESET_RT, tcdm_r_rdata_p3_30_i, tcdm_r_rdata_p3_31_i, tcdm_gnt_p3_i, tcdm_r_valid_p3_i, gpio_data_12_i, gpio_data_13_i, tcdm_r_rdata_p3_22_i, tcdm_r_rdata_p3_23_i, tcdm_r_rdata_p3_24_i, tcdm_r_rdata_p3_25_i, tcdm_r_rdata_p3_26_i, tcdm_r_rdata_p3_27_i, tcdm_r_rdata_p3_28_i, tcdm_r_rdata_p3_29_i, tcdm_r_rdata_p3_16_i, tcdm_r_rdata_p3_17_i, tcdm_r_rdata_p3_18_i, tcdm_r_rdata_p3_19_i, tcdm_r_rdata_p3_20_i, tcdm_r_rdata_p3_21_i
+   CLK0, CLK1, CLK2, CLK3, CLK4, CLK5, fpgaio_data_0_i, fpgaio_data_1_i, fpgaio_data_2_i, fpgaio_data_3_i, fpgaio_data_4_i, fpgaio_data_5_i, fpgaio_data_6_i, fpgaio_data_7_i, udma_cfg_data_8_i, udma_cfg_data_9_i, udma_cfg_data_10_i, udma_cfg_data_11_i, udma_cfg_data_12_i, udma_cfg_data_13_i, udma_cfg_data_14_i, udma_cfg_data_15_i, udma_cfg_data_2_i, udma_cfg_data_3_i, udma_cfg_data_4_i, udma_cfg_data_5_i, udma_cfg_data_6_i, udma_cfg_data_7_i, udma_tx_lin_data_27_i, udma_tx_lin_data_28_i, udma_tx_lin_data_29_i, udma_tx_lin_data_30_i, udma_tx_lin_data_31_i, udma_rx_lin_ready_i, udma_cfg_data_0_i, udma_cfg_data_1_i, udma_tx_lin_data_21_i, udma_tx_lin_data_22_i, udma_tx_lin_data_23_i, udma_tx_lin_data_24_i, udma_tx_lin_data_25_i, udma_tx_lin_data_26_i, udma_tx_lin_data_13_i, udma_tx_lin_data_14_i, udma_tx_lin_data_15_i, udma_tx_lin_data_16_i, udma_tx_lin_data_17_i, udma_tx_lin_data_18_i, udma_tx_lin_data_19_i, udma_tx_lin_data_20_i, udma_tx_lin_data_7_i, udma_tx_lin_data_8_i, udma_tx_lin_data_9_i, udma_tx_lin_data_10_i, udma_tx_lin_data_11_i, udma_tx_lin_data_12_i, udma_tx_lin_valid_i, udma_tx_lin_data_0_i, udma_tx_lin_data_1_i, udma_tx_lin_data_2_i, udma_tx_lin_data_3_i, udma_tx_lin_data_4_i, udma_tx_lin_data_5_i, udma_tx_lin_data_6_i, apb_hwce_pwdata_0_i, apb_hwce_pwdata_1_i, apb_hwce_pwdata_2_i, apb_hwce_pwdata_3_i, apb_hwce_pwdata_4_i, apb_hwce_pwdata_5_i, apb_hwce_pwdata_6_i, apb_hwce_pwdata_7_i, apb_hwce_pwdata_8_i, apb_hwce_pwdata_9_i, apb_hwce_pwdata_10_i, apb_hwce_pwdata_11_i, apb_hwce_pwdata_12_i, apb_hwce_pwdata_13_i, apb_hwce_pwdata_14_i, apb_hwce_pwdata_15_i, apb_hwce_pwdata_16_i, apb_hwce_pwdata_17_i, apb_hwce_pwdata_18_i, apb_hwce_pwdata_19_i, apb_hwce_pwdata_20_i, apb_hwce_pwdata_21_i, apb_hwce_pwdata_22_i, apb_hwce_pwdata_23_i, apb_hwce_pwdata_24_i, apb_hwce_pwdata_25_i, apb_hwce_pwdata_26_i, apb_hwce_pwdata_27_i, apb_hwce_pwdata_28_i, apb_hwce_pwdata_29_i, apb_hwce_pwdata_30_i, apb_hwce_pwdata_31_i, apb_hwce_addr_0_i, apb_hwce_addr_1_i, apb_hwce_addr_2_i, apb_hwce_addr_3_i, apb_hwce_addr_4_i, apb_hwce_addr_5_i, apb_hwce_addr_6_i, apb_hwce_enable_i, apb_hwce_psel_i, apb_hwce_pwrite_i, fpgaio_data_28_i, fpgaio_data_29_i, fpgaio_data_30_i, fpgaio_data_31_i, fpgaio_data_32_i, fpgaio_data_33_i, fpgaio_data_34_i, fpgaio_data_35_i, fpgaio_data_36_i, fpgaio_data_37_i, fpgaio_data_38_i, fpgaio_data_39_i, fpgaio_data_40_i, RESET_LB, RESET_LT, fpgaio_data_20_i, fpgaio_data_21_i, fpgaio_data_22_i, fpgaio_data_23_i, fpgaio_data_24_i, fpgaio_data_25_i, fpgaio_data_26_i, fpgaio_data_27_i, udma_cfg_data_30_i, udma_cfg_data_31_i, fpgaio_data_16_i, fpgaio_data_17_i, fpgaio_data_18_i, fpgaio_data_19_i, udma_cfg_data_22_i, udma_cfg_data_23_i, udma_cfg_data_24_i, udma_cfg_data_25_i, udma_cfg_data_26_i, udma_cfg_data_27_i, udma_cfg_data_28_i, udma_cfg_data_29_i, udma_cfg_data_16_i, udma_cfg_data_17_i, udma_cfg_data_18_i, udma_cfg_data_19_i, udma_cfg_data_20_i, udma_cfg_data_21_i, tcdm_r_rdata_p3_8_i, tcdm_r_rdata_p3_9_i, tcdm_r_rdata_p3_10_i, tcdm_r_rdata_p3_11_i, tcdm_r_rdata_p3_12_i, tcdm_r_rdata_p3_13_i, tcdm_r_rdata_p3_14_i, tcdm_r_rdata_p3_15_i, tcdm_r_rdata_p3_2_i, tcdm_r_rdata_p3_3_i, tcdm_r_rdata_p3_4_i, tcdm_r_rdata_p3_5_i, tcdm_r_rdata_p3_6_i, tcdm_r_rdata_p3_7_i, tcdm_r_rdata_p2_28_i, tcdm_r_rdata_p2_29_i, tcdm_r_rdata_p2_30_i, tcdm_r_rdata_p2_31_i, tcdm_gnt_p2_i, tcdm_r_valid_p2_i, tcdm_r_rdata_p3_0_i, tcdm_r_rdata_p3_1_i, tcdm_r_rdata_p2_22_i, tcdm_r_rdata_p2_23_i, tcdm_r_rdata_p2_24_i, tcdm_r_rdata_p2_25_i, tcdm_r_rdata_p2_26_i, tcdm_r_rdata_p2_27_i, tcdm_r_rdata_p2_14_i, tcdm_r_rdata_p2_15_i, tcdm_r_rdata_p2_16_i, tcdm_r_rdata_p2_17_i, tcdm_r_rdata_p2_18_i, tcdm_r_rdata_p2_19_i, tcdm_r_rdata_p2_20_i, tcdm_r_rdata_p2_21_i, tcdm_r_rdata_p2_8_i, tcdm_r_rdata_p2_9_i, tcdm_r_rdata_p2_10_i, tcdm_r_rdata_p2_11_i, tcdm_r_rdata_p2_12_i, tcdm_r_rdata_p2_13_i, tcdm_r_rdata_p2_0_i, tcdm_r_rdata_p2_1_i, tcdm_r_rdata_p2_2_i, tcdm_r_rdata_p2_3_i, tcdm_r_rdata_p2_4_i, tcdm_r_rdata_p2_5_i, tcdm_r_rdata_p2_6_i, tcdm_r_rdata_p2_7_i, tcdm_r_rdata_p0_0_i, tcdm_r_rdata_p0_1_i, tcdm_r_rdata_p0_2_i, tcdm_r_rdata_p0_3_i, tcdm_r_rdata_p0_4_i, tcdm_r_rdata_p0_5_i, tcdm_r_rdata_p0_6_i, tcdm_r_rdata_p0_7_i, tcdm_r_rdata_p0_8_i, tcdm_r_rdata_p0_9_i, tcdm_r_rdata_p0_10_i, tcdm_r_rdata_p0_11_i, tcdm_r_rdata_p0_12_i, tcdm_r_rdata_p0_13_i, tcdm_r_rdata_p0_14_i, tcdm_r_rdata_p0_15_i, tcdm_r_rdata_p0_16_i, tcdm_r_rdata_p0_17_i, tcdm_r_rdata_p0_18_i, tcdm_r_rdata_p0_19_i, tcdm_r_rdata_p0_20_i, tcdm_r_rdata_p0_21_i, tcdm_r_rdata_p0_22_i, tcdm_r_rdata_p0_23_i, tcdm_r_rdata_p0_24_i, tcdm_r_rdata_p0_25_i, tcdm_r_rdata_p0_26_i, tcdm_r_rdata_p0_27_i, tcdm_r_rdata_p0_28_i, tcdm_r_rdata_p0_29_i, tcdm_r_rdata_p0_30_i, tcdm_r_rdata_p0_31_i, tcdm_gnt_p0_i, tcdm_r_valid_p0_i, tcdm_r_rdata_p1_0_i, tcdm_r_rdata_p1_1_i, tcdm_r_rdata_p1_2_i, tcdm_r_rdata_p1_3_i, tcdm_r_rdata_p1_4_i, tcdm_r_rdata_p1_5_i, tcdm_r_rdata_p1_6_i, tcdm_r_rdata_p1_7_i, tcdm_r_rdata_p1_8_i, tcdm_r_rdata_p1_9_i, tcdm_r_rdata_p1_10_i, tcdm_r_rdata_p1_11_i, tcdm_r_rdata_p1_12_i, tcdm_r_rdata_p1_13_i, tcdm_r_rdata_p1_14_i, tcdm_r_rdata_p1_15_i, tcdm_r_rdata_p1_16_i, tcdm_r_rdata_p1_17_i, tcdm_r_rdata_p1_18_i, tcdm_r_rdata_p1_19_i, tcdm_r_rdata_p1_20_i, tcdm_r_rdata_p1_21_i, tcdm_r_rdata_p1_22_i, tcdm_r_rdata_p1_23_i, tcdm_r_rdata_p1_24_i, tcdm_r_rdata_p1_25_i, tcdm_r_rdata_p1_26_i, tcdm_r_rdata_p1_27_i, tcdm_r_rdata_p1_28_i, tcdm_r_rdata_p1_29_i, tcdm_r_rdata_p1_30_i, tcdm_r_rdata_p1_31_i, tcdm_gnt_p1_i, tcdm_r_valid_p1_i, fpgaio_data_8_i, fpgaio_data_9_i, fpgaio_data_10_i, fpgaio_data_11_i, RESET_RB, fpgaio_data_14_i, fpgaio_data_15_i, RESET_RT, tcdm_r_rdata_p3_30_i, tcdm_r_rdata_p3_31_i, tcdm_gnt_p3_i, tcdm_r_valid_p3_i, fpgaio_data_12_i, fpgaio_data_13_i, tcdm_r_rdata_p3_22_i, tcdm_r_rdata_p3_23_i, tcdm_r_rdata_p3_24_i, tcdm_r_rdata_p3_25_i, tcdm_r_rdata_p3_26_i, tcdm_r_rdata_p3_27_i, tcdm_r_rdata_p3_28_i, tcdm_r_rdata_p3_29_i, tcdm_r_rdata_p3_16_i, tcdm_r_rdata_p3_17_i, tcdm_r_rdata_p3_18_i, tcdm_r_rdata_p3_19_i, tcdm_r_rdata_p3_20_i, tcdm_r_rdata_p3_21_i
  );
 
 output        FB_SPE_OUT_0_;        // From U_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo of myDesign_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo.v
@@ -64,50 +64,50 @@ output        fcb_spis_miso;        // From U_fcb of fcb.v
 output        fcb_spis_miso_en;     // From U_fcb of fcb.v
 output        fcb_sysclk_en;        // From U_fcb of fcb.v
 
-output   gpio_oe_0_o;
-output   gpio_data_0_o;
-output   gpio_oe_1_o;
-output   gpio_data_1_o;
-output   gpio_oe_2_o;
-output   gpio_data_2_o;
-output   gpio_oe_3_o;
-output   gpio_data_3_o;
-output   gpio_oe_4_o;
-output   gpio_data_4_o;
-output   gpio_oe_5_o;
-output   gpio_data_5_o;
-output   gpio_oe_6_o;
-output   gpio_data_6_o;
-output   gpio_oe_7_o;
-output   gpio_data_7_o;
-output   gpio_oe_20_o;
-output   gpio_data_20_o;
-output   gpio_oe_25_o;
-output   gpio_data_25_o;
-output   gpio_oe_26_o;
-output   gpio_data_26_o;
-output   gpio_oe_27_o;
-output   gpio_data_27_o;
-output   gpio_oe_21_o;
-output   gpio_data_21_o;
-output   gpio_oe_22_o;
-output   gpio_data_22_o;
-output   gpio_oe_23_o;
-output   gpio_data_23_o;
-output   gpio_oe_24_o;
-output   gpio_data_24_o;
+output   fpgaio_oe_0_o;
+output   fpgaio_data_0_o;
+output   fpgaio_oe_1_o;
+output   fpgaio_data_1_o;
+output   fpgaio_oe_2_o;
+output   fpgaio_data_2_o;
+output   fpgaio_oe_3_o;
+output   fpgaio_data_3_o;
+output   fpgaio_oe_4_o;
+output   fpgaio_data_4_o;
+output   fpgaio_oe_5_o;
+output   fpgaio_data_5_o;
+output   fpgaio_oe_6_o;
+output   fpgaio_data_6_o;
+output   fpgaio_oe_7_o;
+output   fpgaio_data_7_o;
+output   fpgaio_oe_20_o;
+output   fpgaio_data_20_o;
+output   fpgaio_oe_25_o;
+output   fpgaio_data_25_o;
+output   fpgaio_oe_26_o;
+output   fpgaio_data_26_o;
+output   fpgaio_oe_27_o;
+output   fpgaio_data_27_o;
+output   fpgaio_oe_21_o;
+output   fpgaio_data_21_o;
+output   fpgaio_oe_22_o;
+output   fpgaio_data_22_o;
+output   fpgaio_oe_23_o;
+output   fpgaio_data_23_o;
+output   fpgaio_oe_24_o;
+output   fpgaio_data_24_o;
 output   events_12_o;
 output   events_13_o;
-output   gpio_oe_19_o;
-output   gpio_data_19_o;
+output   fpgaio_oe_19_o;
+output   fpgaio_data_19_o;
 output   events_14_o;
 output   events_15_o;
-output   gpio_oe_16_o;
-output   gpio_data_16_o;
-output   gpio_oe_17_o;
-output   gpio_data_17_o;
-output   gpio_oe_18_o;
-output   gpio_data_18_o;
+output   fpgaio_oe_16_o;
+output   fpgaio_data_16_o;
+output   fpgaio_oe_17_o;
+output   fpgaio_data_17_o;
+output   fpgaio_oe_18_o;
+output   fpgaio_data_18_o;
 output   udma_cfg_data_26_o;
 output   udma_cfg_data_27_o;
 output   events_4_o;
@@ -218,34 +218,34 @@ output   apb_hwce_prdata_20_o;
 output   apb_hwce_prdata_21_o;
 output   apb_hwce_prdata_30_o;
 output   apb_hwce_prdata_31_o;
-output   gpio_oe_31_o;
-output   gpio_data_31_o;
+output   fpgaio_oe_31_o;
+output   fpgaio_data_31_o;
 output   apb_hwce_ready_o;
 output   apb_hwce_pslverr_o;
-output   gpio_oe_28_o;
-output   gpio_data_28_o;
-output   gpio_oe_29_o;
-output   gpio_data_29_o;
-output   gpio_oe_30_o;
-output   gpio_data_30_o;
-output   gpio_oe_32_o;
-output   gpio_data_32_o;
-output   gpio_oe_37_o;
-output   gpio_data_37_o;
-output   gpio_oe_38_o;
-output   gpio_data_38_o;
-output   gpio_oe_39_o;
-output   gpio_data_39_o;
-output   gpio_oe_40_o;
-output   gpio_data_40_o;
-output   gpio_oe_33_o;
-output   gpio_data_33_o;
-output   gpio_oe_34_o;
-output   gpio_data_34_o;
-output   gpio_oe_35_o;
-output   gpio_data_35_o;
-output   gpio_oe_36_o;
-output   gpio_data_36_o;
+output   fpgaio_oe_28_o;
+output   fpgaio_data_28_o;
+output   fpgaio_oe_29_o;
+output   fpgaio_data_29_o;
+output   fpgaio_oe_30_o;
+output   fpgaio_data_30_o;
+output   fpgaio_oe_32_o;
+output   fpgaio_data_32_o;
+output   fpgaio_oe_37_o;
+output   fpgaio_data_37_o;
+output   fpgaio_oe_38_o;
+output   fpgaio_data_38_o;
+output   fpgaio_oe_39_o;
+output   fpgaio_data_39_o;
+output   fpgaio_oe_40_o;
+output   fpgaio_data_40_o;
+output   fpgaio_oe_33_o;
+output   fpgaio_data_33_o;
+output   fpgaio_oe_34_o;
+output   fpgaio_data_34_o;
+output   fpgaio_oe_35_o;
+output   fpgaio_data_35_o;
+output   fpgaio_oe_36_o;
+output   fpgaio_data_36_o;
 output   tcdm_addr_p3_16_o;
 output   tcdm_wdata_p3_16_o;
 output   tcdm_wdata_p3_22_o;
@@ -462,10 +462,10 @@ output   tcdm_be_p1_0_o;
 output   tcdm_be_p1_1_o;
 output   tcdm_be_p1_2_o;
 output   tcdm_be_p1_3_o;
-output   gpio_oe_8_o;
-output   gpio_data_8_o;
-output   gpio_oe_9_o;
-output   gpio_data_9_o;
+output   fpgaio_oe_8_o;
+output   fpgaio_data_8_o;
+output   fpgaio_oe_9_o;
+output   fpgaio_data_9_o;
 output   tcdm_wdata_p1_26_o;
 output   tcdm_wdata_p1_27_o;
 output   tcdm_wdata_p1_28_o;
@@ -474,26 +474,26 @@ output   tcdm_wdata_p1_30_o;
 output   tcdm_wdata_p1_31_o;
 output   tcdm_req_p1_o;
 output   tcdm_wen_p1_o;
-output   gpio_oe_10_o;
-output   gpio_data_10_o;
-output   gpio_oe_11_o;
-output   gpio_data_11_o;
-output   gpio_oe_14_o;
-output   gpio_data_14_o;
-output   gpio_oe_15_o;
-output   gpio_data_15_o;
+output   fpgaio_oe_10_o;
+output   fpgaio_data_10_o;
+output   fpgaio_oe_11_o;
+output   fpgaio_data_11_o;
+output   fpgaio_oe_14_o;
+output   fpgaio_data_14_o;
+output   fpgaio_oe_15_o;
+output   fpgaio_data_15_o;
 output   tcdm_wdata_p3_30_o;
 output   tcdm_wdata_p3_31_o;
-output   gpio_oe_13_o;
-output   gpio_data_13_o;
+output   fpgaio_oe_13_o;
+output   fpgaio_data_13_o;
 output   tcdm_req_p3_o;
 output   tcdm_wen_p3_o;
 output   tcdm_be_p3_0_o;
 output   tcdm_be_p3_1_o;
 output   tcdm_be_p3_2_o;
 output   tcdm_be_p3_3_o;
-output   gpio_oe_12_o;
-output   gpio_data_12_o;
+output   fpgaio_oe_12_o;
+output   fpgaio_data_12_o;
 
 input         FB_SPE_IN_0_;         // To U_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo of myDesign_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo.v
 input         FB_SPE_IN_1_;         // To U_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo of myDesign_QL_eFPGA_ArcticPro2_32X32_GF_22_ETH_demo.v
@@ -539,14 +539,14 @@ input         CLK2;
 input         CLK3;
 input         CLK4;
 input         CLK5;
-input         gpio_data_0_i;
-input         gpio_data_1_i;
-input         gpio_data_2_i;
-input         gpio_data_3_i;
-input         gpio_data_4_i;
-input         gpio_data_5_i;
-input         gpio_data_6_i;
-input         gpio_data_7_i;
+input         fpgaio_data_0_i;
+input         fpgaio_data_1_i;
+input         fpgaio_data_2_i;
+input         fpgaio_data_3_i;
+input         fpgaio_data_4_i;
+input         fpgaio_data_5_i;
+input         fpgaio_data_6_i;
+input         fpgaio_data_7_i;
 input         udma_cfg_data_8_i;
 input         udma_cfg_data_9_i;
 input         udma_cfg_data_10_i;
@@ -639,35 +639,35 @@ input         apb_hwce_addr_6_i;
 input         apb_hwce_enable_i;
 input         apb_hwce_psel_i;
 input         apb_hwce_pwrite_i;
-input         gpio_data_28_i;
-input         gpio_data_29_i;
-input         gpio_data_30_i;
-input         gpio_data_31_i;
-input         gpio_data_32_i;
-input         gpio_data_33_i;
-input         gpio_data_34_i;
-input         gpio_data_35_i;
-input         gpio_data_36_i;
-input         gpio_data_37_i;
-input         gpio_data_38_i;
-input         gpio_data_39_i;
-input         gpio_data_40_i;
+input         fpgaio_data_28_i;
+input         fpgaio_data_29_i;
+input         fpgaio_data_30_i;
+input         fpgaio_data_31_i;
+input         fpgaio_data_32_i;
+input         fpgaio_data_33_i;
+input         fpgaio_data_34_i;
+input         fpgaio_data_35_i;
+input         fpgaio_data_36_i;
+input         fpgaio_data_37_i;
+input         fpgaio_data_38_i;
+input         fpgaio_data_39_i;
+input         fpgaio_data_40_i;
 input         RESET_LB;
 input         RESET_LT;
-input         gpio_data_20_i;
-input         gpio_data_21_i;
-input         gpio_data_22_i;
-input         gpio_data_23_i;
-input         gpio_data_24_i;
-input         gpio_data_25_i;
-input         gpio_data_26_i;
-input         gpio_data_27_i;
+input         fpgaio_data_20_i;
+input         fpgaio_data_21_i;
+input         fpgaio_data_22_i;
+input         fpgaio_data_23_i;
+input         fpgaio_data_24_i;
+input         fpgaio_data_25_i;
+input         fpgaio_data_26_i;
+input         fpgaio_data_27_i;
 input         udma_cfg_data_30_i;
 input         udma_cfg_data_31_i;
-input         gpio_data_16_i;
-input         gpio_data_17_i;
-input         gpio_data_18_i;
-input         gpio_data_19_i;
+input         fpgaio_data_16_i;
+input         fpgaio_data_17_i;
+input         fpgaio_data_18_i;
+input         fpgaio_data_19_i;
 input         udma_cfg_data_22_i;
 input         udma_cfg_data_23_i;
 input         udma_cfg_data_24_i;
@@ -800,20 +800,20 @@ input         tcdm_r_rdata_p1_30_i;
 input         tcdm_r_rdata_p1_31_i;
 input         tcdm_gnt_p1_i;
 input         tcdm_r_valid_p1_i;
-input         gpio_data_8_i;
-input         gpio_data_9_i;
-input         gpio_data_10_i;
-input         gpio_data_11_i;
+input         fpgaio_data_8_i;
+input         fpgaio_data_9_i;
+input         fpgaio_data_10_i;
+input         fpgaio_data_11_i;
 input         RESET_RB;
-input         gpio_data_14_i;
-input         gpio_data_15_i;
+input         fpgaio_data_14_i;
+input         fpgaio_data_15_i;
 input         RESET_RT;
 input         tcdm_r_rdata_p3_30_i;
 input         tcdm_r_rdata_p3_31_i;
 input         tcdm_gnt_p3_i;
 input         tcdm_r_valid_p3_i;
-input         gpio_data_12_i;
-input         gpio_data_13_i;
+input         fpgaio_data_12_i;
+input         fpgaio_data_13_i;
 input         tcdm_r_rdata_p3_22_i;
 input         tcdm_r_rdata_p3_23_i;
 input         tcdm_r_rdata_p3_24_i;
@@ -1535,12 +1535,12 @@ iir_test QL_eFPGA_Design
       .WL_SEL_3_        (fcb_wl_sel[3]),
       .WL_SEL_TB_INT    (fcb_wl_sel_tb_int),
       `include "math_block_connection.vh"
-      .gpio_data_41_i   ( 1'b0            ),
-      .gpio_data_41_o   (                 ),
-      .gpio_oe_41_o     (                 ),
-      .gpio_data_42_i   ( 1'b0            ),
-      .gpio_data_42_o   (                 ),
-      .gpio_oe_42_o     (                 ),
+      .fpgaio_data_41_i   ( 1'b0            ),
+      .fpgaio_data_41_o   (                 ),
+      .fpgaio_oe_41_o     (                 ),
+      .fpgaio_data_42_i   ( 1'b0            ),
+      .fpgaio_data_42_o   (                 ),
+      .fpgaio_oe_42_o     (                 ),
       
       .apb_hwce_pstrb_i ( 1'b0            ),    // ToDo: This is a hack to eliminate error, need to determine how to correctly set this signal
       .*
