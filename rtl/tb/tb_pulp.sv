@@ -31,8 +31,8 @@ module tb_pulp;
 
    /* simulation platform parameters */
 
-   // Choose your core: 0 for RISCY, 1 for ZERORISCY
-   parameter CORE_TYPE            = 0;
+   // Choose your core: 0 for RISCY, 1 for ZERORISCY, 3 for CV32E40P
+   parameter logic[1:0] CORE_TYPE = 2'd3;
    // if RISCY is instantiated (CORE_TYPE == 0), RISCY_FPU enables the FPU
    parameter RISCY_FPU            = 1;
 
@@ -535,8 +535,8 @@ module tb_pulp;
 
    // PULPissimo chip (design under test)
    pulpissimo #(
-      .CORE_TYPE ( CORE_TYPE ),
-      .USE_FPU   ( RISCY_FPU )
+      .CORE_TYPE ( CORE_TYPE         ),
+      .USE_FPU   ( RISCY_FPU         )
    )
    i_dut (
       .pad_spim_sdio0     ( w_spi_master_sdio0 ),
@@ -604,7 +604,7 @@ module tb_pulp;
          logic [6:0]  dm_addr;
          logic        error;
          int         num_err;
-         automatic logic [9:0]  FC_CORE_ID = {5'd31, 5'd0};
+         automatic logic [9:0]  FC_CORE_ID = CORE_TYPE != 3 ? {5'd31, 5'd0} : '0;
 
          int entry_point;
          logic [31:0] begin_l2_instr;

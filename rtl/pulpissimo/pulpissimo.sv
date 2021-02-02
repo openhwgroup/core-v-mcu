@@ -11,7 +11,8 @@
 `include "pulp_soc_defines.sv"
 
 module pulpissimo #(
-    parameter CORE_TYPE   = 0, // 0 for RISCY, 1 for IBEX RV32IMC (formerly ZERORISCY), 2 for IBEX RV32EC (formerly MICRORISCY)
+    parameter logic [1:0] CORE_TYPE   = 0,
+    // 0 for RISCY, 1 for IBEX RV32IMC (formerly ZERORISCY), 2 for IBEX RV32EC (formerly MICRORISCY), 3 for OpenHW cv32e40p
     parameter USE_FPU     = 1,
     parameter USE_HWPE    = 1
 ) (

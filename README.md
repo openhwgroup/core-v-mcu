@@ -177,6 +177,20 @@ Simple Runtime: https://github.com/pulp-platform/pulp-runtime-examples
 
 SDK: https://github.com/pulp-platform/pulp-rt-examples
 
+Select the core by setting the env variable VSIM_CORE_TYPE with
+
+- 0 (riscy)
+- 1 (Ibex with RV32IMC)
+- 2 (Ibex with RV32EC)
+- 3 (cv32e40p)
+
+
+```bash
+export VSIM_CORE_TYPE="-gCORE_TYPE=3"
+```
+
+By default the CORE_TYPE is '0' (riscy).
+
 Now you can change directory to your favourite test e.g.: for an hello world
 test, run
 ```bash

@@ -22,6 +22,12 @@ if {[info exists ::env(VSIM_RUNNER_FLAGS)]} {
     quietly set VSIM_FLAGS_TCL "$VSIM_FLAGS_TCL $::env(VSIM_RUNNER_FLAGS)"
 }
 
+if {[info exists ::env(VSIM_CORE_TYPE)]} {
+    quietly set VSIM_FLAGS_TCL "$VSIM_FLAGS_TCL $::env(VSIM_CORE_TYPE)"
+}  {
+    quietly set VSIM_FLAGS_TCL "$VSIM_FLAGS_TCL -gCORE_TYPE=0"
+}
+
 quietly set VSIM_TB_PATH $VSIM_SCRIPTS_PATH/../tb
 #######################################
 #######################################
