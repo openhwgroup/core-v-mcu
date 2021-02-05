@@ -19,7 +19,7 @@
 #
 
 core-v-mcu2-soc:
-  commit: master
+  commit: ed7dff710ac01864be238f61f632f670d9423c8c
   server: git@github.com
   group:  QuickLogic-Corp
 
