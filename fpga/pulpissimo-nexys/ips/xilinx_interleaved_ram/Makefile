@@ -19,7 +19,7 @@ $(PROJECT).xpr: ../../fpga-settings.mk tcl/run.tcl
 	$(MAKE) clean
 	$(VIVADO) -mode $(MODE) -source tcl/run.tcl
 	mkdir -p ip
-	if [-d "${PROJECT}.gen" ] ; then \
+	if [ -d "${PROJECT}.gen" ] ; then \
 		cp -r ${PROJECT}.gen/sources_1/ip/${PROJECT}/* ip/. ;\
 	else \
 		cp -r ${PROJECT}.srcs/sources_1/ip/${PROJECT}/* ip/. ;\
