@@ -20,11 +20,9 @@ $(PROJECT).xpr: ../../fpga-settings.mk tcl/run.tcl
 	$(VIVADO) -mode $(MODE) -source tcl/run.tcl
 	mkdir -p ip
 	if [ -d "${PROJECT}.gen" ] ; then \
-		cp -r ${PROJECT}.gen/sources_1/ip/${PROJECT}/* ip/. ;\
-		cp -r ${PROJECT}.srcs/sources_1/ip/${PROJECT}/${PROJECT}.xci ip/. ;\
-	else \
-		cp -r ${PROJECT}.srcs/sources_1/ip/${PROJECT}/* ip/. ;\
+		cp -r ${PROJECT}.gen/sources_1/ip/${PROJECT}/* ip/. ; \
 	fi
+	cp -r ${PROJECT}.srcs/sources_1/ip/${PROJECT}/* ip/.
 	cp ${PROJECT}.runs/${PROJECT}_synth_1/${PROJECT}.dcp ip/.
 
 clean: ## Remove all build products
