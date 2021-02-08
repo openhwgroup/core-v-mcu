@@ -55,6 +55,13 @@ read_ip $FPGA_IPS/xilinx_slow_clk_mngr/ip/xilinx_slow_clk_mngr.xci
 read_ip $FPGA_IPS/xilinx_interleaved_ram/ip/xilinx_interleaved_ram.xci
 read_ip $FPGA_IPS/xilinx_private_ram/ip/xilinx_private_ram.xci
 
+# the following step seems to be needed for Vivado 2020.2
+synth_ip [get_files *xilinx_clk_mngr.xci]
+synth_ip [get_files *zilinx_slow_clk_mngr.xci]
+synth_ip [get_files *xilinx_interleaved_ram.xci]
+synth_ip [get_files *xilinx_private_ram.xci]
+
+
 # Add wrappers and xilinx specific techcells
 add_files -norecurse $FPGA_RTL/fpga_clk_gen.sv
 add_files -norecurse $FPGA_RTL/fpga_slow_clk_gen.sv
