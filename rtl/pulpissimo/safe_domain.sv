@@ -43,9 +43,9 @@ module safe_domain #(
 		output logic [`N_IO-1:0]        io_oe_o,
 		
 		// PERIOS
-        input  logic ['N_PERIO-1:0]      perio_out_i,
-        output logic ['N_PERIO-1:0]      perio_in_o,
-        input  logic ['N_PERIO-1:0]      perio_oe_i,
+        input  logic [`N_PERIO-1:0]      perio_out_i,
+        output logic [`N_PERIO-1:0]      perio_in_o,
+        input  logic [`N_PERIO-1:0]      perio_oe_i,
 
         // GPIOS
         input  logic [`N_GPIO-1:0]      gpio_out_i           ,
