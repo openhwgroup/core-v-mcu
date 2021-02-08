@@ -7,7 +7,9 @@
 // this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
+
 `include "pulp_soc_defines.sv"
+`include "pulp_peripheral_defines.svh"
 
 module safe_domain #(
         parameter int unsigned FLL_DATA_WIDTH = 32,
@@ -35,19 +37,25 @@ module safe_domain #(
         input  logic [383:0]     pad_cfg_i            ,
 
         output logic [47:0][5:0] pad_cfg_o            ,
+		
+		// PERIOS
+        input  logic ['N_PERIO-1:0]      perio_out_i,
+        output logic ['N_PERIO-1:0]      perio_in_o,
+        input  logic ['N_PERIO-1:0]      perio_oe_i,
+        input  logic [191:0]     gpio_cfg_i           ,
 
         // GPIOS
-        input  logic [31:0]      gpio_out_i           ,
-        output logic [31:0]      gpio_in_o            ,
-        input  logic [31:0]      gpio_dir_i           ,
+        input  logic [`N_GPIO-1:0]      gpio_out_i           ,
+        output logic [`N_GPIO-1:0]      gpio_in_o            ,
+        input  logic [`N_GPIO-1:0]      gpio_oe_i           ,
         input  logic [191:0]     gpio_cfg_i           ,
         
         // FPGA
-        input  logic [1:0]            selected_mode_i     ,
-        input  logic [`N_FPGAIO-1:0]   fpgaio_out_i          ,
+        input  logic [1:0]            	selected_mode_i     ,
+        input  logic [`N_FPGAIO-1:0]   	fpgaio_out_i          ,
         //input  logic [`N_FPGAIO-1:0]   fpgaio_in_hw_i        ,
-        output logic [`N_FPGAIO-1:0]   fpgaio_in_o           ,
-        input  logic [`N_FPGAIO-1:0]   fpgaio_oe_i           ,
+        output logic [`N_FPGAIO-1:0]   	fpgaio_in_o           ,
+        input  logic [`N_FPGAIO-1:0]   	fpgaio_oe_i           ,
 
         // UART
         input  logic                  uart_tx_i            ,
@@ -218,15 +226,11 @@ module safe_domain #(
     //*** GPIO CONFIGURATIONS **********************************
     //**********************************************************
 
-   logic [31:0][5:0] s_gpio_cfg;
+   logic [`N_GPIO-1:0][5:0] s_gpio_cfg;
 
    genvar i,j;
 
-    pad_control #(
-        .N_UART ( N_UART ),
-        .N_SPI  ( N_SPI  ),
-        .N_I2C  ( N_I2C  )
-    ) pad_control_i (
+    pad_control i_pad_control (
 
         //********************************************************************//
         //*** PERIPHERALS SIGNALS ********************************************//
@@ -237,7 +241,7 @@ module safe_domain #(
 
         .gpio_out_i            ( gpio_out_i            ),
         .gpio_in_o             ( gpio_in_o             ),
-        .gpio_dir_i            ( gpio_dir_i            ),
+        .gpio_oe_i             ( gpio_oe_i             ),
         .gpio_cfg_i            ( s_gpio_cfg            ),
 
         //.selected_mode_i       ( selected_mode_i       ),
