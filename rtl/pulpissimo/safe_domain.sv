@@ -90,21 +90,21 @@ module safe_domain #(
         .pad_cfg_i             ( pad_cfg_i             ),
         .pad_cfg_o             ( pad_cfg_o             ),
 		
-		.io_out_o            ( io_out_o            ),
-        .io_in_i             ( io_in_i             ),
-        .io_oe_o             ( io_oe_o             ),
+		.io_out_o            	( io_out_o            ),
+        .io_in_i             	( io_in_i             ),
+        .io_oe_o             	( io_oe_o             ),
 		
 		.perio_out_i            ( perio_out_i            ),
         .perio_in_o             ( perio_in_o             ),
         .perio_oe_i             ( perio_oe_i             ),
 
-        .gpio_out_i            ( gpio_out_i            ),
-        .gpio_in_o             ( gpio_in_o             ),
-        .gpio_oe_i             ( gpio_oe_i             ),
+        .gpio_out_i            	( gpio_out_i            ),
+        .gpio_in_o             	( gpio_in_o             ),
+        .gpio_oe_i             	( gpio_oe_i             ),
 
-        .fpgaio_out_i            ( fpgaio_out_i            ),
-        .fpgaio_in_o             ( fpgaio_in_o             ),
-        .fpgaio_oe_i             ( fpgaio_oe_i             ),
+        .fpgaio_out_i           ( fpgaio_out_i            ),
+        .fpgaio_in_o            ( fpgaio_in_o             ),
+        .fpgaio_oe_i            ( fpgaio_oe_i             )
     );
 
 
@@ -148,18 +148,18 @@ module safe_domain #(
     assign test_mode_o     = 1'b0;
     assign mode_select_o   = 1'b0;
 
-    //********************************************************
-    //*** PAD AND GPIO CONFIGURATION SIGNALS PACK ************
-    //********************************************************
+    // //********************************************************
+    // //*** PAD AND GPIO CONFIGURATION SIGNALS PACK ************
+    // //********************************************************
 
-    generate
-       for (i=0; i<32; i++)
-	 begin : GEN_GPIO_CFG_I
-	    for (j=0; j<6; j++)
-	      begin : GEN_GPIO_CFG_J
-		 assign s_gpio_cfg[i][j] = gpio_cfg_i[j+6*i];
-	      end
-	 end
-    endgenerate
+    // generate
+       // for (i=0; i<32; i++)
+	 // begin : GEN_GPIO_CFG_I
+	    // for (j=0; j<6; j++)
+	      // begin : GEN_GPIO_CFG_J
+		 // assign s_gpio_cfg[i][j] = gpio_cfg_i[j+6*i];
+	      // end
+	 // end
+    // endgenerate
 
 endmodule // safe_domain
