@@ -9,6 +9,7 @@
 // specific language governing permissions and limitations under the License.
 
 `include "pulp_soc_defines.sv"
+`include "pulp_peripheral_defines.svh"
 
 module soc_domain #(
     parameter CORE_TYPE            = 0,
@@ -57,9 +58,9 @@ module soc_domain #(
 
     output logic [NB_CL_CORES-1:0]           cluster_dbg_irq_valid_o,
 
-    input  logic [31:0]                      gpio_in_i,
-    output logic [31:0]                      gpio_out_o,
-    output logic [31:0]                      gpio_dir_o,
+    input  logic [`N_GPIO-1:0]                      gpio_in_i,
+    output logic [`N_GPIO-1:0]                      gpio_out_o,
+    output logic [`N_GPIO-1:0]                      gpio_oe_o,
     output logic [191:0]                     gpio_cfg_o,
     output logic [`N_FPGAIO-1:0]             fpgaio_out_o,
     input  logic [`N_FPGAIO-1:0]             fpgaio_in_i,
@@ -383,7 +384,7 @@ module soc_domain #(
         .pad_mux_o                   (pad_mux_o[127:0]),
         .pad_cfg_o                   (pad_cfg_o[383:0]),
         .gpio_out_o                  (gpio_out_o[31:0]),
-        .gpio_dir_o                  (gpio_dir_o[31:0]),
+        .gpio_oe_o                  (gpio_oe_o[31:0]),
         .gpio_cfg_o                  (gpio_cfg_o[191:0]),
         .fpgaio_out_o                (fpgaio_out_o),
         .fpgaio_oe_o                 (fpgaio_oe_o),
