@@ -296,7 +296,7 @@ module soc_domain #(
 		.jtag_trst_ni                (jtag_trst_ni),
 		// pad control
 		.pad_mux_o                   (pad_mux_o),
-        .pad_cfg_o                   (pad_cfg_o[),
+        .pad_cfg_o                   (pad_cfg_o),
 		// PERIOS
 		.perio_in_i                  (perio_in_i),
         .perio_out_o                 (perio_out_o),
