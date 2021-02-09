@@ -226,18 +226,19 @@ module pulpissimo #(
   logic                        s_test_mode;
   logic                        s_dft_cg_enable;
   logic                        s_mode_select;
-
-  logic [`N_GPIO-1:0]           s_gpio_out;
-  logic [`N_GPIO-1:0]           s_gpio_in;
-  logic [`N_GPIO-1:0]           s_gpio_dir;
-  logic [191:0]                 s_gpio_cfg;
+	//PERIO
+	logic [`N_PERIO-1:0]		s_perio_out;
+	logic [`N_PERIO-1:0]		s_perio_in;
+	logic [`N_PERIO-1:0]		s_perio_oe;
+	//GPIO
+	logic [`N_GPIO-1:0]			s_gpio_out;
+	logic [`N_GPIO-1:0]       	s_gpio_in;
+	logic [`N_GPIO-1:0]       	s_gpio_oe;
+	// FPGAIO
+	logic [`N_FPGAIO-1:0]    	s_fpgaio_out;
+	logic [`N_FPGAIO-1:0]     	s_fpgaio_in;
+	logic [`N_FPGAIO-1:0]      	s_fpgaio_oe;
   
-  // FPGA
-  logic [1:0]                   s_selected_mode_i;
-  logic [`N_FPGAIO-1:0]         s_fpgaio_out;
-  //logic [`N_FPGAIO-1:0]         s_fpga_in_hw_i;
-  logic [`N_FPGAIO-1:0]         s_fpgaio_in;
-  logic [`N_FPGAIO-1:0]         s_fpgaio_oe;
   logic                         s_fpga_clk_1_i;
   logic                         s_fpga_clk_2_i;
   logic                         s_fpga_clk_3_i;
@@ -607,175 +608,31 @@ logic [1:0]                  s_selected_pad_mode;
         .test_mode_o                ( s_test_mode                 ),
         .mode_select_o              ( s_mode_select               ),
         .dft_cg_enable_o            ( s_dft_cg_enable             ),
-
+		// PAD control signals
         .pad_cfg_o                  ( s_pad_cfg                   ),
-
         .pad_cfg_i                  ( s_pad_cfg_soc               ),
         .pad_mux_i                  ( s_pad_mux_soc               ),
-
+		// IO signals
+        .io_out_i                   ( s_io_out                  ),
+        .io_in_o                    ( s_io_in                   ),
+        .io_oe_i                    ( s_io_oe                   ),
+		// PERIO signals
+        .perio_out_i                ( s_perio_out                 ),
+        .perio_in_o                 ( s_perio_in                  ),
+        .perio_oe_i                 ( s_perio_oe                  ),
+		// GPIO signals
         .gpio_out_i                 ( s_gpio_out                  ),
         .gpio_in_o                  ( s_gpio_in                   ),
-        .gpio_dir_i                 ( s_gpio_dir                  ),
-        .gpio_cfg_i                 ( s_gpio_cfg                  ),
-        
-        // FPGA
-        //.selected_mode_i            ( s_selected_mode_i           ),
+        .gpio_oe_i                  ( s_gpio_oe                   ),
+        // FPGAIO signals
         .fpgaio_out_i               ( s_fpgaio_out                ),
-        //.fpga_in_hw_i               ( s_fpga_in_hw_i              ),
         .fpgaio_in_o                ( s_fpgaio_in                 ),
         .fpgaio_oe_i                ( s_fpgaio_oe                 ),
-
-        .uart_tx_i                  ( s_uart_tx                   ),
-        .uart_rx_o                  ( s_uart_rx                   ),
-
-        .i2c_scl_out_i              ( s_i2c_scl_out               ),
-        .i2c_scl_in_o               ( s_i2c_scl_in                ),
-        .i2c_scl_oe_i               ( s_i2c_scl_oe                ),
-        .i2c_sda_out_i              ( s_i2c_sda_out               ),
-        .i2c_sda_in_o               ( s_i2c_sda_in                ),
-        .i2c_sda_oe_i               ( s_i2c_sda_oe                ),
-
-        .i2s_slave_sd0_o            ( s_i2s_sd0_in                ),
-        .i2s_slave_sd1_o            ( s_i2s_sd1_in                ),
-        .i2s_slave_ws_o             ( s_i2s_ws_in                 ),
-        .i2s_slave_ws_i             ( s_i2s_ws0_out               ),
-        .i2s_slave_ws_oe            ( s_i2s_slave_ws_oe           ),
-        .i2s_slave_sck_o            ( s_i2s_sck_in                ),
-        .i2s_slave_sck_i            ( s_i2s_sck0_out              ),
-        .i2s_slave_sck_oe           ( s_i2s_slave_sck_oe          ),
-
-        .spi_clk_i                  ( s_spi_clk                   ),
-        .spi_csn_i                  ( s_spi_csn                   ),
-        .spi_oen_i                  ( s_spi_oen                   ),
-        .spi_sdo_i                  ( s_spi_sdo                   ),
-        .spi_sdi_o                  ( s_spi_sdi                   ),
-
-        .sdio_clk_i                 ( s_sdio_clk                  ),
-        .sdio_cmd_i                 ( s_sdio_cmdo                 ),
-        .sdio_cmd_o                 ( s_sdio_cmdi                 ),
-        .sdio_cmd_oen_i             ( s_sdio_cmd_oen              ),
-        .sdio_data_i                ( s_sdio_datao                ),
-        .sdio_data_o                ( s_sdio_datai                ),
-        .sdio_data_oen_i            ( s_sdio_data_oen             ),
-
-        .cam_pclk_o                 ( s_cam_pclk                  ),
-        .cam_data_o                 ( s_cam_data                  ),
-        .cam_hsync_o                ( s_cam_hsync                 ),
-        .cam_vsync_o                ( s_cam_vsync                 ),
-
+		// Timer signals
         .timer0_i                   ( s_timer0                    ),
         .timer1_i                   ( s_timer1                    ),
         .timer2_i                   ( s_timer2                    ),
-        .timer3_i                   ( s_timer3                    ),
-
-        .out_spim_sdio0_o           ( s_out_spim_sdio0            ),
-        .out_spim_sdio1_o           ( s_out_spim_sdio1            ),
-        .out_spim_sdio2_o           ( s_out_spim_sdio2            ),
-        .out_spim_sdio3_o           ( s_out_spim_sdio3            ),
-        .out_spim_csn0_o            ( s_out_spim_csn0             ),
-        .out_spim_csn1_o            ( s_out_spim_csn1             ),
-        .out_spim_sck_o             ( s_out_spim_sck              ),
-
-        .out_sdio_clk_o             ( s_out_sdio_clk              ),
-        .out_sdio_cmd_o             ( s_out_sdio_cmd              ),
-        .out_sdio_data0_o           ( s_out_sdio_data0            ),
-        .out_sdio_data1_o           ( s_out_sdio_data1            ),
-        .out_sdio_data2_o           ( s_out_sdio_data2            ),
-        .out_sdio_data3_o           ( s_out_sdio_data3            ),
-
-        .out_uart_rx_o              ( s_out_uart_rx               ),
-        .out_uart_tx_o              ( s_out_uart_tx               ),
-
-        .out_cam_pclk_o             ( s_out_cam_pclk              ),
-        .out_cam_hsync_o            ( s_out_cam_hsync             ),
-        .out_cam_data0_o            ( s_out_cam_data0             ),
-        .out_cam_data1_o            ( s_out_cam_data1             ),
-        .out_cam_data2_o            ( s_out_cam_data2             ),
-        .out_cam_data3_o            ( s_out_cam_data3             ),
-        .out_cam_data4_o            ( s_out_cam_data4             ),
-        .out_cam_data5_o            ( s_out_cam_data5             ),
-        .out_cam_data6_o            ( s_out_cam_data6             ),
-        .out_cam_data7_o            ( s_out_cam_data7             ),
-        .out_cam_vsync_o            ( s_out_cam_vsync             ),
-
-        .out_i2c0_sda_o             ( s_out_i2c0_sda              ),
-        .out_i2c0_scl_o             ( s_out_i2c0_scl              ),
-        .out_i2s0_sck_o             ( s_out_i2s0_sck              ),
-        .out_i2s0_ws_o              ( s_out_i2s0_ws               ),
-        .out_i2s0_sdi_o             ( s_out_i2s0_sdi              ),
-        .out_i2s1_sdi_o             ( s_out_i2s1_sdi              ),
-
-        .in_spim_sdio0_i            ( s_in_spim_sdio0             ),
-        .in_spim_sdio1_i            ( s_in_spim_sdio1             ),
-        .in_spim_sdio2_i            ( s_in_spim_sdio2             ),
-        .in_spim_sdio3_i            ( s_in_spim_sdio3             ),
-        .in_spim_csn0_i             ( s_in_spim_csn0              ),
-        .in_spim_csn1_i             ( s_in_spim_csn1              ),
-        .in_spim_sck_i              ( s_in_spim_sck               ),
-
-        .in_sdio_clk_i              ( s_in_sdio_clk               ),
-        .in_sdio_cmd_i              ( s_in_sdio_cmd               ),
-        .in_sdio_data0_i            ( s_in_sdio_data0             ),
-        .in_sdio_data1_i            ( s_in_sdio_data1             ),
-        .in_sdio_data2_i            ( s_in_sdio_data2             ),
-        .in_sdio_data3_i            ( s_in_sdio_data3             ),
-
-        .in_uart_rx_i               ( s_in_uart_rx                ),
-        .in_uart_tx_i               ( s_in_uart_tx                ),
-        .in_cam_pclk_i              ( s_in_cam_pclk               ),
-        .in_cam_hsync_i             ( s_in_cam_hsync              ),
-        .in_cam_data0_i             ( s_in_cam_data0              ),
-        .in_cam_data1_i             ( s_in_cam_data1              ),
-        .in_cam_data2_i             ( s_in_cam_data2              ),
-        .in_cam_data3_i             ( s_in_cam_data3              ),
-        .in_cam_data4_i             ( s_in_cam_data4              ),
-        .in_cam_data5_i             ( s_in_cam_data5              ),
-        .in_cam_data6_i             ( s_in_cam_data6              ),
-        .in_cam_data7_i             ( s_in_cam_data7              ),
-        .in_cam_vsync_i             ( s_in_cam_vsync              ),
-
-        .in_i2c0_sda_i              ( s_in_i2c0_sda               ),
-        .in_i2c0_scl_i              ( s_in_i2c0_scl               ),
-        .in_i2s0_sck_i              ( s_in_i2s0_sck               ),
-        .in_i2s0_ws_i               ( s_in_i2s0_ws                ),
-        .in_i2s0_sdi_i              ( s_in_i2s0_sdi               ),
-        .in_i2s1_sdi_i              ( s_in_i2s1_sdi               ),
-
-        .oe_spim_sdio0_o            ( s_oe_spim_sdio0             ),
-        .oe_spim_sdio1_o            ( s_oe_spim_sdio1             ),
-        .oe_spim_sdio2_o            ( s_oe_spim_sdio2             ),
-        .oe_spim_sdio3_o            ( s_oe_spim_sdio3             ),
-        .oe_spim_csn0_o             ( s_oe_spim_csn0              ),
-        .oe_spim_csn1_o             ( s_oe_spim_csn1              ),
-        .oe_spim_sck_o              ( s_oe_spim_sck               ),
-
-        .oe_sdio_clk_o              ( s_oe_sdio_clk               ),
-        .oe_sdio_cmd_o              ( s_oe_sdio_cmd               ),
-        .oe_sdio_data0_o            ( s_oe_sdio_data0             ),
-        .oe_sdio_data1_o            ( s_oe_sdio_data1             ),
-        .oe_sdio_data2_o            ( s_oe_sdio_data2             ),
-        .oe_sdio_data3_o            ( s_oe_sdio_data3             ),
-
-        .oe_uart_rx_o               ( s_oe_uart_rx                ),
-        .oe_uart_tx_o               ( s_oe_uart_tx                ),
-        .oe_cam_pclk_o              ( s_oe_cam_pclk               ),
-        .oe_cam_hsync_o             ( s_oe_cam_hsync              ),
-        .oe_cam_data0_o             ( s_oe_cam_data0              ),
-        .oe_cam_data1_o             ( s_oe_cam_data1              ),
-        .oe_cam_data2_o             ( s_oe_cam_data2              ),
-        .oe_cam_data3_o             ( s_oe_cam_data3              ),
-        .oe_cam_data4_o             ( s_oe_cam_data4              ),
-        .oe_cam_data5_o             ( s_oe_cam_data5              ),
-        .oe_cam_data6_o             ( s_oe_cam_data6              ),
-        .oe_cam_data7_o             ( s_oe_cam_data7              ),
-        .oe_cam_vsync_o             ( s_oe_cam_vsync              ),
-
-        .oe_i2c0_sda_o              ( s_oe_i2c0_sda               ),
-        .oe_i2c0_scl_o              ( s_oe_i2c0_scl               ),
-        .oe_i2s0_sck_o              ( s_oe_i2s0_sck               ),
-        .oe_i2s0_ws_o               ( s_oe_i2s0_ws                ),
-        .oe_i2s0_sdi_o              ( s_oe_i2s0_sdi               ),
-        .oe_i2s1_sdi_o              ( s_oe_i2s1_sdi               )
+        .timer3_i                   ( s_timer3                    )
    );
 
    //
@@ -824,7 +681,7 @@ logic [1:0]                  s_selected_pad_mode;
 
         .gpio_in_i                    ( s_gpio_in                        ),
         .gpio_out_o                   ( s_gpio_out                       ),
-        .gpio_dir_o                   ( s_gpio_dir                       ),
+        .gpio_oe_o                   ( s_gpio_oe                       ),
         .gpio_cfg_o                   ( s_gpio_cfg                       ),
         
         // FPGA

@@ -58,11 +58,11 @@ module soc_domain #(
 
     output logic [NB_CL_CORES-1:0]           cluster_dbg_irq_valid_o,
 	
-	// PAD CONTROL REGISTER
+	// PAD CONTROL signals
 	output logic [`N_IO-1:0][`NBIT_PADMUX-1:0]	pad_mux_o,
 	output logic [`N_IO-1:0][`NBIT_PADCFG-1:0]	pad_cfg_o,
 
-    // PERIOS
+    // PERIO signals
 	output logic [`N_PERIO-1:0]      perio_out_o,
 	input  logic [`N_PERIO-1:0]      perio_in_i,
 	output logic [`N_PERIO-1:0]      perio_oe_o,
@@ -285,10 +285,6 @@ module soc_domain #(
       .EVNT_WIDTH                       ( EVNT_WIDTH         ),
       .NB_CORES                         ( NB_CL_CORES        ),
       // .NB_HWPE_PORTS                    ( 4                   ),
-      .NGPIO                            ( 32                  ),
-      .NPAD                             ( 64                  ),
-      .NBIT_PADCFG                      ( 6                  ),
-      .NBIT_PADMUX                      ( 2                  ),
       .ISOLATE_CLUSTER_CDC              ( 1                  ),
       .USE_ZFINX                        ( 0                  )
     ) pulp_soc_i (

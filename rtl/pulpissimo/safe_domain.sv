@@ -13,10 +13,7 @@
 
 module safe_domain #(
         parameter int unsigned FLL_DATA_WIDTH = 32,
-        parameter int unsigned FLL_ADDR_WIDTH = 32,
-        parameter int unsigned N_UART = 1,
-        parameter int unsigned N_SPI = 1,
-        parameter int unsigned N_I2C = 2
+        parameter int unsigned FLL_ADDR_WIDTH = 32
 ) (
         input  logic             ref_clk_i            ,
         output logic             slow_clk_o           ,
