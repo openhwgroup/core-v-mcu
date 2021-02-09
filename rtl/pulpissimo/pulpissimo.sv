@@ -341,8 +341,8 @@ module pulpissimo #(
   logic                        s_dma_pe_irq_ack;
   logic                        s_dma_pe_irq_valid;
 
-  logic [127:0]                s_pad_mux_soc;
-  logic [383:0]                s_pad_cfg_soc;
+  logic [`N_IO:0][`NBIT_PADMUX-1:0]	s_pad_mux_soc;
+  logic [`N_IO:0][`NBIT_PADCFG-1:0]	s_pad_cfg_soc;
 logic [1:0]                  s_selected_pad_mode;
 
   logic                        efpga_test_fcb_pif_vldi;
@@ -613,9 +613,9 @@ logic [1:0]                  s_selected_pad_mode;
         .pad_cfg_i                  ( s_pad_cfg_soc               ),
         .pad_mux_i                  ( s_pad_mux_soc               ),
 		// IO signals
-        .io_out_i                   ( s_io_out                  ),
-        .io_in_o                    ( s_io_in                   ),
-        .io_oe_i                    ( s_io_oe                   ),
+        .io_out_o                   ( s_io_out                  ),
+        .io_in_i                    ( s_io_in                   ),
+        .io_oe_o                    ( s_io_oe                   ),
 		// PERIO signals
         .perio_out_i                ( s_perio_out                 ),
         .perio_in_o                 ( s_perio_in                  ),
