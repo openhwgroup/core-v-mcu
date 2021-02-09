@@ -84,6 +84,11 @@ module soc_domain #(
     input  logic                             fpga_clk_3_i,
     input  logic                             fpga_clk_4_i,
     input  logic                             fpga_clk_5_i,
+	
+	output logic[3:0]						timer_ch0_o,
+	output logic[3:0]						timer_ch1_o,
+	output logic[3:0]						timer_ch2_o,
+	output logic[3:0]						timer_ch3_o,
 
 
     //eFPGA SPIS
@@ -456,7 +461,7 @@ module soc_domain #(
         .cluster_busy_i              (cluster_busy_i),
         .dma_pe_evt_valid_i          (dma_pe_evt_valid_i),
         .dma_pe_irq_valid_i          (dma_pe_irq_valid_i),
-        .pf_evt_valid_i              (pf_evt_valid_i),
+        .pf_evt_valid_i              (pf_evt_valid_i)
         
         // .uart_rx_i                   (uart_rx_i),
         // .cam_clk_i                   (cam_clk_i),
