@@ -341,8 +341,8 @@ module pulpissimo #(
   logic                        s_dma_pe_irq_ack;
   logic                        s_dma_pe_irq_valid;
 
-  logic [`N_IO:0][`NBIT_PADMUX-1:0]	s_pad_mux_soc;
-  logic [`N_IO:0][`NBIT_PADCFG-1:0]	s_pad_cfg_soc;
+  logic [`N_IO-1:0][`NBIT_PADMUX-1:0]	s_pad_mux_soc;
+  logic [`N_IO-1:0][`NBIT_PADCFG-1:0]	s_pad_cfg_soc;
 logic [1:0]                  s_selected_pad_mode;
 
   logic                        efpga_test_fcb_pif_vldi;
