@@ -85,10 +85,10 @@ module soc_domain #(
     input  logic                             fpga_clk_4_i,
     input  logic                             fpga_clk_5_i,
 	
-	output logic[3:0]						timer_ch0_o,
-	output logic[3:0]						timer_ch1_o,
-	output logic[3:0]						timer_ch2_o,
-	output logic[3:0]						timer_ch3_o,
+	output logic [3:0]						timer_ch0_o,
+	output logic [3:0]						timer_ch1_o,
+	output logic [3:0]						timer_ch2_o,
+	output logic [3:0]						timer_ch3_o,
 
 
     //eFPGA SPIS
