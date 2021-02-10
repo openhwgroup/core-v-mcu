@@ -78,8 +78,11 @@ if {$rev == "nexys4"} {
 	puts "Use nexys4 constraints."
 	add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4.xdc
 } else {
-	puts "Use nexys4DDR/A7 constraints."
-	add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4DDR.xdc
+	#puts "Use nexys4DDR/A7 constraints."
+	#add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4DDR.xdc
+  puts "Use core-v-mcu2 constraints."
+	add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu2-timing.xdc
+  add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu2-pin-assigment.xdc
 }
 
 
