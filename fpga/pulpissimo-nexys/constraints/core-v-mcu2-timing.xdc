@@ -35,7 +35,7 @@ set_case_analysis 0 i_pulpissimo/safe_domain_i/i2s_slave_sck_o
 ## JTAG
 create_clock -period 100.000 -name tck -waveform {0.000 50.000} [get_ports pad_jtag_tck]
 set_input_jitter tck 1.000
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets tck_int]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets s_io[8]]; # was tck_int
 
 
 # minimize routing delay
@@ -77,3 +77,4 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins i_pulpis
 
 # Create asynchronous clock group between JTAG TCK and SoC clock.
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins i_pulpissimo/pad_jtag_tck]] -group [get_clocks -of_objects [get_pins i_pulpissimo/soc_domain_i/pulp_soc_i/i_clk_rst_gen/clk_soc_o]]
+ 
