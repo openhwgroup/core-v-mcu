@@ -22,7 +22,6 @@
 module xilinx_pulpissimo
   (
    input wire  sys_clk,
-
    inout wire  pad_spim_sdio0,
    inout wire  pad_spim_sdio1,
    inout wire  pad_spim_sdio2,
@@ -59,7 +58,7 @@ module xilinx_pulpissimo
    inout wire  pad_sdio_data2,
    inout wire  pad_sdio_data3,
 
-	 inout wire	 pad_i2c0_sda, 
+   inout wire	 pad_i2c0_sda, 
    inout wire  pad_i2c0_scl, 
 
    inout wire  pad_i2s0_sck,
@@ -175,7 +174,7 @@ module xilinx_pulpissimo
        //.pad_jtag_trst(pad_jtag_trst),
 			 .pad_jtag_trst(1'b1),
        .pad_xtal_in(ref_clk),
-       .pad_bootsel()
+       .pad_bootsel(pad_bootsel)
        );
 
 endmodule

@@ -12,8 +12,8 @@
 module pad_frame
     (
 
-        input logic [47:0][5:0] pad_cfg_i        ,
-
+        input logic [47:0][5:0] pad_cfg_i ,
+        input mhz4,
         // REF CLOCK
         output logic            ref_clk_o        ,
 
@@ -212,7 +212,7 @@ module pad_frame
     pad_functional_pu padinst_i2c0_scl   (.OEN(~oe_i2c0_scl_i  ), .I(out_i2c0_scl_i  ), .O(in_i2c0_scl_o  ), .PAD(pad_i2c0_scl  ), .PEN(~pad_cfg_i[8][0] ) );
 
 
-    pad_functional_pu padinst_bootsel    (.OEN(1'b1            ), .I(                ), .O(bootsel_o      ), .PAD(pad_bootsel   ), .PEN(1'b1             ) );
+    pad_functional_pu padinst_bootsel    (.OEN(~rstn_o          ), .I(mhz4               ), .O(bootsel_o      ), .PAD(pad_bootsel   ), .PEN(1'b1             ));
 
 
 `ifndef PULP_FPGA_EMUL

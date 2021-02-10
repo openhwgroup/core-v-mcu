@@ -16,10 +16,11 @@ module safe_domain #(
         parameter int unsigned N_SPI = 1,
         parameter int unsigned N_I2C = 2
 ) (
-        input  logic             ref_clk_i            ,
-        output logic             slow_clk_o           ,
-        input  logic             rst_ni               ,
-        output logic             rst_no               ,
+        input logic 		      ref_clk_i ,
+        output logic 		      slow_clk_o ,
+   	output logic 	mhz4 ,
+        input logic 		      rst_ni ,
+        output logic 		      rst_no ,
 
         output logic             test_clk_o           ,
         output logic             test_mode_o          ,
@@ -406,6 +407,7 @@ module safe_domain #(
     (
      .rst_ni(s_rstn_sync),
      .ref_clk_i(ref_clk_i),
+     .mhz4 (mhz4),
      .slow_clk_o(slow_clk_o)
      );
 `endif

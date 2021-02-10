@@ -204,6 +204,8 @@ module pulpissimo #(
 
   logic                        s_test_clk;
   logic                        s_slow_clk;
+  logic 		       mhz4;
+  
   logic                        s_sel_fll_clk;
 
   logic [11:0]                 s_pm_cfg_data;
@@ -375,6 +377,7 @@ module pulpissimo #(
   //
   pad_frame pad_frame_i (
     .pad_cfg_i             ( s_pad_cfg              ),
+    .mhz4 (mhz4),
     .ref_clk_o             ( s_ref_clk              ),
     .rstn_o                ( s_rstn                 ),
     .jtag_tdo_i            ( s_jtag_tdo             ),
@@ -534,6 +537,7 @@ module pulpissimo #(
 
         .ref_clk_i                  ( s_ref_clk                   ),
         .slow_clk_o                 ( s_slow_clk                  ),
+	.mhz4 (mhz4),
         .rst_ni                     ( s_rstn                     ),
 
         .rst_no                     ( s_rstn_por                  ),
