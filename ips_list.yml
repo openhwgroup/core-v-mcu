@@ -19,7 +19,7 @@
 #
 
 core-v-mcu2-soc:
-  commit: cv32int
+  commit: master
   server: git@github.com
   group:  QuickLogic-Corp
 

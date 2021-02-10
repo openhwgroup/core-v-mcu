@@ -57,7 +57,7 @@ read_ip $FPGA_IPS/xilinx_private_ram/ip/xilinx_private_ram.xci
 
 # the following step seems to be needed for Vivado 2020.2
 synth_ip [get_files *xilinx_clk_mngr.xci]
-synth_ip [get_files *zilinx_slow_clk_mngr.xci]
+synth_ip [get_files *xilinx_slow_clk_mngr.xci]
 synth_ip [get_files *xilinx_interleaved_ram.xci]
 synth_ip [get_files *xilinx_private_ram.xci]
 
@@ -73,7 +73,7 @@ add_files -norecurse $FPGA_RTL/pulp_clock_gating_xilinx.sv
 
 
 # set pulpissimo as top
-set_property top xilinx_pulpissimo [current_fileset]; #
+set_property top xilinx_pulpissimo [current_fileset]; 
 
 # needed only if used in batch mode
 update_compile_order -fileset sources_1
