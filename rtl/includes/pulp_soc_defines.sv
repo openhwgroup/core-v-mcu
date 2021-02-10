@@ -144,7 +144,7 @@
 `define N_I2CM    	2
 `define N_I2C     	`N_I2CM		// ToDo: Compatibility
 `define N_I2SC    	0
-`define N_I2S		`N_I2SS		// ToDo: Cpmpatibility
+`define N_I2S	      `N_I2SC		// ToDo: Cpmpatibility
 `define N_CSI2    	0
 `define N_HYPER   	0
 `define N_SDIO    	0
