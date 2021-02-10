@@ -77,8 +77,6 @@ module soc_domain #(
 	input  logic [`N_FPGAIO-1:0]   	fpgaio_in_i           ,
 	output logic [`N_FPGAIO-1:0]   	fpgaio_oe_o           ,
 
-
-    input  logic [1:0]                       selected_mode_i,
     input  logic                             fpga_clk_1_i,
     input  logic                             fpga_clk_2_i,
     input  logic                             fpga_clk_3_i,
@@ -290,6 +288,20 @@ module soc_domain #(
     ) pulp_soc_i (
 		// sysio
 		.ref_clk_i                   (ref_clk_i),
+		.slow_clk_i                  (slow_clk_i),
+        .test_clk_i                  (test_clk_i),
+		
+        .rstn_glob_i                 (rstn_glob_i),
+		
+		.mode_select_i               (mode_select_i),
+		.dft_cg_enable_i             (dft_cg_enable_i),
+		.dft_test_mode_i             (dft_test_mode_i),
+        
+        .bootsel_i                   (bootsel_i),
+		
+        .fc_fetch_en_valid_i         (fc_fetch_en_valid_i),
+        .fc_fetch_en_i               (fc_fetch_en_i),
+		
 		.jtag_tck_i                  (jtag_tck_i),
         .jtag_tdi_i                  (jtag_tdi_i),
 		.jtag_tdo_o                  (jtag_tdo_o),
@@ -400,15 +412,8 @@ module soc_domain #(
         
         // Inputs
         
-        .slow_clk_i                  (slow_clk_i),
-        .test_clk_i                  (test_clk_i),
-        .rstn_glob_i                 (rstn_glob_i),
-        .dft_test_mode_i             (dft_test_mode_i),
-        .dft_cg_enable_i             (dft_cg_enable_i),
-        .mode_select_i               (mode_select_i),
-        .bootsel_i                   (bootsel_i),
-        .fc_fetch_en_valid_i         (fc_fetch_en_valid_i),
-        .fc_fetch_en_i               (fc_fetch_en_i),
+        
+        
         .data_slave_aw_writetoken_i  (data_slave_aw_writetoken_i[7:0]),
         .data_slave_aw_addr_i        (data_slave_aw_addr_i[AXI_ADDR_WIDTH-1:0]),
         .data_slave_aw_prot_i        (data_slave_aw_prot_i[2:0]),

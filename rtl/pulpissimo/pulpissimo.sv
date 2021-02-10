@@ -652,7 +652,7 @@ logic [1:0]                  s_selected_pad_mode;
       .BUFFER_WIDTH       ( BUFFER_WIDTH               ),
       .EVNT_WIDTH         ( EVENT_WIDTH                ),
       .NB_CL_CORES        ( 0                          )
-   ) soc_domain_i (
+   ) i_soc_domain (
 
         .ref_clk_i                    ( s_ref_clk                        ),
         .slow_clk_i                   ( s_slow_clk                       ),
@@ -675,68 +675,70 @@ logic [1:0]                  s_selected_pad_mode;
         .jtag_tms_i                   ( s_jtag_tms                       ),
         .jtag_tdi_i                   ( s_jtag_tdi                       ),
         .jtag_tdo_o                   ( s_jtag_tdo                       ),
-
+		// Pad control signals
         .pad_cfg_o                    ( s_pad_cfg_soc                    ),
         .pad_mux_o                    ( s_pad_mux_soc                    ),
-
+		// PERIO signals
+		.perio_in_i                  (perio_in_i),
+        .perio_out_o                 (perio_out_o),
+        .perio_oe_o                  (perio_oe_o),
+		// GPIO signals
         .gpio_in_i                    ( s_gpio_in                        ),
         .gpio_out_o                   ( s_gpio_out                       ),
-        .gpio_oe_o                   ( s_gpio_oe                       ),
-        .gpio_cfg_o                   ( s_gpio_cfg                       ),
-        
-        // FPGA
+        .gpio_oe_o                    ( s_gpio_oe                       ),     
+        // FPGAIO signals
         .fpgaio_out_o                 ( s_fpgaio_out                    ),
         .fpgaio_in_i                  ( s_fpgaio_in                     ),
         .fpgaio_oe_o                  ( s_fpgaio_oe                     ),
-        .selected_mode_i              ( s_selected_mode_i               ),
+		
         .fpga_clk_1_i                 ( s_fpga_clk_1_i                  ),
         .fpga_clk_2_i                 ( s_fpga_clk_2_i                  ),
         .fpga_clk_3_i                 ( s_fpga_clk_3_i                  ),
         .fpga_clk_4_i                 ( s_fpga_clk_4_i                  ),
         .fpga_clk_5_i                 ( s_fpga_clk_5_i                  ),
 
-        .uart_tx_o                    ( s_uart_tx                       ),
-        .uart_rx_i                    ( s_uart_rx                       ),
+        // .uart_tx_o                    ( s_uart_tx                       ),
+        // .uart_rx_i                    ( s_uart_rx                       ),
 
-        .cam_clk_i                    ( s_cam_pclk                       ),
-        .cam_data_i                   ( s_cam_data                       ),
-        .cam_hsync_i                  ( s_cam_hsync                      ),
-        .cam_vsync_i                  ( s_cam_vsync                      ),
+        // .cam_clk_i                    ( s_cam_pclk                       ),
+        // .cam_data_i                   ( s_cam_data                       ),
+        // .cam_hsync_i                  ( s_cam_hsync                      ),
+        // .cam_vsync_i                  ( s_cam_vsync                      ),
 
         .timer_ch0_o                  ( s_timer0                         ),
         .timer_ch1_o                  ( s_timer1                         ),
         .timer_ch2_o                  ( s_timer2                         ),
         .timer_ch3_o                  ( s_timer3                         ),
 
-        .i2c_scl_i                    ( s_i2c_scl_in                     ),
-        .i2c_scl_o                    ( s_i2c_scl_out                    ),
-        .i2c_scl_oe_o                 ( s_i2c_scl_oe                     ),
-        .i2c_sda_i                    ( s_i2c_sda_in                     ),
-        .i2c_sda_o                    ( s_i2c_sda_out                    ),
-        .i2c_sda_oe_o                 ( s_i2c_sda_oe                     ),
+        // .i2c_scl_i                    ( s_i2c_scl_in                     ),
+        // .i2c_scl_o                    ( s_i2c_scl_out                    ),
+        // .i2c_scl_oe_o                 ( s_i2c_scl_oe                     ),
+        // .i2c_sda_i                    ( s_i2c_sda_in                     ),
+        // .i2c_sda_o                    ( s_i2c_sda_out                    ),
+        // .i2c_sda_oe_o                 ( s_i2c_sda_oe                     ),
 
-        .i2s_slave_sd0_i              ( s_i2s_sd0_in                     ),
-        .i2s_slave_sd1_i              ( s_i2s_sd1_in                     ),
-        .i2s_slave_ws_i               ( s_i2s_ws_in                      ),
-        .i2s_slave_ws_o               ( s_i2s_ws0_out                    ),
-        .i2s_slave_ws_oe              ( s_i2s_slave_ws_oe                ),
-        .i2s_slave_sck_i              ( s_i2s_sck_in                     ),
-        .i2s_slave_sck_o              ( s_i2s_sck0_out                   ),
-        .i2s_slave_sck_oe             ( s_i2s_slave_sck_oe               ),
+        // .i2s_slave_sd0_i              ( s_i2s_sd0_in                     ),
+        // .i2s_slave_sd1_i              ( s_i2s_sd1_in                     ),
+        // .i2s_slave_ws_i               ( s_i2s_ws_in                      ),
+        // .i2s_slave_ws_o               ( s_i2s_ws0_out                    ),
+        // .i2s_slave_ws_oe              ( s_i2s_slave_ws_oe                ),
+        // .i2s_slave_sck_i              ( s_i2s_sck_in                     ),
+        // .i2s_slave_sck_o              ( s_i2s_sck0_out                   ),
+        // .i2s_slave_sck_oe             ( s_i2s_slave_sck_oe               ),
 
-        .spi_clk_o                    ( s_spi_clk                        ),
-        .spi_csn_o                    ( s_spi_csn                        ),
-        .spi_oen_o                    ( s_spi_oen                        ),
-        .spi_sdo_o                    ( s_spi_sdo                        ),
-        .spi_sdi_i                    ( s_spi_sdi                        ),
+        // .spi_clk_o                    ( s_spi_clk                        ),
+        // .spi_csn_o                    ( s_spi_csn                        ),
+        // .spi_oen_o                    ( s_spi_oen                        ),
+        // .spi_sdo_o                    ( s_spi_sdo                        ),
+        // .spi_sdi_i                    ( s_spi_sdi                        ),
 
-        .sdio_clk_o                   ( s_sdio_clk                       ),
-        .sdio_cmd_o                   ( s_sdio_cmdo                      ),
-        .sdio_cmd_i                   ( s_sdio_cmdi                      ),
-        .sdio_cmd_oen_o               ( s_sdio_cmd_oen                   ),
-        .sdio_data_o                  ( s_sdio_datao                     ),
-        .sdio_data_i                  ( s_sdio_datai                     ),
-        .sdio_data_oen_o              ( s_sdio_data_oen                  ),
+        // .sdio_clk_o                   ( s_sdio_clk                       ),
+        // .sdio_cmd_o                   ( s_sdio_cmdo                      ),
+        // .sdio_cmd_i                   ( s_sdio_cmdi                      ),
+        // .sdio_cmd_oen_o               ( s_sdio_cmd_oen                   ),
+        // .sdio_data_o                  ( s_sdio_datao                     ),
+        // .sdio_data_i                  ( s_sdio_datai                     ),
+        // .sdio_data_oen_o              ( s_sdio_data_oen                  ),
 
         .cluster_busy_i               ( s_cluster_busy                   ),
 
@@ -910,8 +912,7 @@ logic [1:0]                  s_selected_pad_mode;
         .cluster_fetch_enable_o       (                                  ),
         .cluster_boot_addr_o          (                                  ),
         .cluster_test_en_o            (                                  ),
-        .cluster_dbg_irq_valid_o      (                                  ), // we dont' have a cluster
-        .*
+        .cluster_dbg_irq_valid_o      (                                  ) // we dont' have a cluster
     );
 
 assign s_dma_pe_evt_valid               = '0;
