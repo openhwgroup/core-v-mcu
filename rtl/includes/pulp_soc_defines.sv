@@ -75,7 +75,7 @@
 //`define RISCV
 
 //PARAMETERS
-`define CORE_TYPE     0   // 0 for cv32e40p (formerly RI5CY), 1 for IBEX RV32IMC (formeryly ZERORI5CY), 2 for IBEX RV32EC (formeryly MICRORI5CY)
+`define CORE_TYPE     0   // 0 for cv32e40p (formerly RI5CY), 1 for IBEX RV32IMC (formeryly ZERORI5CY), 2 for IBEX RV32EC (formerly MICRORI5CY)
 `define USE_FPU       0
 `define USE_HWPE      0
 `define NB_CLUSTERS   0
