@@ -316,8 +316,9 @@ module fpga_bootrom #
 	0275: value <= 32'b00110101110001011000010101101110;
 	0276: value <= 32'b00010001010000011011011111010101;
 	0277: value <= 32'b00111101101001011100011000000110;
-	defualt: value <= 32'h00000000;
+	default: value <= 32'h00000000;
 	
      endcase
+     end
 // Assign value = 32'h0000006f; //jal x0,0;
-endmodule : fpga_bootrom;
+endmodule
