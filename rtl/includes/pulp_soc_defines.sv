@@ -134,7 +134,7 @@
 `define N_GPIO      32    // Number of IO the GPIO block can potentially control
 
 `define NBIT_PADCFG 6     // Number of pad configuration signals
-`define NBIT_PADMUX 4     // Number of bits in the pad mux select, which means there are 2^NBIT_PADMUX possible configurations
+`define NBIT_PADMUX 2     // Number of bits in the pad mux select, which means there are 2^NBIT_PADMUX possible configurations
 
 // At this time fixed by padframe
 // Please keep in same order as the generation in udma_subsystem
