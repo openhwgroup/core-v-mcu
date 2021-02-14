@@ -684,9 +684,9 @@ logic [1:0]                  s_selected_pad_mode;
         .pad_cfg_o                    ( s_pad_cfg_soc                    ),
         .pad_mux_o                    ( s_pad_mux_soc                    ),
         // PERIO signals
-        .perio_in_i                  (perio_in_i),
-        .perio_out_o                 (perio_out_o),
-        .perio_oe_o                  (perio_oe_o),
+        .perio_in_i                  ( s_perio_in),
+        .perio_out_o                 ( s_perio_out),
+        .perio_oe_o                  ( s_perio_oe),
         // GPIO signals
         .gpio_in_i                    ( s_gpio_in                        ),
         .gpio_out_o                   ( s_gpio_out                       ),
