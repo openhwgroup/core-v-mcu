@@ -60,6 +60,8 @@ module safe_domain #(
         input  logic [3:0]       timer1_i             ,
         input  logic [3:0]       timer2_i             ,
         input  logic [3:0]       timer3_i
+        , input logic debug0,
+        input logic debug1
     );
 
     logic        s_test_clk;
@@ -86,12 +88,12 @@ module safe_domain #(
         .pad_mux_i             ( pad_mux_i             ),
         .pad_cfg_i             ( pad_cfg_i             ),
         .pad_cfg_o             ( pad_cfg_o             ),
-		
-		.io_out_o            	( io_out_o            ),
+        
+        .io_out_o            	( io_out_o            ),
         .io_in_i             	( io_in_i             ),
         .io_oe_o             	( io_oe_o             ),
-		
-		.perio_out_i            ( perio_out_i            ),
+
+        .perio_out_i            ( perio_out_i            ),
         .perio_in_o             ( perio_in_o             ),
         .perio_oe_i             ( perio_oe_i             ),
 

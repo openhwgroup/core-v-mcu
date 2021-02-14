@@ -420,6 +420,9 @@ logic [1:0]                  s_selected_pad_mode;
   logic                        s_bootsel;
   logic                        s_fc_fetch_en_valid;
   logic                        s_fc_fetch_en;
+  
+  logic debug1;
+  logic debug0;
 
   //
   // PAD FRAME
@@ -633,6 +636,8 @@ logic [1:0]                  s_selected_pad_mode;
         .timer1_i                   ( s_timer1                    ),
         .timer2_i                   ( s_timer2                    ),
         .timer3_i                   ( s_timer3                    )
+        ,.debug0(s_debug0),
+        .debug1(s_debug1)
    );
 
    //
@@ -675,14 +680,14 @@ logic [1:0]                  s_selected_pad_mode;
         .jtag_tms_i                   ( s_jtag_tms                       ),
         .jtag_tdi_i                   ( s_jtag_tdi                       ),
         .jtag_tdo_o                   ( s_jtag_tdo                       ),
-		// Pad control signals
+        // Pad control signals
         .pad_cfg_o                    ( s_pad_cfg_soc                    ),
         .pad_mux_o                    ( s_pad_mux_soc                    ),
-		// PERIO signals
-		.perio_in_i                  (perio_in_i),
+        // PERIO signals
+        .perio_in_i                  (perio_in_i),
         .perio_out_o                 (perio_out_o),
         .perio_oe_o                  (perio_oe_o),
-		// GPIO signals
+        // GPIO signals
         .gpio_in_i                    ( s_gpio_in                        ),
         .gpio_out_o                   ( s_gpio_out                       ),
         .gpio_oe_o                    ( s_gpio_oe                       ),     
