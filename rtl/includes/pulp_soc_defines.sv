@@ -138,7 +138,7 @@
 
 // At this time fixed by padframe
 // Please keep in same order as the generation in udma_subsystem
-`define N_UART    	1
+`define N_UART    	2
 `define N_QSPIM    	1
 `define N_SPI     	`N_QSPIM		// ToDo: Compatibility
 `define N_I2CM    	2
