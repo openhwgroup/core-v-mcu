@@ -12,7 +12,7 @@
 `include "pulp_peripheral_defines.svh"
 
 module pulpissimo #(
-    parameter CORE_TYPE   = 0, // 0 for RISCY, 1 for IBEX RV32IMC (formerly ZERORISCY), 2 for IBEX RV32EC (formerly MICRORISCY)
+    parameter logic [1:0] CORE_TYPE   = 3, // 0 for RISCY, 1 for IBEX RV32IMC (formerly ZERORISCY), 2 for IBEX RV32EC (formerly MICRORISCY)
     parameter USE_FPU     = 1,
     parameter USE_HWPE    = 1
 ) (
@@ -210,6 +210,8 @@ module pulpissimo #(
 
   logic                        s_test_clk;
   logic                        s_slow_clk;
+  logic 		       mhz4;
+  
   logic                        s_sel_fll_clk;
 
   logic [11:0]                 s_pm_cfg_data;
@@ -433,6 +435,8 @@ logic [1:0]                  s_selected_pad_mode;
   pad_frame i_pad_frame (
 `endif
     .pad_cfg_i             ( s_pad_cfg              ),
+    .mhz4 (mhz4),
+    .bootsel_o (s_bootsel),
     .ref_clk_o             ( s_ref_clk              ),
     .rstn_o                ( s_rstn                 ),
     .jtag_tdo_i            ( s_jtag_tdo             ),
@@ -603,7 +607,9 @@ logic [1:0]                  s_selected_pad_mode;
 
         .ref_clk_i                  ( s_ref_clk                   ),
         .slow_clk_o                 ( s_slow_clk                  ),
-        .rst_ni                     ( s_rstn                     ),
+        .mhz4                       (mhz4                         ),
+        .bootsel_i                  (s_bootsel                    ),
+        .rst_ni                     ( s_rstn                      ),
 
         .rst_no                     ( s_rstn_por                  ),
 

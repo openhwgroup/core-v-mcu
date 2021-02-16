@@ -28,7 +28,8 @@ module fpga_slow_clk_gen
                                   //by 256 to arrive to a 32.768kHz clock
     )
   (input logic ref_clk_i,
-   input logic rst_ni,
+   input logic 	rst_ni,
+   output logic mhz4, 
    output logic slow_clk_o
    );
 
@@ -72,10 +73,16 @@ module fpga_slow_clk_gen
     end
   end
 
-  BUFGCE i_clock_gate
+   BUFG i_4mhz (
+		.I(clk_counter_d[0]),
+		.O(mhz4)
+		);
+   
+
+  BUFG i_clock_gate
     (
-      .I(intermmediate_clock),
-      .CE(clock_gate_en),
+      .I(clk_counter_d[7]),
+ //     .CE(clock_gate_en),
       .O(slow_clk_o)
      );
 

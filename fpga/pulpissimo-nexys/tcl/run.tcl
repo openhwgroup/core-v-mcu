@@ -55,6 +55,13 @@ read_ip $FPGA_IPS/xilinx_slow_clk_mngr/ip/xilinx_slow_clk_mngr.xci
 read_ip $FPGA_IPS/xilinx_interleaved_ram/ip/xilinx_interleaved_ram.xci
 read_ip $FPGA_IPS/xilinx_private_ram/ip/xilinx_private_ram.xci
 
+# the following step seems to be needed for Vivado 2020.2
+synth_ip [get_files *xilinx_clk_mngr.xci]
+synth_ip [get_files *xilinx_slow_clk_mngr.xci]
+synth_ip [get_files *xilinx_interleaved_ram.xci]
+synth_ip [get_files *xilinx_private_ram.xci]
+
+
 # Add wrappers and xilinx specific techcells
 add_files -norecurse $FPGA_RTL/fpga_clk_gen.sv
 add_files -norecurse $FPGA_RTL/fpga_slow_clk_gen.sv
@@ -101,7 +108,7 @@ set_property needs_refresh false [get_runs synth_1]
 # Remove unused IOBUF cells in padframe (they are not optimized away since the
 # pad driver also drives the input creating a datapath from pad_xy_o to pad_xy_i
 # )
-remove_cell i_pulpissimo/i_pad_frame/padinst_bootsel
+#remove_cell i_pulpissimo/i_pad_frame/padinst_bootsel
 
 
 # Launch Implementation
