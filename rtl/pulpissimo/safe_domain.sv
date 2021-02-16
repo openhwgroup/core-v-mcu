@@ -17,7 +17,6 @@ module safe_domain #(
 ) (
         input  logic             ref_clk_i            ,
         output logic             slow_clk_o           ,
-        output logic             mhz4                 ,
         input  logic             bootsel_i            ,
         input  logic             rst_ni               ,
         output logic             rst_no               ,
@@ -136,7 +135,7 @@ module safe_domain #(
     (
      .rst_ni(s_rstn_sync),
      .ref_clk_i(ref_clk_i),
-     .mhz4 (mhz4),
+     .mhz4 (),
      .slow_clk_o(slow_clk_o)
      );
 `endif

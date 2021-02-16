@@ -210,7 +210,7 @@ module pulpissimo #(
 
   logic                        s_test_clk;
   logic                        s_slow_clk;
-  logic 		       mhz4;
+
   
   logic                        s_sel_fll_clk;
 
@@ -435,7 +435,6 @@ logic [1:0]                  s_selected_pad_mode;
   pad_frame i_pad_frame (
 `endif
     .pad_cfg_i             ( s_pad_cfg              ),
-    .mhz4 (mhz4),
     .bootsel_o (s_bootsel),
     .ref_clk_o             ( s_ref_clk              ),
     .rstn_o                ( s_rstn                 ),
@@ -607,7 +606,6 @@ logic [1:0]                  s_selected_pad_mode;
 
         .ref_clk_i                  ( s_ref_clk                   ),
         .slow_clk_o                 ( s_slow_clk                  ),
-        .mhz4                       (mhz4                         ),
         .bootsel_i                  (s_bootsel                    ),
         .rst_ni                     ( s_rstn                      ),
 
