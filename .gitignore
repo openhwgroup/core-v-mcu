@@ -4,3 +4,13 @@ sim/
 .cached_ipdb.json
 __pycache__/
 ipstools/
+*.bak
+rtl/modules-gf22fdx
+rtl/ql_fcb/src_files.yml
+fpga/core-v-mcu2.bit/
+rtl/ql_fcb/README.md
+rtl/ql_fcb/rtl/
+rtl/ql_math_unit/
+rtl/includes/pulp_peripheral_defines.svh
+rtl/pulpissimo/pad_control.sv
+rtl/pulpissimo/pad_frame.sv

@@ -27,9 +27,9 @@ set FPGA_RTL rtl
 set FPGA_IPS ips
 
 # remove duplicate incompatible modules
-remove_files $IPS/pulp_soc/rtl/components/axi_slice_dc_slave_wrap.sv
-remove_file $IPS/pulp_soc/rtl/components/axi_slice_dc_master_wrap.sv
-remove_file $IPS/tech_cells_generic/pad_functional_xilinx.sv
+# remove_files $IPS/pulp_soc/rtl/components/axi_slice_dc_slave_wrap.sv
+# remove_file $IPS/pulp_soc/rtl/components/axi_slice_dc_master_wrap.sv
+# remove_file $IPS/tech_cells_generic/pad_functional_xilinx.sv
 
 # Set Verilog Defines.
 set DEFINES "FPGA_TARGET_XILINX=1 PULP_FPGA_EMUL=1 AXI4_XCHECK_OFF=1"
@@ -85,8 +85,11 @@ if {$rev == "nexys4"} {
 	puts "Use nexys4 constraints."
 	add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4.xdc
 } else {
-	puts "Use nexys4DDR/A7 constraints."
-	add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4DDR.xdc
+	#puts "Use nexys4DDR/A7 constraints."
+	#add_files -fileset constrs_1 -norecurse $CONSTRS/nexys4DDR.xdc
+  puts "Use core-v-mcu2 constraints."
+	add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu2-timing.xdc
+  add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu2-pin-assigment.xdc
 }
 
 
@@ -105,7 +108,8 @@ set_property needs_refresh false [get_runs synth_1]
 # Remove unused IOBUF cells in padframe (they are not optimized away since the
 # pad driver also drives the input creating a datapath from pad_xy_o to pad_xy_i
 # )
-#remove_cell i_pulpissimo/pad_frame_i/padinst_bootsel
+#remove_cell i_pulpissimo/i_pad_frame/padinst_bootsel
+
 
 
 # Launch Implementation

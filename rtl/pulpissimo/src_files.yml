@@ -3,6 +3,7 @@ pulpissimo:
     ../includes,
   ]
   files: [
+    ../includes/arnold_pad_config.sv,
     jtag_tap_top.sv,
     pad_control.sv,
     pad_frame.sv,
@@ -11,7 +12,18 @@ pulpissimo:
     rtc_date.sv,
     rtc_clock.sv,
     pulpissimo.sv,
+    pad_arnold_physical_mux.sv,
   ]
   vlog_opts: [
   -L pulp_soc_lib
+  ]
+pulpissimo_padframe:
+  flags: [
+    skip_synthesis,
+  ]
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    pad_frame.sv,
   ]

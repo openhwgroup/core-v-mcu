@@ -12,4 +12,10 @@ vip:
   path: vip
 pulpissimo:
   path: pulpissimo
+quicklogic:
+  path: quicklogic
+ql_fcb:
+  path: ql_fcb
+ql_math_unit:
+  path: ql_math_unit
 

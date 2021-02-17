@@ -1,0 +1,5 @@
+ql_fcb:
+  files: [
+    fcb.sv
+  ]
+

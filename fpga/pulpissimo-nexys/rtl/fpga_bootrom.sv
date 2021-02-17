@@ -21,8 +21,9 @@
 //-----------------------------------------------------------------------------
 
 
-module fpga_bootrom #
-  (
+
+module fpga_bootrom
+  #(
    parameter ADDR_WIDTH=32,
    parameter DATA_WIDTH=32
    )

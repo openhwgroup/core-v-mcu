@@ -74,7 +74,10 @@
 // -> define RISCV for RISC-V processor
 //`define RISCV
 
-//PARAMETRES
+//PARAMETERS
+`define CORE_TYPE     3   // 3 for cv32e40p , 0, pulp, 1 for IBEX RV32IMC (formeryly ZERORI5CY), 2 for IBEX RV32EC (formerly MICRORI5CY)
+`define USE_FPU       0
+`define USE_HWPE      0
 `define NB_CLUSTERS   0
 `define NB_CORES      0
 `define NB_DMAS       0
@@ -103,7 +106,7 @@
   `define LEVEL_SHIFTER
 `endif
 
-// Comment to use bheavioral memories, uncomment to use stdcell latches. If uncommented, simulations slowdown occuor
+// Comment to use behavioral memories, uncomment to use stdcell latches. If uncommented, simulations slowdown occuor
 `ifdef SYNTHESIS
  `define SCM_IMPLEMENTED
  `define SCM_BASED_ICACHE
@@ -120,6 +123,47 @@
 //`define MMU_LOCAL_COPY_REGS
 //
 //////////////////////
+
+//--------------------------------------
+//
+// Peripherals
+//
+//--------------------------------------
+`define N_IO        48    // Number of IO in pad frame
+`define N_SYSIO     3     // Number of IO used for system functions like reset
+`define N_GPIO      32    // Number of IO the GPIO block can potentially control
+
+`define NBIT_PADCFG 6     // Number of pad configuration signals
+`define NBIT_PADMUX 2     // Number of bits in the pad mux select, which means there are 2^NBIT_PADMUX possible configurations
+
+// At this time fixed by padframe
+// Please keep in same order as the generation in udma_subsystem
+`define N_UART    	2
+`define N_QSPIM    	1
+`define N_SPI     	`N_QSPIM		// ToDo: Compatibility
+`define N_I2CM    	2
+`define N_I2C     	`N_I2CM		// ToDo: Compatibility
+`define N_I2SC    	0
+`define N_I2S	      `N_I2SC		// ToDo: Cpmpatibility
+`define N_CSI2    	0
+`define N_HYPER   	0
+`define N_SDIO    	0
+`define N_CAM     	1
+`define N_JTAG    	0
+`define N_MRAM    	0
+`define N_FILTER  	1
+`define N_FPGA    	1
+`define N_EXT_PER   0			// ToDo: Only set to one if PULP_TRAINING -- do we still need?
+
+
+//--------------------------------------
+//
+// EFPGA
+//
+//--------------------------------------
+`define N_EFPGA_TCDM_PORTS  4     // Number of TCDM ports connected to eFPGA
+`define N_FPGAIO            43    // Number of GPIO ports on eFPGA (may not all be connected to GPIO)
+`define N_EFPGA_EVENTS      16    // Number of events from EFPGA
 
 // Width of byte enable for a given data width
 `define EVAL_BE_WIDTH(DATAWIDTH) (DATAWIDTH/8)
