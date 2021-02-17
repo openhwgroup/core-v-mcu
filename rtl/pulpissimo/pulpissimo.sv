@@ -210,7 +210,6 @@ module pulpissimo #(
 
   logic                        s_test_clk;
   logic                        s_slow_clk;
-
   
   logic                        s_sel_fll_clk;
 
@@ -436,6 +435,7 @@ logic [1:0]                  s_selected_pad_mode;
 `endif
     .pad_cfg_i             ( s_pad_cfg              ),
     .bootsel_o (s_bootsel),
+
     .ref_clk_o             ( s_ref_clk              ),
     .rstn_o                ( s_rstn                 ),
     .jtag_tdo_i            ( s_jtag_tdo             ),

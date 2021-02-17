@@ -90,49 +90,60 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins i_pulpis
 #############################################################
 
 ## Sys clock
-set_property -dict {PACKAGE_PIN E3  IOSTANDARD LVCMOS33} [get_ports sys_clk]
+set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports sys_clk]
 
 ##Switches
 set_property -dict { PACKAGE_PIN J15   IOSTANDARD LVCMOS33 } [get_ports { bootsel }]; #IO_L24N_T3_RS0_15 Sch=sw[0]
 
 ## Buttons
-set_property -dict {PACKAGE_PIN C12  IOSTANDARD LVCMOS33} [get_ports pad_reset_n]
-set_property -dict {PACKAGE_PIN N17 IOSTANDARD LVCMOS33} [get_ports btnc_i]
-set_property -dict {PACKAGE_PIN P18 IOSTANDARD LVCMOS33} [get_ports btnd_i]
-set_property -dict {PACKAGE_PIN P17 IOSTANDARD LVCMOS33} [get_ports btnl_i]
-set_property -dict {PACKAGE_PIN M17 IOSTANDARD LVCMOS33} [get_ports btnr_i]
-set_property -dict {PACKAGE_PIN M18 IOSTANDARD LVCMOS33} [get_ports btnu_i]
+set_property -dict {PACKAGE_PIN C12 IOSTANDARD LVCMOS33} [get_ports pad_reset_n]
+#set_property -dict {PACKAGE_PIN N17 IOSTANDARD LVCMOS33} [get_ports btnc_i]
+set_property -dict {PACKAGE_PIN G3 IOSTANDARD LVCMOS33} [get_ports btnc_i]
+#set_property -dict {PACKAGE_PIN P18 IOSTANDARD LVCMOS33} [get_ports btnd_i]
+set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports btnd_i]
+#set_property -dict {PACKAGE_PIN P17 IOSTANDARD LVCMOS33} [get_ports btnl_i]
+set_property -dict {PACKAGE_PIN G4 IOSTANDARD LVCMOS33} [get_ports btnl_i]
+#set_property -dict {PACKAGE_PIN M17 IOSTANDARD LVCMOS33} [get_ports btnr_i]
+set_property -dict {PACKAGE_PIN G2 IOSTANDARD LVCMOS33} [get_ports btnr_i]
+#set_property -dict {PACKAGE_PIN M18 IOSTANDARD LVCMOS33} [get_ports btnu_i]
+set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS33} [get_ports btnu_i]
 
-## PMOD A as JTAG 
+## PMOD A as JTAG
 set_property -dict {PACKAGE_PIN C17 IOSTANDARD LVCMOS33} [get_ports pad_jtag_tms]
 set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports pad_jtag_tdi]
 set_property -dict {PACKAGE_PIN E18 IOSTANDARD LVCMOS33} [get_ports pad_jtag_tdo]
 set_property -dict {PACKAGE_PIN G17 IOSTANDARD LVCMOS33} [get_ports pad_jtag_tck]
 
 ##PMOD B for I2C and I2S
-set_property -dict { PACKAGE_PIN D14   IOSTANDARD LVCMOS33 } [get_ports pad_i2c0_sda] 
-set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports pad_i2c0_scl]
-
-set_property -dict { PACKAGE_PIN E16   IOSTANDARD LVCMOS33 } [get_ports pad_i2s0_sck]
-set_property -dict { PACKAGE_PIN F13   IOSTANDARD LVCMOS33 } [get_ports pad_i2s0_ws]
-set_property -dict { PACKAGE_PIN G13   IOSTANDARD LVCMOS33 } [get_ports pad_i2s0_sdi]
-set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports pad_i2s1_sdi]
+set_property -dict {PACKAGE_PIN D14 IOSTANDARD LVCMOS33} [get_ports pad_i2c0_sda]
+set_property -dict {PACKAGE_PIN F16 IOSTANDARD LVCMOS33} [get_ports pad_i2c0_scl]
+set_property -dict {PACKAGE_PIN G16 IOSTANDARD LVCMOS33} [get_ports pad_bootsel]
+set_property -dict {PACKAGE_PIN E16 IOSTANDARD LVCMOS33} [get_ports pad_i2s0_sck]
+set_property -dict {PACKAGE_PIN F13 IOSTANDARD LVCMOS33} [get_ports pad_i2s0_ws]
+set_property -dict {PACKAGE_PIN G13 IOSTANDARD LVCMOS33} [get_ports pad_i2s0_sdi]
+set_property -dict {PACKAGE_PIN H16 IOSTANDARD LVCMOS33} [get_ports pad_i2s1_sdi]
 
 ## UART
 set_property -dict {PACKAGE_PIN C4 IOSTANDARD LVCMOS33} [get_ports pad_uart_rx]
 set_property -dict {PACKAGE_PIN D4 IOSTANDARD LVCMOS33} [get_ports pad_uart_tx]
+
 #set_property -dict {PACKAGE_PIN D3 IOSTANDARD LVCMOS33} [get_ports pad_uart_cts]
 #set_property -dict {PACKAGE_PIN E5 IOSTANDARD LVCMOS33} [get_ports pad_uart_rts]
 
 ## LEDs
 set_property -dict {PACKAGE_PIN H17 IOSTANDARD LVCMOS33} [get_ports led0_o]
-set_property -dict {PACKAGE_PIN K15 IOSTANDARD LVCMOS33} [get_ports led1_o]
-set_property -dict {PACKAGE_PIN J13 IOSTANDARD LVCMOS33} [get_ports led2_o]
-set_property -dict {PACKAGE_PIN N14 IOSTANDARD LVCMOS33} [get_ports led3_o]
+#set_property -dict {PACKAGE_PIN K15 IOSTANDARD LVCMOS33} [get_ports led1_o]
+set_property -dict {PACKAGE_PIN K1 IOSTANDARD LVCMOS33} [get_ports led1_o]
+#set_property -dict {PACKAGE_PIN J13 IOSTANDARD LVCMOS33} [get_ports led2_o]
+set_property -dict {PACKAGE_PIN F6 IOSTANDARD LVCMOS33} [get_ports led2_o]
+#set_property -dict {PACKAGE_PIN N14 IOSTANDARD LVCMOS33} [get_ports led3_o]
+set_property -dict {PACKAGE_PIN H4 IOSTANDARD LVCMOS33} [get_ports led3_o]
 
 ## Switches
-set_property -dict {PACKAGE_PIN J15 IOSTANDARD LVCMOS33} [get_ports switch0_i]
-set_property -dict {PACKAGE_PIN L16 IOSTANDARD LVCMOS33} [get_ports switch1_i]
+#set_property -dict {PACKAGE_PIN J15 IOSTANDARD LVCMOS33} [get_ports switch0_i]
+set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports switch0_i]
+#set_property -dict {PACKAGE_PIN L16 IOSTANDARD LVCMOS33} [get_ports switch1_i]
+set_property -dict {PACKAGE_PIN G1 IOSTANDARD LVCMOS33} [get_ports switch1_i]
 
 ## QSPI Flash
 ## disabled. Have a look at the Readme
@@ -144,9 +155,12 @@ set_property -dict {PACKAGE_PIN L16 IOSTANDARD LVCMOS33} [get_ports switch1_i]
 # not working for now
 
 #Use PMOD C for SPIM0
-set_property -dict {PACKAGE_PIN K1 IOSTANDARD LVCMOS33} [get_ports pad_spim_csn0]
-set_property -dict {PACKAGE_PIN F6 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio0]
-set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio1]
+set_property -dict {PACKAGE_PIN K15 IOSTANDARD LVCMOS33} [get_ports pad_spim_csn0]
+#set_property -dict {PACKAGE_PIN K1 IOSTANDARD LVCMOS33} [get_ports pad_spim_csn0]
+#set_property -dict {PACKAGE_PIN F6 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio0]
+set_property -dict {PACKAGE_PIN J13 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio0]
+set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio1]
+#set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio1]
 set_property -dict {PACKAGE_PIN G6 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio2]
 set_property -dict {PACKAGE_PIN E7 IOSTANDARD LVCMOS33} [get_ports pad_spim_sdio3]
 set_property -dict {PACKAGE_PIN J3 IOSTANDARD LVCMOS33} [get_ports pad_spim_sck]
@@ -155,13 +169,14 @@ set_property -dict {PACKAGE_PIN J3 IOSTANDARD LVCMOS33} [get_ports pad_spim_sck]
 
 ## SD Card
 set_property -dict {PACKAGE_PIN B1 IOSTANDARD LVCMOS33} [get_ports pad_sdio_clk]
-#set_property -dict {PACKAGE_PIN A1 IOSTANDARD LVCMOS33} [get_ports { sd_cd }]; 
+#set_property -dict {PACKAGE_PIN A1 IOSTANDARD LVCMOS33} [get_ports { sd_cd }];
 set_property -dict {PACKAGE_PIN C1 IOSTANDARD LVCMOS33} [get_ports pad_sdio_cmd]
 set_property -dict {PACKAGE_PIN C2 IOSTANDARD LVCMOS33} [get_ports pad_sdio_data0]
 set_property -dict {PACKAGE_PIN E1 IOSTANDARD LVCMOS33} [get_ports pad_sdio_data1]
 set_property -dict {PACKAGE_PIN F1 IOSTANDARD LVCMOS33} [get_ports pad_sdio_data2]
 set_property -dict {PACKAGE_PIN D2 IOSTANDARD LVCMOS33} [get_ports pad_sdio_data3]
-set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports sdio_reset_o]
+#set_property -dict {PACKAGE_PIN E2 IOSTANDARD LVCMOS33} [get_ports sdio_reset_o]
+set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports sdio_reset_o]
 
 # Nexys 4 has a quad SPI flash
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]

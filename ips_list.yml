@@ -19,7 +19,7 @@
 #
 
 core-v-mcu2-soc:
-  commit: efpga_integration
+  commit: cv32int
   server: git@github.com
   group:  QuickLogic-Corp
 

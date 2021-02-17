@@ -12,7 +12,7 @@
 `include "pulp_peripheral_defines.svh"
 
 module soc_domain #(
-    parameter CORE_TYPE            = 0,
+    parameter logic [1:0] CORE_TYPE            = 0,
     parameter USE_FPU              = 1,
     parameter USE_HWPE             = 1,
     parameter NB_CL_CORES          = 8,

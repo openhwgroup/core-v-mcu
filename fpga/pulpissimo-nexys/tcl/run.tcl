@@ -73,7 +73,7 @@ add_files -norecurse $FPGA_RTL/pulp_clock_gating_xilinx.sv
 
 
 # set pulpissimo as top
-set_property top xilinx_pulpissimo [current_fileset]; #
+set_property top xilinx_pulpissimo [current_fileset]; 
 
 # needed only if used in batch mode
 update_compile_order -fileset sources_1
@@ -109,6 +109,7 @@ set_property needs_refresh false [get_runs synth_1]
 # pad driver also drives the input creating a datapath from pad_xy_o to pad_xy_i
 # )
 #remove_cell i_pulpissimo/i_pad_frame/padinst_bootsel
+
 
 
 # Launch Implementation
