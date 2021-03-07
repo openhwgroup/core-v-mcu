@@ -19,10 +19,10 @@ The following instructions start from a clean Ubuntu 18.04 installation. Note
 that to build the PULP environment, we use the old PULP GNU tool chain. The
 new CORE-V GNU tool chain can be downloaded later.
 
-1. Download and install the [pre-built PULP GCC toolchain from Embecosm](https://www.embecosm.com/resources/tool-chain-downloads/#pulp). In this case select the `tar.gz` file for Ubuntu 18.04. We shall assume the tool chain is to be installed in `/opt`, but it can be any writable directory on your machine, including in your home directory. Just replace `/opt` by the directory you have chosen in the following instructions. The actual name of the downloaded file will vary, and you should adjust the following commands accordingly. In this case, we are using `pulp-gcc-ubuntu1804-20200913.tar.gz` and assume you have downloaded it into your `Downloads` directory.
+1. Download and install the [pre-built CORE-V GCC toolchain from Embecosm](https://www.embecosm.com/resources/tool-chain-downloads/#corev). In this case select the `tar.gz` file for Ubuntu 18.04. We shall assume the tool chain is to be installed in `/opt`, but it can be any writable directory on your machine, including in your home directory. Just replace `/opt` by the directory you have chosen in the following instructions. The actual name of the downloaded file will vary, and you should adjust the following commands accordingly. In this case, we are using `corev-openhw-gcc-ubuntu1804-20200913.tar.gz` and assume you have downloaded it into your `Downloads` directory.
 ```
-$ tar xf ~/Downloads/pulp-gcc-ubuntu1804-20200913.tar.gz
-$ export PULP_RISCV_GCC_TOOLCHAIN=/opt/pulp-gcc-ubuntu1804-20200913
+$ tar xf ~/Downloads/corev-openhw-gcc-ubuntu1804-20200913.tar.gz
+$ export PULP_RISCV_GCC_TOOLCHAIN=/opt/corev-openhw-gcc-ubuntu1804-20200913
 $ export PATH=$PULP_RISCV_GCC_TOOLCHAIN/bin:$PATH
 ```
 2. Install the PULP SDK
