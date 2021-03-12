@@ -18,8 +18,8 @@
 #  work, make sure to checkout a branch.
 #
 
-core-v-mcu2-soc:
-  commit: master
+core-v-mcu-soc:
+  commit: interrupt-timer-io-updates
   server: git@github.com
   group:  QuickLogic-Corp
 
