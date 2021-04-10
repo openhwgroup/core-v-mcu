@@ -1,0 +1,21 @@
+pulp_soc:
+  vlog_opts: [
+    -L riscv_dbg_lib,
+  ]
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    soc_interconnect.sv,
+    boot_rom.sv,
+    l2_ram_multi_bank.sv,
+    lint_jtag_wrap.sv,
+    periph_bus_wrap.sv,
+    soc_clk_rst_gen.sv,
+    soc_event_arbiter.sv,
+    soc_event_generator.sv,
+    soc_event_queue.sv,
+    soc_interconnect_wrap.sv,
+    soc_peripherals.sv,
+    pulp_soc.sv,
+  ]

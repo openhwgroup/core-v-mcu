@@ -1,0 +1,6 @@
+udma_camera:
+  files: [
+    rtl/camera_reg_if.sv,
+    rtl/camera_if.sv,
+  ]
+

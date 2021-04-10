@@ -1,0 +1,11 @@
+#!/bin/bash
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+set -e
+ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+find rtl/core-v-mcu-soc rtl/pulpissimo \
+    -name '*.sv' | \
+    xargs verible-verilog-format --inplace 2> /dev/zero

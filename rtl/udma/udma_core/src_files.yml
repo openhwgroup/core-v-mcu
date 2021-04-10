@@ -1,0 +1,25 @@
+udma_core:
+  incdirs: [
+        ./rtl,
+  ]        
+  files: [
+    rtl/core/udma_ch_addrgen.sv,
+    rtl/core/udma_arbiter.sv,
+    rtl/core/udma_core.sv,
+    rtl/core/udma_rx_channels.sv,
+    rtl/core/udma_tx_channels.sv,
+    rtl/core/udma_stream_unit.sv,
+    rtl/common/udma_ctrl.sv,
+    rtl/common/udma_apb_if.sv,
+    rtl/common/io_clk_gen.sv,
+    rtl/common/io_event_counter.sv,
+    rtl/common/io_generic_fifo.sv,
+    rtl/common/io_tx_fifo.sv,
+    rtl/common/io_tx_fifo_mark.sv,
+    rtl/common/io_tx_fifo_dc.sv,
+    rtl/common/io_shiftreg.sv,
+    rtl/common/udma_dc_fifo.sv,
+    rtl/common/udma_clkgen.sv,
+    rtl/common/udma_clk_div_cnt.sv,
+  ]
+

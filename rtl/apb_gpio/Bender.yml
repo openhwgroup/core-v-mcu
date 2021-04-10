@@ -1,0 +1,5 @@
+package:
+  name: apb_gpio
+  authors: [ "Antonio Pullini <pullinia@iis.ee.ethz.ch>" ]
+sources:
+  - rtl/apb_gpio.sv

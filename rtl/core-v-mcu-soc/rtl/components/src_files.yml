@@ -1,0 +1,56 @@
+components:
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    apb_clkdiv.sv,
+    apb_timer_unit.sv,
+    apb_soc_ctrl.sv,
+    counter.sv,
+    memory_models.sv,
+    pulp_interfaces.sv,
+    axi_slice_dc_master_wrap.sv,
+    axi_slice_dc_slave_wrap.sv,
+    glitch_free_clk_mux.sv,
+    scm_2048x32.sv,
+    scm_512x32.sv,
+  ]
+
+components_xilinx:
+  incdirs: [
+    ../includes,
+  ]
+  targets: [
+    xilinx,
+  ]
+  files: [
+    glitch_free_clk_mux_xilinx.sv,
+  ]
+
+components_rtl:
+  incdirs: [
+    ../includes,
+  ]
+  targets: [
+    rtl,
+  ]
+  files: [
+    glitch_free_clk_mux.sv,
+  ]
+
+
+components_behav:
+  incdirs: [
+    ../includes,
+  ]
+  targets: [
+    rtl,
+  ]
+  files: [
+    freq_meter.sv,
+    apb_dummy.sv,
+  ]
+  flags: [
+    skip_synthesis,
+  ]
+

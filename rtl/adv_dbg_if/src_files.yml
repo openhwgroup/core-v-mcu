@@ -1,0 +1,37 @@
+adv_dbg_if:
+  incdirs: [
+    rtl,
+  ]
+  files: [
+    rtl/adbg_axi_biu.sv,
+    rtl/adbg_axi_module.sv,
+    rtl/adbg_lint_biu.sv,
+    rtl/adbg_lint_module.sv,
+    rtl/adbg_crc32.v,
+    rtl/adbg_or1k_biu.sv,
+    rtl/adbg_or1k_module.sv,
+    rtl/adbg_or1k_status_reg.sv,
+    rtl/adbg_top.sv,
+    rtl/bytefifo.v,
+    rtl/syncflop.v,
+    rtl/syncreg.v,
+    rtl/adbg_tap_top.v,
+    rtl/adv_dbg_if.sv,
+    rtl/adbg_axionly_top.sv,
+    rtl/adbg_lintonly_top.sv,
+  ]
+  jg_slint_top_name: [
+    adbg_top
+  ]
+  jg_slint_elab_opt: [    
+  ]
+  jg_slint_postelab_cmds: [
+  ]
+  jg_slint_clocks: [
+    tck_i,
+    axi_aclk,    
+  ]
+  jg_slint_resets: [
+    ~trstn_i,
+    ~axi_aresetn,
+  ]

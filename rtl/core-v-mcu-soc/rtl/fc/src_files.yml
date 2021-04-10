@@ -1,0 +1,10 @@
+fc:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  files: [
+    fc_demux.sv,
+    fc_subsystem.sv,
+    fc_hwpe.sv,
+  ]

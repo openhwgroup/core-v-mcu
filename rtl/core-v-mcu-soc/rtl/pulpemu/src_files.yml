@@ -1,0 +1,25 @@
+pulpemu:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  defines: [
+    '$(PULP_FPGA_SIM_ZYNQ)',
+  ]
+  targets: [
+    xilinx,
+  ]
+  files: [
+    pulpemu_apb_demux.sv,
+    pulpemu_clk_gating.sv,
+    pulpemu_gpio.sv,
+    pulpemu_i2c.sv,
+    pulpemu_spi_master.sv,
+    pulpemu_spi_slave.sv,
+    pulpemu_stdout.sv,
+    pulpemu.sv,
+    pulpemu_trace.sv,
+    pulpemu_uart.sv,
+    pulpemu_zynq2pulp_gpio.sv,
+    ../../tb/fake_zynq_wrapper.sv,
+  ]

@@ -1,0 +1,16 @@
+udma_i2s:
+  files: [
+    rtl/i2s_clk_gen.sv,
+    rtl/i2s_rx_channel.sv,
+    rtl/i2s_tx_channel.sv,
+    rtl/i2s_ws_gen.sv,
+    rtl/i2s_clkws_gen.sv,
+    rtl/i2s_txrx.sv,
+    rtl/cic_top.sv,
+    rtl/cic_integrator.sv,
+    rtl/cic_comb.sv,
+    rtl/pdm_top.sv,
+    rtl/udma_i2s_reg_if.sv,
+    rtl/udma_i2s_top.sv,
+  ]
+

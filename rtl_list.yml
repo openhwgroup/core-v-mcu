@@ -1,0 +1,100 @@
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+common_cells:
+  path: common_cells
+L2_tcdm_hybrid_interco:
+  path: L2_tcdm_hybrid_interco
+cluster_interconnect:
+  path: cluster_interconnect
+adv_dbg_if:
+  path: adv_dbg_if
+apb2per:
+  path: apb2per
+apb_adv_timer:
+  path: apb_adv_timer
+apb_fll_if:
+  path: apb_fll_if
+apb_gpio:
+  path: apb_gpio
+apb_node:
+  path: apb_node
+apb2apbcomp:
+  path: apb2apbcomp
+apb_interrupt_cntrl:
+  path: apb_interrupt_cntrl
+axi:
+  path: axi
+axi_slice:
+  path: axi_slice
+axi_slice_dc:
+  path: axi_slice_dc
+timer_unit:
+  path: timer_unit
+fpnew:
+  path: fpnew
+jtag_pulp:
+  path: jtag_pulp
+# TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
+#riscv:
+#  path: #riscv
+#ibex:
+#  path: #ibex
+cv32e40p:
+  path: cv32e40p
+cv32e40p:
+  path: cv32e40p
+scm:
+  path: scm
+generic_FLL:
+  path: generic_FLL
+tech_cells_generic:
+  path: tech_cells_generic
+udma/udma_core:
+  path: udma/udma_core
+udma/udma_uart:
+  path: udma/udma_uart
+udma/udma_i2c:
+  path: udma/udma_i2c
+udma/udma_i2s:
+  path: udma/udma_i2s
+udma/udma_qspi:
+  path: udma/udma_qspi
+udma/udma_sdio:
+  path: udma/udma_sdio
+udma/udma_camera:
+  path: udma/udma_camera
+udma/udma_filter:
+  path: udma/udma_filter
+udma/udma_external_per:
+  path: udma/udma_external_per
+hwpe-ctrl:
+  path: hwpe-ctrl
+hwpe-stream:
+  path: hwpe-stream
+hwpe-mac-engine:
+  path: hwpe-mac-engine
+riscv-dbg:
+  path: riscv-dbg
+register_interface:
+  path: register_interface
+logint_dc_fifo_xbar:
+  path: logint_dc_fifo_xbar
+pulp_soc:
+  path: core-v-mcu-soc
+tb:
+  path: tb
+vip:
+  path: vip
+pulpissimo:
+  path: pulpissimo
+quicklogic:
+  path: quicklogic
+
+# TODO(timsaxe): Add source files to `core-v-mcu`
+# ql_fcb:
+#   path: ql_fcb
+# ql_math_unit:
+#   path: ql_math_unit
+

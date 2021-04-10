@@ -1,0 +1,7 @@
+__pycache__/
+.cached_ipdb.json
+*.bak
+*~
+*.bit
+install/
+ips/

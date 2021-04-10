@@ -1,0 +1,7 @@
+apb_gpio:
+  incdirs: [
+        ../includes,
+  ]
+  files: [
+    ./rtl/gpiov2.sv,
+  ]

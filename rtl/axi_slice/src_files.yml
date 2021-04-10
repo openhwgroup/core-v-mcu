@@ -1,0 +1,24 @@
+axi_slice:
+  files: [
+    src/axi_single_slice.sv,
+    src/axi_ar_buffer.sv,
+    src/axi_aw_buffer.sv,
+    src/axi_b_buffer.sv,
+    src/axi_r_buffer.sv,
+    src/axi_slice.sv,
+    src/axi_w_buffer.sv,
+    src/axi_slice_wrap.sv,
+  ]
+  jg_slint_top_name: [
+    axi_slice
+  ]
+  jg_slint_elab_opt: [    
+  ]
+  jg_slint_postelab_cmds: [
+  ]
+  jg_slint_clocks: [
+    clk_i,
+  ]
+  jg_slint_resets: [
+    ~rst_ni,
+  ]

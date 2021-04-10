@@ -1,0 +1,9 @@
+udma_external_per:
+  files: [
+    rtl/udma_external_per_reg_if.sv,
+    rtl/udma_external_per_wrapper.sv,
+    rtl/udma_external_per_top.sv,
+    rtl/udma_traffic_gen_rx.sv,
+    rtl/udma_traffic_gen_tx.sv,
+  ]
+

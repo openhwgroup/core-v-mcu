@@ -1,0 +1,4 @@
+apb2apbcomp:
+  files: [
+    apb2apbcomp.sv,
+  ]

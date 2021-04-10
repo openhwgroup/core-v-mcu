@@ -1,0 +1,23 @@
+
+variables:
+  VSIM: vsim-10.7e
+  VLOG: vlog-10.7e
+
+before_script:
+  - export PATH="~balasr/.local/bin":$PATH
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - cd testbench
+    - make build
+
+test_pulp_tap:
+  stage: test
+  script:
+    - cd testbench
+    - make build run

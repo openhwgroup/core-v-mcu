@@ -1,0 +1,10 @@
+udma_sdio:
+  files: [
+    rtl/sdio_crc7.sv,
+    rtl/sdio_crc16.sv,
+    rtl/sdio_txrx_cmd.sv,
+    rtl/sdio_txrx_data.sv,
+    rtl/sdio_txrx.sv,
+    rtl/udma_sdio_reg_if.sv,
+    rtl/udma_sdio_top.sv,
+  ]

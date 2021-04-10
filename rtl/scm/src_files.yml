@@ -1,0 +1,53 @@
+scm:
+  vlog_opts: [
+    +nowarnSVCHK,
+  ]
+  targets: [
+    rtl,
+    tsmc55,
+    gf22,
+  ]
+  files: [
+    latch_scm/register_file_1r_1w_test_wrap.sv,
+    latch_scm/register_file_1w_64b_multi_port_read_32b_1row.sv,
+    latch_scm/register_file_1w_multi_port_read_1row.sv,
+    latch_scm/register_file_1r_1w_all.sv,
+    latch_scm/register_file_1r_1w_all_test_wrap.sv,
+    latch_scm/register_file_1r_1w_be.sv,
+    latch_scm/register_file_1r_1w.sv,
+    latch_scm/register_file_1r_1w_1row.sv,
+    latch_scm/register_file_1w_128b_multi_port_read_32b.sv,
+    latch_scm/register_file_1w_64b_multi_port_read_32b.sv,
+    latch_scm/register_file_1w_64b_1r_32b.sv,
+    latch_scm/register_file_1w_multi_port_read_be.sv,
+    latch_scm/register_file_1w_multi_port_read.sv,
+    latch_scm/register_file_2r_1w_asymm.sv,
+    latch_scm/register_file_2r_1w_asymm_test_wrap.sv,
+    latch_scm/register_file_2r_2w.sv,
+    latch_scm/register_file_3r_2w.sv,
+    latch_scm/register_file_3r_2w_be.sv,
+    latch_scm/register_file_multi_way_1w_64b_multi_port_read_32b.sv,
+    latch_scm/register_file_multi_way_1w_multi_port_read.sv,
+  ]
+scm_fpga:
+  vlog_opts: [
+    +nowarnSVCHK,
+  ]
+  targets: [
+    xilinx,
+  ]
+  files: [
+    fpga_scm/register_file_1r_1w_all.sv,
+    fpga_scm/register_file_1r_1w_be.sv,
+    fpga_scm/register_file_1r_1w.sv,
+    fpga_scm/register_file_1r_1w_1row.sv,
+    fpga_scm/register_file_1r_1w_raw.sv,
+    fpga_scm/register_file_1w_multi_port_read.sv,
+    fpga_scm/register_file_1w_64b_multi_port_read_32b.sv,
+    fpga_scm/register_file_1w_64b_1r_32b.sv,
+    fpga_scm/register_file_2r_1w_asymm.sv,
+    fpga_scm/register_file_2r_1w_asymm_test_wrap.sv,
+    fpga_scm/register_file_2r_2w.sv,
+    fpga_scm/register_file_3r_2w.sv,
+    fpga_scm/register_file_3r_2w_be.sv,
+  ]

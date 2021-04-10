@@ -1,0 +1,10 @@
+udma_filter:
+  files: [
+    rtl/udma_filter_au.sv,
+    rtl/udma_filter_bincu.sv,
+    rtl/udma_filter_rx_dataout.sv,
+    rtl/udma_filter_tx_datafetch.sv,
+    rtl/udma_filter_reg_if.sv,
+    rtl/udma_filter.sv,
+  ]
+

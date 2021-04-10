@@ -1,0 +1,1 @@
+Dual-clock fifo for XBAR interface.

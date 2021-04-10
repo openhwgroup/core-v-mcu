@@ -1,0 +1,5 @@
+logint_dc_fifo:
+  files: [
+            log_int_dc_slice.sv,
+            log_int_dc_slice_wrap.sv,
+  ]

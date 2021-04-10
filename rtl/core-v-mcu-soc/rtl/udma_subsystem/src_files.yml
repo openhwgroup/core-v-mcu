@@ -1,0 +1,8 @@
+udma_subsystem:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  files: [
+    udma_subsystem.sv,
+  ]

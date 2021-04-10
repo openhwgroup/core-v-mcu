@@ -1,0 +1,54 @@
+hwpe-stream:
+  vlog_opts: [
+    +nowarnSVCHK,
+  ]
+  incdirs: [
+    rtl,
+  ]
+  files: [
+    rtl/hwpe_stream_package.sv,
+    rtl/hwpe_stream_interfaces.sv,
+    rtl/hwpe_stream_addressgen.sv,
+    rtl/hwpe_stream_fifo_earlystall_sidech.sv,
+    rtl/hwpe_stream_fifo_earlystall.sv,
+    rtl/hwpe_stream_fifo_scm.sv,
+    rtl/hwpe_stream_fifo_sidech.sv,
+    rtl/hwpe_stream_fifo.sv,
+    rtl/hwpe_stream_buffer.sv,
+    rtl/hwpe_stream_merge.sv,
+    rtl/hwpe_stream_fence.sv,
+    rtl/hwpe_stream_split.sv,
+    rtl/hwpe_stream_sink.sv,
+    rtl/hwpe_stream_source.sv,
+    rtl/hwpe_stream_sink_realign.sv,
+    rtl/hwpe_stream_source_realign.sv,
+    rtl/hwpe_stream_mux_static.sv,
+    rtl/hwpe_stream_demux_static.sv,
+    rtl/hwpe_stream_tcdm_fifo_load.sv,
+    rtl/hwpe_stream_tcdm_fifo_load_sidech.sv,
+    rtl/hwpe_stream_tcdm_fifo_store.sv,
+    rtl/hwpe_stream_tcdm_mux.sv,
+    rtl/hwpe_stream_tcdm_mux_static.sv,
+    rtl/hwpe_stream_tcdm_reorder.sv,
+    rtl/hwpe_stream_tcdm_reorder_static.sv,
+  ]
+
+tb_hwpe_stream:
+  flags: [
+    skip_synthesis,
+  ]
+  files: [
+    tb/tb_hwpe_stream_reservoir.sv,
+    tb/tb_hwpe_stream_receiver.sv,
+  ]
+
+tb_hwpe_stream_local:
+  flags: [
+    only_local,
+    skip_synthesis,
+  ]
+  files: [
+    tb/tb_hwpe_stream_sink_realign.sv,
+    tb/tb_hwpe_stream_source_realign.sv,
+  ]
+

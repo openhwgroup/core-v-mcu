@@ -1,0 +1,18 @@
+apb_node:
+  files: [
+    src/apb_node.sv,
+    src/apb_node_wrap.sv,
+  ]
+  jg_slint_top_name: [
+    apb_node_wrap
+  ]
+  jg_slint_elab_opt: [    
+  ]
+  jg_slint_postelab_cmds: [
+  ]
+  jg_slint_clocks: [
+    clk_i,
+  ]
+  jg_slint_resets: [
+    ~rst_ni,
+  ]

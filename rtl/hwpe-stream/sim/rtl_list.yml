@@ -1,0 +1,15 @@
+#
+# List of RTL sources. Contrarily to IPs, these reside in
+# the current Git repository.
+# Uses the YAML syntax.
+#
+
+rtl:
+  path: ..
+  domain: [cluster]
+
+common_cells:
+  path: ../../common_cells
+  domain: [cluster]
+
+

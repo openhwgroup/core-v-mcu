@@ -1,0 +1,7 @@
+/TAGS
+/testbench/transcript
+/testbench/vsim.wlf
+*.do
+/Bender.lock
+work/
+*.ini

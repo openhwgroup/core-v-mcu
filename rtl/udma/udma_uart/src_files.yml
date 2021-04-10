@@ -1,0 +1,8 @@
+udma_uart:
+  files: [
+    rtl/udma_uart_reg_if.sv,
+    rtl/udma_uart_top.sv,
+    rtl/udma_uart_rx.sv,
+    rtl/udma_uart_tx.sv,
+  ]
+
