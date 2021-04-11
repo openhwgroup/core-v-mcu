@@ -8,8 +8,6 @@ L2_tcdm_hybrid_interco:
   path: L2_tcdm_hybrid_interco
 cluster_interconnect:
   path: cluster_interconnect
-adv_dbg_if:
-  path: adv_dbg_if
 apb2per:
   path: apb2per
 apb_adv_timer:
@@ -34,8 +32,6 @@ timer_unit:
   path: timer_unit
 fpnew:
   path: fpnew
-jtag_pulp:
-  path: jtag_pulp
 # TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
 #riscv:
 #  path: #riscv
