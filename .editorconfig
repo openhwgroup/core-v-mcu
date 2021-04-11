@@ -12,6 +12,8 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.hjson]
+indent_size = 2
 # SystemVerilog wants 2 spaces of indentation
 [*.{sv,svh,sv.tpl}]
 indent_size = 2
