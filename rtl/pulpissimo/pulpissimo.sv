@@ -25,8 +25,6 @@ module pulpissimo #(
   localparam AXI_CLUSTER_SOC_ID_WIDTH = 6;
 
   localparam AXI_USER_WIDTH = 6;
-  localparam AXI_CLUSTER_SOC_STRB_WIDTH = AXI_CLUSTER_SOC_DATA_WIDTH / 8;
-  localparam AXI_SOC_CLUSTER_STRB_WIDTH = AXI_SOC_CLUSTER_DATA_WIDTH / 8;
 
   localparam BUFFER_WIDTH = 8;
   localparam EVENT_WIDTH = 8;
@@ -363,11 +361,8 @@ module pulpissimo #(
       .AXI_DATA_OUT_WIDTH(AXI_SOC_CLUSTER_DATA_WIDTH),
       .AXI_ID_IN_WIDTH   (AXI_CLUSTER_SOC_ID_WIDTH),
       .AXI_USER_WIDTH    (AXI_USER_WIDTH),
-      .AXI_STRB_IN_WIDTH (AXI_CLUSTER_SOC_STRB_WIDTH),
-      .AXI_STRB_OUT_WIDTH(AXI_SOC_CLUSTER_STRB_WIDTH),
       .BUFFER_WIDTH      (BUFFER_WIDTH),
-      .EVNT_WIDTH        (EVENT_WIDTH),
-      .NB_CL_CORES       (0)
+      .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
 
       .ref_clk_i (s_ref_clk),
@@ -483,114 +478,7 @@ module pulpissimo #(
       .efpga_test_MLATCH_i        (efpga_test_MLATCH),
 
       .cluster_pow_o(s_cluster_pow),
-      .cluster_byp_o(s_cluster_byp),
-
-      .data_slave_aw_writetoken_i ('0),
-      .data_slave_aw_addr_i       ('0),
-      .data_slave_aw_prot_i       ('0),
-      .data_slave_aw_region_i     ('0),
-      .data_slave_aw_len_i        ('0),
-      .data_slave_aw_size_i       ('0),
-      .data_slave_aw_burst_i      ('0),
-      .data_slave_aw_lock_i       ('0),
-      .data_slave_aw_cache_i      ('0),
-      .data_slave_aw_qos_i        ('0),
-      .data_slave_aw_id_i         ('0),
-      .data_slave_aw_user_i       ('0),
-      .data_slave_aw_readpointer_o(),
-
-      .data_slave_ar_writetoken_i ('0),
-      .data_slave_ar_addr_i       ('0),
-      .data_slave_ar_prot_i       ('0),
-      .data_slave_ar_region_i     ('0),
-      .data_slave_ar_len_i        ('0),
-      .data_slave_ar_size_i       ('0),
-      .data_slave_ar_burst_i      ('0),
-      .data_slave_ar_lock_i       ('0),
-      .data_slave_ar_cache_i      ('0),
-      .data_slave_ar_qos_i        ('0),
-      .data_slave_ar_id_i         ('0),
-      .data_slave_ar_user_i       ('0),
-      .data_slave_ar_readpointer_o(),
-
-      .data_slave_w_writetoken_i ('0),
-      .data_slave_w_data_i       ('0),
-      .data_slave_w_strb_i       ('0),
-      .data_slave_w_user_i       ('0),
-      .data_slave_w_last_i       ('0),
-      .data_slave_w_readpointer_o(),
-
-      .data_slave_r_writetoken_o (),
-      .data_slave_r_data_o       (),
-      .data_slave_r_resp_o       (),
-      .data_slave_r_last_o       (),
-      .data_slave_r_id_o         (),
-      .data_slave_r_user_o       (),
-      .data_slave_r_readpointer_i('0),
-
-      .data_slave_b_writetoken_o (),
-      .data_slave_b_resp_o       (),
-      .data_slave_b_id_o         (),
-      .data_slave_b_user_o       (),
-      .data_slave_b_readpointer_i('0),
-
-      .data_master_aw_writetoken_o (),
-      .data_master_aw_addr_o       (),
-      .data_master_aw_prot_o       (),
-      .data_master_aw_region_o     (),
-      .data_master_aw_len_o        (),
-      .data_master_aw_size_o       (),
-      .data_master_aw_burst_o      (),
-      .data_master_aw_lock_o       (),
-      .data_master_aw_cache_o      (),
-      .data_master_aw_qos_o        (),
-      .data_master_aw_id_o         (),
-      .data_master_aw_user_o       (),
-      .data_master_aw_readpointer_i('0),
-
-      .data_master_ar_writetoken_o (),
-      .data_master_ar_addr_o       (),
-      .data_master_ar_prot_o       (),
-      .data_master_ar_region_o     (),
-      .data_master_ar_len_o        (),
-      .data_master_ar_size_o       (),
-      .data_master_ar_burst_o      (),
-      .data_master_ar_lock_o       (),
-      .data_master_ar_cache_o      (),
-      .data_master_ar_qos_o        (),
-      .data_master_ar_id_o         (),
-      .data_master_ar_user_o       (),
-      .data_master_ar_readpointer_i('0),
-
-      .data_master_w_writetoken_o (),
-      .data_master_w_data_o       (),
-      .data_master_w_strb_o       (),
-      .data_master_w_user_o       (),
-      .data_master_w_last_o       (),
-      .data_master_w_readpointer_i('0),
-
-      .data_master_r_writetoken_i ('0),
-      .data_master_r_data_i       ('0),
-      .data_master_r_resp_i       ('0),
-      .data_master_r_last_i       ('0),
-      .data_master_r_id_i         ('0),
-      .data_master_r_user_i       ('0),
-      .data_master_r_readpointer_o(),
-
-      .data_master_b_writetoken_i ('0),
-      .data_master_b_resp_i       ('0),
-      .data_master_b_id_i         ('0),
-      .data_master_b_user_i       ('0),
-      .data_master_b_readpointer_o(),
-
-      .cluster_clk_o (),
-      .cluster_rstn_o(),
-
-      .cluster_rtc_o          (),
-      .cluster_fetch_enable_o (),
-      .cluster_boot_addr_o    (),
-      .cluster_test_en_o      (),
-      .cluster_dbg_irq_valid_o()  // we dont' have a cluster
+      .cluster_byp_o(s_cluster_byp)
   );
 
   assign s_dma_pe_evt_valid = '0;

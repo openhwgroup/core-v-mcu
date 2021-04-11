@@ -26,8 +26,6 @@ axi:
   path: axi
 axi_slice:
   path: axi_slice
-axi_slice_dc:
-  path: axi_slice_dc
 timer_unit:
   path: timer_unit
 fpnew:
