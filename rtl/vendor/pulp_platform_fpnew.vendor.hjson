@@ -1,0 +1,20 @@
+// Copyright 2020 OpenHW Group
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+{
+  name: "pulp_platform_fpnew",
+  target_dir: "pulp_platform_fpnew",
+
+  upstream: {
+    url: "https://github.com/pulp-platform/fpnew.git",
+    rev: "master",
+  },
+
+  exclude_from_upstream: [
+    "src/common_cells",
+    "src/fpu_div_sqrt_mvp",
+    "tb",
+    "ips_list.yml",
+    "src_files.yml"
+  ]
+}
