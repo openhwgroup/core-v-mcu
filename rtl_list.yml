@@ -3,7 +3,16 @@
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 common_cells:
-  path: common_cells
+  path: vendor/pulp_platform_common_cells
+axi:
+  path: vendor/pulp_platform_axi
+fpnew:
+  path: vendor/pulp_platform_fpnew
+cv32e40p:
+  path: vendor/openhwgroup_cv32e40p
+register_interface:
+  path: vendor/pulp_platform_register_interface
+
 L2_tcdm_hybrid_interco:
   path: L2_tcdm_hybrid_interco
 cluster_interconnect:
@@ -22,21 +31,15 @@ apb2apbcomp:
   path: apb2apbcomp
 apb_interrupt_cntrl:
   path: apb_interrupt_cntrl
-axi:
-  path: axi
 axi_slice:
   path: axi_slice
 timer_unit:
   path: timer_unit
-fpnew:
-  path: vendor/pulp_platform_fpnew
 # TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
 #riscv:
 #  path: #riscv
 #ibex:
 #  path: #ibex
-cv32e40p:
-  path: vendor/openhwgroup_cv32e40p
 scm:
   path: scm
 generic_FLL:
@@ -63,8 +66,6 @@ udma/udma_external_per:
   path: udma/udma_external_per
 riscv-dbg:
   path: riscv-dbg
-register_interface:
-  path: vendor/pulp_platform_register_interface
 logint_dc_fifo_xbar:
   path: logint_dc_fifo_xbar
 core-v-mcu-soc:
