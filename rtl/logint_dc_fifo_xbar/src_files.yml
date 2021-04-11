@@ -1,5 +1,11 @@
 logint_dc_fifo:
   files: [
-            log_int_dc_slice.sv,
-            log_int_dc_slice_wrap.sv,
+    log_int_dc_slice.sv,
+    log_int_dc_slice_wrap.sv,
+    dc_data_buffer.sv,
+    dc_full_detector.v,
+    dc_synchronizer.v,
+    dc_token_ring_fifo_din.v,
+    dc_token_ring_fifo_dout.v,
+    dc_token_ring.v
   ]

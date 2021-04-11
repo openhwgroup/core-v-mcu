@@ -14,6 +14,7 @@ pulpissimo:
   ]
   vlog_opts: [
   -L pulp_soc_lib
+  -L riscv_dbg_lib
   ]
 pulpissimo_padframe:
   flags: [
