@@ -1,3 +1,4 @@
-pulpissimo/*
-pulpissimo_*.bin
-pulpissimo_*.bit
+core-v-mcu/*
+core_v_mcu_*.bin
+core_v_mcu_*.bit
+*.gen

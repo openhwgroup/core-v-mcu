@@ -6,7 +6,7 @@
 > CORE-V MCU originated from PULPissimo and is currently in change to become a
 > stand-alone project within OpenHW Group independent from PULPIssimo.
 >
-> In case you should be interested to join the project please feel free top open
+> In case you should be interested to join the project please feel free to open
 > an issue, or involve yourself in any open issues/discussions.
 
 ## Getting Started
@@ -23,8 +23,23 @@ Make sure the generated scripts are up-to-date:
 ./generate-scripts
 ```
 
-Build the system:
+Build the system using Modelsim:
 
 ```
 make build
+```
+
+## Building an FPGA Image
+
+```
+$ cd fpga
+$ make nexys rev=nexysA7-100T
+```
+
+Make sure you have the latest Xilinx board-parts installed.
+
+
+Currently unsupported:
+```
+$ make genesys2
 ```

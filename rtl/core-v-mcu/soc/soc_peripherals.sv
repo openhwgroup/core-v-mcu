@@ -912,24 +912,4 @@ module soc_peripherals #(
       .efpga_test_MLATCH_i         (efpga_test_MLATCH_i)
   );
 
-`ifdef PULP_TRAINING
-`ifndef SYNTHESIS
-
-  apb_dummy_registers #(
-      .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
-  ) i_apb_dummy_reg_unit (
-      .HCLK   (clk_i),
-      .HRESETn(rst_ni),
-      .PADDR  (s_apb_dummy_bus.paddr),
-      .PWDATA (s_apb_dummy_bus.pwdata),
-      .PWRITE (s_apb_dummy_bus.pwrite),
-      .PSEL   (s_apb_dummy_bus.psel),
-      .PENABLE(s_apb_dummy_bus.penable),
-      .PRDATA (s_apb_dummy_bus.prdata),
-      .PREADY (s_apb_dummy_bus.pready),
-      .PSLVERR(s_apb_dummy_bus.pslverr)
-  );
-
-`endif
-`endif
 endmodule

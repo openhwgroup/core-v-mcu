@@ -15,7 +15,7 @@ trim_trailing_whitespace = true
 [*.hjson]
 indent_size = 2
 # SystemVerilog wants 2 spaces of indentation
-[*.{sv,svh,sv.tpl}]
+[*.{sv,svh,sv.tpl,v}]
 indent_size = 2
 
 # Use tabs for Makefiles.
