@@ -36,9 +36,7 @@ fpnew:
 #ibex:
 #  path: #ibex
 cv32e40p:
-  path: cv32e40p
-cv32e40p:
-  path: cv32e40p
+  path: vendor/openhwgroup_cv32e40p
 scm:
   path: scm
 generic_FLL:
