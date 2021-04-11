@@ -28,7 +28,13 @@ filesets:
     - fe/rtl/FLL_zerodelta.vhd
     file_type: vhdlSource
 
+  files_stub:
+    files:
+    - fe/model/fll_stub.sv
+    file_type: systemVerilogSource
+
 targets:
   default:
     filesets:
     - target_sim? (files_rtl)
+    - tool_verilator? (files_stub)

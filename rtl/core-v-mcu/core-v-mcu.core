@@ -83,13 +83,17 @@ filesets:
     files:
     - components/freq_meter.sv
     file_type: systemVerilogSource
+
 targets:
-  sim:
-    default_tool: modelsim
+  default: &default_target
     filesets:
     - files_rtl_generic
     - rtl-behavioral
     toplevel: [core_v_mcu]
+
+  sim:
+    <<: *default_target
+    default_tool: modelsim
     tools:
       modelsim:
         vlog_options:
@@ -97,3 +101,14 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress 2583
         - -suppress 13314
+
+  lint:
+    <<: *default_target
+    default_tool: verilator
+    toplevel: [core_v_mcu]
+    tools:
+      verilator:
+        mode: lint-only
+        verilator_options:
+        - -Wno-fatal
+

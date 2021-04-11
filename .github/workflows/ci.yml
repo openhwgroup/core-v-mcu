@@ -1,0 +1,31 @@
+# Copyright 2020 ETH Zurich and University of Bologna.
+# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-License-Identifier: Apache-2.0
+
+# Run functional regression checks
+name: ci
+on: [push]
+
+jobs:
+  ##################
+  # Verilator Lint #
+  ##################
+  verilator_lint:
+    name: Verilator Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - name: Install requirements
+      run: pip install -r python-requirements.txt
+    - name: Install Verilator
+      run: |
+        echo 'deb http://download.opensuse.org/repositories/home:/phiwag:/edatools/xUbuntu_20.04/ /' | sudo tee /etc/apt/sources.list.d/home:phiwag:edatools.list
+        curl -fsSL https://download.opensuse.org/repositories/home:phiwag:edatools/xUbuntu_20.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_phiwag_edatools.gpg > /dev/null
+        sudo apt update
+        sudo apt install verilator-4.100
+    - name: Run Lint
+      run: |
+        fusesoc --cores-root . run --target=lint --setup --build --run openhwgroup.org:systems:core-v-mcu
