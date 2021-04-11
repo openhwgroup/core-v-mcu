@@ -72,34 +72,22 @@ module fc_hwpe #(
       .per_master_r_rdata_i(periph_r_rdata)
   );
 
-  mac_top_wrap #(
-      .ID(ID_WIDTH)
-  ) i_mac_top_wrap (
-      .clk_i         (clk_i),
-      .rst_ni        (rst_ni),
-      .test_mode_i   (test_mode_i),
-      .tcdm_req      (tcdm_req),
-      .tcdm_gnt      (tcdm_gnt),
-      .tcdm_add      (tcdm_add),
-      .tcdm_wen      (tcdm_wen),
-      .tcdm_be       (tcdm_be),
-      .tcdm_data     (tcdm_wdata),
-      .tcdm_r_data   (tcdm_r_rdata),
-      .tcdm_r_valid  (tcdm_r_valid),
-      .periph_req    (periph_req),
-      .periph_gnt    (periph_gnt),
-      .periph_add    (periph_add),
-      .periph_wen    (~periph_we),
-      .periph_be     (periph_be),
-      .periph_data   (periph_wdata),
-      .periph_id     ('0),
-      .periph_r_data (periph_r_rdata),
-      .periph_r_valid(periph_r_valid),
-      .periph_r_id   (periph_r_id),
-      .evt_o         (s_evt)
-  );
+
+  // TODO: Currently tied-off, we can potentially include a more simple HW
+  // accelerator.
+  assign tcdm_req = '0;
+  assign tcdm_add = '0;
+  assign tcdm_wen = '0;
+  assign tcdm_be = '0;
+  assign tcdm_wdata = '0;
+  assign periph_gnt = '0;
+  assign periph_r_data = '0;
+  assign periph_r_valid = '0;
+  assign periph_r_id = '0;
+  assign s_evt = '0;
+
   assign busy_o = 1'b1;
-  assign evt_o  = s_evt[0];
+  assign evt_o = s_evt[0];
 
   genvar i;
   generate

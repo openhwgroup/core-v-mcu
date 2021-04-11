@@ -63,19 +63,13 @@ udma/udma_filter:
   path: udma/udma_filter
 udma/udma_external_per:
   path: udma/udma_external_per
-hwpe-ctrl:
-  path: hwpe-ctrl
-hwpe-stream:
-  path: hwpe-stream
-hwpe-mac-engine:
-  path: hwpe-mac-engine
 riscv-dbg:
   path: riscv-dbg
 register_interface:
   path: register_interface
 logint_dc_fifo_xbar:
   path: logint_dc_fifo_xbar
-pulp_soc:
+core-v-mcu-soc:
   path: core-v-mcu-soc
 tb:
   path: tb
