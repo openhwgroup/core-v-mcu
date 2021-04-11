@@ -10,6 +10,8 @@ Welcome to CORE-V MCU's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   github
+
 
 
 Indices and tables
