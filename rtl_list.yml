@@ -44,8 +44,6 @@ timer_unit:
 #  path: #riscv
 #ibex:
 #  path: #ibex
-scm:
-  path: scm
 generic_FLL:
   path: generic_FLL
 udma/udma_core:
