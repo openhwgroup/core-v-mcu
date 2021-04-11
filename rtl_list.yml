@@ -64,7 +64,7 @@ udma/udma_external_per:
 riscv-dbg:
   path: riscv-dbg
 register_interface:
-  path: register_interface
+  path: vendor/pulp_platform_register_interface
 logint_dc_fifo_xbar:
   path: logint_dc_fifo_xbar
 core-v-mcu-soc:
