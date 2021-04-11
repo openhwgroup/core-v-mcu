@@ -29,7 +29,7 @@ axi_slice:
 timer_unit:
   path: timer_unit
 fpnew:
-  path: fpnew
+  path: vendor/pulp_platform_fpnew
 # TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
 #riscv:
 #  path: #riscv
