@@ -17,8 +17,8 @@ riscv-dbg:
 tech_cells_generic:
   path: vendor/pulp_platform_tech_cells_generic
 
-quicklogic:
-  path: quicklogic
+efpga:
+  path: efpga
 
 # TODO(timsaxe): Add source files to `core-v-mcu`
 # ql_fcb:
@@ -26,11 +26,11 @@ quicklogic:
 # ql_math_unit:
 #   path: ql_math_unit
 
-
 L2_tcdm_hybrid_interco:
   path: L2_tcdm_hybrid_interco
-cluster_interconnect:
-  path: cluster_interconnect
+tcdm_interconnect:
+  path: tcdm_interconnect
+
 apb2per:
   path: apb2per
 apb_adv_timer:
@@ -45,10 +45,11 @@ apb2apbcomp:
   path: apb2apbcomp
 apb_interrupt_cntrl:
   path: apb_interrupt_cntrl
+apb_timer_unit:
+  path: apb_timer_unit
+
 axi_slice:
   path: axi_slice
-timer_unit:
-  path: timer_unit
 # TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
 #ibex:
 #  path: #ibex

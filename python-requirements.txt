@@ -7,3 +7,4 @@ gitpython
 hjson
 pyyaml
 sphinx
+yamlfmt

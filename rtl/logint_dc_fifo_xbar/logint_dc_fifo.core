@@ -1,0 +1,26 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:logint_dc_fifo_xbar
+description: Logarithmic interconnect dual-clock crossbar (deprecated)
+
+filesets:
+  files_rtl:
+    files:
+    - log_int_dc_slice.sv
+    - log_int_dc_slice_wrap.sv
+    - dc_data_buffer.sv
+    - dc_full_detector.v
+    - dc_synchronizer.v
+    - dc_token_ring_fifo_din.v
+    - dc_token_ring_fifo_dout.v
+    - dc_token_ring.v
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

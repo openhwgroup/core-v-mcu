@@ -1,0 +1,23 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:udma_qspi
+description: uDMA Quad-SPI interface
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/udma_spim_defines.sv: {is_include_file: true}
+    - rtl/udma_spim_reg_if.sv
+    - rtl/udma_spim_ctrl.sv
+    - rtl/udma_spim_txrx.sv
+    - rtl/udma_spim_top.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

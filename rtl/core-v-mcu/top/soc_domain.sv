@@ -44,8 +44,6 @@ module soc_domain
     // Do not override, derived.
     parameter AXI_STRB_WIDTH_IN = AXI_DATA_IN_WIDTH / 8,
     parameter AXI_STRB_WIDTH_OUT = AXI_DATA_OUT_WIDTH / 8
-    // disabling the connection. For PULPissimo (MCU without a cluster) this should be set
-    // to 0.
 ) (
     input logic ref_clk_i,
     input logic slow_clk_i,
@@ -897,17 +895,17 @@ module soc_domain
       .boot_rom_slave       (s_mem_rom_bus)
   );
 
-  assign s_data_in_bus.aw_ready  = 1'b0;
-  assign s_data_in_bus.w_ready   = 1'b0;
-  assign s_data_in_bus.b_valid   = 1'b0;
-  assign s_data_in_bus.ar_ready  = 1'b0;
-  assign s_data_in_bus.r_valid   = 1'b0;
+  assign s_data_out_bus.aw_ready = 1'b0;
+  assign s_data_out_bus.w_ready  = 1'b0;
+  assign s_data_out_bus.b_valid  = 1'b0;
+  assign s_data_out_bus.ar_ready = 1'b0;
+  assign s_data_out_bus.r_valid  = 1'b0;
 
-  assign s_data_out_bus.aw_valid = 1'b0;
-  assign s_data_out_bus.w_valid  = 1'b0;
-  assign s_data_out_bus.b_ready  = 1'b0;
-  assign s_data_out_bus.ar_valid = 1'b0;
-  assign s_data_out_bus.r_ready  = 1'b0;
+  assign s_data_in_bus.aw_valid  = 1'b0;
+  assign s_data_in_bus.w_valid   = 1'b0;
+  assign s_data_in_bus.b_ready   = 1'b0;
+  assign s_data_in_bus.ar_valid  = 1'b0;
+  assign s_data_in_bus.r_ready   = 1'b0;
 
   /* Debug Subsystem */
 

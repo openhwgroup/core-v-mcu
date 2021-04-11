@@ -1,0 +1,36 @@
+From 982f06d4c02015653bc99a89d7244d7c34131a38 Mon Sep 17 00:00:00 2001
+From: Florian Zaruba <zarubaf@iis.ee.ethz.ch>
+Date: Sun, 11 Apr 2021 17:36:10 +0200
+Subject: [PATCH] Add fuseSoC core files
+
+First round of core files
+
+Signed-off-by: <florian@openhwgroup.org>
+---
+ axi.core | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/axi.core b/axi.core
+index cd4fbb9..c7d54ec 100644
+--- a/axi.core
++++ b/axi.core
+@@ -1,6 +1,6 @@
+ CAPI=2:
+ 
+-name : pulp-platform.org::axi:0.28.0-dev
++name : pulp-platform.org::axi:0.28.0
+ 
+ filesets:
+   rtl:
+@@ -46,7 +46,7 @@ filesets:
+       - src/axi_xbar.sv
+     file_type : systemVerilogSource
+     depend :
+-      - ">=pulp-platform.org::common_cells:1.21.0"
++      - ">=pulp-platform.org::common_cells:1.20.0"
+ 
+ generators:
+   axi_intercon_gen:
+-- 
+2.25.1.377.g2d2118b814
+

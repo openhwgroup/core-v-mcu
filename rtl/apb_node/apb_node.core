@@ -1,0 +1,20 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:apb_node
+description: APB single master to multiple slaves interface.
+
+filesets:
+  files_rtl:
+    files:
+    - src/apb_node.sv
+    - src/apb_node_wrap.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

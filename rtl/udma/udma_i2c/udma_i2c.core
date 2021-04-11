@@ -1,0 +1,22 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:udma_i2c
+description: uDMA I2C interface
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/udma_i2c_reg_if.sv
+    - rtl/udma_i2c_bus_ctrl.sv
+    - rtl/udma_i2c_control.sv
+    - rtl/udma_i2c_top.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

@@ -1,36 +1,99 @@
 CAPI=2:
 
-name: "openhwgroup:systems:core-v-mcu"
-description: "CORE-V MCU Top."
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-filsets:
-    files_rtl_generic:
-        files:
-            - ../../rtl/includes: {is_include_file : true, include_path : ../../rtl/includes}
-            - rtl/include/tcdm_macros.svh: {is_include_file : true, include_path : rtl/include/}
-            - rtl/soc/pkg_soc_interconnect.sv
-            - rtl/soc/axi64_2_lint32_wrap.sv
-            - rtl/soc/lint_2_axi_wrap.sv
-            - rtl/soc/contiguous_crossbar.sv
-            - rtl/soc/interleaved_crossbar.sv
-            - rtl/soc/tcdm_demux.sv
-            - rtl/soc/boot_rom.sv
-            - rtl/soc/l2_ram_multi_bank.sv
-            - rtl/soc/lint_jtag_wrap.sv
-            - rtl/soc/periph_bus_wrap.sv
-            - rtl/soc/soc_clk_rst_gen.sv
-            - rtl/soc/soc_event_arbiter.sv
-            - rtl/soc/soc_event_generator.sv
-            - rtl/soc/soc_event_queue.sv
-            - rtl/soc/tcdm_error_slave.sv
-            - rtl/soc/soc_interconnect.sv
-            - rtl/soc/soc_interconnect_wrap.sv
-            - rtl/soc/soc_peripherals.sv
+name: openhwgroup.org:systems:core-v-mcu
+description: CORE-V MCU Top.
+
+filesets:
+  files_rtl_generic:
+    depend:
+    - pulp-platform.org::axi
+    - pulp-platform.org::common_cells
+    - pulp-platform.org::riscv_dbg
+    - pulp-platform.org::tech_cells_generic
+    - openhwgroup.org:ip:apb_adv_timer
+    - openhwgroup.org:ip:apb_fll_if
+    - openhwgroup.org:ip:apb_gpio
+    - openhwgroup.org:ip:apb_interrupt_cntrl
+    - openhwgroup.org:ip:apb_node
+    - openhwgroup.org:ip:apb2apbcomp
+    - openhwgroup.org:ip:apb2per
+    - openhwgroup.org:ip:apb_timer_unit
+    - openhwgroup.org:ip:udma_uart
+    - openhwgroup.org:ip:udma_sdio
+    - openhwgroup.org:ip:udma_qspi
+    - openhwgroup.org:ip:udma_i2s
+    - openhwgroup.org:ip:udma_i2c
+    - openhwgroup.org:ip:udma_filter
+    - openhwgroup.org:ip:udma_external_per
+    - openhwgroup.org:ip:udma_core
+    - openhwgroup.org:ip:udma_camera
+    - openhwgroup.org:ip:logint_dc_fifo_xbar
+    - openhwgroup.org:ip:l2_tcdm_hybrid_interco
+    - quicklogic.com:ip:efpga
+    - openhwgroup.org:ip:generic_fll
+    - openhwgroup.org:ip:tcdm_interconnect
+    - openhwgroup.org:ip:cv32e40p
+    files:
+    - ../includes/periph_bus_defines.sv: {is_include_file: true, include_path: ../includes}
+    - ../includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: ../includes}
+    - ../includes/pulp_soc_defines.sv: {is_include_file: true, include_path: ../includes}
+    - ../includes/soc_mem_map.svh: {is_include_file: true, include_path: ../includes}
+    - include/tcdm_macros.svh: {is_include_file: true, include_path: include/}
+    - soc/pkg_soc_interconnect.sv
+    - soc/axi64_2_lint32_wrap.sv
+    - soc/lint_2_axi_wrap.sv
+    - soc/contiguous_crossbar.sv
+    - soc/interleaved_crossbar.sv
+    - soc/tcdm_demux.sv
+    - soc/boot_rom.sv
+    - soc/l2_ram_multi_bank.sv
+    - soc/lint_jtag_wrap.sv
+    - soc/periph_bus_wrap.sv
+    - soc/soc_clk_rst_gen.sv
+    - soc/soc_event_arbiter.sv
+    - soc/soc_event_generator.sv
+    - soc/soc_event_queue.sv
+    - soc/tcdm_error_slave.sv
+    - soc/soc_interconnect.sv
+    - soc/soc_interconnect_wrap.sv
+    - soc/soc_peripherals.sv
+    - udma_subsystem/udma_subsystem.sv
+    - fc/fc_demux.sv
+    - fc/fc_subsystem.sv
+    - fc/fc_hwpe.sv
+    - components/apb_soc_ctrl.sv
+    - components/pulp_interfaces.sv
+    - efpga_subsystem/efpga_subsystem_rtl_tests.sv: {is_include_file: true}
+    - efpga_subsystem/efpga_subsystem.sv
+    - efpga_subsystem/apb_efpga_hwce.sv
+    - efpga_subsystem/dc_accelerator_fsm.sv
+    - efpga_subsystem/efpga_sel_clk_dc_fifo.sv
+    - top/pad_control.sv
+    - top/pad_frame.sv
+    - top/safe_domain.sv
+    - top/soc_domain.sv
+    - top/core_v_mcu.sv
     file_type: systemVerilogSource
 
+  rtl-behavioral:
+    files:
+    - components/freq_meter.sv
+    file_type: systemVerilogSource
 targets:
-    sim:
-        default_tool: modelsim
-        filesets :
-            - files_rtl_generic
-        toplevel: [pps_tb]
+  sim:
+    default_tool: modelsim
+    filesets:
+    - files_rtl_generic
+    - rtl-behavioral
+    toplevel: [core_v_mcu]
+    tools:
+      modelsim:
+        vlog_options:
+        - -svinputport=compat
+        - -override_timescale 1ns/1ps
+        - -suppress 2583
+        - -suppress 13314

@@ -124,14 +124,14 @@ module apb_gpio #(
             end
             `REG_OUT1: begin
               if (NrGPIO > 64) r_gpio_out[63:32] <= PWDATA[31:0];
-              else if (NrGPIO > 32) r_gpio_out[NrGPIO-1:32] <= PWDATA[NrGPIO-33:0];
+              else if (NrGPIO > 32) r_gpio_out[NrGPIO-1:32] <= PWDATA >> 32;
             end
             `REG_OUT2: begin
               if (NrGPIO > 96) r_gpio_out[95:64] <= PWDATA[31:0];
-              else if (NrGPIO > 64) r_gpio_out[NrGPIO-1:0] <= PWDATA[NrGPIO-65:0];
+              else if (NrGPIO > 64) r_gpio_out[NrGPIO-1:0] <= PWDATA >> 64;
             end
             `REG_OUT3: begin
-              if (NrGPIO > 96) r_gpio_out[NrGPIO-1 : 0] <= PWDATA[NrGPIO-97 : 0];
+              if (NrGPIO > 96) r_gpio_out[NrGPIO-1 : 0] <= PWDATA >> 96;
             end
           endcase  // case (PADDR[6:2])
         end else begin  // APB READ

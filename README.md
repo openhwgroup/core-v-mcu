@@ -43,3 +43,11 @@ Currently unsupported:
 ```
 $ make genesys2
 ```
+
+## Experimental fuseSoC Support
+
+Once can sanity check the top-level using QuestaSim:
+
+```
+fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu
+```

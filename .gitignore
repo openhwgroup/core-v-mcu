@@ -7,3 +7,4 @@ install/
 build/
 ./ips
 gmon.out
+modelsim.ini

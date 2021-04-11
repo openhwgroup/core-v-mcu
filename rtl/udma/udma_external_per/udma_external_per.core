@@ -1,0 +1,23 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:udma_external_per
+description: uDMA external peripheral interface
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/udma_external_per_reg_if.sv
+    - rtl/udma_external_per_wrapper.sv
+    - rtl/udma_external_per_top.sv
+    - rtl/udma_traffic_gen_rx.sv
+    - rtl/udma_traffic_gen_tx.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl
