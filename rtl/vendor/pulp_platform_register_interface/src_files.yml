@@ -5,8 +5,8 @@ register_interface:
 
   incdirs:
     - include
-    - ../axi/axi/include
-    - ../common_cells/include
+    - ../pulp_platform_axi/include
+    - ../pulp_platform_common_cells/include
   files:
     # Level 0
     - src/reg_intf.sv
@@ -29,8 +29,8 @@ reggen_primitives:
 
   incdirs:
     - include
-    - ../axi/axi/include
-    - ../common_cells/include
+    - ../pulp_platform_axi/include
+    - ../pulp_platform_common_cells/include
   files:
     - vendor/lowrisc_opentitan/src/prim_subreg.sv
     - vendor/lowrisc_opentitan/src/prim_subreg_arb.sv
