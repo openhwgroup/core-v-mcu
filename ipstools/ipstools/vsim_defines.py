@@ -56,7 +56,7 @@ vmap $LIB_NAME $LIB_PATH
 ##############################################################################
 """
 
-VSIM_POSTAMBLE ="""
+VSIM_POSTAMBLE = """
 echo "${Cyan}--> ${IP} compilation complete! ${NC}"
 exit 0
 

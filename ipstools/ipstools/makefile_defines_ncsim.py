@@ -43,8 +43,8 @@ $(LIB_PATH)/%s.nmake: $(SRC_SVLOG_%s) $(SRC_VHDL_%s)
 """
 
 MKN_BUILDCMD_SVLOG = "$(SVLOG_CC) -makelib ./ncsim_libs %s $(INCDIR_%s) $(SRC_SVLOG_%s) -endlib"
-MKN_BUILDCMD_VLOG  = "$(VLOG_CC) -makelib ./ncsim_libs %s $(INCDIR_%s) $(SRC_SVLOG_%s) -endlib"
-MKN_BUILDCMD_VHDL  = "$(VHDL_CC) -makelib ./ncsim_libs %s $(SRC_VHDL_%s) -endlib"
+MKN_BUILDCMD_VLOG = "$(VLOG_CC) -makelib ./ncsim_libs %s $(INCDIR_%s) $(SRC_SVLOG_%s) -endlib"
+MKN_BUILDCMD_VHDL = "$(VHDL_CC) -makelib ./ncsim_libs %s $(SRC_VHDL_%s) -endlib"
 
 NCELAB_LIST_PREAMBLE = """#
 # Copyright (C) 2015-2019 ETH Zurich, University of Bologna

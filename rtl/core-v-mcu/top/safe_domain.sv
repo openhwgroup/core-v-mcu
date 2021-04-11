@@ -133,7 +133,6 @@ module safe_domain #(
   fpga_slow_clk_gen i_slow_clk_gen (
       .rst_ni(s_rstn_sync),
       .ref_clk_i(ref_clk_i),
-      .mhz4(),
       .slow_clk_o(slow_clk_o)
   );
 `endif

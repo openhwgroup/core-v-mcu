@@ -13,6 +13,7 @@
 from __future__ import print_function
 from .IPApproX_common import *
 
+
 class IPTreeNode(object):
     """Represents a node in the IP hierarchy tree.
 
@@ -41,16 +42,14 @@ class IPTreeNode(object):
     the list of all dependencies so that it is possible to resolve conflicts.                       
 
     """
-
     def __init__(self,
-        node,
-        default_server='https://github.com',
-        default_group='pulp-platform',
-        default_commit='master',
-        children=None,
-        father=None,
-        verbose=False
-    ):
+                 node,
+                 default_server='https://github.com',
+                 default_group='pulp-platform',
+                 default_commit='master',
+                 children=None,
+                 father=None,
+                 verbose=False):
 
         super(IPTreeNode, self).__init__()
         self.node = node
@@ -71,17 +70,27 @@ class IPTreeNode(object):
             commit = node['commit']
         else:
             commit = default_commit
-        ips = load_ips_list_from_server(server, group, node['name'], commit, verbose=verbose)
+        ips = load_ips_list_from_server(server,
+                                        group,
+                                        node['name'],
+                                        commit,
+                                        verbose=verbose)
         father_of_children = {
-            'server' : server,
-            'group'  : group,
-            'name'   : node['name'],
-            'commit' : commit
+            'server': server,
+            'group': group,
+            'name': node['name'],
+            'commit': commit
         }
         self.itself = father_of_children
         children = []
         for ip in ips:
-            children.append(IPTreeNode(ip, default_server, default_group, default_commit, father=father_of_children, verbose=verbose))
+            children.append(
+                IPTreeNode(ip,
+                           default_server,
+                           default_group,
+                           default_commit,
+                           father=father_of_children,
+                           verbose=verbose))
         self.children = children
 
     def flattenize_children(self):

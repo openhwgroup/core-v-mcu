@@ -50,8 +50,6 @@ axi_slice:
 timer_unit:
   path: timer_unit
 # TODO(zarubaf,timsaxe): Make Ibex and other upcoming cores configurable here.
-#riscv:
-#  path: #riscv
 #ibex:
 #  path: #ibex
 generic_FLL:

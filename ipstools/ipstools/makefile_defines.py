@@ -58,8 +58,8 @@ $(LIB_PATH)/%s.vmake: $(SRC_SVLOG_%s) $(SRC_VHDL_%s)
 MK_BUILDCMD_SVLOG_LINT = "$(SVLOG_LINT) %s $(INCDIR_%s) $(SRC_SVLOG_%s)"
 MK_BUILDCMD_VLOG_LINT = "$(VLOG_LINT) %s $(INCDIR_%s) $(SRC_%s)"
 MK_BUILDCMD_SVLOG = "$(SVLOG_CC) -work $(LIB_PATH) %s $(INCDIR_%s) $(SRC_SVLOG_%s)"
-MK_BUILDCMD_VLOG  = "$(VLOG_CC) -work $(LIB_PATH) %s $(INCDIR_%s) $(SRC_%s)"
-MK_BUILDCMD_VHDL  = "$(VHDL_CC) -work $(LIB_PATH) %s $(SRC_VHDL_%s)"
+MK_BUILDCMD_VLOG = "$(VLOG_CC) -work $(LIB_PATH) %s $(INCDIR_%s) $(SRC_%s)"
+MK_BUILDCMD_VHDL = "$(VHDL_CC) -work $(LIB_PATH) %s $(SRC_VHDL_%s)"
 
 # templates for general Makefile
 MK_LIBS_PREAMBLE = """#
