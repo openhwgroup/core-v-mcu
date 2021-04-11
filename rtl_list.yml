@@ -17,6 +17,16 @@ riscv-dbg:
 tech_cells_generic:
   path: vendor/pulp_platform_tech_cells_generic
 
+quicklogic:
+  path: quicklogic
+
+# TODO(timsaxe): Add source files to `core-v-mcu`
+# ql_fcb:
+#   path: ql_fcb
+# ql_math_unit:
+#   path: ql_math_unit
+
+
 L2_tcdm_hybrid_interco:
   path: L2_tcdm_hybrid_interco
 cluster_interconnect:
@@ -66,20 +76,9 @@ udma/udma_external_per:
   path: udma/udma_external_per
 logint_dc_fifo_xbar:
   path: logint_dc_fifo_xbar
-core-v-mcu-soc:
-  path: core-v-mcu-soc
+core-v-mcu:
+  path: core-v-mcu
 tb:
   path: tb
 vip:
   path: vip
-pulpissimo:
-  path: pulpissimo
-quicklogic:
-  path: quicklogic
-
-# TODO(timsaxe): Add source files to `core-v-mcu`
-# ql_fcb:
-#   path: ql_fcb
-# ql_math_unit:
-#   path: ql_math_unit
-

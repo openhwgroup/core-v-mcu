@@ -5,3 +5,4 @@ __pycache__/
 *.bit
 install/
 ips/
+build/

@@ -533,7 +533,7 @@ module tb_pulp;
     );
 
    // PULPissimo chip (design under test)
-   pulpissimo #(
+   core_v_mcu #(
       .CORE_TYPE ( CORE_TYPE ),
       .USE_FPU   ( RISCY_FPU )
    )

@@ -1,0 +1,36 @@
+CAPI=2:
+
+name: "openhwgroup:systems:core-v-mcu"
+description: "CORE-V MCU Top."
+
+filsets:
+    files_rtl_generic:
+        files:
+            - ../../rtl/includes: {is_include_file : true, include_path : ../../rtl/includes}
+            - rtl/include/tcdm_macros.svh: {is_include_file : true, include_path : rtl/include/}
+            - rtl/soc/pkg_soc_interconnect.sv
+            - rtl/soc/axi64_2_lint32_wrap.sv
+            - rtl/soc/lint_2_axi_wrap.sv
+            - rtl/soc/contiguous_crossbar.sv
+            - rtl/soc/interleaved_crossbar.sv
+            - rtl/soc/tcdm_demux.sv
+            - rtl/soc/boot_rom.sv
+            - rtl/soc/l2_ram_multi_bank.sv
+            - rtl/soc/lint_jtag_wrap.sv
+            - rtl/soc/periph_bus_wrap.sv
+            - rtl/soc/soc_clk_rst_gen.sv
+            - rtl/soc/soc_event_arbiter.sv
+            - rtl/soc/soc_event_generator.sv
+            - rtl/soc/soc_event_queue.sv
+            - rtl/soc/tcdm_error_slave.sv
+            - rtl/soc/soc_interconnect.sv
+            - rtl/soc/soc_interconnect_wrap.sv
+            - rtl/soc/soc_peripherals.sv
+    file_type: systemVerilogSource
+
+targets:
+    sim:
+        default_tool: modelsim
+        filesets :
+            - files_rtl_generic
+        toplevel: [pps_tb]
