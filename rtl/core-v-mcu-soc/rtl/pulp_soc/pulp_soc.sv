@@ -432,7 +432,6 @@ module pulp_soc
   logic [31:0] dm_slave_addr, dm_slave_wdata, dm_slave_rdata;
   logic [ 3:0] dm_slave_be;
   logic        lint_riscv_jtag_bus_master_we;
-  logic        int_td;
 
   logic        master_req;
   logic [31:0] master_add;
@@ -449,15 +448,6 @@ module pulp_soc
 
 
   logic spi_master0_csn3, spi_master0_csn2;
-
-  // tap to lint wrap
-  logic s_jtag_shift_dr;
-  logic s_jtag_update_dr;
-  logic s_jtag_capture_dr;
-  logic s_jtag_axireg_sel;
-  logic s_jtag_axireg_tdi;
-  logic s_jtag_axireg_tdo;
-
 
   APB_BUS s_apb_eu_bus ();
   APB_BUS s_apb_hwpe_bus ();
@@ -518,7 +508,6 @@ module pulp_soc
   XBAR_TCDM_BUS s_mem_l2_bus[NB_L2_BANKS-1:0] ();
   XBAR_TCDM_BUS s_mem_l2_pri_bus[NB_L2_BANKS_PRI-1:0] ();
 
-  XBAR_TCDM_BUS s_lint_debug_bus ();
   XBAR_TCDM_BUS s_lint_pulp_jtag_bus ();
   XBAR_TCDM_BUS s_lint_riscv_jtag_bus ();
   XBAR_TCDM_BUS s_lint_udma_tx_bus ();
@@ -945,7 +934,7 @@ module pulp_soc
       .tcdm_fc_instr        (s_lint_fc_instr_bus),
       .tcdm_udma_rx         (s_lint_udma_rx_bus),
       .tcdm_udma_tx         (s_lint_udma_tx_bus),
-      .tcdm_debug           (s_lint_debug_bus),
+      .tcdm_debug           (s_lint_riscv_jtag_bus),
       .tcdm_hwpe            (s_lint_hwpe_bus),
       .tcdm_efpga           (s_lint_efpga_bus),
       .axi_master_plug      (s_data_in_bus),
@@ -977,11 +966,13 @@ module pulp_soc
       .tms_i           (jtag_tms_i),
       .trst_ni         (jtag_trst_ni),
       .td_i            (jtag_tdi_i),
-      .td_o            (int_td),
+      .td_o            (jtag_tdo_o),
       .tdo_oe_o        ()
   );
 
-  // set hartinfo
+  // Set `hartinfo`.
+  // TODO(zarubaf, davideschiavone, timsaxe): Set correct hartinfo struct, based
+  // on selected core/
   always_comb begin : set_hartinfo
     for (int hartid = 0; hartid < NrHarts; hartid = hartid + 1) begin
       hartinfo[hartid] = RI5CY_HARTINFO;
@@ -998,7 +989,6 @@ module pulp_soc
       .BusWidth       (32),
       .SelectableHarts(SELECTABLE_HARTS)
   ) i_dm_top (
-
       .clk_i        (s_soc_clk),
       .rst_ni       (s_soc_rstn),
       .testmode_i   (1'b0),
@@ -1034,50 +1024,8 @@ module pulp_soc
   );
   assign s_lint_riscv_jtag_bus.wen = ~lint_riscv_jtag_bus_master_we;
 
-  jtag_tap_top jtag_tap_top_i (
-      .tck_i  (jtag_tck_i),
-      .trst_ni(jtag_trst_ni),
-      .tms_i  (jtag_tms_i),
-      .td_i   (int_td),
-      .td_o   (jtag_tdo_o),
-
-      .test_clk_i (1'b0),
-      .test_rstn_i(s_soc_rstn),
-
-      .jtag_shift_dr_o  (s_jtag_shift_dr),
-      .jtag_update_dr_o (s_jtag_update_dr),
-      .jtag_capture_dr_o(s_jtag_capture_dr),
-
-      .axireg_sel_o      (s_jtag_axireg_sel),
-      .dbg_axi_scan_in_o (s_jtag_axireg_tdi),
-      .dbg_axi_scan_out_i(s_jtag_axireg_tdo),
-      .soc_jtag_reg_i    (soc_jtag_reg_soc),
-      .soc_jtag_reg_o    (soc_jtag_reg_tap),
-      .sel_fll_clk_o     (s_sel_fll_clk)
-  );
-
-  lint_jtag_wrap i_lint_jtag (
-      .tck_i           (jtag_tck_i),
-      .tdi_i           (s_jtag_axireg_tdi),
-      .trstn_i         (jtag_trst_ni),
-      .tdo_o           (s_jtag_axireg_tdo),
-      .shift_dr_i      (s_jtag_shift_dr),
-      .pause_dr_i      (1'b0),
-      .update_dr_i     (s_jtag_update_dr),
-      .capture_dr_i    (s_jtag_capture_dr),
-      .lint_select_i   (s_jtag_axireg_sel),
-      .clk_i           (s_soc_clk),
-      .rst_ni          (s_soc_rstn),
-      .jtag_lint_master(s_lint_pulp_jtag_bus)
-  );
-
-  tcdm_arbiter_2x1 jtag_lint_arbiter_i (
-      .clk_i(s_soc_clk),
-      .rst_ni(s_soc_rstn),
-      .tcdm_bus_1_i(s_lint_riscv_jtag_bus),
-      .tcdm_bus_0_i(s_lint_pulp_jtag_bus),
-      .tcdm_bus_o(s_lint_debug_bus)
-  );
+  assign soc_jtag_reg_tap = '0;
+  assign s_sel_fll_clk = '1;
 
   apb2per #(
       .PER_ADDR_WIDTH(32),
