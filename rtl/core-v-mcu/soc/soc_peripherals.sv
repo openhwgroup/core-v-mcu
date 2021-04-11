@@ -486,7 +486,8 @@ module soc_peripherals #(
   // ╚═╝  ╚═╝╚═╝     ╚═════╝      ╚═════╝ ╚═╝     ╚═╝ ╚═════╝  //
   ///////////////////////////////////////////////////////////////
 
-  apb_gpiov2 #(
+  apb_gpio #(
+      .NrGPIO(`N_GPIO),
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) i_apb_gpio (
       .HCLK   (clk_i),
