@@ -11,7 +11,7 @@
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
 
-module pulpissimo #(
+module core_v_mcu #(
     parameter logic [1:0] CORE_TYPE   = 3, // 0 for RISCY, 1 for IBEX RV32IMC (formerly ZERORISCY), 2 for IBEX RV32EC (formerly MICRORISCY)
     parameter USE_FPU = 1,
     parameter USE_HWPE = 1

@@ -6,6 +6,6 @@
 set -e
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
-find rtl/core-v-mcu-soc rtl/pulpissimo \
+find rtl/core-v-mcu \
     -name '*.sv' | \
     xargs verible-verilog-format --inplace 2> /dev/zero

@@ -1,0 +1,129 @@
+core-v-mcu-soc:
+  incdirs: [
+    ../includes,
+    include,
+    ../vendor/pulp_platform_axi/include
+  ]
+  files: [
+    soc/pkg_soc_interconnect.sv,
+    soc/axi64_2_lint32_wrap.sv,
+    soc/lint_2_axi_wrap.sv,
+    soc/contiguous_crossbar.sv,
+    soc/interleaved_crossbar.sv,
+    soc/tcdm_demux.sv,
+    soc/boot_rom.sv,
+    soc/l2_ram_multi_bank.sv,
+    soc/lint_jtag_wrap.sv,
+    soc/periph_bus_wrap.sv,
+    soc/soc_clk_rst_gen.sv,
+    soc/soc_event_arbiter.sv,
+    soc/soc_event_generator.sv,
+    soc/soc_event_queue.sv,
+    soc/tcdm_error_slave.sv,
+    soc/soc_interconnect.sv,
+    soc/soc_interconnect_wrap.sv,
+    soc/soc_peripherals.sv,
+  ]
+  vlog_opts : [
+    -L riscv_dbg_lib,
+    -L axi_lib
+  ]
+udma_subsystem:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  files: [
+    udma_subsystem/udma_subsystem.sv,
+  ]
+
+fc:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  files: [
+    fc/fc_demux.sv,
+    fc/fc_subsystem.sv,
+    fc/fc_hwpe.sv,
+  ]
+
+components:
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    components/apb_clkdiv.sv,
+    components/apb_soc_ctrl.sv,
+    components/memory_models.sv,
+    components/pulp_interfaces.sv,
+    components/glitch_free_clk_mux.sv,
+    components/obi_pulp_adapter.sv,
+  ]
+
+components_rtl:
+  incdirs: [
+    ../includes,
+  ]
+  targets: [
+    rtl
+  ]
+  files: [
+    components/glitch_free_clk_mux.sv,
+    components/apb_dummy.sv,
+  ]
+
+
+components_behav:
+  incdirs: [
+    ../includes,
+  ]
+  targets: [
+    rtl
+  ]
+  files: [
+    components/freq_meter.sv,
+  ]
+  flags: [
+    skip_synthesis,
+  ]
+
+efpga_subsystem:
+  incdirs: [
+    ../includes,
+    .,
+  ]
+  files: [
+    efpga_subsystem/efpga_subsystem.sv,
+    efpga_subsystem/apb_efpga_hwce.sv,
+    efpga_subsystem/dc_accelerator_fsm.sv,
+    efpga_subsystem/efpga_sel_clk_dc_fifo.sv,
+  ]
+
+top:
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    top/pad_control.sv,
+    top/pad_frame.sv,
+    top/safe_domain.sv,
+    top/soc_domain.sv,
+    top/rtc_date.sv,
+    top/rtc_clock.sv,
+    top/core_v_mcu.sv,
+  ]
+  vlog_opts: [
+  -L riscv_dbg_lib
+  ]
+
+pulpissimo_padframe:
+  flags: [
+    skip_synthesis,
+  ]
+  incdirs: [
+    ../includes,
+  ]
+  files: [
+    top/pad_frame.sv,
+  ]
