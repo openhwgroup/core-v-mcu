@@ -5,6 +5,8 @@
   name: "pulp_platform_axi",
   target_dir: "pulp_platform_axi",
 
+  patch_dir: "patches/pulp_platform_axi",
+
   upstream: {
     url: "https://github.com/pulp-platform/axi.git",
     rev: "master",

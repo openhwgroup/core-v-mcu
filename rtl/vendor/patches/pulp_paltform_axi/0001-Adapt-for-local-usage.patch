@@ -1,0 +1,26 @@
+From 808f839347f7b9a3aa9d6a4c3c8bd43fd5b23cac Mon Sep 17 00:00:00 2001
+From: Florian Zaruba <florian@openhwgroup.org>
+Date: Sun, 11 Apr 2021 12:41:13 +0200
+Subject: [PATCH] Adapt for local usage Signed-off-by:
+ <florian@openhwgroup.org>
+
+---
+ src_files.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src_files.yml b/src_files.yml
+index e718850..5b67770 100644
+--- a/src_files.yml
++++ b/src_files.yml
+@@ -4,7 +4,7 @@ axi:
+   ]
+   incdirs:
+     - include
+-    - ../../common_cells/include
++    - ../pulp_platform_common_cells/include
+   files:
+     # Source files grouped in levels. Files in level 0 have no dependencies on files in this
+     # package. Files in level 1 only depend on files in level 0, files in level 2 on files in
+-- 
+2.25.1.377.g2d2118b814
+
