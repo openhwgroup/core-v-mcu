@@ -53,26 +53,9 @@ components:
     ../includes,
   ]
   files: [
-    components/apb_clkdiv.sv,
     components/apb_soc_ctrl.sv,
-    components/memory_models.sv,
     components/pulp_interfaces.sv,
-    components/glitch_free_clk_mux.sv,
-    components/obi_pulp_adapter.sv,
   ]
-
-components_rtl:
-  incdirs: [
-    ../includes,
-  ]
-  targets: [
-    rtl
-  ]
-  files: [
-    components/glitch_free_clk_mux.sv,
-    components/apb_dummy.sv,
-  ]
-
 
 components_behav:
   incdirs: [
@@ -109,8 +92,6 @@ top:
     top/pad_frame.sv,
     top/safe_domain.sv,
     top/soc_domain.sv,
-    top/rtc_date.sv,
-    top/rtc_clock.sv,
     top/core_v_mcu.sv,
   ]
   vlog_opts: [
