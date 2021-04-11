@@ -12,6 +12,10 @@ cv32e40p:
   path: vendor/openhwgroup_cv32e40p
 register_interface:
   path: vendor/pulp_platform_register_interface
+riscv-dbg:
+  path: vendor/pulp_platform_riscv_dbg
+tech_cells_generic:
+  path: vendor/pulp_platform_tech_cells_generic
 
 L2_tcdm_hybrid_interco:
   path: L2_tcdm_hybrid_interco
@@ -44,8 +48,6 @@ scm:
   path: scm
 generic_FLL:
   path: generic_FLL
-tech_cells_generic:
-  path: tech_cells_generic
 udma/udma_core:
   path: udma/udma_core
 udma/udma_uart:
@@ -64,8 +66,6 @@ udma/udma_filter:
   path: udma/udma_filter
 udma/udma_external_per:
   path: udma/udma_external_per
-riscv-dbg:
-  path: riscv-dbg
 logint_dc_fifo_xbar:
   path: logint_dc_fifo_xbar
 core-v-mcu-soc:
