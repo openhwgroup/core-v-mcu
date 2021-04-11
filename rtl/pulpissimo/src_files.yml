@@ -13,7 +13,7 @@ pulpissimo:
     pulpissimo.sv,
   ]
   vlog_opts: [
-  -L pulp_soc_lib
+  -L core_v_mcu_soc_lib
   -L riscv_dbg_lib
   ]
 pulpissimo_padframe:
