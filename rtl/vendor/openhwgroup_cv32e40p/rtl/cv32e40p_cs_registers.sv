@@ -1502,7 +1502,7 @@ end //PULP_SECURE
       if( (cnt_gidx == 1) ||
           (cnt_gidx >= (NUM_MHPMCOUNTERS+3) ) )
         begin : gen_non_implemented
-        assign mhpmcounter_q[cnt_gidx] = 'b0;
+        always_ff @(posedge clk) mhpmcounter_q[cnt_gidx] <= 'b0;
       end
       else begin : gen_implemented
         always_ff @(posedge clk, negedge rst_n)
@@ -1533,11 +1533,11 @@ end //PULP_SECURE
       if( (evt_gidx < 3) ||
           (evt_gidx >= (NUM_MHPMCOUNTERS+3) ) )
         begin : gen_non_implemented
-        assign mhpmevent_q[evt_gidx] = 'b0;
+        always_ff @(posedge clk) mhpmevent_q[evt_gidx] <= 'b0;
       end
       else begin : gen_implemented
         if (NUM_HPM_EVENTS < 32) begin : gen_tie_off
-             assign mhpmevent_q[evt_gidx][31:NUM_HPM_EVENTS] = 'b0;
+            always_ff @(posedge clk) mhpmevent_q[evt_gidx][31:NUM_HPM_EVENTS] <= 'b0;
         end
         always_ff @(posedge clk, negedge rst_n)
             if (!rst_n)
@@ -1556,7 +1556,7 @@ end //PULP_SECURE
           (en_gidx == 1) ||
           (en_gidx >= (NUM_MHPMCOUNTERS+3) ) )
         begin : gen_non_implemented
-        assign mcounteren_q[en_gidx] = 'b0;
+        always_ff @(posedge clk) mcounteren_q[en_gidx] <= 'b0;
       end
       else begin : gen_implemented
         always_ff @(posedge clk, negedge rst_n)
@@ -1576,7 +1576,7 @@ end //PULP_SECURE
       if( (inh_gidx == 1) ||
           (inh_gidx >= (NUM_MHPMCOUNTERS+3) ) )
         begin : gen_non_implemented
-        assign mcountinhibit_q[inh_gidx] = 'b0;
+        always_ff @(posedge clk) mcountinhibit_q[inh_gidx] <= 'b0;
       end
       else begin : gen_implemented
         always_ff @(posedge clk, negedge rst_n)

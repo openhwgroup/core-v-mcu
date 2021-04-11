@@ -1,0 +1,25 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:tcdm_interconnect
+description: TCDM Interconnect
+
+filesets:
+  files_rtl:
+    files:
+    - src/tcdm_interconnect_pkg.sv
+    - src/addr_dec_resp_mux.sv
+    - src/amo_shim.sv
+    - src/xbar.sv
+    - src/clos_net.sv
+    - src/bfly_net.sv
+    - src/tcdm_interconnect.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

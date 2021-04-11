@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : pulp-platform.org::axi:0.28.0-dev
+name : pulp-platform.org::axi:0.28.0
 
 filesets:
   rtl:
@@ -46,7 +46,7 @@ filesets:
       - src/axi_xbar.sv
     file_type : systemVerilogSource
     depend :
-      - ">=pulp-platform.org::common_cells:1.21.0"
+      - ">=pulp-platform.org::common_cells:1.20.0"
 
 generators:
   axi_intercon_gen:

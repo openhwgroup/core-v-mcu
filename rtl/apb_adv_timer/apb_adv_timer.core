@@ -1,0 +1,28 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:apb_adv_timer
+description: Advanced timer including PWM functionality.
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/adv_timer_apb_if.sv
+    - rtl/comparator.sv
+    - rtl/lut_4x4.sv
+    - rtl/out_filter.sv
+    - rtl/up_down_counter.sv
+    - rtl/input_stage.sv
+    - rtl/prescaler.sv
+    - rtl/apb_adv_timer.sv
+    - rtl/timer_cntrl.sv
+    - rtl/timer_module.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

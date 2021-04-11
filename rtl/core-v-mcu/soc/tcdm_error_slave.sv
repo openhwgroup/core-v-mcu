@@ -45,9 +45,11 @@ module tcdm_error_slave #(
   end
 
 `ifndef SYNTHESIS
+`ifndef VERILATOR
   no_req :
   assert property (@(posedge clk_i) disable iff (~rst_ni) not slave.req)
   else $error("Illegal bus request to address %x.", slave.add);
+`endif
 `endif
 
 endmodule : tcdm_error_slave

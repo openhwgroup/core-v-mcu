@@ -1,0 +1,19 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: quicklogic.com:ip:efpga
+description: uDMA UART interface
+
+filesets:
+  files_rtl:
+    files:
+    - eFPGA_wrapper.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

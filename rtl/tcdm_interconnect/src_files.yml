@@ -1,0 +1,12 @@
+tcdm_interconnect:
+  incdirs: [
+  ]
+  files: [
+    src/tcdm_interconnect_pkg.sv,
+    src/addr_dec_resp_mux.sv,
+    src/amo_shim.sv,
+    src/xbar.sv,
+    src/clos_net.sv,
+    src/bfly_net.sv,
+    src/tcdm_interconnect.sv,
+  ]

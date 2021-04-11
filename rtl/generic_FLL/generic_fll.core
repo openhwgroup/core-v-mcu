@@ -1,0 +1,40 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:generic_fll
+description: A behavioral FLL model
+
+filesets:
+  files_rtl:
+    files:
+    - fe/model/gf22_DCO_model.tc.vhd
+    - fe/model/gf22_FLL_model.vhd
+    - fe/rtl/FLLPkg.vhd
+    - fe/rtl/FLL_clk_divider.vhd
+    - fe/rtl/FLL_clk_period_quantizer.vhd
+    - fe/rtl/FLL_clock_gated.rtl.vhd
+    - fe/rtl/FLL_digital.vhd
+    - fe/rtl/FLL_dither_pattern_gen.vhd
+    - fe/rtl/FLL_glitchfree_clkdiv.vhd
+    - fe/rtl/FLL_glitchfree_clkmux.vhd
+    - fe/rtl/FLL_mux.rtl.vhd
+    - fe/rtl/FLL_loop_filter.vhd
+    - fe/rtl/FLL_reg.vhd
+    - fe/rtl/FLL_settling_monitor.vhd
+    - fe/rtl/FLL_synchroedge.vhd
+    - fe/rtl/FLL_zerodelta.vhd
+    file_type: vhdlSource
+
+  files_stub:
+    files:
+    - fe/model/fll_stub.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - target_sim? (files_rtl)
+    - tool_verilator? (files_stub)

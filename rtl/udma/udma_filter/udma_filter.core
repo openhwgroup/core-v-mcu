@@ -1,0 +1,24 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:udma_filter
+description: uDMA filter module
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/udma_filter_au.sv
+    - rtl/udma_filter_bincu.sv
+    - rtl/udma_filter_rx_dataout.sv
+    - rtl/udma_filter_tx_datafetch.sv
+    - rtl/udma_filter_reg_if.sv
+    - rtl/udma_filter.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl
