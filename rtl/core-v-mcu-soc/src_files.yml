@@ -2,7 +2,7 @@ core-v-mcu-soc:
   incdirs: [
     ../../rtl/includes,
     rtl/include,
-    ../axi/include
+    ../vendor/pulp_platform_axi/include
   ]
   files: [
     rtl/soc/pkg_soc_interconnect.sv,
