@@ -1,3 +1,7 @@
+// Copyright 2020 OpenHW Group
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
 module gf22_FLL (
   output logic FLLCLK,
   input  logic FLLOE,
@@ -19,5 +23,13 @@ module gf22_FLL (
   input  logic JTD,
   output logic JTQ
 );
+
+  assign FLLCLK = REFCLK;
+
+  assign LOCK = '1;
+  assign CFGACK = '0;
+  assign CFGQ = '0;
+  assign TQ = '0;
+  assign JTQ = '0;
 
 endmodule
