@@ -1,4 +1,27 @@
-// PER_ID definitions
+/*
+ * This is a generated file
+ * 
+ * Copyright 2021 QuickLogic
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+`define BUILD_DATE 32'h20210415
+`define BUILD_TIME 32'h00113703
+
+//  PER_ID definitions
 `define PER_ID_UART      0
 `define PER_ID_QSPIM     2
 `define PER_ID_I2CM      3
@@ -13,7 +36,7 @@
 `define PER_ID_FPGA      7
 `define PER_ID_EXT_PER   8
 
-// UDMA TX channels
+//  UDMA TX channels
 `define CH_ID_TX_UART    0
 `define CH_ID_TX_UART0   0
 `define CH_ID_TX_UART1   1
@@ -34,7 +57,7 @@
 `define CH_ID_TX_FPGA0   6
 `define CH_ID_TX_EXT_PER 7
 
-// UDMA RX channels
+//  UDMA RX channels
 `define CH_ID_RX_UART    0
 `define CH_ID_RX_UART0   0
 `define CH_ID_RX_UART1   1
@@ -55,14 +78,14 @@
 `define CH_ID_RX_FPGA0   6
 `define CH_ID_RX_EXT_PER 7
 
-// Number of channels
+//  Number of channels
 `define N_TX_CHANNELS  7
 `define N_RX_CHANNELS  7
 
-// Width of perio bus
+//  Width of perio bus
 `define N_PERIO  38
 
-// define index locations in perio bus
+//  define index locations in perio bus
 `define PERIO_UART_NPORTS 2
 `define PERIO_UART0_TX   0
 `define PERIO_UART0_RX   1

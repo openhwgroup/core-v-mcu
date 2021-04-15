@@ -94,7 +94,6 @@ top:
     top/safe_domain.sv,
     top/soc_domain.sv,
     top/core_v_mcu.sv,
-    top/jtag_tap_top.sv,
   ]
   vlog_opts: [
   -L riscv_dbg_lib

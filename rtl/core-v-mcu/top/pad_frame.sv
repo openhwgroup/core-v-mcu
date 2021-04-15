@@ -119,4 +119,4 @@ module pad_frame(
     pad_functional_pd i_pad_46   (.OEN(~io_oe_i[46]), .I(io_out_i[46]), .O(io_in_o[46]), .PAD(io[46]), .PEN(~pad_cfg_i[46][0]));
     pad_functional_pd i_pad_47   (.OEN(~io_oe_i[47]), .I(io_out_i[47]), .O(io_in_o[47]), .PAD(io[47]), .PEN(~pad_cfg_i[47][0]));
 
-endmodule  // pad_frame
+endmodule
