@@ -11,6 +11,8 @@ filesets:
   files_rtl:
     files:
     - eFPGA_wrapper.sv
+    - top.sv
+    - a2_math_unit.sv
     file_type: systemVerilogSource
 
 targets:

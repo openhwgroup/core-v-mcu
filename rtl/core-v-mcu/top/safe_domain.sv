@@ -15,11 +15,12 @@ module safe_domain #(
     parameter int unsigned FLL_DATA_WIDTH = 32,
     parameter int unsigned FLL_ADDR_WIDTH = 32
 ) (
-    input  logic ref_clk_i,
-    output logic slow_clk_o,
-    input  logic bootsel_i,
-    input  logic rst_ni,
-    output logic rst_no,
+        input  logic             ref_clk_i            ,
+        output logic             slow_clk_o           ,
+        output logic                               efpga_clk_o,
+        input  logic             bootsel_i            ,
+        input  logic             rst_ni               ,
+        output logic             rst_no               ,
 
     output logic test_clk_o,
     output logic test_mode_o,
@@ -117,7 +118,6 @@ module safe_domain #(
       .init_no    ()  //not used
   );
 
-  assign slow_clk_o = ref_clk_i;
 
 `else
   assign s_rstn_sync = s_rstn;
@@ -130,11 +130,13 @@ module safe_domain #(
   //Peripheral clock PLLs in soc_domain.sv. Instead all PLL use directly the
   //board reference clock as input.
 
-  fpga_slow_clk_gen i_slow_clk_gen (
-      .rst_ni(s_rstn_sync),
-      .ref_clk_i(ref_clk_i),
-      .slow_clk_o(slow_clk_o)
-  );
+  fpga_slow_clk_gen i_slow_clk_gen
+    (
+     .rst_ni(s_rstn_sync),
+     .ref_clk_i(ref_clk_i),
+     .mhz4 (efpga_clk_o),
+     .slow_clk_o(slow_clk_o)
+     );
 `endif
 
 

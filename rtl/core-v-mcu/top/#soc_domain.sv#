@@ -31,6 +31,7 @@ module soc_domain
     parameter NB_HWPE_PORTS = 4,
     parameter NGPIO = 43,
     parameter NPAD = 64,  //Must not be changed as other parts
+
     //downstreams are not parametrci
     parameter NBIT_PADCFG = 6,  //Must not be changed as other parts
     //downstreams are not parametrci

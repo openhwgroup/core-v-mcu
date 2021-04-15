@@ -28,6 +28,7 @@ module periph_bus_wrap #(
     APB_BUS.Master mmap_debug_master,
     APB_BUS.Master timer_master,
     APB_BUS.Master hwpe_master,
+   APB_BUS.Master fcb_master,
     APB_BUS.Master stdout_master
 );
 
@@ -92,16 +93,23 @@ module periph_bus_wrap #(
   assign s_start_addr[10] = `DEBUG_START_ADDR;
   assign s_end_addr[10]   = `DEBUG_END_ADDR;
 
-  //********************************************************
-  //**************** SOC BUS *******************************
-  //********************************************************
-  apb_node_wrap #(
-      .NB_MASTER     (NB_MASTER),
-      .APB_ADDR_WIDTH(APB_ADDR_WIDTH),
-      .APB_DATA_WIDTH(APB_DATA_WIDTH)
-  ) apb_node_wrap_i (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
+    `APB_ASSIGN_MASTER(s_masters[11], fcb_master);
+    assign s_start_addr[11] = `EFPGA_CONFIG_START_ADDR;
+    assign s_end_addr[11]   = `EFPGA_CONFIG_END_ADDR;
+
+
+
+   
+    //********************************************************
+    //**************** SOC BUS *******************************
+    //********************************************************
+    apb_node_wrap #(
+        .NB_MASTER      ( NB_MASTER      ),
+        .APB_ADDR_WIDTH ( APB_ADDR_WIDTH ),
+        .APB_DATA_WIDTH ( APB_DATA_WIDTH )
+    ) apb_node_wrap_i (
+        .clk_i        ( clk_i        ),
+        .rst_ni       ( rst_ni       ),
 
       .apb_slave  (s_slave),
       .apb_masters(s_masters),

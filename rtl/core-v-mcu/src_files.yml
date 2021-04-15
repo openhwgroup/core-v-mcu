@@ -78,9 +78,10 @@ efpga_subsystem:
   ]
   files: [
     efpga_subsystem/efpga_subsystem.sv,
-    efpga_subsystem/apb_efpga_hwce.sv,
-    efpga_subsystem/dc_accelerator_fsm.sv,
-    efpga_subsystem/efpga_sel_clk_dc_fifo.sv,
+    efpga_subsystem/A2_fifo.sv,
+    efpga_subsystem/A2_fifo_ctl.sv,
+    efpga_subsystem/A2_fifo_ram.sv,
+    efpga_subsystem/tcdm_interface.sv,
   ]
 
 top:
@@ -93,6 +94,7 @@ top:
     top/safe_domain.sv,
     top/soc_domain.sv,
     top/core_v_mcu.sv,
+    top/jtag_tap_top.sv,
   ]
   vlog_opts: [
   -L riscv_dbg_lib
