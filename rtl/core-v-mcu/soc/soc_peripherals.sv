@@ -19,13 +19,13 @@ module soc_peripherals #(
     parameter NB_CLUSTERS    = 0,
     parameter EVNT_WIDTH     = 8
 ) (
-    input logic                                clk_i,
-    input logic                                periph_clk_i,
-    input logic [5:0]                          fpga_clk_in,
-    input logic                                rst_ni,
+    input logic       clk_i,
+    input logic       periph_clk_i,
+    input logic [5:0] fpga_clk_in,
+    input logic       rst_ni,
     //check the reset
-    input logic ref_clk_i,
-    input logic slow_clk_i,
+    input logic       ref_clk_i,
+    input logic       slow_clk_i,
 
     input  logic        sel_fll_clk_i,
     input  logic        dft_test_mode_i,
@@ -50,19 +50,19 @@ module soc_peripherals #(
     APB_BUS.Master apb_debug_master,
 
     // FABRIC CONTROLLER MASTER REFILL PORT
-           XBAR_TCDM_BUS.Master        l2_rx_master,
-           XBAR_TCDM_BUS.Master        l2_tx_master,
+    XBAR_TCDM_BUS.Master l2_rx_master,
+    XBAR_TCDM_BUS.Master l2_tx_master,
     // MASTER PORT TO SOC FLL
-           FLL_BUS.Master              soc_fll_master,
+    FLL_BUS.Master       soc_fll_master,
     // MASTER PORT TO PER FLL
-           FLL_BUS.Master              per_fll_master,
+    FLL_BUS.Master       per_fll_master,
     // MASTER PORT TO CLUSTER FLL
-           FLL_BUS.Master              cluster_fll_master,
+    FLL_BUS.Master       cluster_fll_master,
     // MASTER PORT TO L2 from eFPGA
-    XBAR_TCDM_BUS.Master               l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
-                                               
-    XBAR_TCDM_BUS.Slave                efpga_apbt1_slave,
-/*
+    XBAR_TCDM_BUS.Master l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
+
+           XBAR_TCDM_BUS.Slave        efpga_apbt1_slave,
+    /*
     input  logic                       jtag_req_valid_i,
     output logic                       debug_req_ready_o,
     input  logic                       jtag_resp_ready_i,
@@ -72,11 +72,11 @@ module soc_peripherals #(
     output logic                       ndmreset_o,
     output logic                       dm_debug_req_o,
 */
-    input  logic                       dma_pe_evt_i,
-    input  logic                       dma_pe_irq_i,
-    input  logic                       pf_evt_i,
-    input  logic                [ 1:0] fc_hwpe_events_i,
-    output logic                [31:0] fc_events_o,
+    input  logic                      dma_pe_evt_i,
+    input  logic                      dma_pe_irq_i,
+    input  logic                      pf_evt_i,
+    input  logic               [ 1:0] fc_hwpe_events_i,
+    output logic               [31:0] fc_events_o,
 
     // Pad control signals
     output logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
@@ -224,14 +224,14 @@ module soc_peripherals #(
 
   APB_BUS s_fll_bus ();
 
-    APB_BUS s_gpio_bus ();
-    APB_BUS s_udma_bus ();
-    APB_BUS s_soc_ctrl_bus ();
-    APB_BUS s_adv_timer_bus ();
-    APB_BUS s_soc_evnt_gen_bus ();
-    APB_BUS s_stdout_bus ();
-    APB_BUS s_apb_timer_bus ();
-    APB_BUS s_apb_fcb_bus ();
+  APB_BUS s_gpio_bus ();
+  APB_BUS s_udma_bus ();
+  APB_BUS s_soc_ctrl_bus ();
+  APB_BUS s_adv_timer_bus ();
+  APB_BUS s_soc_evnt_gen_bus ();
+  APB_BUS s_stdout_bus ();
+  APB_BUS s_apb_timer_bus ();
+  APB_BUS s_apb_fcb_bus ();
 
   logic [                   31:0]                            s_gpio_sync;
   logic                                                      s_sel_hyper_axi;
@@ -296,12 +296,12 @@ module soc_peripherals #(
   logic                                                      reset_perf_counter_efpga_x;
   logic [                   31:0]                            perf_counter_value_x;
 
-   logic [31:0]                                      control_in, status_out;
-   logic [7:0]                                       version;
-   
-               
-   
-/*  old pulp interrupts
+  logic [31:0] control_in, status_out;
+  logic [7:0] version;
+
+
+
+  /*  old pulp interrupts
     assign s_events[UDMA_EVENTS-1:0]  = s_udma_events;
     assign s_events[135]              = s_adv_timer_events[0];
     assign s_events[136]              = s_adv_timer_events[1];
@@ -409,19 +409,19 @@ module soc_peripherals #(
 
       .apb_slave(apb_slave),
 
-        .fll_master          ( s_fll_bus          ),
-        .gpio_master         ( s_gpio_bus         ),
-        .udma_master         ( s_udma_bus         ),
-        .soc_ctrl_master     ( s_soc_ctrl_bus     ),
-        .adv_timer_master    ( s_adv_timer_bus    ),
-        .soc_evnt_gen_master ( s_soc_evnt_gen_bus ),
-        .eu_master           ( apb_eu_master      ),
-        .mmap_debug_master   ( apb_debug_master   ),
-        .hwpe_master         ( apb_hwpe_master    ),
-        .timer_master        ( s_apb_timer_bus    ),
-        .stdout_master       ( s_stdout_bus       ),
-        .fcb_master ( s_apb_fcb_bus)
-    );
+      .fll_master         (s_fll_bus),
+      .gpio_master        (s_gpio_bus),
+      .udma_master        (s_udma_bus),
+      .soc_ctrl_master    (s_soc_ctrl_bus),
+      .adv_timer_master   (s_adv_timer_bus),
+      .soc_evnt_gen_master(s_soc_evnt_gen_bus),
+      .eu_master          (apb_eu_master),
+      .mmap_debug_master  (apb_debug_master),
+      .hwpe_master        (apb_hwpe_master),
+      .timer_master       (s_apb_timer_bus),
+      .stdout_master      (s_stdout_bus),
+      .fcb_master         (s_apb_fcb_bus)
+  );
 
 `ifdef SYNTHESIS
   assign s_stdout_bus.pready  = 'h0;
@@ -430,17 +430,19 @@ module soc_peripherals #(
 `endif
 
 
-    /////////////////////////////////////////////////////////////////////////
-    //  █████╗ ██████╗ ██████╗     ███████╗██╗     ██╗         ██╗███████╗ //
-    // ██╔══██╗██╔══██╗██╔══██╗    ██╔════╝██║     ██║         ██║██╔════╝ //
-    // ███████║██████╔╝██████╔╝    █████╗  ██║     ██║         ██║█████╗   //
-    // ██╔══██║██╔═══╝ ██╔══██╗    ██╔══╝  ██║     ██║         ██║██╔══╝   //
-    // ██║  ██║██║     ██████╔╝    ██║     ███████╗███████╗    ██║██║      //
-    // ╚═╝  ╚═╝╚═╝     ╚═════╝     ╚═╝     ╚══════╝╚══════╝    ╚═╝╚═╝      //
-    /////////////////////////////////////////////////////////////////////////
-    apb_fll_if #(.APB_ADDR_WIDTH(APB_ADDR_WIDTH)) apb_fll_if_i (
-        .HCLK        ( clk_i                   ),
-        .HRESETn     ( rst_ni                  ),
+  /////////////////////////////////////////////////////////////////////////
+  //  █████╗ ██████╗ ██████╗     ███████╗██╗     ██╗         ██╗███████╗ //
+  // ██╔══██╗██╔══██╗██╔══██╗    ██╔════╝██║     ██║         ██║██╔════╝ //
+  // ███████║██████╔╝██████╔╝    █████╗  ██║     ██║         ██║█████╗   //
+  // ██╔══██║██╔═══╝ ██╔══██╗    ██╔══╝  ██║     ██║         ██║██╔══╝   //
+  // ██║  ██║██║     ██████╔╝    ██║     ███████╗███████╗    ██║██║      //
+  // ╚═╝  ╚═╝╚═╝     ╚═════╝     ╚═╝     ╚══════╝╚══════╝    ╚═╝╚═╝      //
+  /////////////////////////////////////////////////////////////////////////
+  apb_fll_if #(
+      .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
+  ) apb_fll_if_i (
+      .HCLK   (clk_i),
+      .HRESETn(rst_ni),
 
       .PADDR  (s_fll_bus.paddr),
       .PWDATA (s_fll_bus.pwdata),
@@ -485,11 +487,11 @@ module soc_peripherals #(
   // ╚═╝  ╚═╝╚═╝     ╚═════╝      ╚═════╝ ╚═╝     ╚═╝ ╚═════╝  //
   ///////////////////////////////////////////////////////////////
 
-    apb_gpiov2 #(
-        .APB_ADDR_WIDTH (APB_ADDR_WIDTH)
-    ) i_apb_gpio (
-        .HCLK            ( clk_i              ),
-        .HRESETn         ( rst_ni             ),
+  apb_gpiov2 #(
+      .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
+  ) i_apb_gpio (
+      .HCLK   (clk_i),
+      .HRESETn(rst_ni),
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
@@ -544,10 +546,10 @@ module soc_peripherals #(
       .dft_test_mode_i(dft_test_mode_i),
       .dft_cg_enable_i(1'b0),
 
-        .sys_clk_i        ( clk_i                ),
-        .periph_clk_i     ( periph_clk_i         ),
-        .efpga_clk_i      ( periph_clk_i          ), // FIXME if udma stays
-        .sys_resetn_i     ( rst_ni               ),
+      .sys_clk_i   (clk_i),
+      .periph_clk_i(periph_clk_i),
+      .efpga_clk_i (periph_clk_i),  // FIXME if udma stays
+      .sys_resetn_i(rst_ni),
 
       .udma_apb_paddr  (s_udma_bus.paddr),
       .udma_apb_pwdata (s_udma_bus.pwdata),
@@ -625,12 +627,10 @@ module soc_peripherals #(
   // ██║  ██║██║     ██████╔╝    ███████║╚██████╔╝╚██████╗    ╚██████╗   ██║   ██║  ██║███████╗ //
   // ╚═╝  ╚═╝╚═╝     ╚═════╝     ╚══════╝ ╚═════╝  ╚═════╝     ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝ //
   ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (`N_IO > 64)
-        $error("apb_soc_ctrl doesn't support any other value than NPAD=64");
-    if (`NBIT_PADMUX != 2)
-        $error("apb_soc_ctrl doesn't support any other value than NBIT_PADMUX=2");
-	logic [`N_IO-1:0][`NBIT_PADMUX-1:0]  s_pad_mux_local;
-	logic [`N_IO:0][`NBIT_PADCFG-1:0]  s_pad_cfg_local;
+  if (`N_IO > 64) $error("apb_soc_ctrl doesn't support any other value than NPAD=64");
+  if (`NBIT_PADMUX != 2) $error("apb_soc_ctrl doesn't support any other value than NBIT_PADMUX=2");
+  logic [`N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_local;
+  logic [  `N_IO:0][`NBIT_PADCFG-1:0] s_pad_cfg_local;
   apb_soc_ctrl #(
       .NB_CORES      (NB_CORES),
       .NB_CLUSTERS   (NB_CLUSTERS),
@@ -669,10 +669,10 @@ module soc_peripherals #(
       .enable_tcdm1_efpga_o (enable_tcdm1_efpga),
       .enable_tcdm0_efpga_o (enable_tcdm0_efpga),
 
-        .control_in(control_in),
-                      .status_out(status_out),
-                      .version(version),
-        
+      .control_in(control_in),
+      .status_out(status_out),
+      .version(version),
+
 
       .soc_jtag_reg_i(soc_jtag_reg_i),
       .soc_jtag_reg_o(soc_jtag_reg_o),
@@ -805,21 +805,18 @@ module soc_peripherals #(
   ////////////////////////////////////////////////
 
 
-   
-    efpga_subsystem
-    #(
-       .L2_ADDR_WIDTH             ( TCDM_EFPGA_ADDR_WIDTH                                           ),
-       .APB_FPGA_ADDR_WIDTH       ( APB_EFPGA_HWCE_ADDR_WIDTH                                       )
-    )
-    i_efpga_subsystem
-    (
-        .asic_clk_i              (  clk_i                      ),
-        .fpga_clk0_i             (  fpga_clk_in[0]                  ),
-        .fpga_clk1_i             (  fpga_clk_in[1]            ),
-        .fpga_clk2_i             (  fpga_clk_in[2]              ),
-        .fpga_clk3_i             (  fpga_clk_in[3]               ),
-        .fpga_clk4_i             (  fpga_clk_in[4]               ),
-        .fpga_clk5_i             (  fpga_clk_in[5]               ),
+
+  efpga_subsystem #(
+      .L2_ADDR_WIDTH      (TCDM_EFPGA_ADDR_WIDTH),
+      .APB_FPGA_ADDR_WIDTH(APB_EFPGA_HWCE_ADDR_WIDTH)
+  ) i_efpga_subsystem (
+      .asic_clk_i (clk_i),
+      .fpga_clk0_i(fpga_clk_in[0]),
+      .fpga_clk1_i(fpga_clk_in[1]),
+      .fpga_clk2_i(fpga_clk_in[2]),
+      .fpga_clk3_i(fpga_clk_in[3]),
+      .fpga_clk4_i(fpga_clk_in[4]),
+      .fpga_clk5_i(fpga_clk_in[5]),
 
 
       .sel_clk_dc_fifo_efpga_i(sel_clk_dc_fifo_efpga),
@@ -836,12 +833,12 @@ module soc_peripherals #(
       .rst_n(rst_ni),
 
 
-        .l2_asic_tcdm_o          ( l2_efpga_tcdm_master  ),
-        .apbprogram_i (s_apb_fcb_bus),
-        .apbt1_i                 (efpga_apbt1_slave ),
-        .control_in(control_in),
-                      .status_out(status_out),
-                      .version(version),
+      .l2_asic_tcdm_o(l2_efpga_tcdm_master),
+      .apbprogram_i  (s_apb_fcb_bus),
+      .apbt1_i       (efpga_apbt1_slave),
+      .control_in    (control_in),
+      .status_out    (status_out),
+      .version       (version),
 
       .fpgaio_oe_o (fpgaio_oe_o),
       .fpgaio_in_i (fpgaio_in_i),
@@ -858,33 +855,33 @@ module soc_peripherals #(
       .efpga_fcb_spis_miso_en_o  (efpga_fcb_spis_miso_en_o),
       .efpga_fcb_spis_miso_o     (efpga_fcb_spis_miso_o),
 
-         //eFPGA TEST MODE
-        .efpga_STM_i                  ( efpga_STM_i),
+      //eFPGA TEST MODE
+      .efpga_STM_i(efpga_STM_i),
 
-        .efpga_test_FB_SPE_OUT_0_o    ( efpga_test_FB_SPE_OUT_0_o                                   ),
-        .efpga_test_FB_SPE_OUT_1_o    ( efpga_test_FB_SPE_OUT_1_o                                   ),
-        .efpga_test_FB_SPE_OUT_2_o    ( efpga_test_FB_SPE_OUT_2_o                                   ),
-        .efpga_test_FB_SPE_OUT_3_o    ( efpga_test_FB_SPE_OUT_3_o                                   ),
-        .efpga_test_fcb_pif_vldi_i    ( efpga_test_fcb_pif_vldi_i                                   ),
-        .efpga_test_fcb_pif_di_l_0_i  ( efpga_test_fcb_pif_di_l_0_i                                 ),
-        .efpga_test_fcb_pif_di_l_1_i  ( efpga_test_fcb_pif_di_l_1_i                                 ),
-        .efpga_test_fcb_pif_di_l_2_i  ( efpga_test_fcb_pif_di_l_2_i                                 ),
-        .efpga_test_fcb_pif_di_l_3_i  ( efpga_test_fcb_pif_di_l_3_i                                 ),
-        .efpga_test_fcb_pif_di_h_0_i  ( efpga_test_fcb_pif_di_h_0_i                                 ),
-        .efpga_test_fcb_pif_di_h_1_i  ( efpga_test_fcb_pif_di_h_1_i                                 ),
-        .efpga_test_fcb_pif_di_h_2_i  ( efpga_test_fcb_pif_di_h_2_i                                 ),
-        .efpga_test_fcb_pif_di_h_3_i  ( efpga_test_fcb_pif_di_h_3_i                                 ),
-        .efpga_test_FB_SPE_IN_0_i     ( efpga_test_FB_SPE_IN_0_i                                    ),
-        .efpga_test_FB_SPE_IN_1_i     ( efpga_test_FB_SPE_IN_1_i                                    ),
-        .efpga_test_FB_SPE_IN_2_i     ( efpga_test_FB_SPE_IN_2_i                                    ),
-        .efpga_test_FB_SPE_IN_3_i     ( efpga_test_FB_SPE_IN_3_i                                    ),
-        .efpga_test_M_0_i             ( efpga_test_M_0_i                                            ),
-        .efpga_test_M_1_i             ( efpga_test_M_1_i                                            ),
-        .efpga_test_M_2_i             ( efpga_test_M_2_i                                            ),
-        .efpga_test_M_3_i             ( efpga_test_M_3_i                                            ),
-        .efpga_test_M_4_i             ( efpga_test_M_4_i                                            ),
-        .efpga_test_M_5_i             ( efpga_test_M_5_i                                            ),
-        .efpga_test_MLATCH_i          ( efpga_test_MLATCH_i                                         )
-    );
+      .efpga_test_FB_SPE_OUT_0_o  (efpga_test_FB_SPE_OUT_0_o),
+      .efpga_test_FB_SPE_OUT_1_o  (efpga_test_FB_SPE_OUT_1_o),
+      .efpga_test_FB_SPE_OUT_2_o  (efpga_test_FB_SPE_OUT_2_o),
+      .efpga_test_FB_SPE_OUT_3_o  (efpga_test_FB_SPE_OUT_3_o),
+      .efpga_test_fcb_pif_vldi_i  (efpga_test_fcb_pif_vldi_i),
+      .efpga_test_fcb_pif_di_l_0_i(efpga_test_fcb_pif_di_l_0_i),
+      .efpga_test_fcb_pif_di_l_1_i(efpga_test_fcb_pif_di_l_1_i),
+      .efpga_test_fcb_pif_di_l_2_i(efpga_test_fcb_pif_di_l_2_i),
+      .efpga_test_fcb_pif_di_l_3_i(efpga_test_fcb_pif_di_l_3_i),
+      .efpga_test_fcb_pif_di_h_0_i(efpga_test_fcb_pif_di_h_0_i),
+      .efpga_test_fcb_pif_di_h_1_i(efpga_test_fcb_pif_di_h_1_i),
+      .efpga_test_fcb_pif_di_h_2_i(efpga_test_fcb_pif_di_h_2_i),
+      .efpga_test_fcb_pif_di_h_3_i(efpga_test_fcb_pif_di_h_3_i),
+      .efpga_test_FB_SPE_IN_0_i   (efpga_test_FB_SPE_IN_0_i),
+      .efpga_test_FB_SPE_IN_1_i   (efpga_test_FB_SPE_IN_1_i),
+      .efpga_test_FB_SPE_IN_2_i   (efpga_test_FB_SPE_IN_2_i),
+      .efpga_test_FB_SPE_IN_3_i   (efpga_test_FB_SPE_IN_3_i),
+      .efpga_test_M_0_i           (efpga_test_M_0_i),
+      .efpga_test_M_1_i           (efpga_test_M_1_i),
+      .efpga_test_M_2_i           (efpga_test_M_2_i),
+      .efpga_test_M_3_i           (efpga_test_M_3_i),
+      .efpga_test_M_4_i           (efpga_test_M_4_i),
+      .efpga_test_M_5_i           (efpga_test_M_5_i),
+      .efpga_test_MLATCH_i        (efpga_test_MLATCH_i)
+  );
 
 endmodule

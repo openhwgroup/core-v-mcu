@@ -24,9 +24,9 @@ module core_v_mcu #(
   localparam AXI_SOC_CLUSTER_DATA_WIDTH = 32;
   localparam AXI_CLUSTER_SOC_ID_WIDTH = 6;
 
-  localparam AXI_USER_WIDTH             = 6;
-  localparam AXI_CLUSTER_SOC_STRB_WIDTH = AXI_CLUSTER_SOC_DATA_WIDTH/8;
-  localparam AXI_SOC_CLUSTER_STRB_WIDTH = AXI_SOC_CLUSTER_DATA_WIDTH/8;
+  localparam AXI_USER_WIDTH = 6;
+  localparam AXI_CLUSTER_SOC_STRB_WIDTH = AXI_CLUSTER_SOC_DATA_WIDTH / 8;
+  localparam AXI_SOC_CLUSTER_STRB_WIDTH = AXI_SOC_CLUSTER_DATA_WIDTH / 8;
 
   localparam BUFFER_WIDTH = 8;
   localparam EVENT_WIDTH = 8;
@@ -94,7 +94,7 @@ module core_v_mcu #(
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_in;
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_oe;
 
-   logic                                s_efpga_clk;
+  logic                                      s_efpga_clk;
   logic                                      s_fpga_clk_1_i;
   logic                                      s_fpga_clk_2_i;
   logic                                      s_fpga_clk_3_i;
@@ -312,11 +312,11 @@ module core_v_mcu #(
       .FLL_ADDR_WIDTH(2)
   ) i_safe_domain (
 
-        .ref_clk_i                  ( s_ref_clk                   ),
-        .slow_clk_o                 ( s_slow_clk                  ),
-        .efpga_clk_o                (s_efpga_clk),
-        .bootsel_i                  (s_bootsel                    ),
-        .rst_ni                     ( s_rstn                      ),
+      .ref_clk_i  (s_ref_clk),
+      .slow_clk_o (s_slow_clk),
+      .efpga_clk_o(s_efpga_clk),
+      .bootsel_i  (s_bootsel),
+      .rst_ni     (s_rstn),
 
       .rst_no(s_rstn_por),
 
@@ -353,51 +353,51 @@ module core_v_mcu #(
       .debug1         (s_debug1)
   );
 
-   //
-   // SOC DOMAIN
-   //
+  //
+  // SOC DOMAIN
+  //
 
 
-                              assign efpga_fcb_spis_rst_n             = 0;
-                              assign efpga_fcb_spis_mosi              = 0;
-                              assign efpga_fcb_spis_cs_n              = 0;
-                              assign efpga_fcb_spis_clk               = 0;
-                              assign efpga_fcb_spi_mode_en_bo         = 0;
-                              assign s_in_stm= 0;
-                              assign fpga_test_fcb_pif_vldi         = 0;
-                              assign fpga_test_fcb_pif_di_l_0       = 0;
-                              assign fpga_test_fcb_pif_di_l_1       = 0;
-                              assign fpga_test_fcb_pif_di_l_2       = 0;
-                              assign fpga_test_fcb_pif_di_l_3       = 0;
-                              assign fpga_test_fcb_pif_di_h_0       = 0;
-                              assign fpga_test_fcb_pif_di_h_1       = 0;
-                              assign fpga_test_fcb_pif_di_h_2       = 0;
-                              assign fpga_test_fcb_pif_di_h_3       = 0;
-                              assign fpga_test_FB_SPE_IN_0          = 0;
-                              assign fpga_test_FB_SPE_IN_1          = 0;
-                              assign fpga_test_FB_SPE_IN_2          = 0;
-                              assign fpga_test_FB_SPE_IN_3          = 0;
-                              assign fpga_test_M_0                  = 0;
-                              assign fpga_test_M_1                  = 0;
-                              assign fpga_test_M_2                  = 0;
-                              assign fpga_test_M_3                  = 0;
-                              assign fpga_test_M_4                  = 0;
-                              assign fpga_test_M_5                  = 0;
-                              assign fpga_test_MLATCH               = 0;
+  assign efpga_fcb_spis_rst_n     = 0;
+  assign efpga_fcb_spis_mosi      = 0;
+  assign efpga_fcb_spis_cs_n      = 0;
+  assign efpga_fcb_spis_clk       = 0;
+  assign efpga_fcb_spi_mode_en_bo = 0;
+  assign s_in_stm                 = 0;
+  assign fpga_test_fcb_pif_vldi   = 0;
+  assign fpga_test_fcb_pif_di_l_0 = 0;
+  assign fpga_test_fcb_pif_di_l_1 = 0;
+  assign fpga_test_fcb_pif_di_l_2 = 0;
+  assign fpga_test_fcb_pif_di_l_3 = 0;
+  assign fpga_test_fcb_pif_di_h_0 = 0;
+  assign fpga_test_fcb_pif_di_h_1 = 0;
+  assign fpga_test_fcb_pif_di_h_2 = 0;
+  assign fpga_test_fcb_pif_di_h_3 = 0;
+  assign fpga_test_FB_SPE_IN_0    = 0;
+  assign fpga_test_FB_SPE_IN_1    = 0;
+  assign fpga_test_FB_SPE_IN_2    = 0;
+  assign fpga_test_FB_SPE_IN_3    = 0;
+  assign fpga_test_M_0            = 0;
+  assign fpga_test_M_1            = 0;
+  assign fpga_test_M_2            = 0;
+  assign fpga_test_M_3            = 0;
+  assign fpga_test_M_4            = 0;
+  assign fpga_test_M_5            = 0;
+  assign fpga_test_MLATCH         = 0;
 
-                              
-   soc_domain #(
-      .CORE_TYPE          ( CORE_TYPE                  ),
-      .USE_FPU            ( USE_FPU                    ),
-      .USE_HWPE           ( USE_HWPE                   ),
-      .AXI_ADDR_WIDTH     ( AXI_ADDR_WIDTH             ),
-      .AXI_DATA_IN_WIDTH  ( AXI_CLUSTER_SOC_DATA_WIDTH ),
-      .AXI_DATA_OUT_WIDTH ( AXI_SOC_CLUSTER_DATA_WIDTH ),
-      .AXI_ID_IN_WIDTH    ( AXI_CLUSTER_SOC_ID_WIDTH   ),
-      .AXI_USER_WIDTH     ( AXI_USER_WIDTH             ),
-      .BUFFER_WIDTH       ( BUFFER_WIDTH               ),
-      .EVNT_WIDTH         ( EVENT_WIDTH                )
-   ) i_soc_domain (
+
+  soc_domain #(
+      .CORE_TYPE         (CORE_TYPE),
+      .USE_FPU           (USE_FPU),
+      .USE_HWPE          (USE_HWPE),
+      .AXI_ADDR_WIDTH    (AXI_ADDR_WIDTH),
+      .AXI_DATA_IN_WIDTH (AXI_CLUSTER_SOC_DATA_WIDTH),
+      .AXI_DATA_OUT_WIDTH(AXI_SOC_CLUSTER_DATA_WIDTH),
+      .AXI_ID_IN_WIDTH   (AXI_CLUSTER_SOC_ID_WIDTH),
+      .AXI_USER_WIDTH    (AXI_USER_WIDTH),
+      .BUFFER_WIDTH      (BUFFER_WIDTH),
+      .EVNT_WIDTH        (EVENT_WIDTH)
+  ) i_soc_domain (
 
       .ref_clk_i (s_ref_clk),
       .slow_clk_i(s_slow_clk),
@@ -436,42 +436,41 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-        .fpga_clk_in ({s_fpgaio_in[5:2],
-                      s_slow_clk, s_efpga_clk}),
-        .timer_ch0_o                  ( s_timer0                         ),
-        .timer_ch1_o                  ( s_timer1                         ),
-        .timer_ch2_o                  ( s_timer2                         ),
-        .timer_ch3_o                  ( s_timer3                         ),
+      .fpga_clk_in({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
+      .timer_ch0_o(s_timer0),
+      .timer_ch1_o(s_timer1),
+      .timer_ch2_o(s_timer2),
+      .timer_ch3_o(s_timer3),
 
-        // .i2c_scl_i                    ( s_i2c_scl_in                     ),
-        // .i2c_scl_o                    ( s_i2c_scl_out                    ),
-        // .i2c_scl_oe_o                 ( s_i2c_scl_oe                     ),
-        // .i2c_sda_i                    ( s_i2c_sda_in                     ),
-        // .i2c_sda_o                    ( s_i2c_sda_out                    ),
-        // .i2c_sda_oe_o                 ( s_i2c_sda_oe                     ),
+      // .i2c_scl_i                    ( s_i2c_scl_in                     ),
+      // .i2c_scl_o                    ( s_i2c_scl_out                    ),
+      // .i2c_scl_oe_o                 ( s_i2c_scl_oe                     ),
+      // .i2c_sda_i                    ( s_i2c_sda_in                     ),
+      // .i2c_sda_o                    ( s_i2c_sda_out                    ),
+      // .i2c_sda_oe_o                 ( s_i2c_sda_oe                     ),
 
-        // .i2s_slave_sd0_i              ( s_i2s_sd0_in                     ),
-        // .i2s_slave_sd1_i              ( s_i2s_sd1_in                     ),
-        // .i2s_slave_ws_i               ( s_i2s_ws_in                      ),
-        // .i2s_slave_ws_o               ( s_i2s_ws0_out                    ),
-        // .i2s_slave_ws_oe              ( s_i2s_slave_ws_oe                ),
-        // .i2s_slave_sck_i              ( s_i2s_sck_in                     ),
-        // .i2s_slave_sck_o              ( s_i2s_sck0_out                   ),
-        // .i2s_slave_sck_oe             ( s_i2s_slave_sck_oe               ),
+      // .i2s_slave_sd0_i              ( s_i2s_sd0_in                     ),
+      // .i2s_slave_sd1_i              ( s_i2s_sd1_in                     ),
+      // .i2s_slave_ws_i               ( s_i2s_ws_in                      ),
+      // .i2s_slave_ws_o               ( s_i2s_ws0_out                    ),
+      // .i2s_slave_ws_oe              ( s_i2s_slave_ws_oe                ),
+      // .i2s_slave_sck_i              ( s_i2s_sck_in                     ),
+      // .i2s_slave_sck_o              ( s_i2s_sck0_out                   ),
+      // .i2s_slave_sck_oe             ( s_i2s_slave_sck_oe               ),
 
-        // .spi_clk_o                    ( s_spi_clk                        ),
-        // .spi_csn_o                    ( s_spi_csn                        ),
-        // .spi_oen_o                    ( s_spi_oen                        ),
-        // .spi_sdo_o                    ( s_spi_sdo                        ),
-        // .spi_sdi_i                    ( s_spi_sdi                        ),
+      // .spi_clk_o                    ( s_spi_clk                        ),
+      // .spi_csn_o                    ( s_spi_csn                        ),
+      // .spi_oen_o                    ( s_spi_oen                        ),
+      // .spi_sdo_o                    ( s_spi_sdo                        ),
+      // .spi_sdi_i                    ( s_spi_sdi                        ),
 
-        // .sdio_clk_o                   ( s_sdio_clk                       ),
-        // .sdio_cmd_o                   ( s_sdio_cmdo                      ),
-        // .sdio_cmd_i                   ( s_sdio_cmdi                      ),
-        // .sdio_cmd_oen_o               ( s_sdio_cmd_oen                   ),
-        // .sdio_data_o                  ( s_sdio_datao                     ),
-        // .sdio_data_i                  ( s_sdio_datai                     ),
-        // .sdio_data_oen_o              ( s_sdio_data_oen                  ),
+      // .sdio_clk_o                   ( s_sdio_clk                       ),
+      // .sdio_cmd_o                   ( s_sdio_cmdo                      ),
+      // .sdio_cmd_i                   ( s_sdio_cmdi                      ),
+      // .sdio_cmd_oen_o               ( s_sdio_cmd_oen                   ),
+      // .sdio_data_o                  ( s_sdio_datao                     ),
+      // .sdio_data_i                  ( s_sdio_datai                     ),
+      // .sdio_data_oen_o              ( s_sdio_data_oen                  ),
 
       .cluster_busy_i(s_cluster_busy),
 
