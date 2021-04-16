@@ -87,7 +87,7 @@ targets:
   default: &default_target
     filesets:
     - files_rtl_generic
-    - rtl-behavioral
+    - target_sim? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -110,4 +110,3 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
-

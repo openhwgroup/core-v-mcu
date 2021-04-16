@@ -48,6 +48,5 @@ targets:
     - rtl
     - target_sim? (rtl_sim)
     - target_lint? (rtl_sim)
-    - tool_xilinx? (rtl_xilinx)
     - ! tool_verilator? (rtl_primitives)
 
