@@ -25,7 +25,7 @@ quicklogic:
     ./ql_fcb/rtl/fcbsmc.sv,
     ./ql_fcb/rtl/fcbssc.sv,
     ./ql_fcb/rtl/fcb.sv,
-    ./ql_fcb/rtl/ql_gf22c28_w_RTL.sv,
+    ./ql_fcb/rtl/ql_generic_gates.sv,
     ./ql_fcb/rtl/registers.v,
     ./ql_fcb/rtl/serializer_deserializer.v,
     ./ql_fcb/rtl/spi_master_top.v,

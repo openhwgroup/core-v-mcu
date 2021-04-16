@@ -1,26 +1,7 @@
-// -----------------------------------------------------------------------------
-// title          : SPI Master	
-// project        : SPI Master PSB
-// -----------------------------------------------------------------------------
-// file           : spi_master_top.v , Top Level File
-// author         : XXXXXX		
-// company        : QuickLogic Corp
-// created        : 2015/06/21
-// last update    : 
-// platform       : 
-// standard       : Verilog 2001
-// -----------------------------------------------------------------------------
-// description: Top module
-// -----------------------------------------------------------------------------
-// copyright (c) 2012
-// -----------------------------------------------------------------------------
-// revisions  :
-// date            version    author              description
-// 2008/xx/xx      1.0        XXXXX               created
-// -----------------------------------------------------------------------------
-// Comments: 
-// -----------------------------------------------------------------------------
-// ---------- Design Unit Header ---------- //
+// Copyright 2021 QuickLogic
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
 `timescale 1ns / 10ps
 
 module spi_master_top ( smc_clear_br_cnt, Baud_rate_re_o, spi_rd_data, Baud_Clk_i, wb_clk_i, wb_rst_i, arst_i, wb_adr_i, wb_dat_i, wb_dat_o,

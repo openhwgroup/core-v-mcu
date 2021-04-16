@@ -1,16 +1,6 @@
-// file           : registers.v 
-// description  : SPI Register Module
-// Modified        : 2013/09/09 
-// Modified by     : Rakesh Moolacheri	
-// -----------------------------------------------------------------------------
-// copyright (c) 2012
-// -----------------------------------------------------------------------------
-// revisions  :
-// date            version    author              description
-// 2008/xx/xx      1.0        XXXXX               created
-// -----------------------------------------------------------------------------
-// Comments: 
-// -----------------------------------------------------------------------------
+// Copyright 2021 QuickLogic
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 `timescale 1ns / 10ps
 module registers (AD_i, CLK_i, RST_i, RST_SYNC_i, WR_i,	Data_i,	Data_o,Divisor_o, SPE_o,	
