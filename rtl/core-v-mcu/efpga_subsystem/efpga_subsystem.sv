@@ -1,15 +1,5 @@
 `include "pulp_soc_defines.sv"
 
-`ifndef SYNTHESIS
-//`define ASYNC_INTERFACE
-//`define USE_HWCE
-// `define USE_RTL_DESIGNS
-// `define USE_BNN_HWCE
-//`define USE_FULLTEST_GPIOFLL_ACC
-//`define USE_FULLTEST_GPIOFLL_ACC_WRAP
-//`define USE_MUNTANIALA_TEST
-`endif
-
 module efpga_subsystem
 #(
         parameter L2_ADDR_WIDTH       = 32,
@@ -201,11 +191,6 @@ module efpga_subsystem
 
     logic                                         efpga_clk;
     logic  [`N_EFPGA_EVENTS-1:0]                   event_fpga,event_fpga_gate, event_edge, wedge_ack;
-
-
-`ifndef SYNTHESIS
-    `include "efpga_subsystem_rtl_tests.sv"
-`endif
 
 
     efpga_sel_clk_dc_fifo efpga_sel_clk_dc_fifo_mux_i
@@ -428,8 +413,6 @@ module efpga_subsystem
     assign tcdm_req_fpga_gated[1]  = enable_tcdm2_efpga_i &  tcdm_req_fpga[1];
     assign tcdm_req_fpga_gated[0]  = enable_tcdm0_efpga_i &  tcdm_req_fpga[0];
 
-
-`ifndef USE_RTL_DESIGNS
 
       assign tcdm_addr_fpga[0][31:20]   = 12'h1C0;
       assign tcdm_addr_fpga[1][31:20]   = 12'h1C0;
@@ -1263,6 +1246,4 @@ module efpga_subsystem
          .fpgaio_data_12_o                     ( fpgaio_out_o[12]           )
        );
 
-
-`endif // USE_RTL_DESIGNS
 endmodule
