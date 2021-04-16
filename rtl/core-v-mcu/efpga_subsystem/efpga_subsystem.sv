@@ -1,15 +1,5 @@
 `include "pulp_soc_defines.sv"
 
-`ifndef SYNTHESIS
-//`define ASYNC_INTERFACE
-//`define USE_HWCE
-// `define USE_RTL_DESIGNS
-// `define USE_BNN_HWCE
-//`define USE_FULLTEST_GPIOFLL_ACC
-//`define USE_FULLTEST_GPIOFLL_ACC_WRAP
-//`define USE_MUNTANIALA_TEST
-`endif
-
 module efpga_subsystem
 #(
         parameter L2_ADDR_WIDTH       = 32,
@@ -199,6 +189,7 @@ module efpga_subsystem
 
 
    XBAR_TCDM_BUS                                  apbt1_int();
+
    logic                                              s_lint_VALID, s_lint_GNT, s_lint_REQ;
    
    logic                                              s_efpga_clk;
@@ -422,8 +413,6 @@ module efpga_subsystem
     assign tcdm_req_fpga_gated[1]  = enable_tcdm2_efpga_i &  tcdm_req_fpga[1] & tcdm_gnt_fpga[1];
     assign tcdm_req_fpga_gated[0]  = enable_tcdm0_efpga_i &  tcdm_req_fpga[0] & tcdm_gnt_fpga[0];
 
-
-`ifndef USE_RTL_DESIGNS
 
       assign tcdm_addr_fpga[0][31:20]   = 12'h1C0;
       assign tcdm_addr_fpga[1][31:20]   = 12'h1C0;
@@ -676,6 +665,4 @@ fcb U_fcb(
          .tcdm_be_p3                     ( tcdm_be_fpga[3]          )
        );
 
-
-`endif // USE_RTL_DESIGNS
 endmodule
