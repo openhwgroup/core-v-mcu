@@ -67,7 +67,6 @@ filesets:
     - fc/fc_hwpe.sv
     - components/apb_soc_ctrl.sv
     - components/pulp_interfaces.sv
-    - efpga_subsystem/efpga_subsystem_rtl_tests.sv: {is_include_file: true}
     - efpga_subsystem/efpga_subsystem.sv
     - efpga_subsystem/apb_efpga_hwce.sv
     - efpga_subsystem/dc_accelerator_fsm.sv
