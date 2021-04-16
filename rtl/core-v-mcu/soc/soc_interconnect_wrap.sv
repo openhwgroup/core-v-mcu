@@ -56,7 +56,6 @@ module soc_interconnect_wrap
     AXI_BUS.Slave axi_master_plug,  // Normally used for cluster -> SoC communication
     AXI_BUS.Master axi_slave_plug,  // Normally used for SoC -> cluster communication
     APB_BUS.Master apb_peripheral_bus,  // Connects to all the SoC Peripherals
-    XBAR_TCDM_BUS.Master tcdm_efpga_apbprogram,
     XBAR_TCDM_BUS.Master tcdm_efpga_apbt1,
     XBAR_TCDM_BUS.Master     l2_interleaved_slaves[NR_L2_PORTS], // Connects to the interleaved memory banks
     XBAR_TCDM_BUS.Master l2_private_slaves[2],  // Connects to core-private memory banks
@@ -96,22 +95,25 @@ module soc_interconnect_wrap
   ////////////////////////////////////////
   // Address Rules for the interconnect //
   ////////////////////////////////////////
-  localparam NR_RULES_L2_DEMUX = 3;
+  localparam NR_RULES_L2_DEMUX = 4;
   //Everything that is not routed to port 1 or 2 ends up in port 0 by default
   localparam addr_map_rule_t [NR_RULES_L2_DEMUX-1:0] L2_DEMUX_RULES = '{
        '{ idx: 1 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK1_END_ADDR} , //Both , bank0 and bank1 are in the  same address block
   '{ idx: 1 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}      ,
-       '{ idx: 2 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }};
+        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}, 
+        '{ idx: 2 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }};
 
   localparam NR_RULES_INTERLEAVED_REGION = 1;
   localparam addr_map_rule_t [NR_RULES_INTERLEAVED_REGION-1:0] INTERLEAVED_ADDR_SPACE = '{
        '{ idx: 1 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }};
 
-  localparam NR_RULES_CONTIG_CROSSBAR = 3;
+  localparam NR_RULES_CONTIG_CROSSBAR = 4;
   localparam addr_map_rule_t [NR_RULES_CONTIG_CROSSBAR-1:0] CONTIGUOUS_CROSSBAR_RULES = '{
         '{ idx: 0 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK0_END_ADDR} ,
         '{ idx: 1 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK1_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK1_END_ADDR} ,
-        '{ idx: 2 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}};
+        '{ idx: 2 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR},
+        '{ idx: 3 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}
+          };
 
   localparam NR_RULES_AXI_CROSSBAR = 2;
   localparam addr_map_rule_t [NR_RULES_AXI_CROSSBAR-1:0] AXI_CROSSBAR_RULES = '{
@@ -174,10 +176,11 @@ module soc_interconnect_wrap
     `TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS+i], axi_bridge_2_interconnect[i])
   end
 
-  XBAR_TCDM_BUS contiguous_slaves[3] ();
+  XBAR_TCDM_BUS contiguous_slaves[4] ();
   `TCDM_ASSIGN_INTF(l2_private_slaves[0], contiguous_slaves[0])
   `TCDM_ASSIGN_INTF(l2_private_slaves[1], contiguous_slaves[1])
   `TCDM_ASSIGN_INTF(boot_rom_slave, contiguous_slaves[2])
+  `TCDM_ASSIGN_INTF(tcdm_efpga_apbt1, contiguous_slaves[3])
 
   AXI_BUS #(
       .AXI_ADDR_WIDTH(32),
@@ -197,8 +200,9 @@ module soc_interconnect_wrap
       .NR_ADDR_RULES_L2_DEMUX(NR_RULES_L2_DEMUX),
       .NR_SLAVE_PORTS_INTERLEAVED(NR_L2_PORTS),  // Number of interleaved memory banks
       .NR_ADDR_RULES_SLAVE_PORTS_INTLVD(NR_RULES_INTERLEAVED_REGION),
-      .NR_SLAVE_PORTS_CONTIG(3),  // Bootrom + number of private memory banks (normally 1 for
+      .NR_SLAVE_PORTS_CONTIG(4),  // Bootrom + number of private memory banks (normally 1 for
       // programm instructions and 1 for programm stack )
+      // efpga async apb port
       .NR_ADDR_RULES_SLAVE_PORTS_CONTIG(NR_RULES_CONTIG_CROSSBAR),
       .NR_AXI_SLAVE_PORTS(2),  // 1 for AXI to cluster, 1 for SoC peripherals (converted to APB)
       .NR_ADDR_RULES_AXI_SLAVE_PORTS(NR_RULES_AXI_CROSSBAR),

@@ -1,0 +1,83 @@
+#!/bin/bash 
+
+#echo "Cloning core-v-mcu"
+#git clone git@github.com:QuickLogic-Corp/core-v-mcu.git |& tee install-core-v-mcu.log
+#if [ ${COREVMCU_COMMIT}_ != "_" ]
+#then
+#	(cd core-v-mcu; git checkout ${COREVMCU_COMMIT}) |& tee --append install-core-v-mcu.log
+#fi
+#if [ $# -gt 0 ]; then
+#	echo "Changing to commit $1" |& tee --append install-core-v-mcu.log
+#	(cd core-v-mcu; git checkout $1) |& tee --append install-core-v-mcu.log
+#fi
+#echo "######################################"
+#echo "#"
+#echo -n "# core-v-mcu branch:"
+#(cd core-v-mcu; git branch --list)
+#echo "#"
+#echo "######################################"
+
+#
+# Caution: sequence here is tricky -- if directory exists you can't clone into it
+#          so we have to make the main framework (core-v-mcu)
+#          then add in the synthesis scripts
+#          then fill out the framework with dependent IPS
+#          then fill in remaining unique directories
+#
+#echo "Filling in submodules"
+
+# turn the detached message off
+#git config --global advice.detachedHead false
+#( cd  core-v-mcu \
+#  && git clone git@github.com:QuickLogic-Corp/core-v-mcu-gf22fdx.git gf22fdx \
+#  &&  ./update-ips \
+#  && git clone git@github.com:QuickLogic-Corp/core-v-mcu-rtl-modules-gf22fdx.git rtl/modules-gf22fdx \
+#  && git clone git@github.com:QuickLogic-Corp/ql_fcb.git rtl/ql_fcb \
+#  && git clone git@github.com:QuickLogic-Corp/ql_math_unit.git rtl/ql_math_unit  --branch Acc+4\
+#  && git clone git@github.com:QuickLogic-Corp/tech_cells_gf22fdx.git ips/tech_cells_gf22fdx \
+#  && ./generate-scripts\
+#  && echo "**PASSED**"
+#  ) |& tee --append install-core-v-mcu.log
+  
+#grep '**PASSED**' install-core-v-mcu.log
+#if [ $? -ne 0 ]; then
+#  exit 1
+#fi
+
+#echo "######################################"
+#echo "#"
+#echo -n "# core-v-mcu-soc branch:"
+#(cd core-v-mcu/ips/core-v-mcu-soc; git branch --list)
+#echo "#"
+#echo "######################################"
+
+#
+# Handle IO definitions
+#
+#     --pad-frame-gf22-sv core-v-mcu/rtl/modules-gf22fdx/pad_frame_gf22.sv\
+> install-core-v-mcu.log
+(
+     echo "######################################" \
+  && echo "#" \
+  && echo "# run ioscript.py" \
+  && echo "#" \
+  && echo "######################################" \
+  && python3 ioscript.py\
+      --soc-defines rtl/includes/pulp_soc_defines.sv\
+      --peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
+      --periph-bus-defines rtl/includes/periph_bus_defines.sv\
+      --pin-table pin-table.csv\
+      --perdef-json perdef.json\
+      --pad-control rtl/core-v-mcu/top/pad_control.sv\
+      --pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
+      --xilinx-core-v-mcu-sv fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
+      --input-xdc fpga/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
+      --output-xdc fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assigment.xdc\
+      --cvmcu-h core-v-mcu-config.h\
+  && echo "############# Done ###################" \
+) |& tee --append install-core-v-mcu.log
+
+grep '### Done ###' install-core-v-mcu.log
+if [ $? -ne 0 ]; then
+  exit 1
+fi

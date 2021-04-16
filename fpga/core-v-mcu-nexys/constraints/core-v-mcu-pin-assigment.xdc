@@ -113,8 +113,8 @@ set_property -dict { PACKAGE_PIN E6 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io
 ##Pmod Header JD
 #set_property -dict { PACKAGE_PIN H4    IOSTANDARD LVCMOS33 } [get_ports { JD[1] }]; #IO_L21N_T3_DQS_35 Sch=jd[1]
 #set_property -dict { PACKAGE_PIN H1    IOSTANDARD LVCMOS33 } [get_ports { JD[2] }]; #IO_L17P_T2_35 Sch=jd[2]
-set_property -dict { PACKAGE_PIN G1 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[46] }]; #IO_L17N_T2_35 Sch=jd[3]
-set_property -dict { PACKAGE_PIN G3 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[47] }]; #IO_L20N_T3_35 Sch=jd[4]
+set_property -dict { PACKAGE_PIN G1 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[13] }]; #IO_L17N_T2_35 Sch=jd[3]
+set_property -dict { PACKAGE_PIN G3 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[14] }]; #IO_L20N_T3_35 Sch=jd[4]
 #set_property -dict { PACKAGE_PIN H2    IOSTANDARD LVCMOS33 } [get_ports { JD[7] }]; #IO_L15P_T2_DQS_35 Sch=jd[7]
 #set_property -dict { PACKAGE_PIN G4    IOSTANDARD LVCMOS33 } [get_ports { JD[8] }]; #IO_L20P_T3_35 Sch=jd[8]
 #set_property -dict { PACKAGE_PIN G2    IOSTANDARD LVCMOS33 } [get_ports { JD[9] }]; #IO_L15N_T2_DQS_35 Sch=jd[9]
@@ -165,8 +165,8 @@ set_property -dict { PACKAGE_PIN D2 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io
 #set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports { ACL_INT[2] }]; #IO_L20P_T3_A20_15 Sch=acl_int[2]
 
 ##Temperature Sensor
-set_property -dict { PACKAGE_PIN C14 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[13] }]; #IO_L1N_T0_AD0N_15 Sch=tmp_scl
-set_property -dict { PACKAGE_PIN C15 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[14] }]; #IO_L12N_T1_MRCC_15 Sch=tmp_sda
+set_property -dict { PACKAGE_PIN C14 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[46] }]; #IO_L1N_T0_AD0N_15 Sch=tmp_scl
+set_property -dict { PACKAGE_PIN C15 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[47] }]; #IO_L12N_T1_MRCC_15 Sch=tmp_sda
 #set_property -dict { PACKAGE_PIN D13   IOSTANDARD LVCMOS33 } [get_ports { TMP_INT }]; #IO_L6N_T0_VREF_15 Sch=tmp_int
 #set_property -dict { PACKAGE_PIN B14   IOSTANDARD LVCMOS33 } [get_ports { TMP_CT }]; #IO_L2N_T0_AD8N_15 Sch=tmp_ct
 

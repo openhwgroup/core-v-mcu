@@ -28,6 +28,7 @@ module periph_bus_wrap #(
     APB_BUS.Master mmap_debug_master,
     APB_BUS.Master timer_master,
     APB_BUS.Master hwpe_master,
+    APB_BUS.Master fcb_master,
     APB_BUS.Master stdout_master
 );
 
@@ -91,6 +92,13 @@ module periph_bus_wrap #(
   `APB_ASSIGN_MASTER(s_masters[10], mmap_debug_master);
   assign s_start_addr[10] = `DEBUG_START_ADDR;
   assign s_end_addr[10]   = `DEBUG_END_ADDR;
+
+  `APB_ASSIGN_MASTER(s_masters[11], fcb_master);
+  assign s_start_addr[11] = `EFPGA_CONFIG_START_ADDR;
+  assign s_end_addr[11]   = `EFPGA_CONFIG_END_ADDR;
+
+
+
 
   //********************************************************
   //**************** SOC BUS *******************************
