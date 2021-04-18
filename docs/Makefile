@@ -1,20 +1,34 @@
-# Minimal makefile for Sphinx documentation
-#
 
-# You can set these variables from the command line, and also
-# from the environment for the first two.
-SPHINXOPTS    ?=
-SPHINXBUILD   ?= sphinx-build
-SOURCEDIR     = .
-BUILDDIR      = _build
 
-# Put it first so that "make" without argument is like "make help".
-help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+# Directory where generated md files go
+AUTO_MD_DIR=auto-docs
+CSV_MIRROR_DIR=csv-mirror/
 
-.PHONY: help Makefile
+FOO=$(shell find ../rtl -name '*.csv' -exec mkdir -p ${CSV_MIRROR_DIR} \; -exec cp {} ${CSV_MIRROR_DIR} \;)
+$(info ${FOO})
+SRCS=$(shell find ../rtl -name '*.csv' -print)
+$(info ${SRCS})
+MD_FILES:=$(addprefix ${AUTO_MD_DIR}/,$(notdir $(SRCS:.csv=.md)))
+$(info ${MD_FILES})
 
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
+
+all:    doc
+
+clean:
+				rm ${MDFILES}
+				(cd sphinx-source; make clean)
+				
+install:
+				cp -r sphinx-source/_build/html ${INSTALL_DIR}
+
+doc:    ${MD_FILES}
+				make -f make-sphinx.mk html
+				
+
+${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
+			@mkdir -p ${AUTO_MD_DIR}
+			@python3 ../util/ioscript.py\
+				--soc-defines ../rtl/includes/pulp_soc_defines.sv\
+				--reg-def-csv $<\
+				--reg-def-md $@
