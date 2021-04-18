@@ -30,5 +30,6 @@ ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 			@mkdir -p ${AUTO_MD_DIR}
 			@python3 ../util/ioscript.py\
 				--soc-defines ../rtl/includes/pulp_soc_defines.sv\
+				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
 				--reg-def-csv $<\
 				--reg-def-md $@

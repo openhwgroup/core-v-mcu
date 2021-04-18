@@ -108,6 +108,11 @@ def evaluate_defines(x):
                 old = '`'+d
                 new = soc_defines[d]
                 x = x.replace(old, new)
+        for d in per_bus_defines:
+            if d != '' and d in x:
+                old = '`'+d
+                new = per_bus_defines[d]
+                x = x.replace(old, new)
     return x
 
 ####################################################################################
@@ -358,14 +363,14 @@ if args.soc_defines != None and args.cvmcu_h != None:
         # Add SOC Controller information
         ###########
         cvmcu_h.write("\n")
-        cvmcu_h.write("//  Timer configuration information\n")
+        cvmcu_h.write("//  SOC controller configuration information\n")
         cvmcu_h.write("#define SOC_CTRL_START_ADDR %s\n" % per_bus_defines["SOC_CTRL_START_ADDR"])
         
         ###########
         # Add EU information
         ###########
         cvmcu_h.write("\n")
-        cvmcu_h.write("//  Timer configuration information\n")
+        cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
         cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
         
         ###########

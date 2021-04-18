@@ -1,4 +1,6 @@
-Module,UDMA_UART addr=UDMA_CH_ADDR_UART(id),,,,,
+Module,UDMA_UART,,,,,
+,Memory address: UDMA_CH_ADDR_UART(`UDMA_CH_ADDR_UART),,,,,
+,,,,,,
 ,Basic UART driven by UDMA system,,,,,
 Register,Offset/Field,MSB,LSB,Type,Default,Description
 0x00,RX_SADDR,,,,,
