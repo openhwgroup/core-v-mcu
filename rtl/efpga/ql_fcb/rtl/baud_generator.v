@@ -14,7 +14,6 @@
 // -----------------------------------------------------------------------------
 // Comments: 
 // -----------------------------------------------------------------------------
-`timescale 1ns / 10ps
 
 module baud_generator (smc_clear_br_cnt,Baud_rate_fe, Baud_rate_re, Baud_Rate_o,
 						Bus_Clk_i, 

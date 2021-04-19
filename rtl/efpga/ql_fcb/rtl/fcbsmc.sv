@@ -77,10 +77,6 @@ module fcbsmc #(
     output logic       fsmc_fmic_seq_done,  //FSM
     output logic       fsmc_frfu_set_fb_cfg_done  //Set FB Cfg Done Bit
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

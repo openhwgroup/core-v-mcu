@@ -4,8 +4,8 @@
 
 module TPRAM_WRAP (
   //OUTPUT
-  TPRAM_MATHB_R_DATA, 
-  TPRAM_EFPGA_R_DATA, 
+  TPRAM_MATHB_R_DATA,
+  TPRAM_EFPGA_R_DATA,
   //INPUT
   EFPGA_TPRAM_R_MODE,
   EFPGA_TPRAM_W_MODE,
@@ -21,9 +21,9 @@ module TPRAM_WRAP (
 
 );
 
-localparam  DWORD_MODE = 2'b00; //32-bit 
-localparam  WORD_MODE  = 2'b01; //16-bit 
-localparam  BYTE_MODE  = 2'b10; //8-bit  
+localparam  DWORD_MODE = 2'b00; //32-bit
+localparam  WORD_MODE  = 2'b01; //16-bit
+localparam  BYTE_MODE  = 2'b10; //8-bit
 localparam  RESV_MODE  = 2'b11; //32-bit
 
 //TPRAM CTRL
@@ -58,14 +58,14 @@ reg  [31:0] efpga_w_data;
 //vincent@20181031reg  [11:0] fEFPGA_TPRAM_R_ADDR;
 reg  [ 2:0] tpram_dataout_sel;
 
-wire [63:0] tpram_w_data; 
+wire [63:0] tpram_w_data;
 wire [63:0] tpram_r_data;
 wire        tpram_r_cen;
 wire        tpram_w_cen;
 wire [ 8:0] tpram_r_addr;
 wire [ 8:0] tpram_w_addr;
 
-wire        r_addr_ff_rstn;  
+wire        r_addr_ff_rstn;
 
 /*------------------------------*/
 /*      EMULATION SPECIFIC      */
@@ -90,19 +90,7 @@ assign tpram_r_addr = EFPGA_TPRAM_R_ADDR[11:3];
 assign tpram_w_addr = EFPGA_TPRAM_W_ADDR[11:3];
 
     `ifndef PULP_FPGA_EMUL
-      MBH_ZSWL_IN22FDX_R2PV_WFVG_W00512B064M04C128 U_TPRAM_512X64(
-        .clkA (EFPGA_TPRAM_R_CLK),
-        .clkB (EFPGA_TPRAM_W_CLK),
-        .cenA (tpram_r_cen),
-        .cenB (tpram_w_cen),
-        .deepsleep (1'b0),                 //vincent
-        .powergate (EFPGA_TPRAM_POWERDN),
-        .aA (tpram_r_addr),
-        .aB (tpram_w_addr),
-        .d  (tpram_w_data),
-        .bw (tpram_bit_write),
-        .q  (tpram_r_data)
-          );
+      // TODO: Unify SRAMs
     `else // !`ifndef PULP_FPGA_EMUL
       psram512x64 U_TPRAM_512X64(
         .clkA (EFPGA_TPRAM_R_CLK),
@@ -155,9 +143,9 @@ assign tpram_w_data = EFPGA_TPRAM_WDSEL ? {MATHB_TPRAM_W_DATA,MATHB_TPRAM_W_DATA
 //assign tpram_w_data[31:0]  = EFPGA_TPRAM_WDSEL ? MATHB_TPRAM_W_DATA : efpga_w_data; //MUX_WDSEL
 
 always@(*) begin: WDATA_MODE_SEL
-  if (EFPGA_TPRAM_WE) begin 
+  if (EFPGA_TPRAM_WE) begin
     if (EFPGA_TPRAM_W_MODE == BYTE_MODE) begin
-      case (EFPGA_TPRAM_W_ADDR[2:0])    
+      case (EFPGA_TPRAM_W_ADDR[2:0])
         3'h0 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA; tpram_bit_write = 64'h0000_0000_0000_00ff; end
         3'h1 : begin  efpga_w_data = {EFPGA_TPRAM_W_DATA[23:0],EFPGA_TPRAM_W_DATA[31:24]};tpram_bit_write = 64'h0000_0000_0000_ff00; end
         3'h2 : begin  efpga_w_data = {EFPGA_TPRAM_W_DATA[15:0],EFPGA_TPRAM_W_DATA[31:16]};tpram_bit_write = 64'h0000_0000_00ff_0000; end
@@ -169,37 +157,37 @@ always@(*) begin: WDATA_MODE_SEL
         default : efpga_w_data = 64'h0;
       endcase
     end // end of if (EFPGA_TPRAM_W_MODE == BYTE_MODE))
-    else if (EFPGA_TPRAM_W_MODE == WORD_MODE) begin 
-      case (EFPGA_TPRAM_W_ADDR[2:1])    
+    else if (EFPGA_TPRAM_W_MODE == WORD_MODE) begin
+      case (EFPGA_TPRAM_W_ADDR[2:1])
         2'h0 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'h0000_0000_0000_ffff; end
         2'h1 : begin  efpga_w_data = {EFPGA_TPRAM_W_DATA[15:0],EFPGA_TPRAM_W_DATA[31:16]};tpram_bit_write = 64'h0000_0000_ffff_0000; end
         2'h2 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'h0000_ffff_0000_0000; end
         2'h3 : begin  efpga_w_data = {EFPGA_TPRAM_W_DATA[15:0],EFPGA_TPRAM_W_DATA[31:16]};tpram_bit_write = 64'hffff_0000_0000_0000; end
-	    default : efpga_w_data = 64'h0; 
+	    default : efpga_w_data = 64'h0;
       endcase
     end // end of if (EFPGA_TPRAM_W_MODE == WORD_MODE))
     else if (EFPGA_TPRAM_W_MODE == DWORD_MODE ) begin
-      case (EFPGA_TPRAM_W_ADDR[2])    
+      case (EFPGA_TPRAM_W_ADDR[2])
         2'h0 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'h0000_0000_ffff_ffff; end
         2'h1 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'hffff_ffff_0000_0000; end
-	    default : efpga_w_data = 64'h0; 
+	    default : efpga_w_data = 64'h0;
       endcase
     end // end of if (EFPGA_TPRAM_W_MODE == DWORD_MODE))
-    else begin // DEFAULT is RESV_W_MODE 
-      case (EFPGA_TPRAM_W_ADDR[2])    
+    else begin // DEFAULT is RESV_W_MODE
+      case (EFPGA_TPRAM_W_ADDR[2])
         2'h0 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'h0000_0000_ffff_ffff; end
         2'h1 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'hffff_ffff_0000_0000; end
-	    default : efpga_w_data = 64'h0; 
+	    default : efpga_w_data = 64'h0;
        endcase
-    end 
-  end  
+    end
+  end
   else if (EFPGA_TPRAM_WE && EFPGA_TPRAM_WDSEL) begin  // overide mode -- data from math block is always 32-bits
-      case (EFPGA_TPRAM_W_ADDR[2])    
+      case (EFPGA_TPRAM_W_ADDR[2])
         2'h0 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'h0000_0000_ffff_ffff; end
         2'h1 : begin  efpga_w_data = EFPGA_TPRAM_W_DATA;tpram_bit_write = 64'hffff_ffff_0000_0000; end
-	    default : efpga_w_data = 64'h0; 
+	    default : efpga_w_data = 64'h0;
        endcase
-  end  
+  end
   else begin
     efpga_w_data = 32'h0;
     //tpram_w_data[63:0] = 64'h0;
@@ -217,10 +205,10 @@ always@(posedge EFPGA_TPRAM_R_CLK or negedge r_addr_ff_rstn)
   if (~r_addr_ff_rstn)
     tpram_dataout_sel <= #0.2 3'h0;
     //vincent@20181031fEFPGA_TPRAM_R_ADDR <= #0.2 1'b0;
-  else  
+  else
     //vincent@20181031fEFPGA_TPRAM_R_ADDR <= #0.2 EFPGA_TPRAM_R_ADDR;
     tpram_dataout_sel <= #0.2 EFPGA_TPRAM_R_ADDR[2:0];
- 
+
 always@(*) begin: RDATA_MODE_SEL
   if (EFPGA_TPRAM_R_MODE == BYTE_MODE ) begin
     //vincent@20181031case ( fEFPGA_TPRAM_R_ADDR[2:0] )
@@ -245,20 +233,20 @@ always@(*) begin: RDATA_MODE_SEL
       2'b1_1: efpga_r_data[31: 0] = {tpram_r_data[15:0],tpram_r_data[63:48]};
       default : efpga_r_data = tpram_r_data[31: 0];
     endcase
-  end  
+  end
   else if  ( EFPGA_TPRAM_R_MODE == DWORD_MODE ) begin
     //vincent@20181031case ( fEFPGA_TPRAM_R_ADDR[2] )
     case ( tpram_dataout_sel[2] )
       1'b0: efpga_r_data[31: 0] = tpram_r_data[31: 0];
-      1'b1: efpga_r_data[31: 0] = tpram_r_data[63:32]; 
+      1'b1: efpga_r_data[31: 0] = tpram_r_data[63:32];
       default : efpga_r_data = tpram_r_data[31: 0];
     endcase
   end
-  else begin 
+  else begin
     //vincent@20181031case ( fEFPGA_TPRAM_R_ADDR[2] )
     case ( tpram_dataout_sel[2] )
       1'b0: efpga_r_data[31: 0] = tpram_r_data[31: 0];
-      1'b1: efpga_r_data[31: 0] = tpram_r_data[63:32]; 
+      1'b1: efpga_r_data[31: 0] = tpram_r_data[63:32];
       default : efpga_r_data = tpram_r_data[31: 0];
     endcase
   end

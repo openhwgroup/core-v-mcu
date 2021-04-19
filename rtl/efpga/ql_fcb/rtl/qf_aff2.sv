@@ -22,10 +22,6 @@ module qf_aff2 #(
     output logic                           fifo_empty_flag_rdclk,
     output logic                           fifo_full_flag_wrclk
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

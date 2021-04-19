@@ -207,10 +207,6 @@ module fcbrfu #(
     output logic [1:0] frfu_fpmu_pmu_time_ctl,  //Internal Timing Configure 
     output logic [1:0] frfu_fclp_clp_time_ctl  //Internal Timing Configure 
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //--------------------------------------------------------------------------------//
   //-- Internal Signal and Parameter 						--//

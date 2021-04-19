@@ -49,10 +49,6 @@ module fcbmic (
     output logic       fcb_sysclk_en,  //1'b1 : Turn on the RC/SYS clock. Note:
     output logic [3:0] fcb_io_sv_180  //Select the IO Supply Voltage, 0x0 : 3.3
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

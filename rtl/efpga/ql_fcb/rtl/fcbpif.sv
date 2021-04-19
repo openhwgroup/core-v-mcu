@@ -33,10 +33,6 @@ module fcbpif (
     output logic        fpif_frwf_wff_wr_en,  //Write enable of Write FIFO
     output logic        fpif_frwf_crf_rd_en  //Read Enable of Cfg Read FIFO
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

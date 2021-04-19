@@ -51,7 +51,6 @@ SPI_slave
 
 ------------------------------------------------------------------------------*/
 
-`timescale 1ns / 100ps
 
 module SPI_slave (
 	input			rst_n,			// system/global reset (active-high)
