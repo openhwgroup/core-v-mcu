@@ -51,10 +51,6 @@ module fcbclp #(
     output logic       fclp_frfu_fb_cfg_cleanup,
     output logic       fclp_frfu_clear_cfg_done  //Clear the CFG Done.
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

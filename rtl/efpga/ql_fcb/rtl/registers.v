@@ -2,7 +2,6 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-`timescale 1ns / 10ps
 module registers (AD_i, CLK_i, RST_i, RST_SYNC_i, WR_i,	Data_i,	Data_o,Divisor_o, SPE_o,	
 				  BIDIROEn_o, SPC0_o, CPOL_o, CPHA_o, LSBFE_o,trnfer_cmplte_i,start_o,stop_o,
 				  read_o,write_o, SPI_Bit_Ctrl_o,Ext_SPI_Clk_Cnt_o,Ext_SPI_Clk_En_o,SPI_Read_Data_i, 

@@ -41,10 +41,6 @@ module fcbrwf (
     output logic        frwf_frfu_crf_full,  //Full Flag of Cfg Read FIFO
     output logic        frwf_frfu_crf_full_m1  //Full minus 1 Flag of Cfg Read FIFO
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

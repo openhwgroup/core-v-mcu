@@ -36,10 +36,6 @@ module fcbaps #(
     output logic        faps_frwf_wff_wr_en,  //Write Enable of Write FIFO
     output logic        faps_frwf_crf_rd_en  //Read Enable of Cfg Read FIFO
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

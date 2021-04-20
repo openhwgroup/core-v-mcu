@@ -2,7 +2,6 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-`timescale 1ns / 10ps
 
 module serializer_deserializer ( smc_clear_br_cnt, Baud_rate_re_o, Baud_Clk_i ,MOSI_i,MOSI_o, MOSI_OEn_o, MISO_i, SCK_o, SSn0_o, SSn1_o, SSn2_o, SSn3_o, SSn4_o, SSn5_o, SSn6_o, SSn7_o, 
 								 Divisor_i, SPE_i, BIDIROEn_i, SPC0_i, CPOL_i, CPHA_i, LSBFE_i, Bus_CLK_i, RST_i, RST_SYNC_i,test_mode_en,test_clk,

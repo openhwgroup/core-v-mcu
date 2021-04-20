@@ -31,10 +31,6 @@ module fcbssc (
     output logic [7:0] fssc_frfu_cwf_wr_data,  //Write Data of Cfg Write FIFO
     output logic       fssc_frfu_cwf_wr_en  //Write Enable to indicate the whole 32-B
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//

@@ -111,10 +111,7 @@ module fcbpmu #(
     output logic fpmu_frfu_fb_cfg_cleanup,
     output logic fpmu_pmu_busy  //Indicate the PMU is Busy
 );
-  //------------------------------------------------------------------------//
-  //-- Declare Time Unit                                                  --//
-  //------------------------------------------------------------------------//
-  timeunit 1ns; timeprecision 100ps;
+
 
   //------------------------------------------------------------------------//
   //-- Local Parameter                                                    --//
