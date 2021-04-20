@@ -1,7 +1,6 @@
 // Copyright 2021 QuickLogic
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-`timescale 1ns / 1ns
 
 module A2_fifo #(
     parameter FIFO_DEPTH = 4,
