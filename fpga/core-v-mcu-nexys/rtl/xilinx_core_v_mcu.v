@@ -1,14 +1,14 @@
 //-----------------------------------------------------------------------------
 // This file is a generated file
 //-----------------------------------------------------------------------------
-// Title         : PULPissimo Verilog Wrapper
+// Title         : Core-v-mcu Verilog Wrapper
 //-----------------------------------------------------------------------------
-// File          : xilinx_pulpissimo.v
+// File          : xilinx_core_v_mcu.v
 // Author        : Manuel Eggimann  <meggimann@iis.ee.ethz.ch>
 // Created       : 21.05.2019
 //-----------------------------------------------------------------------------
 // Description :
-// Verilog Wrapper of PULPissimo to use the module within Xilinx IP integrator.
+// Verilog Wrapper of Core-v-mcu to use the module within Xilinx IP integrator.
 //-----------------------------------------------------------------------------
 // Copyright (C) 2013-2019 ETH Zurich, University of Bologna
 // Copyright and related rights are licensed under the Solderpad Hardware

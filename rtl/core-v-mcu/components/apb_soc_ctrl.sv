@@ -42,6 +42,9 @@
 
 `define RESET_TYPE1_EFPGA 12'hE8 //BASEADDR+0xE8
 `define ENABLE_IN_OUT_EFPGA 12'hEC //BASEADDR+0xEC
+`define EFPGA_CONTROL 12'hF0
+`define EFPGA_STATUS 12'hF4
+`define EFPGA_VERSION 12'hF8
 `define PAD_CFG_MUX 12'b0100????????  // 0x400 - 7FC for 256 PADMUX
 
 
@@ -78,11 +81,15 @@ module apb_soc_ctrl #(
     output logic                      PREADY,
     output logic                      PSLVERR,
 
-    input logic sel_fll_clk_i,
-    input logic boot_l2_i,
-    input logic bootsel_i,
-    input logic fc_fetch_en_valid_i,
-    input logic fc_fetch_en_i,
+    input  logic        sel_fll_clk_i,
+    input  logic        boot_l2_i,
+    input  logic        bootsel_i,
+    input  logic        fc_fetch_en_valid_i,
+    input  logic        fc_fetch_en_i,
+    input        [31:0] status_out,
+    input        [ 7:0] version,
+    output logic [31:0] control_in,
+
 
     output logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
     output logic [`N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
@@ -114,7 +121,7 @@ module apb_soc_ctrl #(
   localparam IDX_WIDTH = `LOG2(`N_IO);
   localparam CONFIG = 12'h4??;
 
-  (* mark_debug = "yes" *)logic [    IDX_WIDTH-1:0]                   r_io_pad;
+  logic [    IDX_WIDTH-1:0]                   r_io_pad;
 
 
   logic [             31:0]                   r_pwr_reg;
@@ -280,8 +287,9 @@ module apb_soc_ctrl #(
             `REG_CLUSTER_BOOT_ADDR0: r_cluster_boot[31:0] <= PWDATA;
             `REG_CLUSTER_BOOT_ADDR1: r_cluster_boot[63:32] <= PWDATA;
 
-            `RESET_TYPE1_EFPGA:   r_reset_type1_efpga <= PWDATA[3:0];
+            `RESET_TYPE1_EFPGA: r_reset_type1_efpga <= PWDATA[3:0];
             `ENABLE_IN_OUT_EFPGA: r_enable_inout_efpga <= PWDATA[5:0];
+            `EFPGA_CONTROL: control_in <= PWDATA;
             12'h4??: begin
               if (PADDR[9:2] < `N_IO) begin
                 r_io_pad <= PADDR[9:2];
@@ -328,6 +336,9 @@ module apb_soc_ctrl #(
             `REG_CLUSTER_BOOT_ADDR1: PRDATA <= r_cluster_boot[63:32];
             `RESET_TYPE1_EFPGA: PRDATA <= {28'b0, r_reset_type1_efpga};
             `ENABLE_IN_OUT_EFPGA: PRDATA <= {26'b0, r_enable_inout_efpga};
+            `EFPGA_CONTROL: PRDATA <= control_in;
+            `EFPGA_STATUS: PRDATA <= status_out;
+            `EFPGA_VERSION: PRDATA[7:0] <= version;
             default: begin
               PSLVERR <= 1;
               PRDATA  <= 32'hDEADBEEF;

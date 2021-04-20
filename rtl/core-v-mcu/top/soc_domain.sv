@@ -40,11 +40,14 @@ module soc_domain
     parameter int unsigned N_SPI = 1,
     parameter int unsigned N_I2C = 2,
     parameter USE_ZFINX = 1,
-    parameter bit ISOLATE_CLUSTER_CDC = 0, // If 0, ties the cluster <-> soc AXI CDC isolation signal to 0 statically
-    // Do not override, derived.
+    parameter bit ISOLATE_CLUSTER_CDC = 0,
     parameter AXI_STRB_WIDTH_IN = AXI_DATA_IN_WIDTH / 8,
-    parameter AXI_STRB_WIDTH_OUT = AXI_DATA_OUT_WIDTH / 8
+    parameter AXI_STRB_WIDTH_OUT = AXI_DATA_OUT_WIDTH / 8 // If 0, ties the cluster <-> soc AXI CDC isolation signal to 0 statically
+    // Do not override, derived.
 ) (
+
+
+
     input logic ref_clk_i,
     input logic slow_clk_i,
     input logic test_clk_i,
@@ -178,22 +181,22 @@ module soc_domain
     output logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
 
     // Signals to pad frame
-    input  logic [ `N_PERIO-1:0] perio_in_i,
-    output logic [ `N_PERIO-1:0] perio_out_o,
-    output logic [ `N_PERIO-1:0] perio_oe_o,
+    input logic [ `N_PERIO-1:0] 		perio_in_i,
+    output logic [ `N_PERIO-1:0] 		perio_out_o,
+    output logic [ `N_PERIO-1:0] 		perio_oe_o,
     // Signals to gpio controller
-    input  logic [  `N_GPIO-1:0] gpio_in_i,
-    output logic [  `N_GPIO-1:0] gpio_out_o,
-    output logic [  `N_GPIO-1:0] gpio_oe_o,
+    input logic [ `N_GPIO-1:0] 			gpio_in_i,
+    output logic [ `N_GPIO-1:0] 		gpio_out_o,
+    output logic [ `N_GPIO-1:0] 		gpio_oe_o,
     // IO signals to efpga
-    input  logic [`N_FPGAIO-1:0] fpgaio_in_i,
-    output logic [`N_FPGAIO-1:0] fpgaio_out_o,
-    output logic [`N_FPGAIO-1:0] fpgaio_oe_o,
+    input logic [`N_FPGAIO-1:0] 		fpgaio_in_i,
+    output logic [`N_FPGAIO-1:0] 		fpgaio_out_o,
+    output logic [`N_FPGAIO-1:0] 		fpgaio_oe_o,
     // Timers
-    output logic [          3:0] timer_ch0_o,
-    output logic [          3:0] timer_ch1_o,
-    output logic [          3:0] timer_ch2_o,
-    output logic [          3:0] timer_ch3_o,
+    output logic [ 3:0] 			timer_ch0_o,
+    output logic [ 3:0] 			timer_ch1_o,
+    output logic [ 3:0] 			timer_ch2_o,
+    output logic [ 3:0] 			timer_ch3_o,
 
     // output logic [191:0]                  gpio_cfg_o,
     // output logic                          uart_tx_o,
@@ -242,11 +245,7 @@ module soc_domain
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
     input logic [1:0] selected_mode_i,
-    input logic       fpga_clk_1_i,
-    input logic       fpga_clk_2_i,
-    input logic       fpga_clk_3_i,
-    input logic       fpga_clk_4_i,
-    input logic       fpga_clk_5_i,
+    input logic [5:0] fpga_clk_in,
 
     //eFPGA SPIS
     input  logic efpga_fcb_spis_rst_n_i,
@@ -499,7 +498,6 @@ module soc_domain
   XBAR_TCDM_BUS s_lint_hwpe_bus[NB_HWPE_PORTS-1:0] ();
 
   XBAR_TCDM_BUS s_lint_efpga_bus[`N_EFPGA_TCDM_PORTS-1:0] ();
-  XBAR_TCDM_BUS s_lint_efpga_apbprogram_bus ();
   XBAR_TCDM_BUS s_lint_efpga_apbt1_bus ();
 
 `ifdef REMAP_ADDRESS
@@ -596,9 +594,8 @@ module soc_domain
       .l2_rx_master(s_lint_udma_rx_bus),
       .l2_tx_master(s_lint_udma_tx_bus),
 
-      .l2_efpga_tcdm_master  (s_lint_efpga_bus),
-      .efpga_apbprogram_slave(s_lint_efpga_apbprogram_bus),
-      .efpga_apbt1_slave     (s_lint_efpga_apbt1_bus),
+      .l2_efpga_tcdm_master(s_lint_efpga_bus),
+      .efpga_apbt1_slave   (s_lint_efpga_apbt1_bus),
 
       .soc_jtag_reg_i(soc_jtag_reg_tap),
       .soc_jtag_reg_o(soc_jtag_reg_soc),
@@ -678,11 +675,7 @@ module soc_domain
       // .sddata_oen_o           ( sdio_data_oen_o        ),
 
       // other FPGA signals
-      .fpga_clk_1_i(fpga_clk_1_i),
-      .fpga_clk_2_i(fpga_clk_2_i),
-      .fpga_clk_3_i(fpga_clk_3_i),
-      .fpga_clk_4_i(fpga_clk_4_i),
-      .fpga_clk_5_i(fpga_clk_5_i),
+      .fpga_clk_in(fpga_clk_in),
 
       //eFPGA SPIS
       .efpga_fcb_spis_rst_n_i    (efpga_fcb_spis_rst_n_i),
@@ -888,7 +881,6 @@ module soc_domain
       .axi_master_plug      (s_data_in_bus),
       .axi_slave_plug       (s_data_out_bus),
       .apb_peripheral_bus   (s_apb_periph_bus),
-      .tcdm_efpga_apbprogram(s_lint_efpga_apbprogram_bus),
       .tcdm_efpga_apbt1     (s_lint_efpga_apbt1_bus),
       .l2_interleaved_slaves(s_mem_l2_bus),
       .l2_private_slaves    (s_mem_l2_pri_bus),
@@ -930,9 +922,7 @@ module soc_domain
       .tdo_oe_o        ()
   );
 
-  // Set `hartinfo`.
-  // TODO(zarubaf, davideschiavone, timsaxe): Set correct hartinfo struct, based
-  // on selected core/
+  // set hartinfo
   always_comb begin : set_hartinfo
     for (int hartid = 0; hartid < NrHarts; hartid = hartid + 1) begin
       hartinfo[hartid] = RI5CY_HARTINFO;

@@ -1,6 +1,6 @@
 include fpga-settings.mk
 
-PROJECT:=pulpissimo-$(BOARD)
+PROJECT:=core-v-mcu-$(BOARD)
 VIVADO ?= vivado
 
 .DEFAULT_GOAL:=help
