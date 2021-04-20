@@ -290,7 +290,7 @@ module efpga_subsystem
        .push_clk(asic_clk_i),
        .push_rst_n(rst_n),
      .data_req_i(s_lint_REQ),
-     .data_add_i       ( apbt1_i.add[ADDR_WIDTH-1:0] ),
+     .data_add_i       ( apbt1_i.add[APB_FPGA_ADDR_WIDTH-1:0] ),
       .data_wen_i       ( apbt1_i.wen                 ),
       .data_wdata_i     ( apbt1_i.wdata               ),
       .data_be_i        ( apbt1_i.be                  ),
@@ -303,7 +303,7 @@ module efpga_subsystem
 
 //       .push_bus(apbt1_i),
            .data_req_o       (apbt1_int.req                ),
-      .data_add_o       ( apbt1_int.add[ADDR_WIDTH-1:0]  ),
+      .data_add_o       ( apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0]  ),
       .data_wen_o       ( apbt1_int.wen                  ),
       .data_wdata_o     ( apbt1_int.wdata                ),
       .data_be_o        ( apbt1_int.be                   ),
