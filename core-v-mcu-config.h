@@ -11,7 +11,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES ORETH CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
@@ -21,8 +21,8 @@
 #ifndef __CORE_V_MCU_CONFIG_H_
 #define __CORE_V_MCU_CONFIG_H_
 
-#define BUILD_DATE 0x20210415
-#define BUILD_TIME 0x00113703
+#define BUILD_DATE 0x20210420
+#define BUILD_TIME 0x00094427
 
 //  SOC options
 #define N_IO                 48

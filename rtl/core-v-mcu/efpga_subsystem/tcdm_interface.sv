@@ -5,20 +5,20 @@
 module tcdm_interface (
     input efpga_rst,
     input efpga_clk,
-    (* mark_debug = "yes" *)    input efpga_req,
-    (* mark_debug = "yes" *)    output efpga_gnt,
-    (* mark_debug = "yes" *)    output efpga_fmo,
-    (* mark_debug = "yes" *)    output efpga_valid,
-    (* mark_debug = "yes" *)    input [56:0] efpga_req_data, // 20 addr + 4 be, + 32 data + wen
-    (* mark_debug = "yes" *) output [56:0] soc_req_data, // 20 addr + 4 be, + 32 data + wen
-    (* mark_debug = "yes" *) output [31:0] efpga_rdata,
+        input efpga_req,
+        output efpga_gnt,
+        output efpga_fmo,
+        output efpga_valid,
+        input [56:0] efpga_req_data, // 20 addr + 4 be, + 32 data + wen
+     output [56:0] soc_req_data, // 20 addr + 4 be, + 32 data + wen
+     output [31:0] efpga_rdata,
 
     input soc_rst,
     input soc_clk,
-    (* mark_debug = "yes" *)    output soc_req,
-    (* mark_debug = "yes" *)    input soc_gnt,
-    (* mark_debug = "yes" *)    input soc_valid,
-    (* mark_debug = "yes" *) input [31:0] soc_rdata
+        output soc_req,
+        input soc_gnt,
+        input soc_valid,
+     input [31:0] soc_rdata
 );
 
 
