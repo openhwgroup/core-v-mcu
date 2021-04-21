@@ -15,7 +15,6 @@
 module soc_domain
   import dm::*;
 #(
-    parameter logic [1:0] CORE_TYPE = 0,
     parameter USE_FPU = 1,
     parameter USE_HWPE = 1,
     parameter USE_CLUSTER_EVENT = 1,
@@ -324,7 +323,7 @@ module soc_domain
 
   localparam ROM_ADDR_WIDTH = 13;
 
-  localparam FC_CORE_CLUSTER_ID = CORE_TYPE != 3 ? 6'd31 : 6'd0;
+  localparam FC_CORE_CLUSTER_ID = 6'd0;
   localparam CL_CORE_CLUSTER_ID = 6'd0;
 
   localparam FC_CORE_CORE_ID = 4'd0;
@@ -789,7 +788,6 @@ module soc_domain
 `endif
 
   fc_subsystem #(
-      .CORE_TYPE (CORE_TYPE),
       .USE_FPU   (USE_FPU),
       .CORE_ID   (FC_CORE_CORE_ID),
       .CLUSTER_ID(FC_CORE_CLUSTER_ID),
