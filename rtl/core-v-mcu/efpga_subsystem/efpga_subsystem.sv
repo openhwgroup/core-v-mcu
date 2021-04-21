@@ -279,7 +279,7 @@ module efpga_subsystem
        .push_clk(asic_clk_i),
        .push_rst_n(rst_n),
      .data_req_i(s_lint_REQ),
-     .data_add_i       ( apbt1_i.add),
+     .data_add_i       ( apbt1_i.add[19:0]),
       .data_wen_i       ( apbt1_i.wen                 ),
       .data_wdata_i     ( apbt1_i.wdata               ),
       .data_be_i        ( apbt1_i.be                  ),

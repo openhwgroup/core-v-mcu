@@ -212,7 +212,7 @@ module soc_peripherals #(
 
 
   //eFPGA parameters
-  localparam APB_EFPGA_HWCE_ADDR_WIDTH = 32;
+  localparam APB_EFPGA_HWCE_ADDR_WIDTH = 20;
   localparam TCDM_EFPGA_ADDR_WIDTH = 32;
   localparam N_EFPGA_EVENTS = 16;
 
