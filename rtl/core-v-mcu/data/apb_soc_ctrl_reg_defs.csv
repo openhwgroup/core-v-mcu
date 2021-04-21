@@ -24,6 +24,22 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,HOUR,23,16,RO,,Hour in BCD
 ,MINUTES,15,8,RO,,Minutes in BCD
 ,SECONDS,7,0,RO,,Seconds in BCD
+0x0014,IO_CFG0,,,,,
+,N_GPIO,23,16,RO,`N_GPIO,Number of IO connected to GPIO controller
+,N_SYSIO,15,8,RO,`N_SYSIO,Number of fixed-function IO
+,N_IO,7,0,RO,`N_IO,Number of IO on device (not necessarily on package)
+0x0018,IO_CFG1,,,,,
+,NBIT_PADMUX,15,8,RO,`NBIT_PADMUX,"Number of bits in pad mux select, which means there are 2^NBIT_PADMUX options"
+,NBIT_PADCFG,7,0,RO,`NBIT_PADCFG,Number of bits in padconfiguration
+0x0020,PER_CFG0,,,,,
+,N_I2SC,31,24,RO,`N_I2SC,Number of I2S clients
+,N_I2CM,23,16,RO,`N_I2CM,Number of I2C masters
+,N_QSPIM,15,8,RO,`N_QSPIM,Number of QSPI masters
+,N_UART,7,0,RO,`N_UART,Number of UARTs
+0x0024,PER_CFG1,,,,,
+,N_CAM,15,8,RO,`N_CAM,Number of Camera controllers
+,N_SDIO,7,0,RO,`N_SDIO,Number of SDIO controllers
+,,,,,,
 0x0074,JTAGREG,,,,,JTAG register
 0x00A0,CORESTATUS,,,,,
 ,EOC,31,31,RW,,EOC condition

@@ -9,6 +9,7 @@ CORE-V-MCU User Manual
     :maxdepth: 1
     
     doc-src/overview.md
+    github.md
     auto-docs/apb_soc_ctrl_reg_defs
     auto-docs/apb_interrupt_cntrl_reg_defs
     auto-docs/apb_timer_unit_reg_defs

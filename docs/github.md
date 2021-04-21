@@ -1,5 +1,9 @@
 # Github
 
+We encourage people to get involved and contribute to this project.
+
+As with any activity, we have our ways-of-working that help keep entropy under control.
+
 Working with Git and Github can be quite a steep learning curve. Here is an
 attempt to collect general best-practices and recipes.
 
