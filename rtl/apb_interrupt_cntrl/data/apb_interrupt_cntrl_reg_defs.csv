@@ -1,0 +1,113 @@
+Module,APB_INTERRUPT_CNTRL,,,,,
+,Memory address: EU_START_ADDR(`EU_START_ADDR),,,,,
+Register,Offset/Field,MSB,LSB,Type,Default,Description
+0x000,REG_MASK,,,RW,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x004,REG_MASK_SET,,,W1S,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x008,REG_MASK_CLEAR,,,W1C,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x00C,REG_INT,,,RW,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x010,REG_INT_SET,,,W1S,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x014,REG_INT_CLEAR,,,W1C,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x018,REG_ACK,,,W,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x01C,REG_ACK_SET,,,W1S,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x020,REG_ACK_CLEAR,,,W1C,,
+,fc_hp_events,31,30,,,
+,fc_err_events,29,29,,,
+,unused1,28,24,,0x00,
+,ref_change_event,23,23,,,ref_rise or ref_fall
+,adv_timer_evens,22,19,,,
+,gpio_event,18,18,,,
+,timer_hi_event,17,17,,,
+,timer_lo_event,16,16,,,
+,unused2,15,8,,0x00,
+,timer_lo_event,7,7,,,MTIME irq
+,reserved,6,0,,,Reserved for s/w events routed to irq3?
+0x024,REG_FIFO,,,,,
+,EVENT_ID,7,0,RO,,ID of triggering event
