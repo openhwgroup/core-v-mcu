@@ -10,7 +10,6 @@
 
 
 module fc_subsystem #(
-    parameter logic [1:0] CORE_TYPE           = 0,
     parameter             USE_FPU             = 1,
     parameter             USE_HWPE            = 1,
     parameter             N_EXT_PERF_COUNTERS = 1,
@@ -45,18 +44,6 @@ module fc_subsystem #(
     output logic stoptimer_o,
     output logic supervisor_mode_o
 );
-
-  typedef enum logic [1:0] {
-    RiscyCore     = 0,
-    IbexCoreRVIMC = 1,
-    IbexCoreRVEC  = 2,
-    cv32e40pCore  = 3
-  } core_t;
-
-  localparam core_t CoreSelected = core_t'(CORE_TYPE);
-
-  localparam IBEX_RV32M = CoreSelected == IbexCoreRVIMC;
-  localparam IBEX_RV32E = CoreSelected == IbexCoreRVEC;
 
   // Interrupt signals
   logic        core_irq_req;
@@ -93,7 +80,7 @@ module fc_subsystem #(
   assign perf_counters_int = 1'b0;
   assign fetch_en_int = fetch_en_eu & fetch_en_i;
 
-  assign hart_id = CoreSelected != cv32e40pCore ? {21'b0, CLUSTER_ID[5:0], 1'b0, CORE_ID[3:0]} : '0;
+  assign hart_id = '0;
 
   XBAR_TCDM_BUS core_data_bus ();
   XBAR_TCDM_BUS core_instr_bus ();
@@ -126,9 +113,9 @@ module fc_subsystem #(
   //************ RISCV CORE ********************************
   //********************************************************
 
-  if (CoreSelected == cv32e40pCore) begin : gen_fc_core_cv32e40p
     // OpenHW Group CV32E40P
     assign boot_addr = boot_addr_i;
+
     cv32e40p_core #(
         .PULP_XPULP(1)
     ) lFC_CORE (
@@ -183,91 +170,16 @@ module fc_subsystem #(
         .fetch_enable_i   (fetch_en_int),
         .core_sleep_o     ()
     );
-
-  end else if (CoreSelected == IbexCoreRVEC || CoreSelected == IbexCoreRVIMC) begin: gen_fc_core_ibex
-    assign boot_addr = boot_addr_i & 32'hFFFFFF00; // RI5CY expects 0x80 offset, Ibex expects 0x00 offset (adds reset offset 0x80 internally)
-
-    // TODO: Re-enable tracing if necessary
-    ibex_core #(
-        .PMPEnable               (1'b0),
-        .MHPMCounterNum          (10),
-        .MHPMCounterWidth        (40),
-        .RV32E                   (IBEX_RV32E),
-        .RV32M                   (IBEX_RV32M),
-        .RV32B                   (1'b0),
-        .BranchTargetALU         (1'b0),
-        .WritebackStage          (1'b0),
-        .MultiplierImplementation("fast"),
-        .ICache                  (1'b0),
-        .DbgTriggerEn            (1'b1),
-        .SecureIbex              (1'b0),
-        .DmHaltAddr              (32'h1A110800),
-        .DmExceptionAddr         (32'h1A110808)
-    ) lFC_CORE (
-        .clk_i (clk_i),
-        .rst_ni(rst_ni),
-
-        .test_en_i(test_en_i),
-
-        .hart_id_i  (hart_id),
-        .boot_addr_i(boot_addr),
-
-        // Instruction Memory Interface:  Interface to Instruction Logaritmic interconnect: Req->grant handshake
-        .instr_addr_o  (core_instr_addr),
-        .instr_req_o   (core_instr_req),
-        .instr_rdata_i (core_instr_rdata),
-        .instr_gnt_i   (core_instr_gnt),
-        .instr_rvalid_i(core_instr_rvalid),
-        .instr_err_i   (core_instr_err),
-
-        // Data memory interface:
-        .data_addr_o  (core_data_addr),
-        .data_req_o   (core_data_req),
-        .data_be_o    (core_data_be),
-        .data_rdata_i (core_data_rdata),
-        .data_we_o    (core_data_we),
-        .data_gnt_i   (core_data_gnt),
-        .data_wdata_o (core_data_wdata),
-        .data_rvalid_i(core_data_rvalid),
-        .data_err_i   (core_data_err),
-
-        .irq_software_i(1'b0),
-        .irq_timer_i   (1'b0),
-        .irq_external_i(1'b0),
-        .irq_fast_i    (15'b0),
-        .irq_nm_i      (1'b0),
-
-        .irq_x_i       (core_irq_x),
-        .irq_x_ack_o   (core_irq_ack),
-        .irq_x_ack_id_o(core_irq_ack_id),
-
-        .debug_req_i(debug_req_i),
-
-        .fetch_enable_i(fetch_en_int),
-        .core_sleep_o  ()
-    );
-  end else begin : gen_failure
-    initial begin
-      $error("[%t] CORE_TYPE %d is not supported", $time, CoreSelected);
-      $stop();
-    end
-  end
-
   assign supervisor_mode_o = 1'b1;
 
-  generate
-    if (CoreSelected != RiscyCore) begin : gen_convert_irqs
-      // Ibex and CV32E40P supports 32 additional fast interrupts and reads the interrupt lines directly.
-      // Convert ID back to interrupt lines
-      always_comb begin : gen_core_irq_x
-        core_irq_x = '0;
-        if (core_irq_req) begin
-          core_irq_x[core_irq_id] = 1'b1;
-        end
-      end
-
+  // Ibex and CV32E40P supports 32 additional fast interrupts and reads the interrupt lines directly.
+  // Convert ID back to interrupt lines
+  always_comb begin : gen_core_irq_x
+    core_irq_x = '0;
+    if (core_irq_req) begin
+      core_irq_x[core_irq_id] = 1'b1;
     end
-  endgenerate
+  end
 
   apb_interrupt_cntrl #(
       .PER_ID_WIDTH(PER_ID_WIDTH),
