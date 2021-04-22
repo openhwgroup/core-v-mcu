@@ -68,9 +68,10 @@ filesets:
     - components/apb_soc_ctrl.sv
     - components/pulp_interfaces.sv
     - efpga_subsystem/efpga_subsystem.sv
-    - efpga_subsystem/apb_efpga_hwce.sv
-    - efpga_subsystem/dc_accelerator_fsm.sv
-    - efpga_subsystem/efpga_sel_clk_dc_fifo.sv
+    - efpga_subsystem/A2_fifo.sv
+    - efpga_subsystem/A2_fifo_ctl.sv
+    - efpga_subsystem/A2_fifo_ram.sv
+    - efpga_subsystem/tcdm_interface.sv
     - top/pad_control.sv
     - top/pad_frame.sv
     - top/safe_domain.sv
@@ -88,6 +89,7 @@ targets:
     filesets:
     - files_rtl_generic
     - target_sim? (rtl-behavioral)
+    - target_lint? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:

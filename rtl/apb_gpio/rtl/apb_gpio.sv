@@ -18,7 +18,7 @@
 `define REG_SETDIR 12'h038
 `define REG_SETINT 12'h03C
 
-module apb_gpio #(
+module apb_gpiov2 #(
     parameter int unsigned NrGPIO = 32,
     parameter APB_ADDR_WIDTH = 12
 ) (
