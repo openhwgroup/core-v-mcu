@@ -1,4 +1,6 @@
-
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 # Directory where generated md files go
 AUTO_MD_DIR=auto-docs
@@ -18,13 +20,13 @@ all:    doc
 clean:
 				rm ${MDFILES}
 				(cd sphinx-source; make clean)
-				
+
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
 
 doc:    ${MD_FILES}
 				make -f make-sphinx.mk html
-				
+
 
 ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 			@mkdir -p ${AUTO_MD_DIR}
