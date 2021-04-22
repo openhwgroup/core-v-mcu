@@ -124,13 +124,13 @@ module pad_frame (
   assign jtag_tdi_o = io[9];
 `endif
 `ifndef PULP_FPGA_EMUL
-  pad_functional_pu i_pad_10 (
-      .OEN(1'b1),
-      .I  (),
-      .O  (jtag_tdo_i),
-      .PAD(io[10]),
-      .PEN(1'b1)
-  );
+  // pad_functional_pu i_pad_10 (
+  //     .OEN(1'b1),
+  //     .I  (),
+  //     .O  (jtag_tdo_i),
+  //     .PAD(io[10]),
+  //     .PEN(1'b1)
+  // );
 `else
   assign io[10] = jtag_tdo_i;
 `endif

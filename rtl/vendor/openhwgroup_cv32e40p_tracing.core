@@ -81,5 +81,5 @@ targets:
     - target_sim? (latch_regfile)
     - target_sim? (files_tracer)
     - target_lint? (files_sim)
-    - tool_xilinx? (ff_regfile)
+    - tool_vivado? (ff_regfile)
     - tool_verilator? (ff_regfile)
