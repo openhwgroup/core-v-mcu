@@ -50,7 +50,7 @@ def write_license_header(outfile, define):
     outfile.write(" *\n")
     outfile.write(" * Unless required by applicable law or agreed to in writing, software\n")
     outfile.write(' * distributed under the License is distributed on an "AS IS" BASIS,\n')
-    outfile.write(" * WITHOUT WARRANTIES ORETH CONDITIONS OF ANY KIND, either express or implied.\n")
+    outfile.write(" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n")
     outfile.write(" * See the License for the specific language governing permissions and\n")
     outfile.write(" * limitations under the License.\n")
     outfile.write(" *\n")
