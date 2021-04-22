@@ -31,7 +31,7 @@ filesets:
 
   genesys2-cfg:
     files:
-      - fpga/genesys2.tcl
+    - fpga/genesys2.tcl
     file_type: tclSource
 
   xilinx-ips:
@@ -51,17 +51,17 @@ parameters:
 targets:
   genesys2:
     default_tool: vivado
-    parameters : [PULP_FPGA_EMUL=true]
+    parameters: [PULP_FPGA_EMUL=true]
     description: Digilent Genesys2 Board
-    filesets :
+    filesets:
     - files-rtl
     - genesys2-cfg
     - genesys2-xdc
     - xilinx-ips
     tools:
       vivado:
-        part : xc7k325tffg900-2
-    toplevel : xilinx_core_v_mcu
+        part: xc7k325tffg900-2
+    toplevel: xilinx_core_v_mcu
 
 
 
