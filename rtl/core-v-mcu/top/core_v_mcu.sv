@@ -12,7 +12,7 @@
 `include "pulp_peripheral_defines.svh"
 
 module core_v_mcu #(
-    parameter USE_FPU = 1,
+    parameter USE_FPU  = 1,
     parameter USE_HWPE = 1
 ) (
     inout wire [`N_IO-1:0] io
