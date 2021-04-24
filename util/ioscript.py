@@ -696,14 +696,16 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
         pad_frame_sv.write("    );\n")
         
+        pad_frame_sv.write("    // dummy wire to make lint clean\n")
+        pad_frame_sv.write("    wire void1;\n")
         pad_frame_sv.write("    // connect io\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 pad_frame_sv.write("    `ifndef PULP_FPGA_EMUL\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I( ), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I(%s), .O(void1), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 else:
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O( ), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(1'b0), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 pad_frame_sv.write("    `else\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
                     pad_frame_sv.write("      assign io[%d] = %s;\n" %(ionum, sysionames[ionum]))
