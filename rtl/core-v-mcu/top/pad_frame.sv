@@ -36,6 +36,8 @@ module pad_frame (
     // pad signals
     inout wire [`N_IO-1:0] io
 );
+  // dummy wire to make lint clean
+  wire void1;
   // connect io
   pad_functional_pd i_pad_0 (
       .OEN(~io_oe_i[0]),
@@ -82,8 +84,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_6 (
       .OEN(1'b0),
-      .I  (ref_clk_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (ref_clk_o),
       .PAD(io[6]),
       .PEN(1'b1)
   );
@@ -93,8 +95,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_7 (
       .OEN(1'b0),
-      .I  (rstn_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (rstn_o),
       .PAD(io[7]),
       .PEN(1'b1)
   );
@@ -104,8 +106,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_8 (
       .OEN(1'b0),
-      .I  (jtag_tck_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (jtag_tck_o),
       .PAD(io[8]),
       .PEN(1'b1)
   );
@@ -115,8 +117,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_9 (
       .OEN(1'b0),
-      .I  (jtag_tdi_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (jtag_tdi_o),
       .PAD(io[9]),
       .PEN(1'b1)
   );
@@ -124,21 +126,21 @@ module pad_frame (
   assign jtag_tdi_o = io[9];
 `endif
 `ifndef PULP_FPGA_EMUL
-  // pad_functional_pu i_pad_10 (
-  //     .OEN(1'b1),
-  //     .I  (),
-  //     .O  (jtag_tdo_i),
-  //     .PAD(io[10]),
-  //     .PEN(1'b1)
-  // );
+  pad_functional_pu i_pad_10 (
+      .OEN(1'b1),
+      .I  (jtag_tdo_i),
+      .O  (void1),
+      .PAD(io[10]),
+      .PEN(1'b1)
+  );
 `else
   assign io[10] = jtag_tdo_i;
 `endif
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_11 (
       .OEN(1'b0),
-      .I  (jtag_tms_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (jtag_tms_o),
       .PAD(io[11]),
       .PEN(1'b1)
   );
@@ -148,8 +150,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_12 (
       .OEN(1'b0),
-      .I  (jtag_trst_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (jtag_trst_o),
       .PAD(io[12]),
       .PEN(1'b1)
   );
@@ -173,8 +175,8 @@ module pad_frame (
 `ifndef PULP_FPGA_EMUL
   pad_functional_pu i_pad_15 (
       .OEN(1'b0),
-      .I  (bootsel_o),
-      .O  (),
+      .I  (1'b0),
+      .O  (bootsel_o),
       .PAD(io[15]),
       .PEN(1'b1)
   );

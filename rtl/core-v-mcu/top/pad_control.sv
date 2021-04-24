@@ -438,7 +438,7 @@ module pad_control (
                          ((pad_mux_i[12] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[12] == 2'd2) ? 1'b0 :
                          ((pad_mux_i[12] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[13] = ((pad_mux_i[13] == 2'd0) ? 1'b1 :
+  assign io_oe_o[13] = ((pad_mux_i[13] == 2'd0) ? perio_oe_i[`PERIO_I2CM0_SCL] :
                          ((pad_mux_i[13] == 2'd1) ? 1'b1 :
                          ((pad_mux_i[13] == 2'd2) ? 1'b1 :
                          ((pad_mux_i[13] == 2'd3) ? gpio_oe_i[0] : 1'b0))));
@@ -471,7 +471,7 @@ module pad_control (
                          ((pad_mux_i[20] == 2'd2) ? 1'b0 :
                          ((pad_mux_i[20] == 2'd3) ? 1'b0 : 1'b0))));
   assign io_oe_o[21] = ((pad_mux_i[21] == 2'd0) ? 1'b1 :
-                         ((pad_mux_i[21] == 2'd1) ? 1'b1 :
+                         ((pad_mux_i[21] == 2'd1) ? perio_oe_i[`PERIO_I2CM0_SCL] :
                          ((pad_mux_i[21] == 2'd2) ? gpio_oe_i[6] :
                          ((pad_mux_i[21] == 2'd3) ? 1'b1 : 1'b0))));
   assign io_oe_o[22] = ((pad_mux_i[22] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_DATA0] :
@@ -479,7 +479,7 @@ module pad_control (
                          ((pad_mux_i[22] == 2'd2) ? gpio_oe_i[7] :
                          ((pad_mux_i[22] == 2'd3) ? 1'b0 : 1'b0))));
   assign io_oe_o[23] = ((pad_mux_i[23] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_DATA1] :
-                         ((pad_mux_i[23] == 2'd1) ? 1'b1 :
+                         ((pad_mux_i[23] == 2'd1) ? perio_oe_i[`PERIO_I2CM1_SCL] :
                          ((pad_mux_i[23] == 2'd2) ? gpio_oe_i[8] :
                          ((pad_mux_i[23] == 2'd3) ? 1'b0 : 1'b0))));
   assign io_oe_o[24] = ((pad_mux_i[24] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_DATA2] :
@@ -570,7 +570,7 @@ module pad_control (
                          ((pad_mux_i[45] == 2'd1) ? gpio_oe_i[5] :
                          ((pad_mux_i[45] == 2'd2) ? gpio_oe_i[30] :
                          ((pad_mux_i[45] == 2'd3) ? 1'b1 : 1'b0))));
-  assign io_oe_o[46] = ((pad_mux_i[46] == 2'd0) ? 1'b1 :
+  assign io_oe_o[46] = ((pad_mux_i[46] == 2'd0) ? perio_oe_i[`PERIO_I2CM1_SCL] :
                          ((pad_mux_i[46] == 2'd1) ? gpio_oe_i[5] :
                          ((pad_mux_i[46] == 2'd2) ? gpio_oe_i[31] :
                          ((pad_mux_i[46] == 2'd3) ? 1'b1 : 1'b0))));

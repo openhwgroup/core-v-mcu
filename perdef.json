@@ -62,7 +62,7 @@
 		"usable":	true,
 		"type":		"udma",
 		"ports": {
-			"scl"	: "output",
+			"scl"	: "bidir",
 			"sda"	: "bidir"
 		},
 		"udma_tx": ["tx_i2cm" ],
