@@ -17,3 +17,4 @@ CORE-V-MCU User Manual
     auto-docs/udma_ctrl_reg_defs
     auto-docs/udma_uart_reg_defs
     auto-docs/udma_i2cm_reg_defs
+    auto-docs/udma_qspi_reg_defs

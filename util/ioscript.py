@@ -1134,13 +1134,38 @@ if args.reg_def_csv != None and args.reg_def_md != None:
             reg_table = csv.reader(rdf_input)
             finished_header = False
             for reg in reg_table:
-                if reg[0] == "Register":
+                if reg[0] == "Register" or reg[0] == "Code":
                     finished_header = True
                     break
                 if reg[0] == "Module" or reg[0] == "Title":
                     rdf_output.write("# %s\n\n" % evaluate_defines(reg[1]))
                 else:
                     rdf_output.write("%s\n" % evaluate_defines(reg[1]))
+        rdf_input.close()
+        with open(args.reg_def_csv, 'r') as rdf_input:
+            reg_table = csv.reader(rdf_input)
+            table_format = "| %-4s | %15s | %5s | %-15s |\n"
+            finished_header = False
+            for reg in reg_table:
+                if reg[0] == "Register":
+                    break
+                if reg[0] == "Code":
+                    finished_header = True
+                    rdf_output.write(table_format % ("Code", "Command/Field",  "Bits", "Description"))
+                    rdf_output.write(table_format % ("---", "--------------", "-----", "-------------------------"))
+                    continue
+                if not finished_header:
+                    continue
+                if reg[1] != "":
+                    cmdstring = reg[1]
+                else:
+                    cmdstring = reg[2]
+                if len(reg) == 2:
+                    rdf_output.write(table_format % (reg[0], reg[1], "", "", ""))
+                elif len(reg) >= 5 and reg[3] == '':
+                    rdf_output.write(table_format % (reg[0], cmdstring, "", reg[5]))
+                elif len(reg) >= 5 and reg[3] != '':
+                    rdf_output.write(table_format % (reg[0], cmdstring, reg[3]+":"+reg[4], reg[5]))
         rdf_input.close()
         with open(args.reg_def_csv, 'r') as rdf_input:
             reg_table = csv.reader(rdf_input)
