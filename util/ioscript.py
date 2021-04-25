@@ -1210,6 +1210,7 @@ if args.reg_def_csv != None and args.reg_def_md != None:
         rdf_output.write("| RO          | Read Only    |\n")
         rdf_output.write("| RC          | Read & Clear after read |\n")
         rdf_output.write("| WO          | Write Only |\n")
+        rdf_output.write("| WC          | Write Clears (value ignored; always writes a 0) |\n")
         rdf_output.write("| WS          | Write Sets (value ignored; always writes a 1) |\n")
         rdf_output.write("| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |\n")
         rdf_output.write("| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |\n")
