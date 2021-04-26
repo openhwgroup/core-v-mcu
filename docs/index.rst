@@ -1,22 +1,19 @@
-.. CORE-V MCU documentation master file, created by
-   sphinx-quickstart on Sat Apr 10 16:28:27 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. core-v-mcu User Manual master file
+   created by Sphinx from Word 08:21 19 Mar 2021
 
-Welcome to CORE-V MCU's documentation!
-======================================
+======================
+CORE-V-MCU User Manual
+======================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   github
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+..  toctree::
+    :maxdepth: 1
+    
+    doc-src/overview.md
+    github.md
+    auto-docs/apb_soc_ctrl_reg_defs
+    auto-docs/apb_interrupt_cntrl_reg_defs
+    auto-docs/apb_timer_unit_reg_defs
+    auto-docs/apb_gpio_reg_defs
+    auto-docs/udma_ctrl_reg_defs
+    auto-docs/udma_uart_reg_defs
+    auto-docs/udma_i2cm_reg_defs
