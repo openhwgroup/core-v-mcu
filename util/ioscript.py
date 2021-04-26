@@ -39,6 +39,7 @@ parser.add_argument("--reg-def-csv", help="register definition file (csv)")
 parser.add_argument("--reg-def-h", help="register definition C header file (h)")
 parser.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 parser.add_argument("--reg-def-md", help="register definition markdown file (md)")
+parser.add_argument("--pin-table-md", help="pin table markdown file (md)")
 args = parser.parse_args()
 
 #
@@ -1216,6 +1217,36 @@ if args.reg_def_csv != None and args.reg_def_md != None:
         rdf_output.write("| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |\n")
         rdf_output.write("| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |\n")
     rdf_output.close()
+
+######################################################################
+#
+# Write .md file for pin table
+#
+######################################################################    
+
+if args.pin_table_md != None and args.soc_defines != None and args.pin_table != None:
+    print("Writing '%s'" % args.pin_table_md)
+    with open(args.pin_table_md, 'w') as rdf_output:
+        rdf_output.write("# Pin Assignment\n")
+        rdf_output.write("\n| IO | sysio |")
+        for i in range(N_PADSEL):
+            rdf_output.write(" sel=%d |" % (i))
+        rdf_output.write("\n")
+        rdf_output.write("| --- | --- |")
+        for i in range(N_PADSEL):
+            rdf_output.write(" --- |")
+        rdf_output.write("\n")
+        with open(args.pin_table, 'r') as f_pin_table:
+            pin_table = csv.reader(f_pin_table)
+            pin_num = -2
+            for pin in pin_table:
+                pin_num = pin_num + 1
+                if pin_num >= 0:
+                    # Work to do
+                    rdf_output.write("| %s | %s |" % (pin[1], pin[3]))
+                    for i in range(N_PADSEL):
+                        rdf_output.write(" %s |" % (pin[4+i]))
+                    rdf_output.write("\n")
 
 ######################################################################
 #

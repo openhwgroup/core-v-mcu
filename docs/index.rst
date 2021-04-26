@@ -10,6 +10,7 @@ CORE-V-MCU User Manual
     
     doc-src/overview.md
     github.md
+    auto-docs/pin-table
     auto-docs/apb_soc_ctrl_reg_defs
     auto-docs/apb_interrupt_cntrl_reg_defs
     auto-docs/apb_timer_unit_reg_defs

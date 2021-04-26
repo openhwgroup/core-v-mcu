@@ -11,6 +11,7 @@ $(info ${FOO})
 SRCS=$(shell find ../rtl -name '*.csv' -print)
 $(info ${SRCS})
 MD_FILES:=$(addprefix ${AUTO_MD_DIR}/,$(notdir $(SRCS:.csv=.md)))
+MD_FILES+=${AUTO_MD_DIR}/pin-table.md
 $(info ${MD_FILES})
 
 INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
@@ -35,3 +36,14 @@ ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
 				--reg-def-csv $<\
 				--reg-def-md $@
+				
+${AUTO_MD_DIR}/pin-table.md: ../pin-table.csv
+			@mkdir -p ${AUTO_MD_DIR}
+			@python3 ../util/ioscript.py\
+				--soc-defines ../rtl/includes/pulp_soc_defines.sv\
+				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
+				--peripheral-defines peripheral-defines.svh\
+				--perdef-json ../perdef.json\
+				--pin-table $<\
+				--pin-table-md $@
+			rm peripheral-defines.svh
