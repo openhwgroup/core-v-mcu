@@ -19,3 +19,4 @@ CORE-V-MCU User Manual
     auto-docs/udma_i2cm_reg_defs
     auto-docs/udma_qspi_reg_defs
     auto-docs/udma_sdio_reg_defs
+    auto-docs/udma_camera_reg_defs

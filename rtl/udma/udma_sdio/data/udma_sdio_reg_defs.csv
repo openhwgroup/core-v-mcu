@@ -27,11 +27,11 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0x10,TX_SADDR,,,,,
 ,SADDR,11,0,RW,,Address of transmit memory buffer:
 ,,,,,,"- Read: value of pointer until transfer is over, then 0"
-,,,,,,- Write: set memory buffer start address
+,,,,,,#NAME?
 0x14,TX_SIZE,,,,,
 ,SIZE,15,0,RW,,Buffer size in bytes (1MB max)
-,,,,,,- Read: bytes remaining until transfer complete
-,,,,,,- Write: set number of bytes to transfer
+,,,,,,#NAME?
+,,,,,,#NAME?
 0x18,TX_CFG,,,,,
 ,CLR,5,5,WO,,Clear the transmit channel
 ,PENDING,5,5,RO,,Transmit transaction is pending
