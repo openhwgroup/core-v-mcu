@@ -24,6 +24,7 @@ filesets:
   rtl_primitives:
     files:
     - pulp_platform_tech_cells_generic/src/deprecated/pad_functional.sv
+    file_type: systemVerilogSource
 
   rtl:
     files:
@@ -45,9 +46,8 @@ filesets:
 targets:
   default:
     filesets:
+    - rtl_primitives
     - rtl
     - target_sim? (rtl_sim)
     - target_lint? (rtl_sim)
-    - tool_xilinx? (rtl_xilinx)
-    - ! tool_verilator? (rtl_primitives)
 

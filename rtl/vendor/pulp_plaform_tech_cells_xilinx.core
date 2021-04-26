@@ -1,0 +1,26 @@
+CAPI=2:
+
+name: pulp-platform.org::tech_cells_xilinx
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+filesets:
+  rtl_xilinx:
+    files:
+    - pulp_platform_tech_cells_generic/src/deprecated/cluster_clk_cells_xilinx.sv
+    - pulp_platform_tech_cells_generic/src/deprecated/cluster_pwr_cells.sv
+    - pulp_platform_tech_cells_generic/src/deprecated/pulp_clk_cells_xilinx.sv
+    - pulp_platform_tech_cells_generic/src/deprecated/pulp_pwr_cells.sv
+    - pulp_platform_tech_cells_generic/src/deprecated/pulp_buffer.sv
+    - pulp_platform_tech_cells_generic/src/fpga/tc_clk_xilinx.sv
+    - pulp_platform_tech_cells_generic/src/fpga/tc_sram_xilinx.sv
+    - pulp_platform_tech_cells_generic/src/tc_pwr.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - rtl_xilinx
+

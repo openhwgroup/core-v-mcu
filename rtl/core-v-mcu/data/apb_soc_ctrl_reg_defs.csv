@@ -1,0 +1,73 @@
+Module,SOC_CTRL,,,,,
+, Memory address: SOC_CTRL_START_ADDR (`SOC_CTRL_START_ADDR),,,,,
+,,,,,,
+,This APB peripheral primarily controls I/O configuration and I/O function connection. ,,,,,
+,It also supports a few registers for miscellaneous functions.,,,,,
+,,,,,,
+,I/O control supports two functions:,,,,,
+,,,,,,
+,* I/O configuration,,,,,
+,* I/O function selection,,,,,
+,,,,,,
+,"I/O configuration is a series of bits that control driver characteristics, such as drive strength and slew rate.",,,,,
+,I/O function selection controls the select field of a mux that connects the I/O to different signals in the device.,,,,,
+,,,,,,
+Register,Offset/Field,MSB,LSB,Type,Default,Description
+0x0000,INFO,,,,,
+,N_CORES,31,16,RO,,Number of cores in design
+,N_CLUSTERS,15,0,RO,,Number of clusters in design
+0x000C,BUILD_DATE,,,,,
+,YEAR,31,16,RO,,Year in BCD
+,MONTH,15,8,RO,,Month in BCD
+,DAY,7,0,RO,,Day in BCD
+0x0010,BUILD_TIME,,,,,
+,HOUR,23,16,RO,,Hour in BCD
+,MINUTES,15,8,RO,,Minutes in BCD
+,SECONDS,7,0,RO,,Seconds in BCD
+0x0014,IO_CFG0,,,,,
+,N_GPIO,23,16,RO,`N_GPIO,Number of IO connected to GPIO controller
+,N_SYSIO,15,8,RO,`N_SYSIO,Number of fixed-function IO
+,N_IO,7,0,RO,`N_IO,Number of IO on device (not necessarily on package)
+0x0018,IO_CFG1,,,,,
+,NBIT_PADMUX,15,8,RO,`NBIT_PADMUX,"Number of bits in pad mux select, which means there are 2^NBIT_PADMUX options"
+,NBIT_PADCFG,7,0,RO,`NBIT_PADCFG,Number of bits in padconfiguration
+0x0020,PER_CFG0,,,,,
+,N_I2SC,31,24,RO,`N_I2SC,Number of I2S clients
+,N_I2CM,23,16,RO,`N_I2CM,Number of I2C masters
+,N_QSPIM,15,8,RO,`N_QSPIM,Number of QSPI masters
+,N_UART,7,0,RO,`N_UART,Number of UARTs
+0x0024,PER_CFG1,,,,,
+,N_CAM,15,8,RO,`N_CAM,Number of Camera controllers
+,N_SDIO,7,0,RO,`N_SDIO,Number of SDIO controllers
+,,,,,,
+0x0074,JTAGREG,,,,,JTAG register
+0x00A0,CORESTATUS,,,,,
+,EOC,31,31,RW,,EOC condition
+,STATUS,30,0,RW,,Status bits
+0x00C0,CS_RO,,,,,Read Only mirror
+,EOC,31,31,RO,,EOC condition
+,STATUS,30,0,RO,,Status bits
+0x00C4,BOOTSEL,,,,,
+0x00C8,CLKSEL,,,,,
+0x00D8,CLK_DIV_CLU,,,,,
+0x00E0,SEL_CLK_DC_FIFO_EFPGA,,,,,
+0x00E4,CLK_GATING_DC_FIFO_EFPGA,,,,,
+0x00E8,RESET_TYPE1_EFPGA,,,,,
+,RESET_LB,3,3,R/W,0x0 ,Reset eFPGA Left Bottom Quadrant
+,RESET_RB,2,2,R/W,0x0 ,Reset eFPGA Right Bottom Quadrant
+,RESET_RT,1,1,R/W,0x0 ,Reset eFPGA Right Top Quadrant
+,RESET_LT,0,0,R/W,0x0 ,Reset eFPGA Left Top Quadrant
+0x00EC,ENABLE_IN_OUT_EFPGA,,,,,
+,ENABLE_EVENTS,5,5,R/W,0x00,Enable events from efpga to SOC
+,ENABLE_SOC_ACCESS,4,4,R/W,0x0 ,Enable SOC memory mapped access to EFPGA
+,ENABLE_TCDM_P3,3,3,R/W,0x0 ,Enable EFPGA access via TCDM port 3
+,ENABLE_TCDM_P2,2,2,R/W,1x0 ,Enable EFPGA access via TCDM port 2
+,ENABLE_TCDM_P1,1,1,R/W,2x0 ,Enable EFPGA access via TCDM port 1
+,ENABLE_TCDM_P0,0,0,R/W,3x0 ,Enable EFPGA access via TCDM port 0
+0x00F0,EFPGA_CONTROL_IN,31,0,RW,0x00,EFPGA control  bits use per eFPGA design 
+0x00F4,EFPGA_STATUS_OUT,31,0,R0,,Status from eFPGA 
+,EFPGA_VERSION,7,0,R0,,EFPGA version info
+,,,,,,
+0x0400,IO_CTRL[`N_IO],,,,,
+,CFG,+`NBIT_PADCFG,8,RW,0x00,Pad configuration (TBD)
+,MUX,+`NBIT_PADMUX,0,RW,0x00,Mux select
