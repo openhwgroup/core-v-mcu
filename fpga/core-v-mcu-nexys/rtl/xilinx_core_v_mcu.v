@@ -3,10 +3,6 @@
 //-----------------------------------------------------------------------------
 // Title         : Core-v-mcu Verilog Wrapper
 //-----------------------------------------------------------------------------
-// File          : xilinx_core_v_mcu.v
-// Author        : Manuel Eggimann  <meggimann@iis.ee.ethz.ch>
-// Created       : 21.05.2019
-//-----------------------------------------------------------------------------
 // Description :
 // Verilog Wrapper of Core-v-mcu to use the module within Xilinx IP integrator.
 //-----------------------------------------------------------------------------

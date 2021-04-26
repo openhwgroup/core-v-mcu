@@ -31,7 +31,7 @@ parser.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_d
 parser.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
 parser.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
 parser.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
-parser.add_argument("--xilinx-pulpissimo-sv", help="file for xilinx_pulpissimo.sv")
+parser.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
 parser.add_argument("--input-xdc", help="xdc that defines board")
 parser.add_argument("--output-xdc", help="output xdc for use in Vivado")
 parser.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
@@ -39,7 +39,6 @@ parser.add_argument("--reg-def-csv", help="register definition file (csv)")
 parser.add_argument("--reg-def-h", help="register definition C header file (h)")
 parser.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 parser.add_argument("--reg-def-md", help="register definition markdown file (md)")
-parser.add_argument("--pin-table-md", help="pin table markdown file (md)")
 args = parser.parse_args()
 
 #
@@ -123,11 +122,6 @@ def evaluate_defines(x):
             if d != '' and d in x:
                 old = '`'+d
                 new = soc_defines[d]
-                x = x.replace(old, new)
-        for d in per_bus_defines:
-            if d != '' and d in x:
-                old = '`'+d
-                new = per_bus_defines[d]
                 x = x.replace(old, new)
     return x
 
@@ -702,14 +696,16 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
         pad_frame_sv.write("    );\n")
         
+        pad_frame_sv.write("    // dummy wire to make lint clean\n")
+        pad_frame_sv.write("    wire void1;\n")
         pad_frame_sv.write("    // connect io\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 pad_frame_sv.write("    `ifndef PULP_FPGA_EMUL\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I( ), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I(%s), .O(void1), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 else:
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O( ), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(1'b0), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 pad_frame_sv.write("    `else\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
                     pad_frame_sv.write("      assign io[%d] = %s;\n" %(ionum, sysionames[ionum]))
@@ -810,22 +806,18 @@ if args.pad_frame_gf22_sv != None:
 
 ################################################
 #
-# Generate emulation toplevel (xilinx_pulpissimo)
+# Generate emulation toplevel (xilinx_core_v_mcu)
 #
 ################################################
-if args.xilinx_pulpissimo_sv != None:
-    with open(args.xilinx_pulpissimo_sv, 'w') as x_sv:
+if args.xilinx_core_v_mcu_sv != None:
+    with open(args.xilinx_core_v_mcu_sv, 'w') as x_sv:
         x_sv.write("//-----------------------------------------------------------------------------\n")
         x_sv.write("// This file is a generated file\n")
         x_sv.write("//-----------------------------------------------------------------------------\n")
-        x_sv.write("// Title         : PULPissimo Verilog Wrapper\n")
-        x_sv.write("//-----------------------------------------------------------------------------\n")
-        x_sv.write("// File          : xilinx_pulpissimo.v\n")
-        x_sv.write("// Author        : Manuel Eggimann  <meggimann@iis.ee.ethz.ch>\n")
-        x_sv.write("// Created       : 21.05.2019\n")
+        x_sv.write("// Title         : Core-v-mcu Verilog Wrapper\n")
         x_sv.write("//-----------------------------------------------------------------------------\n")
         x_sv.write("// Description :\n")
-        x_sv.write("// Verilog Wrapper of PULPissimo to use the module within Xilinx IP integrator.\n")
+        x_sv.write("// Verilog Wrapper of Core-v-mcu to use the module within Xilinx IP integrator.\n")
         x_sv.write("//-----------------------------------------------------------------------------\n")
         x_sv.write("// Copyright (C) 2013-2019 ETH Zurich, University of Bologna\n")
         x_sv.write("// Copyright and related rights are licensed under the Solderpad Hardware\n")
@@ -841,7 +833,7 @@ if args.xilinx_pulpissimo_sv != None:
         x_sv.write("`include \"pulp_soc_defines.sv\"\n")
         x_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         x_sv.write("\n")
-        x_sv.write("module xilinx_pulpissimo\n")
+        x_sv.write("module xilinx_core_v_mcu\n")
         x_sv.write("  (\n")
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
         x_sv.write("  );\n")
@@ -878,11 +870,11 @@ if args.xilinx_pulpissimo_sv != None:
         if ionum_end != -1:
             x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
         
-        x_sv.write("  pulpissimo #(\n")
+        x_sv.write("  core_v_mcu #(\n")
         x_sv.write("    .CORE_TYPE(`CORE_TYPE),\n")
         x_sv.write("    .USE_FPU(`USE_FPU),\n")
         x_sv.write("    .USE_HWPE(`USE_HWPE)\n")
-        x_sv.write("  ) i_pulpissimo (\n")
+        x_sv.write("  ) i_core_v_mcu (\n")
         x_sv.write("    .io(s_io)\n")
         x_sv.write("  );\n")
         x_sv.write("endmodule\n")
@@ -915,17 +907,16 @@ if args.input_xdc != None:
 # Write svh files from any register definition files
 #
 ######################################################################
-finished_header = False
 if args.reg_def_csv != None and args.reg_def_svh != None:
     with open(args.reg_def_csv, 'r') as rdf_input:
         with open(args.reg_def_svh, 'w') as rdf_output:
             reg_table = csv.reader(rdf_input)
             for reg in reg_table:
+                if reg[0] == "Register":
+                    continue
                 if reg[0] == "Module" or reg[0] == "Title":
                     module_name = reg[1]
-                if reg[0] == "Register":
-                    finished_header = True
-                    continue
+                    break
                 if reg[0] != '':
                     regname = reg[1].split('[')
                     rdf_output.write("`define %-25s 'h%s\n" % (regname[0], reg[0].replace("0x",""))) 
@@ -941,6 +932,8 @@ if args.reg_def_csv != None and args.reg_def_h != None:
     with open(args.reg_def_csv, 'r') as rdf_input:
         reg_table = csv.reader(rdf_input)
         for reg in reg_table:
+            if reg[0] == "Register":
+                continue
             if reg[0] == "Module" or reg[0] == "Title":
                 x = reg[1].split()
                 module_name = x[0]
@@ -979,13 +972,11 @@ if args.reg_def_csv != None and args.reg_def_h != None:
             reg_offset = -4
             prev_offset = 0
             reserved_num = 0
-            finished_header = False
             for reg in reg_table:
                 if reg[0] == "Register":
-                    finished_header = True
                     continue
-                if not finished_header:
-                    continue
+                if reg[0] == "Module" or reg[0] == "Title":
+                    break
                 if reg[1] == '':
                     continue
                 if reg[0] != '':
@@ -1062,13 +1053,11 @@ if args.reg_def_csv != None and args.reg_def_h != None:
                 field_name = [0] * 32
                 msb_array = [0] * 32
                 lsb_array = [0] * 32
-                finished_header = False
                 for reg in reg_table:
                     if reg[0] == "Register":
-                        finished_header = True
                         continue
-                    if not finished_header:
-                        continue
+                    if reg[0] == "Module" or reg[0] == "Title":
+                        break
                     if reg[1] == '':
                         continue
                     if reg[0] != '':
@@ -1133,50 +1122,23 @@ if args.reg_def_csv != None and args.reg_def_md != None:
     with open(args.reg_def_md, 'w') as rdf_output:
         with open(args.reg_def_csv, 'r') as rdf_input:
             reg_table = csv.reader(rdf_input)
-            finished_header = False
+            skip = True
             for reg in reg_table:
-                if reg[0] == "Register" or reg[0] == "Code":
-                    finished_header = True
-                    break
                 if reg[0] == "Module" or reg[0] == "Title":
+                    skip = False
                     rdf_output.write("# %s\n\n" % evaluate_defines(reg[1]))
                 else:
+                    if skip:
+                        continue
                     rdf_output.write("%s\n" % evaluate_defines(reg[1]))
         rdf_input.close()
         with open(args.reg_def_csv, 'r') as rdf_input:
             reg_table = csv.reader(rdf_input)
-            table_format = "| %-4s | %15s | %5s | %-15s |\n"
-            finished_header = False
-            for reg in reg_table:
-                if reg[0] == "Register":
-                    break
-                if reg[0] == "Code":
-                    finished_header = True
-                    rdf_output.write(table_format % ("Code", "Command/Field",  "Bits", "Description"))
-                    rdf_output.write(table_format % ("---", "--------------", "-----", "-------------------------"))
-                    continue
-                if not finished_header:
-                    continue
-                if reg[1] != "":
-                    cmdstring = reg[1]
-                else:
-                    cmdstring = reg[2]
-                if len(reg) == 2:
-                    rdf_output.write(table_format % (reg[0], reg[1], "", "", ""))
-                elif len(reg) >= 5 and reg[3] == '':
-                    rdf_output.write(table_format % (reg[0], cmdstring, "", reg[5]))
-                elif len(reg) >= 5 and reg[3] != '':
-                    rdf_output.write(table_format % (reg[0], cmdstring, reg[3]+":"+reg[4], reg[5]))
-        rdf_input.close()
-        with open(args.reg_def_csv, 'r') as rdf_input:
-            reg_table = csv.reader(rdf_input)
             table_format = "| %-10s | %5s | %5s | %10s | %-15s |\n"
-            finished_header = False
             for reg in reg_table:
+                if reg[0] == "Module" or reg[0] == "Title":
+                    break
                 if reg[0] == "Register":
-                    finished_header = True
-                    continue
-                if not finished_header:
                     continue
                 # see if `define that needs to be replaced
                 for idx, x in enumerate(reg):
@@ -1211,42 +1173,11 @@ if args.reg_def_csv != None and args.reg_def_md != None:
         rdf_output.write("| RO          | Read Only    |\n")
         rdf_output.write("| RC          | Read & Clear after read |\n")
         rdf_output.write("| WO          | Write Only |\n")
-        rdf_output.write("| WC          | Write Clears (value ignored; always writes a 0) |\n")
         rdf_output.write("| WS          | Write Sets (value ignored; always writes a 1) |\n")
         rdf_output.write("| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |\n")
         rdf_output.write("| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |\n")
         rdf_output.write("| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |\n")
     rdf_output.close()
-
-######################################################################
-#
-# Write .md file for pin table
-#
-######################################################################    
-
-if args.pin_table_md != None and args.soc_defines != None and args.pin_table != None:
-    print("Writing '%s'" % args.pin_table_md)
-    with open(args.pin_table_md, 'w') as rdf_output:
-        rdf_output.write("# Pin Assignment\n")
-        rdf_output.write("\n| IO | sysio |")
-        for i in range(N_PADSEL):
-            rdf_output.write(" sel=%d |" % (i))
-        rdf_output.write("\n")
-        rdf_output.write("| --- | --- |")
-        for i in range(N_PADSEL):
-            rdf_output.write(" --- |")
-        rdf_output.write("\n")
-        with open(args.pin_table, 'r') as f_pin_table:
-            pin_table = csv.reader(f_pin_table)
-            pin_num = -2
-            for pin in pin_table:
-                pin_num = pin_num + 1
-                if pin_num >= 0:
-                    # Work to do
-                    rdf_output.write("| %s | %s |" % (pin[1], pin[3]))
-                    for i in range(N_PADSEL):
-                        rdf_output.write(" %s |" % (pin[4+i]))
-                    rdf_output.write("\n")
 
 ######################################################################
 #

@@ -171,7 +171,7 @@ module efpga_subsystem
    XBAR_TCDM_BUS               l2_efpga_tcdm [`N_EFPGA_TCDM_PORTS-1:0]();
    logic [`N_EFPGA_TCDM_PORTS-1:0] tcdm_clk;
    logic [`N_EFPGA_TCDM_PORTS-1:0] tcdm_req_fpga, tcdm_req_fpga_gated;
-   logic [`N_EFPGA_TCDM_PORTS-1:0][L2_ADDR_WIDTH-1:0] tcdm_addr_fpga;
+   logic [`N_EFPGA_TCDM_PORTS-1:0][APB_FPGA_ADDR_WIDTH-1:0] tcdm_addr_fpga;
    logic [`N_EFPGA_TCDM_PORTS-1:0]                    tcdm_wen_fpga;
    logic [`N_EFPGA_TCDM_PORTS-1:0][31:0]              tcdm_wdata_fpga;
    logic [`N_EFPGA_TCDM_PORTS-1:0][31:0]              tcdm_rdata_fpga;
@@ -222,48 +222,37 @@ module efpga_subsystem
          wen_p0 <= l2_asic_tcdm_o[0].req ? l2_asic_tcdm_o[0].wen : wen_p0;
       end // else: !if(~rst_n)
    end // always @ (posedge asic_clk_i or negedge rst_n)
-   assign l2_asic_tcdm_o[3].add[31:20] = 12'h1C0;   
 
-   tcdm_interface  p3 (
-		       .efpga_rst(reset_hi),
-		       .efpga_clk(tcdm_clk[3]),
-		       .efpga_req(tcdm_req_fpga_gated[3]),
-		       .efpga_gnt(tcdm_gnt_fpga[3]),
-                       .efpga_fmo(tcdm_fmo_fpga[3]),
-		       .efpga_valid(tcdm_valid_fpga[3]),
-		       .efpga_req_data( {tcdm_wen_fpga[3],
-					 tcdm_addr_fpga[3][19:0],
-					 tcdm_be_fpga[3],
-					 tcdm_wdata_fpga[3]}),
-		       .soc_req_data( {l2_asic_tcdm_o[3].wen,	
-				       l2_asic_tcdm_o[3].add[19:0],
-				       l2_asic_tcdm_o[3].be,
-				       l2_asic_tcdm_o[3].wdata}),
-		       .efpga_rdata(tcdm_rdata_fpga[3]),
-		       .soc_rdata(l2_asic_tcdm_o[3].r_rdata),
-		       .soc_rst(reset_hi),
-		       .soc_clk(asic_clk_i),
-		       .soc_req(l2_asic_tcdm_o[3].req),
-		       .soc_gnt(l2_asic_tcdm_o[3].gnt),
-		       .soc_valid(l2_asic_tcdm_o[3].r_valid)
-		       );
 
-   
    
     generate
-        for (genvar g_tcdm = 0; g_tcdm < `N_EFPGA_TCDM_PORTS-1; g_tcdm++) begin : DC_FIFO_TCDM_EFPGA
+        for (genvar g_tcdm = 0; g_tcdm < `N_EFPGA_TCDM_PORTS; g_tcdm++) begin : DC_FIFO_TCDM_EFPGA
 
-             log_int_dc_slice_wrap logint_dc_efpga_tcdm
-             (
-                .push_clk(tcdm_clk[g_tcdm]),
-                .push_rst_n(rst_n),
-                .push_bus(l2_efpga_tcdm[g_tcdm]),
-                .pop_clk(asic_clk_i),
-                .pop_rst_n(rst_n),
-                .test_cgbypass_i('0),
-                .pop_bus(l2_asic_tcdm_o[g_tcdm])
-             );
-
+    tcdm_interface  efpga_tcdm (
+		       .efpga_rst(reset_hi),
+		       .efpga_clk(tcdm_clk[g_tcdm]),
+		       .efpga_req(tcdm_req_fpga_gated[g_tcdm]),
+		       .efpga_gnt(tcdm_gnt_fpga[g_tcdm]),
+                       .efpga_fmo(tcdm_fmo_fpga[g_tcdm]),
+		       .efpga_valid(tcdm_valid_fpga[g_tcdm]),
+		       .efpga_req_data( {tcdm_wen_fpga[g_tcdm],
+					 tcdm_addr_fpga[g_tcdm][APB_FPGA_ADDR_WIDTH-1:0],
+					 tcdm_be_fpga[g_tcdm],
+					 tcdm_wdata_fpga[g_tcdm]}),
+		       .soc_req_data( {l2_asic_tcdm_o[g_tcdm].wen,	
+				       l2_asic_tcdm_o[g_tcdm].add[APB_FPGA_ADDR_WIDTH-1:0],
+				       l2_asic_tcdm_o[g_tcdm].be,
+				       l2_asic_tcdm_o[g_tcdm].wdata}),
+		       .efpga_rdata(tcdm_rdata_fpga[g_tcdm]),
+		       .soc_rdata(l2_asic_tcdm_o[g_tcdm].r_rdata),
+		       .soc_rst(reset_hi),
+		       .soc_clk(asic_clk_i),
+		       .soc_req(l2_asic_tcdm_o[g_tcdm].req),
+		       .soc_gnt(l2_asic_tcdm_o[g_tcdm].gnt),
+		       .soc_valid(l2_asic_tcdm_o[g_tcdm].r_valid)
+		       );
+   assign l2_asic_tcdm_o[g_tcdm].add[31:20] = 12'h1C0;   
+   
              `ifndef SYNTHESIS
              assign  #1 l2_efpga_tcdm[g_tcdm].req   = tcdm_req_fpga_gated[g_tcdm]   ;
              assign  #1 l2_efpga_tcdm[g_tcdm].add   = tcdm_addr_fpga[g_tcdm]        ;
@@ -290,7 +279,7 @@ module efpga_subsystem
        .push_clk(asic_clk_i),
        .push_rst_n(rst_n),
      .data_req_i(s_lint_REQ),
-     .data_add_i       ( apbt1_i.add[APB_FPGA_ADDR_WIDTH-1:0] ),
+     .data_add_i       ( apbt1_i.add[19:0]),
       .data_wen_i       ( apbt1_i.wen                 ),
       .data_wdata_i     ( apbt1_i.wdata               ),
       .data_be_i        ( apbt1_i.be                  ),
@@ -301,63 +290,24 @@ module efpga_subsystem
       .data_r_rdata_o   ( apbt1_i.r_rdata             ),
       .data_r_ID_o      (                              ),
 
-//       .push_bus(apbt1_i),
-           .data_req_o       (apbt1_int.req                ),
-      .data_add_o       ( apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0]  ),
-      .data_wen_o       ( apbt1_int.wen                  ),
-      .data_wdata_o     ( apbt1_int.wdata                ),
-      .data_be_o        ( apbt1_int.be                   ),
-      .data_ID_o        (                              ),
-      .data_gnt_i       ( apbt1_int.gnt                  ),
+     .data_req_o       (apbt1_int.req                ),
+     .data_add_o       ( apbt1_int.add ),
+     .data_wen_o       ( apbt1_int.wen                  ),
+     .data_wdata_o     ( apbt1_int.wdata                ),
+     .data_be_o        ( apbt1_int.be                   ),
+     .data_ID_o        (                              ),
+     .data_gnt_i       ( apbt1_int.gnt                  ),
+     
+     .data_r_valid_i   ( apbt1_int.r_valid              ),
+     .data_r_rdata_i   ( apbt1_int.r_rdata              ),
+     .data_r_ID_i      (   '0                         ),
+     
+     .pop_clk(s_efpga_clk),
+     .pop_rst_n(rst_n),
+     .test_cgbypass_i('0)
+     
 
-      .data_r_valid_i   ( apbt1_int.r_valid              ),
-      .data_r_rdata_i   ( apbt1_int.r_rdata              ),
-      .data_r_ID_i      (   '0                         ),
-
-       .pop_clk(s_efpga_clk),
-       .pop_rst_n(rst_n),
-       .test_cgbypass_i('0)
-
-//       .pop_bus(apbt1_int)
     );
-/*
-
-    lint_2_apb #(
-        .ADDR_WIDTH     ( APB_FPGA_ADDR_WIDTH         ), // 32,
-        .DATA_WIDTH     ( 32                          ), // 32,
-        .BE_WIDTH       ( 4                           ), // DATA_WIDTH/8,
-        .ID_WIDTH       ( 1                           ), // 10,
-        .AUX_WIDTH      ( 1                           )  // 8
-    ) lint_2_apb_t1_i (
-        .clk            ( asic_clk_i),//apb_fpga_clk                   ),
-        .rst_n          ( rst_n                         ),
-        .data_req_i     ( apbt1_int.req                 ),
-        .data_add_i     ( apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0] ),
-        .data_wen_i     ( apbt1_int.wen                 ),
-        .data_wdata_i   ( apbt1_int.wdata               ),
-        .data_be_i      ( apbt1_int.be                  ),
-        .data_aux_i     ( '0                            ),
-        .data_ID_i      ( '0                            ),
-        .data_gnt_o     ( apbt1_int.gnt                 ),
-        // Resp
-        .data_r_valid_o ( apbt1_int.r_valid             ),
-        .data_r_rdata_o ( apbt1_int.r_rdata             ),
-        .data_r_opc_o   (                               ),
-        .data_r_aux_o   (                               ),
-        .data_r_ID_o    (                               ),
-
-        .master_PADDR   ( apb_fpga_addr                 ),
-        .master_PWDATA  ( apb_fpga_pwdata               ),
-        .master_PWRITE  ( apb_fpga_pwrite               ),
-        .master_PSEL    ( apb_fpga_psel                 ),
-        .master_PENABLE ( apb_fpga_enable               ),
-        .master_PRDATA  ( apb_fpga_prdata               ),
-        .master_PREADY  ( apb_fpga_ready_gated          ),
-        .master_PSLVERR ( apb_fpga_pslverr              )
-    );
-*/
-
-
     /*
       EVENT Propagation from EFPGA to ASIC
 
@@ -417,10 +367,6 @@ module efpga_subsystem
     assign tcdm_req_fpga_gated[0]  = enable_tcdm0_efpga_i &  tcdm_req_fpga[0] & tcdm_gnt_fpga[0];
 
 
-      assign tcdm_addr_fpga[0][31:20]   = 12'h1C0;
-      assign tcdm_addr_fpga[1][31:20]   = 12'h1C0;
-      assign tcdm_addr_fpga[2][31:20]   = 12'h1C0;
-      assign tcdm_addr_fpga[3][31:20]   = 12'h1C0;
 
 fcb U_fcb(
     // Outputs
@@ -515,11 +461,11 @@ fcb U_fcb(
     .fcb_pif_en          (efpga2fcb_pif_en),
     .fcb_pif_8b_mode_bo  (1'b1),
     .fcb_apbs_pprot      (3'b000),
-    .fcb_apbs_psel       (apbprogram_i.psel),//(fcb_apbs_psel_x),
-    .fcb_apbs_penable    (apbprogram_i.penable),//(fcb_apbs_penable_x),
-    .fcb_apbs_pwrite     (apbprogram_i.pwrite),//(fcb_apbs_pwrite_x),
-    .fcb_apbs_pwdata     (apbprogram_i.pwdata),//(fcb_apbs_pwdata_x),
-    .fcb_apbs_paddr     (apbprogram_i.paddr[19:0]),//(fcb_apbs_pwdata_x),
+    .fcb_apbs_psel       (apbprogram_i.psel),
+    .fcb_apbs_penable    (apbprogram_i.penable),
+    .fcb_apbs_pwrite     (apbprogram_i.pwrite),
+    .fcb_apbs_pwdata     (apbprogram_i.pwdata),
+    .fcb_apbs_paddr     (apbprogram_i.paddr[19:0]),
     .fcb_apbs_pstrb      (4'b0000),
     .fcb_bl_dout         (efpga2fcb_bl_dout[31:0]),
     .fcb_apbm_prdata_0   ('0),
@@ -597,7 +543,7 @@ fcb U_fcb(
          .CLK5                               (   fpga_clk5_i             ),
 
          .fpgaio_in (fpgaio_in_i),
-         .lint_ADDR(apbt1_int.add[19:0]),
+         .lint_ADDR(apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0]),
          .lint_REQ(apbt1_int.req),
          .lint_WDATA(apbt1_int.wdata),
          .lint_BE(apbt1_int.be),
@@ -647,10 +593,10 @@ fcb U_fcb(
          .tcdm_wdata_p2                 ( tcdm_wdata_fpga[2]       ),
          .tcdm_wdata_p3                 ( tcdm_wdata_fpga[3]       ) ,                                  
 
-         .tcdm_addr_p0                  ( tcdm_addr_fpga[0][19:0]       ),                                  
-         .tcdm_addr_p1                  ( tcdm_addr_fpga[1][19:0]       ),
-         .tcdm_addr_p2                  ( tcdm_addr_fpga[2][19:0]       ),
-         .tcdm_addr_p3                  ( tcdm_addr_fpga[3][19:0]       ),
+         .tcdm_addr_p0                  ( tcdm_addr_fpga[0][APB_FPGA_ADDR_WIDTH-1:0]       ),                                  
+         .tcdm_addr_p1                  ( tcdm_addr_fpga[1][APB_FPGA_ADDR_WIDTH-1:0]       ),
+         .tcdm_addr_p2                  ( tcdm_addr_fpga[2][APB_FPGA_ADDR_WIDTH-1:0]       ),
+         .tcdm_addr_p3                  ( tcdm_addr_fpga[3][APB_FPGA_ADDR_WIDTH-1:0]       ),
 
          .tcdm_wen_p0                     ( tcdm_wen_fpga[0]             ),
          .tcdm_wen_p1                      ( tcdm_wen_fpga[1]             ),
