@@ -9,3 +9,4 @@ build/
 gmon.out
 modelsim.ini
 docs/auto-docs/
+vivado.log
