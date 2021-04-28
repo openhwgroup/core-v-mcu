@@ -847,7 +847,7 @@ if args.xilinx_core_v_mcu_sv != None:
 
         # print remaining connections, if any
         if ionum_end != -1:
-            x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start)
+            x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
 
         x_sv.write("  core_v_mcu #(\n")
         x_sv.write("    .CORE_TYPE(`CORE_TYPE),\n")
