@@ -1,156 +1,117 @@
 # APB_INTERRUPT_CNTRL
 
-Memory address: EU_START_ADDR(0x1A109000)
-
-### REG_MASK offset = 0x000
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_MASK_SET offset = 0x004
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_MASK_CLEAR offset = 0x008
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_INT offset = 0x00C
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_INT_SET offset = 0x010
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_INT_CLEAR offset = 0x014
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_ACK offset = 0x018
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_ACK_SET offset = 0x01C
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_ACK_CLEAR offset = 0x020
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| fc_hp_events | 31:30 |       |            |                 |
-| fc_err_events | 29:29 |       |            |                 |
-| unused1    | 28:24 |       |       0x00 |                 |
-| ref_change_event | 23:23 |       |            | ref_rise or ref_fall |
-| adv_timer_evens | 22:19 |       |            |                 |
-| gpio_event | 18:18 |       |            |                 |
-| timer_hi_event | 17:17 |       |            |                 |
-| timer_lo_event | 16:16 |       |            |                 |
-| unused2    |  15:8 |       |       0x00 |                 |
-| timer_lo_event |   7:7 |       |            | MTIME irq       |
-| reserved   |   6:0 |       |            | Reserved for s/w events routed to irq3? |
-
-### REG_FIFO offset = 0x024
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| EVENT_ID   |   7:0 |    RO |            | ID of triggering event |
+Memory address: EU_START_ADDR(`EU_START_ADDR)
+Offset/Field
+REG_MASK
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_MASK_SET
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_MASK_CLEAR
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_INT
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_INT_SET
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_INT_CLEAR
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_ACK
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_ACK_SET
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_ACK_CLEAR
+fc_hp_events
+fc_err_events
+unused1
+ref_change_event
+adv_timer_evens
+gpio_event
+timer_hi_event
+timer_lo_event
+unused2
+timer_lo_event
+reserved
+REG_FIFO
+EVENT_ID
 
 ### Notes:
 

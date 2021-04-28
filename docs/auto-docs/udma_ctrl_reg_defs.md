@@ -25,29 +25,18 @@ UDMA_CH_ADDR_UART + ID * UDMA_CH_SIZE
 The register definitions for the control channel are specified in this section.
 The register definitions for each peripheral are specified in sections named UDMA_XXXXX.
 
+Offset/Field
+REG_CG
+PERIPH_CLK_ENABLE
 
-### REG_CG offset = 0x000
+REG_CFG_EVT
+CMP_EVENT3
+CMP_EVENT2
+CMP_EVENT1
+CMP_EVENT0
+REG_RST
+PERIPH_RESET
 
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| PERIPH_CLK_ENABLE |  31:0 |    RW |        0x0 | Enable for peripheral clocks; |
-|            |       |       |            | see core-v-mcu_config 'Peripheral clock enable masks' for bit positions |
-
-### REG_CFG_EVT offset = 0x004
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| CMP_EVENT3 | 31:24 |       |       0x00 | Compare value for event detection |
-| CMP_EVENT2 | 23:16 |       |       0x01 | Compare value for event detection |
-| CMP_EVENT1 |  15:8 |       |       0x02 | Compare value for event detection |
-| CMP_EVENT0 |   7:0 |       |       0x03 | Compare value for event detection |
-
-### REG_RST offset = 0x008
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| PERIPH_RESET |  31:0 |    RW |        0x0 | Reset for peripherals; |
-|            |       |       |            | use core-v-mcu_config 'Peripheral clock enable masks' for bit positions |
 
 ### Notes:
 
