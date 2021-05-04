@@ -90,7 +90,7 @@ def typedef(name):
     for y in x:
         typedef = typedef + y[0].upper() + y[1:]
     return typedef
-    
+
 ####################################################################################
 #
 # Routine to generate bittype name (add _b)
@@ -112,7 +112,7 @@ def remove_subscript(x):
     if '[' in x:
         x = x[0:x.index('[')]
     return x
-    
+
 ####################################################################################
 #
 # Routine to replace `defines with value
@@ -200,7 +200,7 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
                 define = "N_"+pername.upper()
                 ninst = int(soc_defines[define])
                 peripheral_defines_svh.write("`define PER_ID_%-8s  %d\n" %(pername.upper(), per_id))
-                
+
                 if ninst > 0 and not perdef['usable']:
                     print("Error: trying to use %s when it is not usable" % pername)
                 def_name = "PERIO_" + pername.upper()+"_NPORTS"
@@ -212,7 +212,7 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
                         perio_index = perio_index + 1
                         perio_dir[def_name] = perports[perport]
                 per_id = per_id + ninst
-                    
+
         peripheral_defines_svh.write("\n")
         peripheral_defines_svh.write("//  UDMA TX channels\n")
         udma_tx_ch = 0
@@ -229,7 +229,7 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
                     for inst in range(ninst):
                         peripheral_defines_svh.write("`define %-16s %d\n" %("CH_ID_"+udma_tx.upper()+str(inst), udma_tx_ch))
                         udma_tx_ch = udma_tx_ch + 1
-         
+
         peripheral_defines_svh.write("\n")
         peripheral_defines_svh.write("//  UDMA RX channels\n")
         udma_rx_ch = 0
@@ -285,7 +285,7 @@ if args.soc_defines != None and args.cvmcu_h != None:
                 cvmcu_h.write("#define %-20s %s\n" % (define, soc_defines[define]))
             elif define[0:5] == 'NBIT_' and soc_defines[define][0] != '`':
                 cvmcu_h.write("#define %-20s %s\n" % (define, soc_defines[define]))
-        
+
         ###########
         # Add UDMA information
         ###########
@@ -305,7 +305,7 @@ if args.soc_defines != None and args.cvmcu_h != None:
                 ninst = int(soc_defines[define])
                 cvmcu_h.write("#define UDMA_CH_ADDR_%-10s (%s + %d * 0x80)\n" % (pername.upper(),per_bus_defines["UDMA_START_ADDR"], (per_id+1)))
                 cvmcu_h.write("#define UDMA_%-18s (%d + id)\n" % (pername.upper()+"_ID(id)", per_id))
-                
+
                 if ninst > 0 and not perdef['usable']:
                     print("Error: trying to use %s when it is not usable" % pername)
                 for inst in range(ninst if ninst > 0 else 1):   # Even if not used, need defines for the generate
@@ -323,13 +323,13 @@ if args.soc_defines != None and args.cvmcu_h != None:
                 pername = perdef['name']
                 define = "N_"+pername.upper()
                 ninst = int(soc_defines[define])
-                
+
                 if ninst > 0 and not perdef['usable']:
                     print("Error: trying to use %s when it is not usable" % pername)
                 for inst in range(ninst if ninst > 0 else 1):   # Even if not used, need defines for the generate
                     cvmcu_h.write("#define UDMA_CTRL_%-16s (1 << %d)\n" % (pername.upper()+str(inst)+"_CLKEN", (per_id+inst)))
                 per_id = per_id + ninst
-                    
+
         udma_tx_ch = 0
         for perdef in perdefs:
             if 'udma_tx' in perdef:
@@ -344,7 +344,7 @@ if args.soc_defines != None and args.cvmcu_h != None:
                     for inst in range(ninst):
                         #peripheral_defines_svh.write("`define %-16s %d\n" %("CH_ID_"+udma_tx.upper()+str(inst), udma_tx_ch))
                         udma_tx_ch = udma_tx_ch + 1
-         
+
         #peripheral_defines_svh.write("\n")
         #peripheral_defines_svh.write("#  UDMA RX channels\n")
         udma_rx_ch = 0
@@ -361,49 +361,49 @@ if args.soc_defines != None and args.cvmcu_h != None:
                     for inst in range(ninst):
                         #peripheral_defines_svh.write("`define %-16s %d\n" %("CH_ID_"+udma_rx.upper()+str(inst), udma_rx_ch))
                         udma_rx_ch = udma_rx_ch + 1
-                        
+
         ###########
         # Add FLL information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  FLL configuration information\n")
         cvmcu_h.write("#define FLL_START_ADDR %s\n" % per_bus_defines["FLL_START_ADDR"])
-        
+
         ###########
         # Add GPIO information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  GPIO configuration information\n")
         cvmcu_h.write("#define GPIO_START_ADDR %s\n" % per_bus_defines["GPIO_START_ADDR"])
-        
+
         ###########
         # Add SOC Controller information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  SOC controller configuration information\n")
         cvmcu_h.write("#define SOC_CTRL_START_ADDR %s\n" % per_bus_defines["SOC_CTRL_START_ADDR"])
-        
+
         ###########
         # Add EU information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
         cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
-        
+
         ###########
         # Add Timer information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  Timer configuration information\n")
         cvmcu_h.write("#define TIMER_START_ADDR %s\n" % per_bus_defines["TIMER_START_ADDR"])
-        
+
         ###########
         # Add AdvTimer information
         ###########
         cvmcu_h.write("\n")
         cvmcu_h.write("//  AdvTimer configuration information\n")
         cvmcu_h.write("#define ADV_TIMER_START_ADDR %s\n" % per_bus_defines["ADV_TIMER_START_ADDR"])
-        
+
         cvmcu_h.write("\n")
         cvmcu_h.write("#endif //__CORE_V_MCU_CONFIG_H_\n")
 
@@ -546,7 +546,7 @@ if args.pad_control_sv != None:
         pad_control_sv.write("    output logic [`N_FPGAIO-1:0]    fpgaio_in_o,\n")
         pad_control_sv.write("    input  logic [`N_FPGAIO-1:0]    fpgaio_oe_i\n")
         pad_control_sv.write("    );\n")
-        
+
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the pad_cfg_o bus\n")
@@ -572,7 +572,7 @@ if args.pad_control_sv != None:
             for i in range(nparen):
                 pad_control_sv.write(")")
             pad_control_sv.write(";\n")
-            
+
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the gpio bus\n")
@@ -593,8 +593,8 @@ if args.pad_control_sv != None:
             for i in range(nparen):
                 pad_control_sv.write(")")
             pad_control_sv.write(";\n")
-        
-            
+
+
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the fpgaio bus\n")
@@ -615,7 +615,7 @@ if args.pad_control_sv != None:
             for i in range(nparen):
                 pad_control_sv.write(")")
             pad_control_sv.write(";\n")
-            
+
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the io_out bus\n")
@@ -635,7 +635,7 @@ if args.pad_control_sv != None:
             for i in range(nparen):
                 pad_control_sv.write(")")
             pad_control_sv.write(";\n")
-            
+
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the io_oe bus\n")
@@ -684,7 +684,7 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("`include \"pulp_soc_defines.sv\"\n")
         pad_frame_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         pad_frame_sv.write("\n")
-        
+
         pad_frame_sv.write("module pad_frame(\n")
         pad_frame_sv.write("\n")
         pad_frame_sv.write("    input logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,\n")
@@ -702,7 +702,6 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("    // pad signals\n")
         pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
         pad_frame_sv.write("    );\n")
-        
         pad_frame_sv.write("    // dummy wire to make lint clean\n")
         pad_frame_sv.write("    wire void1;\n")
         pad_frame_sv.write("    // connect io\n")
@@ -775,7 +774,7 @@ if args.pad_frame_gf22_sv != None:
         pad_frame_sv.write("\n")
         pad_frame_sv.write("`include \"pulp_soc_defines.sv\"\n")
         pad_frame_sv.write("\n")
-        
+
         pad_frame_sv.write("module pad_frame_gf22(\n")
         pad_frame_sv.write("\n")
         pad_frame_sv.write("    input logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,\n")
@@ -793,7 +792,7 @@ if args.pad_frame_gf22_sv != None:
         pad_frame_sv.write("    // pad signals\n")
         pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
         pad_frame_sv.write("    );\n")
-        
+
         pad_frame_sv.write("    // connect io\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
@@ -847,7 +846,7 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io;\n")
         x_sv.write("\n")
-        
+
         ionum_start = 0
         ionum_end = -1
         for ionum in range(N_IO):
@@ -872,11 +871,11 @@ if args.xilinx_core_v_mcu_sv != None:
                     x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("jtag_tck_o"))
                     x_sv.write("    .O(s_io[%d])\n" % sysionames.index("jtag_tck_o"))
                     x_sv.write("  );\n\n")
-                
+
         # print remaining connections, if any
         if ionum_end != -1:
             x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
-        
+
         x_sv.write("  core_v_mcu #(\n")
         x_sv.write("    .CORE_TYPE(`CORE_TYPE),\n")
         x_sv.write("    .USE_FPU(`USE_FPU),\n")
@@ -885,7 +884,7 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("    .io(s_io)\n")
         x_sv.write("  );\n")
         x_sv.write("endmodule\n")
-    
+
 ######################################################################
 #
 # Process the xdc file
@@ -927,10 +926,10 @@ if args.reg_def_csv != None and args.reg_def_svh != None:
                     continue
                 if reg[0] != '':
                     regname = reg[1].split('[')
-                    rdf_output.write("`define %-25s 'h%s\n" % (regname[0], reg[0].replace("0x",""))) 
+                    rdf_output.write("`define %-25s 'h%s\n" % (regname[0], reg[0].replace("0x","")))
         rdf_output.close();
     rdf_input.close()
-    
+
 ######################################################################
 #
 # Write .h files from any register definition files
@@ -1054,7 +1053,7 @@ if args.reg_def_csv != None and args.reg_def_h != None:
             rdf_output.write("  };\n")
             rdf_output.write("} %s_t;\n\n\n" % typedef(module_name))
             rdf_input.close();
-        
+
             with open(args.reg_def_csv, 'r') as rdf_input:
                 reg_table = csv.reader(rdf_input)
                 regname = ''

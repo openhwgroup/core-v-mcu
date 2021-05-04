@@ -63,7 +63,7 @@ jobs:
   # Doc Up-to-Date #
   ##################
   # Check that the documentation is up-to-date.
-  check-vendor:
+  doc-up-to-date:
     name: Doc Up-to-Date
     runs-on: ubuntu-latest
     steps:
@@ -72,7 +72,9 @@ jobs:
       with:
         python-version: 3.x
     - name: Install requirements
-      run: pip install -r python-requirements.txt
+      run: |
+        pip install -r python-requirements.txt
+        pip install -r docs/requirements.txt
     - name: Generate doc and diff
       run: |
         make -C docs all && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation."

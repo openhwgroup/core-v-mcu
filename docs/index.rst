@@ -31,12 +31,13 @@ CORE-V-MCU User Manual
     :maxdepth: 1
     :glob:
     
+
     auto-docs/apb_soc_ctrl_reg_defs
     auto-docs/apb_interrupt_cntrl_reg_defs
     auto-docs/apb_timer_unit_reg_defs
     auto-docs/apb_gpio_reg_defs
     auto-docs/udma_ctrl_reg_defs
-    
+
 ..  toctree::
     :caption: Peripheral Controllers
     :maxdepth: 1
@@ -47,3 +48,4 @@ CORE-V-MCU User Manual
     auto-docs/udma_qspi_reg_defs
     auto-docs/udma_sdio_reg_defs
     auto-docs/udma_camera_reg_defs
+
