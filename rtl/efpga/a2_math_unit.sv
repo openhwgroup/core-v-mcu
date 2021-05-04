@@ -82,7 +82,7 @@ module A2_MATH_UNIT (
       .EFPGA_MATHB_OPER_defPin(2'b11),
       .EFPGA_MATHB_OPER_SEL(m0_osel),
       .TPRAM_MATHB_COEF_R_DATA(coef_rdata),
-      .EFPGA_MATHB_COEF_DATA(coef_in),
+      .EFPGA_MATHB_COEF_DATA(m0_coef_in),
       .EFPGA_MATHB_COEF_defPin(2'b11),
       .EFPGA_MATHB_COEF_SEL(m0_csel),
       .EFPGA_MATHB_TC_defPin(m0_tc),

@@ -206,8 +206,8 @@ always@(*) begin: MUX3_MATHB
     2'b00: MUX3_MATHB_DATAOUT[7:0]  = MAC0_OUT[31:24];  //32-bit x1 mode  
     2'b01: MUX3_MATHB_DATAOUT[7:0]  = MAC1_OUT[15: 8];  //16-bit x2 mode 
     2'b10: MUX3_MATHB_DATAOUT[7:0]  = MAC3_OUT[ 7: 0];  // 8-bit x4 mode
-    2'b11: MUX3_MATHB_DATAOUT[7:0]  = {MAC_4_1_OUT,MAC_4_0_OUT}; // 4 bit mode
-//    default: MUX3_MATHB_DATAOUT[7:0] = MAC0_OUT[31:24]; //32-bit x1 mode  
+    2'b11: MUX3_MATHB_DATAOUT[7:0]  = {MAC_4_7_OUT,MAC_4_6_OUT}; // 4 bit mode
+//    default: MUX3_MATHB_DATAOUT[7:0] = MAC0_OUT[31:24]; //32-bit x1 mode
   endcase
 end 
 
@@ -216,8 +216,8 @@ always@(*) begin: MUX2_MATHB
     2'b00: MUX2_MATHB_DATAOUT[7:0]  = MAC0_OUT[23:16];  //32-bit x1 mode  
     2'b01: MUX2_MATHB_DATAOUT[7:0]  = MAC1_OUT[ 7: 0];  //16-bit x2 mode 
     2'b10: MUX2_MATHB_DATAOUT[7:0]  = MAC4_OUT[ 7: 0];  // 8-bit x4 mode
-        2'b11: MUX2_MATHB_DATAOUT[7:0]  = {MAC_4_3_OUT,MAC_4_2_OUT}; // 4 bit mode
-//    default: MUX2_MATHB_DATAOUT[7:0] = MAC0_OUT[23:16]; //32-bit x1 mode  
+        2'b11: MUX2_MATHB_DATAOUT[7:0]  = {MAC_4_5_OUT,MAC_4_4_OUT}; // 4 bit mode
+//    default: MUX2_MATHB_DATAOUT[7:0] = MAC0_OUT[23:16]; //32-bit x1 mode
   endcase
 end 
 
@@ -226,8 +226,8 @@ always@(*) begin: MUX1_MATHB
     3'b00: MUX1_MATHB_DATAOUT[7:0]  = MAC0_OUT[15: 8];  //32-bit x1 mode  
     3'b01: MUX1_MATHB_DATAOUT[7:0]  = MAC2_OUT[15: 8];  //16-bit x2 mode 
     3'b10: MUX1_MATHB_DATAOUT[7:0]  = MAC5_OUT[ 7: 0];  // 8-bit x4 mode
-        2'b11: MUX1_MATHB_DATAOUT[7:0]  = {MAC_4_5_OUT,MAC_4_4_OUT}; // 4 bit mode
-//    default: MUX1_MATHB_DATAOUT[7:0] = MAC0_OUT[15: 8]; //32-bit x1 mode  
+        2'b11: MUX1_MATHB_DATAOUT[7:0]  = {MAC_4_3_OUT,MAC_4_2_OUT}; // 4 bit mode
+//    default: MUX1_MATHB_DATAOUT[7:0] = MAC0_OUT[15: 8]; //32-bit x1 mode
   endcase
 end 
 
@@ -236,8 +236,8 @@ always@(*) begin: MUX0_MATHB
     3'b00: MUX0_MATHB_DATAOUT[7:0]  = MAC0_OUT[ 7: 0];  //32-bit x1 mode  
     3'b01: MUX0_MATHB_DATAOUT[7:0]  = MAC2_OUT[ 7: 0];  //16-bit x2 mode 
     3'b10: MUX0_MATHB_DATAOUT[7:0]  = MAC6_OUT[ 7: 0];  // 8-bit x4 mode
-    2'b11: MUX0_MATHB_DATAOUT[7:0]  = {MAC_4_7_OUT,MAC_4_6_OUT}; // 4 bit mode
-    default: MUX0_MATHB_DATAOUT[7:0] = MAC0_OUT[ 7: 0]; //32-bit x1 mode  
+    2'b11: MUX0_MATHB_DATAOUT[7:0]  = {MAC_4_1_OUT,MAC_4_0_OUT}; // 4 bit mode
+    default: MUX0_MATHB_DATAOUT[7:0] = MAC0_OUT[ 7: 0]; //32-bit x1 mode
   endcase
 end 
 
