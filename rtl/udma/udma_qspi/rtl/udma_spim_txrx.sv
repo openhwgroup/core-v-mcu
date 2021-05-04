@@ -56,10 +56,10 @@ module udma_spim_txrx
 	input  logic         rx_data_ready_i,
         
 	output logic         spi_clk_o,
-    output logic         spi_oen0_o,
-    output logic         spi_oen1_o,
-    output logic         spi_oen2_o,
-    output logic         spi_oen3_o,
+  output logic        spi_oe0_o,
+  output logic        spi_oe1_o,
+  output logic        spi_oe2_o,
+  output logic        spi_oe3_o,
     output logic         spi_sdo0_o,
     output logic         spi_sdo1_o,
     output logic         spi_sdo2_o,
@@ -154,32 +154,32 @@ module udma_spim_txrx
         case(r_spi_mode)
             `SPI_QUAD_RX:
             begin
-                spi_oen0_o = 1'b1;
-                spi_oen1_o = 1'b1;
-                spi_oen2_o = 1'b1;
-                spi_oen3_o = 1'b1;
+                spi_oe0_o = 0;
+                spi_oe1_o = 0;
+                spi_oe2_o = 0;
+                spi_oe3_o = 0;
             end
             `SPI_QUAD_TX:
             begin
-                spi_oen0_o = 1'b0;
-                spi_oen1_o = 1'b0;
-                spi_oen2_o = 1'b0;
-                spi_oen3_o = 1'b0;
+                spi_oe0_o = rstn_i;
+                spi_oe1_o = rstn_i;
+                spi_oe2_o = rstn_i;
+                spi_oe3_o = rstn_i;
             end
             `SPI_STD:
             begin
-                spi_oen0_o = 1'b0;
-                spi_oen1_o = 1'b1;
-                spi_oen2_o = 1'b1;
-                spi_oen3_o = 1'b1;
+                spi_oe0_o = rstn_i;
+                spi_oe1_o = 1'b0;
+                spi_oe2_o = 1'b0;
+                spi_oe3_o = 1'b0;
             end
             default:
             begin
-                spi_oen0_o = 1'b1;
-                spi_oen1_o = 1'b1;
-                spi_oen2_o = 1'b1;
-                spi_oen3_o = 1'b1;
-            end    
+                spi_oe0_o = 1'b0;
+                spi_oe1_o = 1'b0;
+                spi_oe2_o = 1'b0;
+                spi_oe3_o = 1'b0;
+            end
         endcase
     end
     always_comb begin : proc_offset

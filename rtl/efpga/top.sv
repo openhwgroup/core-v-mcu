@@ -704,7 +704,7 @@ module top (
                 m1_oper1_waddr <= m1_oper1_waddr + 4;
               if (tcdm_gnt_p3) begin
                  tcdm_addr_p3 <=  tcdm_addr_p3 +4;
-                 p3_cnt <= p3_cnt + 1;            
+                 p3_cnt <= p3_cnt + 1;
               end
            end //
            //  case: 2
@@ -1005,9 +1005,9 @@ module top (
             20'b0000_0001_xxxx_xxxx_xxxx: begin
               case (m0_oper0_rmode)
                 0, 3: lint_RDATA <= m0_oper0_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m0_oper0_rdata[15:0], 16'b0} : m0_oper0_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_oper0_rdata[15:0], 16'b0} : m0_oper0_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m0_oper0_rdata[7:0], 24'b0
                 } : {
                   m0_oper0_rdata[15:0], 16'b0
@@ -1019,9 +1019,9 @@ module top (
             20'b0000_0010_xxxx_xxxx_xxxx: begin
               case (m0_oper1_rmode)
                 0, 3: lint_RDATA <= m0_oper1_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m0_oper1_rdata[15:0], 16'b0} : m0_oper1_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_oper1_rdata[15:0], 16'b0} : m0_oper1_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m0_oper1_rdata[7:0], 24'b0
                 } : {
                   m0_oper1_rdata[15:0], 16'b0
@@ -1034,9 +1034,9 @@ module top (
             20'b0000_0011_xxxx_xxxx_xxxx: begin
               case (m0_coef_rmode)
                 0, 3: lint_RDATA <= m0_coef_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m0_coef_rdata[15:0], 16'b0} : m0_coef_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_coef_rdata[15:0], 16'b0} : m0_coef_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m0_coef_rdata[7:0], 24'b0
                 } : {
                   m0_coef_rdata[15:0], 16'b0
@@ -1048,9 +1048,9 @@ module top (
             20'b0000_0100_xxxx_xxxx_xxxx: begin
               case (m1_oper0_rmode)
                 0, 3: lint_RDATA <= m1_oper0_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m1_oper0_rdata[15:0], 16'b0} : m1_oper0_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_oper0_rdata[15:0], 16'b0} : m1_oper0_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m1_oper0_rdata[7:0], 24'b0
                 } : {
                   m1_oper0_rdata[15:0], 16'b0
@@ -1062,9 +1062,9 @@ module top (
             20'b0000_0101_xxxx_xxxx_xxxx: begin
               case (m1_oper1_rmode)
                 0, 3: lint_RDATA <= m1_oper1_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m1_oper1_rdata[15:0], 16'b0} : m1_oper1_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_oper1_rdata[15:0], 16'b0} : m1_oper1_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m1_oper1_rdata[7:0], 24'b0
                 } : {
                   m1_oper1_rdata[15:0], 16'b0
@@ -1076,9 +1076,9 @@ module top (
             20'b0000_0110_xxxx_xxxx_xxxx: begin
               case (m1_coef_rmode)
                 0, 3: lint_RDATA <= m1_coef_rdata;
-                1: lint_RDATA = l_ADDR[1] ? {m1_coef_rdata[15:0], 16'b0} : m1_coef_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_coef_rdata[15:0], 16'b0} : m1_coef_rdata;
                 2:
-                lint_RDATA = l_ADDR[1] ? (l_ADDR[0] ? {
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
                   m1_coef_rdata[7:0], 24'b0
                 } : {
                   m1_coef_rdata[15:0], 16'b0
