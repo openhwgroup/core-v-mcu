@@ -108,6 +108,7 @@ Basic UART driven by UDMA system
 | RO          | Read Only    |
 | RC          | Read & Clear after read |
 | WO          | Write Only |
+| WC          | Write Clears (value ignored; always writes a 0) |
 | WS          | Write Sets (value ignored; always writes a 1) |
 | RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
 | RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |

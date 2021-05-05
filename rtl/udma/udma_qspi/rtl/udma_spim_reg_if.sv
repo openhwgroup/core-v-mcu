@@ -275,7 +275,7 @@ module udma_spim_reg_if #(
         `REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
         `REG_TX_CFG:
-            cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,1'b0,2'b00,r_tx_continuous};
+            cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,1'b0,r_tx_datasize,r_tx_continuous};
         `REG_STATUS:
             cfg_data_o = {30'h0,status_i};
         default:

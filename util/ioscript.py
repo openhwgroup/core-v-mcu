@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #==========================================================
+
 import json
 import argparse
 import csv
@@ -39,6 +40,7 @@ parser.add_argument("--reg-def-csv", help="register definition file (csv)")
 parser.add_argument("--reg-def-h", help="register definition C header file (h)")
 parser.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 parser.add_argument("--reg-def-md", help="register definition markdown file (md)")
+parser.add_argument("--pin-table-md", help="pin table markdown file (md)")
 args = parser.parse_args()
 
 #
@@ -700,7 +702,6 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("    // pad signals\n")
         pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
         pad_frame_sv.write("    );\n")
-
         pad_frame_sv.write("    // dummy wire to make lint clean\n")
         pad_frame_sv.write("    wire void1;\n")
         pad_frame_sv.write("    // connect io\n")
@@ -1132,13 +1133,38 @@ if args.reg_def_csv != None and args.reg_def_md != None:
             reg_table = csv.reader(rdf_input)
             finished_header = False
             for reg in reg_table:
-                if reg[0] == "Register":
+                if reg[0] == "Register" or reg[0] == "Code":
                     finished_header = True
                     break
                 if reg[0] == "Module" or reg[0] == "Title":
                     rdf_output.write("# %s\n\n" % evaluate_defines(reg[1]))
                 else:
                     rdf_output.write("%s\n" % evaluate_defines(reg[1]))
+        rdf_input.close()
+        with open(args.reg_def_csv, 'r') as rdf_input:
+            reg_table = csv.reader(rdf_input)
+            table_format = "| %-4s | %15s | %5s | %-15s |\n"
+            finished_header = False
+            for reg in reg_table:
+                if reg[0] == "Register":
+                    break
+                if reg[0] == "Code":
+                    finished_header = True
+                    rdf_output.write(table_format % ("Code", "Command/Field",  "Bits", "Description"))
+                    rdf_output.write(table_format % ("---", "--------------", "-----", "-------------------------"))
+                    continue
+                if not finished_header:
+                    continue
+                if reg[1] != "":
+                    cmdstring = reg[1]
+                else:
+                    cmdstring = reg[2]
+                if len(reg) == 2:
+                    rdf_output.write(table_format % (reg[0], reg[1], "", "", ""))
+                elif len(reg) >= 5 and reg[3] == '':
+                    rdf_output.write(table_format % (reg[0], cmdstring, "", reg[5]))
+                elif len(reg) >= 5 and reg[3] != '':
+                    rdf_output.write(table_format % (reg[0], cmdstring, reg[3]+":"+reg[4], reg[5]))
         rdf_input.close()
         with open(args.reg_def_csv, 'r') as rdf_input:
             reg_table = csv.reader(rdf_input)
@@ -1183,11 +1209,42 @@ if args.reg_def_csv != None and args.reg_def_md != None:
         rdf_output.write("| RO          | Read Only    |\n")
         rdf_output.write("| RC          | Read & Clear after read |\n")
         rdf_output.write("| WO          | Write Only |\n")
+        rdf_output.write("| WC          | Write Clears (value ignored; always writes a 0) |\n")
         rdf_output.write("| WS          | Write Sets (value ignored; always writes a 1) |\n")
         rdf_output.write("| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |\n")
         rdf_output.write("| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |\n")
         rdf_output.write("| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |\n")
     rdf_output.close()
+
+######################################################################
+#
+# Write .md file for pin table
+#
+######################################################################    
+
+if args.pin_table_md != None and args.soc_defines != None and args.pin_table != None:
+    print("Writing '%s'" % args.pin_table_md)
+    with open(args.pin_table_md, 'w') as rdf_output:
+        rdf_output.write("# Pin Assignment\n")
+        rdf_output.write("\n| IO | sysio |")
+        for i in range(N_PADSEL):
+            rdf_output.write(" sel=%d |" % (i))
+        rdf_output.write("\n")
+        rdf_output.write("| --- | --- |")
+        for i in range(N_PADSEL):
+            rdf_output.write(" --- |")
+        rdf_output.write("\n")
+        with open(args.pin_table, 'r') as f_pin_table:
+            pin_table = csv.reader(f_pin_table)
+            pin_num = -2
+            for pin in pin_table:
+                pin_num = pin_num + 1
+                if pin_num >= 0:
+                    # Work to do
+                    rdf_output.write("| %s | %s |" % (pin[1], pin[3]))
+                    for i in range(N_PADSEL):
+                        rdf_output.write(" %s |" % (pin[4+i]))
+                    rdf_output.write("\n")
 
 ######################################################################
 #

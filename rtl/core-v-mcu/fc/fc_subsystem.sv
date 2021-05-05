@@ -65,6 +65,8 @@ module fc_subsystem #(
   logic [ 4:0] core_irq_ack_id;
   logic        core_irq_ack;
   logic [31:0] core_irq_x;
+  logic [31:0] s_irq_o;
+
 
   // Boot address, core id, cluster id, fethc enable and core_status
   logic [31:0] boot_addr;
@@ -170,7 +172,7 @@ module fc_subsystem #(
         .apu_result_i  ('0),
         .apu_flags_i   ('0),
 
-        .irq_i    (core_irq_x),
+        .irq_i    (s_irq_o),
         .irq_ack_o(core_irq_ack),
         .irq_id_o (core_irq_ack_id),
 
@@ -287,7 +289,7 @@ module fc_subsystem #(
       .core_clock_en_o   (core_clock_en),
       .fetch_en_o        (fetch_en_eu),
       .apb_slave         (apb_slave_eu),
-      .irq_o             (irq_o)
+      .irq_o             (s_irq_o)
   );
 
 

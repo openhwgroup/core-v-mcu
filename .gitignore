@@ -8,3 +8,4 @@ build/
 ./ips
 gmon.out
 modelsim.ini
+vivado.log
