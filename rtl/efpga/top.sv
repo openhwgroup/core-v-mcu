@@ -1012,7 +1012,7 @@ module top (
             20'ha0: lint_RDATA <= m1_m0_odata;
             20'ha4: lint_RDATA <= m1_m1_odata;
             20'ha8: lint_RDATA <= m1_m0_cdata;
-            20'ha8: lint_RDATA <= m1_m1_cdata;
+            20'hac: lint_RDATA <= m1_m1_cdata;
 
             20'h100: lint_RDATA <= m0_m0_dataout;
             20'h104: lint_RDATA <= m0_m1_dataout;
