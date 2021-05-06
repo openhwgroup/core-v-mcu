@@ -1072,18 +1072,6 @@ if args.reg_def_csv != None and args.reg_def_h != None:
                     if reg[1] == '':
                         continue
                     if reg[0] != '':
-                        if regname != '': # spit out previous register
-                            # rdf_output.write("  union {\n")
-                            # rdf_output.write("    __IO uint32_t %s;\n" % regname)
-                            field_format = "      %-4s uint32_t  %-10s : %2d;\n"
-                            if field_num > 0: # got fields to spit out
-                                # rdf_output.write("    struct {\n")
-                                msb = 0
-                                for idx in range(field_num-1, 0, -1):
-                                    # if lsb_array[idx] > msb: # got a gap to fill
-                                        # rdf_output.write(field_format % ("__IO", "", lsb - msb))
-                                    # rdf_output.write(field_format % ("__IO", field_name[field_num], msb_array[field_num] - lsb_array[field_num]))
-                                    msb = msb_array[field_num]
                         regname = remove_subscript(reg[1].upper())
                         regoffset = int(reg[0], 0)
                         rdf_output.write("#define %-30s %s\n" % ("REG_"+regname, reg[0]))

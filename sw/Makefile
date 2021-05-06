@@ -8,8 +8,7 @@ CSV_MIRROR_DIR=csv-mirror/
 
 FOO=$(shell find ../rtl -name '*.csv' -exec mkdir -p ${CSV_MIRROR_DIR} \; -exec cp {} ${CSV_MIRROR_DIR} \;)
 $(info ${FOO})
-SRCS1=$(shell find ../rtl -name '*.csv' -print)
-SRCS=$(filter-out ../rtl/efpga/data/efpga_template_reg_defs.csv,${SRCS1})
+SRCS=$(shell find ../rtl -name '*.csv' -print)
 $(info ${SRCS})
 HDR_FILES:=$(addprefix ${HDR_DIR}/,$(notdir $(SRCS:.csv=.h)))
 $(info ${MD_FILES})
@@ -18,7 +17,7 @@ $(info ${MD_FILES})
 all:    hdrs
 
 clean:
-				rm ${HDR_FILES}
+				rm -rf ${HDR_DIR}
 				rm -rf ${CSV_MIRROR_DIR}
 
 hdrs:    ${HDR_FILES}
