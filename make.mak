@@ -1,4 +1,8 @@
 
+YML=$(shell find . -name '*.yml' -print)
+
+$(info ${YML})
+
 SCRIPTS=sim/tcl_files/config/vsim_ips.tcl
 SCRIPTS+=fpga/core-v-mcu/tcl/ips_src_files.tcl
 SCRIPTS+=fpga/core-v-mcu/tcl/rtl_src_files.tcl
@@ -16,15 +20,17 @@ IOSCRIPT+=fpga/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
 IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
+IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
+IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
 IOSCRIPT_OUT+=fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assigment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
-all:	scripts ${IOSCRIPT_OUT}
+all:	${SCRIPTS} ${IOSCRIPT_OUT}
 
 help:
 			@echo "help"
 			
-${SCRIPTS}:
+${SCRIPTS}:	${YML}
 				./generate-scripts
 				
 ${IOSCRIPT_OUT}:	${IOSCRIPT}
@@ -43,5 +49,5 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					
 					
 .PHONY:bitstream
-bitstream:
+bitstream:	${SCRIPTS}
 				(cd fpga; make nexys rev=nexysA7-100T) 2>&1 | tee vivado.log
