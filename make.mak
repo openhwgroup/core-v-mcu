@@ -29,11 +29,18 @@ IOSCRIPT_OUT+=core-v-mcu-config.h
 all:	${SCRIPTS} ${IOSCRIPT_OUT} docs sw
 
 help:
-			@echo "help"
+			@echo "all:            generate build scripts, custom build files, doc and sw header files"
+			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
+			@echo "lint:           run Verilator lint check"
+			@echo "doc:            generate documentation"
+			@echo "sw:             generate C header files (in ./sw)"
 			
 clean:
 				(cd docs; make clean)
 				(cd sw; make clean)
+				
+lint:
+				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 			
 ${SCRIPTS}:	${YML}
 				./generate-scripts
@@ -62,5 +69,5 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					
 					
 .PHONY:bitstream
-bitstream:	${SCRIPTS}
+bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 				(cd fpga; make nexys rev=nexysA7-100T) 2>&1 | tee vivado.log
