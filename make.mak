@@ -1,7 +1,8 @@
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 YML=$(shell find . -name '*.yml' -print)
-
-$(info ${YML})
 
 SCRIPTS=sim/tcl_files/config/vsim_ips.tcl
 SCRIPTS+=fpga/core-v-mcu/tcl/ips_src_files.tcl
@@ -22,16 +23,28 @@ IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
 IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
 IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
-IOSCRIPT_OUT+=fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assigment.xdc
+IOSCRIPT_OUT+=fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
-all:	${SCRIPTS} ${IOSCRIPT_OUT}
+all:	${SCRIPTS} ${IOSCRIPT_OUT} docs sw
 
 help:
 			@echo "help"
 			
+clean:
+				(cd docs; make clean)
+				(cd sw; make clean)
+			
 ${SCRIPTS}:	${YML}
 				./generate-scripts
+				
+.PHONY:docs
+docs:
+				(cd docs; make)
+				
+.PHONY:sw
+sw:
+				(cd sw; make)
 				
 ${IOSCRIPT_OUT}:	${IOSCRIPT}
 				python3 util/ioscript.py\
@@ -44,7 +57,7 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					--pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
 					--xilinx-core-v-mcu-sv fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
 					--input-xdc fpga/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
-					--output-xdc fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assigment.xdc\
+					--output-xdc fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc\
 					--cvmcu-h core-v-mcu-config.h
 					
 					
