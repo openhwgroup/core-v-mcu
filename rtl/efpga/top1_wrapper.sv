@@ -6,7 +6,6 @@
           Description : Verilog Simulation Netlist file
 ******************************************************************/
 
-`timescale 1ns / 10ps
 
 module QL_eFPGA_ArcticPro2_32X32_GF_22 (
     input  A2F_B_10_0,
