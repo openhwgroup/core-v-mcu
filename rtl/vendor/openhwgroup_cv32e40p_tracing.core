@@ -4,7 +4,7 @@ CAPI=2:
 # Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-name: "openhwgroup.org:ip:cv32e40p"
+name: "openhwgroup.org:ip:cv32e40p_tracing"
 description: "OpenHW Group RISC-V Core CV32E40P with tracing enabled."
 
 filesets:

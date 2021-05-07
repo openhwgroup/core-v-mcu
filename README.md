@@ -46,13 +46,19 @@ $ make genesys2
 
 ## Experimental fuseSoC Support
 
+Run Verilator Simulation (currently failing):
+
+```
+fusesoc --cores-root . run --setup --build --run --target=sim openhwgroup.org:systems:core-v-mcu-verilator
+```
+
 Run Verilator lint target:
 
 ```
 fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
 ```
 
-Once can sanity check the top-level using QuestaSim:
+One can sanity check the top-level using QuestaSim:
 
 ```
 fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu

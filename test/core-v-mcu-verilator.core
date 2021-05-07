@@ -1,0 +1,31 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:systems:core-v-mcu-verilator
+description: CORE-V MCU Verilator Top.
+
+filesets:
+  files_verilator:
+    depend:
+    - openhwgroup.org:systems:core-v-mcu
+    files:
+    # Top-level
+    - core-v-mcu.cc
+    file_type: cppSource
+targets:
+  default: &default_target
+    filesets:
+    - files_verilator
+    toplevel: [core_v_mcu]
+
+  sim:
+    <<: *default_target
+    default_tool: verilator
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - -Wno-fatal
