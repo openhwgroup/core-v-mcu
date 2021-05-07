@@ -28,4 +28,4 @@ targets:
       verilator:
         mode: cc
         verilator_options:
-          - -Wno-fatal
+        - -Wno-fatal
