@@ -24,23 +24,25 @@ from datetime import datetime
 #  Argument handling
 #
 parser = argparse.ArgumentParser()
-parser.add_argument("--soc-defines", help="file with pulp_soc_defines")
-parser.add_argument("--perdef-json", help="peripheral definition json file")
-parser.add_argument("--pin-table", help="csv filecontaining pin-table")
-parser.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
-parser.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
-parser.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
-parser.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
-parser.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
-parser.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
-parser.add_argument("--input-xdc", help="xdc that defines board")
-parser.add_argument("--output-xdc", help="output xdc for use in Vivado")
-parser.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
-parser.add_argument("--reg-def-csv", help="register definition file (csv)")
-parser.add_argument("--reg-def-h", help="register definition C header file (h)")
-parser.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
-parser.add_argument("--reg-def-md", help="register definition markdown file (md)")
-parser.add_argument("--pin-table-md", help="pin table markdown file (md)")
+inputArgs = parser.add_argument_group("input files")
+outputArgs = parser.add_argument_group("output files")
+inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
+inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
+inputArgs.add_argument("--pin-table", help="csv filecontaining pin-table")
+outputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
+outputArgs.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
+outputArgs.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
+outputArgs.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
+outputArgs.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
+outputArgs.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
+inputArgs.add_argument("--input-xdc", help="xdc that defines board")
+outputArgs.add_argument("--output-xdc", help="output xdc for use in Vivado")
+outputArgs.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
+inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
+outputArgs.add_argument("--reg-def-h", help="register definition C header file (h)")
+outputArgs.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
+outputArgs.add_argument("--reg-def-md", help="register definition markdown file (md)")
+outputArgs.add_argument("--pin-table-md", help="pin table markdown file (md)")
 args = parser.parse_args()
 
 #
@@ -1070,18 +1072,6 @@ if args.reg_def_csv != None and args.reg_def_h != None:
                     if reg[1] == '':
                         continue
                     if reg[0] != '':
-                        if regname != '': # spit out previous register
-                            # rdf_output.write("  union {\n")
-                            # rdf_output.write("    __IO uint32_t %s;\n" % regname)
-                            field_format = "      %-4s uint32_t  %-10s : %2d;\n"
-                            if field_num > 0: # got fields to spit out
-                                # rdf_output.write("    struct {\n")
-                                msb = 0
-                                for idx in range(field_num-1, 0, -1):
-                                    # if lsb_array[idx] > msb: # got a gap to fill
-                                        # rdf_output.write(field_format % ("__IO", "", lsb - msb))
-                                    # rdf_output.write(field_format % ("__IO", field_name[field_num], msb_array[field_num] - lsb_array[field_num]))
-                                    msb = msb_array[field_num]
                         regname = remove_subscript(reg[1].upper())
                         regoffset = int(reg[0], 0)
                         rdf_output.write("#define %-30s %s\n" % ("REG_"+regname, reg[0]))

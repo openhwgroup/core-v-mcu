@@ -78,7 +78,7 @@ set rev $::env(rev)
 
 puts "Use CORE V MCU constraints."
 add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu-timing.xdc
-add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu-pin-assigment.xdc
+add_files -fileset constrs_1 -norecurse $CONSTRS/core-v-mcu-pin-assignment.xdc
 
 # Elaborate design
 synth_design -rtl -name rtl_1 -sfcu;# sfcu -> run synthesis in single file compilation unit mode

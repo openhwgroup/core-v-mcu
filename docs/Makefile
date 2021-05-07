@@ -19,8 +19,7 @@ INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
 all:    doc
 
 clean:
-				rm ${MDFILES}
-				(cd sphinx-source; make clean)
+				rm -rf ${AUTO_MD_DIR}
 
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}

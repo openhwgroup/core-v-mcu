@@ -9,3 +9,5 @@ build/
 gmon.out
 modelsim.ini
 vivado.log
+sw/hdr/
+sw/csv-mirror/

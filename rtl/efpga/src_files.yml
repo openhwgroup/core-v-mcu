@@ -2,6 +2,8 @@ quicklogic:
   files: [
     eFPGA_wrapper.sv,
     top.sv,
+    A2_design.sv,
+    top1_wrapper.sv,
     ./a2_math_unit.sv,
     ./ql_math_unit/rtl/DW02_mac.sv,
     ./ql_math_unit/rtl/mac_16bit.v,

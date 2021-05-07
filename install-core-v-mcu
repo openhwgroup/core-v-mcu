@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 if [ $# -gt 0 ]; then
 	echo "Changing to commit $1" |& tee --append install-core-v-mcu.log
@@ -27,7 +27,7 @@ echo "######################################"
       --pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
       --xilinx-core-v-mcu-sv fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
       --input-xdc fpga/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
-      --output-xdc fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assigment.xdc\
+      --output-xdc fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc\
       --cvmcu-h core-v-mcu-config.h\
   && echo "############# Done ###################" \
 ) |& tee --append install-core-v-mcu.log

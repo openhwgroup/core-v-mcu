@@ -197,31 +197,31 @@ end
 /*------------------------------*/
 always@(*) begin : CHECK_SAT_CONDITION
   case(fMAC_OUT_SEL[5:0])
-    6'd0  : is_not_saturation = &fmux_acc_idata[39:15] || !(|fmux_acc_idata[39:15]) ;
-    6'd1  : is_not_saturation = &fmux_acc_idata[39:16] || !(|fmux_acc_idata[39:16]) ;
-    6'd2  : is_not_saturation = &fmux_acc_idata[39:17] || !(|fmux_acc_idata[39:17]) ;
-    6'd3  : is_not_saturation = &fmux_acc_idata[39:18] || !(|fmux_acc_idata[39:18]) ;
-    6'd4  : is_not_saturation = &fmux_acc_idata[39:19] || !(|fmux_acc_idata[39:19]) ;
-    6'd5  : is_not_saturation = &fmux_acc_idata[39:20] || !(|fmux_acc_idata[39:20]) ;
-    6'd6  : is_not_saturation = &fmux_acc_idata[39:21] || !(|fmux_acc_idata[39:21]) ;
-    6'd7  : is_not_saturation = &fmux_acc_idata[39:22] || !(|fmux_acc_idata[39:22]) ;
-    6'd8  : is_not_saturation = &fmux_acc_idata[39:23] || !(|fmux_acc_idata[39:23]) ;
-    6'd9  : is_not_saturation = &fmux_acc_idata[39:24] || !(|fmux_acc_idata[39:24]) ;
-    6'd10 : is_not_saturation = &fmux_acc_idata[39:25] || !(|fmux_acc_idata[39:25]) ;
-    6'd11 : is_not_saturation = &fmux_acc_idata[39:26] || !(|fmux_acc_idata[39:26]) ;
-    6'd12 : is_not_saturation = &fmux_acc_idata[39:27] || !(|fmux_acc_idata[39:27]) ;
-    6'd13 : is_not_saturation = &fmux_acc_idata[39:28] || !(|fmux_acc_idata[39:28]) ;
-    6'd14 : is_not_saturation = &fmux_acc_idata[39:29] || !(|fmux_acc_idata[39:29]) ;
-    6'd15 : is_not_saturation = &fmux_acc_idata[39:30] || !(|fmux_acc_idata[39:30]) ;
-    6'd16 : is_not_saturation = &fmux_acc_idata[39:31] || !(|fmux_acc_idata[39:31]) ;
-    6'd17 : is_not_saturation = &fmux_acc_idata[39:32] || !(|fmux_acc_idata[39:32]) ;
-    6'd18 : is_not_saturation = &fmux_acc_idata[39:33] || !(|fmux_acc_idata[39:33]) ;
-    6'd19 : is_not_saturation = &fmux_acc_idata[39:34] || !(|fmux_acc_idata[39:34]) ;
-    6'd20 : is_not_saturation = &fmux_acc_idata[39:35] || !(|fmux_acc_idata[39:35]) ;
-    6'd21 : is_not_saturation = &fmux_acc_idata[39:36] || !(|fmux_acc_idata[39:36]) ;
-    6'd22 : is_not_saturation = &fmux_acc_idata[39:37] || !(|fmux_acc_idata[39:37]) ;
-    6'd23 : is_not_saturation = &fmux_acc_idata[39:38] || !(|fmux_acc_idata[39:38]) ;
-    default : is_not_saturation = &fmux_acc_idata[39:15] || !(|fmux_acc_idata[39:15]) ;
+    6'd0  : is_not_saturation = &fmux_acc_idata[39:15] || !(|fmux_acc_idata[39:15]) || (~MAC_TC & !(|fmux_acc_idata[39:16])) ;
+    6'd1  : is_not_saturation = &fmux_acc_idata[39:16] || !(|fmux_acc_idata[39:16]) || (~MAC_TC & !(|fmux_acc_idata[39:17])) ;
+    6'd2  : is_not_saturation = &fmux_acc_idata[39:17] || !(|fmux_acc_idata[39:17]) || (~MAC_TC & !(|fmux_acc_idata[39:18])) ;
+    6'd3  : is_not_saturation = &fmux_acc_idata[39:18] || !(|fmux_acc_idata[39:18]) || (~MAC_TC & !(|fmux_acc_idata[39:19])) ;
+    6'd4  : is_not_saturation = &fmux_acc_idata[39:19] || !(|fmux_acc_idata[39:19]) || (~MAC_TC & !(|fmux_acc_idata[39:20])) ;
+    6'd5  : is_not_saturation = &fmux_acc_idata[39:20] || !(|fmux_acc_idata[39:20]) || (~MAC_TC & !(|fmux_acc_idata[39:21])) ;
+    6'd6  : is_not_saturation = &fmux_acc_idata[39:21] || !(|fmux_acc_idata[39:21]) || (~MAC_TC & !(|fmux_acc_idata[39:22])) ;
+    6'd7  : is_not_saturation = &fmux_acc_idata[39:22] || !(|fmux_acc_idata[39:22]) || (~MAC_TC & !(|fmux_acc_idata[39:23])) ;
+    6'd8  : is_not_saturation = &fmux_acc_idata[39:23] || !(|fmux_acc_idata[39:23]) || (~MAC_TC & !(|fmux_acc_idata[39:24])) ;
+    6'd9  : is_not_saturation = &fmux_acc_idata[39:24] || !(|fmux_acc_idata[39:24]) || (~MAC_TC & !(|fmux_acc_idata[39:25])) ;
+    6'd10 : is_not_saturation = &fmux_acc_idata[39:25] || !(|fmux_acc_idata[39:25]) || (~MAC_TC & !(|fmux_acc_idata[39:26])) ;
+    6'd11 : is_not_saturation = &fmux_acc_idata[39:26] || !(|fmux_acc_idata[39:26]) || (~MAC_TC & !(|fmux_acc_idata[39:27])) ;
+    6'd12 : is_not_saturation = &fmux_acc_idata[39:27] || !(|fmux_acc_idata[39:27]) || (~MAC_TC & !(|fmux_acc_idata[39:28])) ;
+    6'd13 : is_not_saturation = &fmux_acc_idata[39:28] || !(|fmux_acc_idata[39:28]) || (~MAC_TC & !(|fmux_acc_idata[39:29])) ;
+    6'd14 : is_not_saturation = &fmux_acc_idata[39:29] || !(|fmux_acc_idata[39:29]) || (~MAC_TC & !(|fmux_acc_idata[39:30])) ;
+    6'd15 : is_not_saturation = &fmux_acc_idata[39:30] || !(|fmux_acc_idata[39:30]) || (~MAC_TC & !(|fmux_acc_idata[39:31])) ;
+    6'd16 : is_not_saturation = &fmux_acc_idata[39:31] || !(|fmux_acc_idata[39:31]) || (~MAC_TC & !(|fmux_acc_idata[39:32])) ;
+    6'd17 : is_not_saturation = &fmux_acc_idata[39:32] || !(|fmux_acc_idata[39:32]) || (~MAC_TC & !(|fmux_acc_idata[39:33])) ;
+    6'd18 : is_not_saturation = &fmux_acc_idata[39:33] || !(|fmux_acc_idata[39:33]) || (~MAC_TC & !(|fmux_acc_idata[39:34])) ;
+    6'd19 : is_not_saturation = &fmux_acc_idata[39:34] || !(|fmux_acc_idata[39:34]) || (~MAC_TC & !(|fmux_acc_idata[39:35])) ;
+    6'd20 : is_not_saturation = &fmux_acc_idata[39:35] || !(|fmux_acc_idata[39:35]) || (~MAC_TC & !(|fmux_acc_idata[39:36])) ;
+    6'd21 : is_not_saturation = &fmux_acc_idata[39:36] || !(|fmux_acc_idata[39:36]) || (~MAC_TC & !(|fmux_acc_idata[39:37])) ;
+    6'd22 : is_not_saturation = &fmux_acc_idata[39:37] || !(|fmux_acc_idata[39:37]) || (~MAC_TC & !(|fmux_acc_idata[39:38])) ;
+    6'd23 : is_not_saturation = &fmux_acc_idata[39:38] || !(|fmux_acc_idata[39:38]) || (~MAC_TC & !(fmux_acc_idata[39])) ;
+    default : is_not_saturation = &fmux_acc_idata[39:15] || !(|fmux_acc_idata[39:15]) || (~MAC_TC & !(|fmux_acc_idata[39:16])) ;
   endcase
 end
 
@@ -230,7 +230,9 @@ always@(*) begin : ACC_SAT_DATA_OUT
     if ( is_not_saturation ) 
       MAC_OUT = acc_data_out_sel;
     else begin
-      if (fmux_acc_idata[39] == 1'b1)
+      if (MAC_TC == 0)
+        MAC_OUT = 16'hffff;
+      else if (fmux_acc_idata[39] == 1'b1)
         MAC_OUT = {1'b1,15'h0};
       else 
         MAC_OUT = {1'b0,15'h7fff};

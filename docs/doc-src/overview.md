@@ -99,38 +99,39 @@ The goals of the whole product tests are to:
  Peripheral tests use the specified peripherals (typically PMOD) to confirm correct system operation.
 
  ### UART tests
+ Pmod used for regression testing: PmodUSBUART
 
-| Type          | Mode                            | PMODZ      | Notes      |
-| :------------  | :---------------------------    | :-------  | :-------  |
-| Blocking    |                  |      ||
-|        | Set config            | USBUART  |baud, stop, bits, parity  |
-|        | Read char              | USBUART  ||
-|        | Write char            | USBUART  ||
-|        | Read N char            | USBUART  ||
-|        | Write N char            | USBUART  ||
-|        | Read through '\n'          | USBUART  ||
-|        | Rx empty              | USBUART  ||
-|        | Tx empty              | USBUART  ||
-|        | Wait for idle            | USBUART  ||
-| Non-blocking  |                  |      ||
+| Type          | Mode                            | Notes      |
+| :------------  | :---------------------------    | :-------  |
+| Blocking    |                    ||
+|        | Set config              |baud, stop, bits, parity  |
+|        | Read char               ||
+|        | Write char              ||
+|        | Read N char             ||
+|        | Write N char            ||
+|        | Read through '\n'       ||
+|        | Rx empty                ||
+|        | Tx empty                ||
+|        | Wait for idle           ||
+| Non-blocking  |                  ||
 
 ### I2Cmaster
-
-| Type       | Mode                | PMOD    | Notes   |
-| :------------  | :---------------------------    | :-------  | :-------  |
-| Blocking     |                   |       |
-|          | Set clock frequency        | AD2    |
-|          | Wait for idle            | AD2    |
-|         | Read register            | AD2    |
-|        | Read non-existant register     | AD2    | Test NAK handling |
-|        | Write register           | AD2    |
-|        | Write non-existant register    | AD2    | Test NAK handling |
-|        | Read N of M registers, M >= N    | AD2    |
-|        | Read N of M registers, M < N    | AD2    | Test NAK handling |
-|        | Write N of M registers, M >= N  | AD2    |
-|        | Write N of M registers, M < N    | AD2    | Test NAK handling |
-| Not tested  |                  |      ||
-|        | Clock stretching          |      ||
+Pmod used for regression testing: PmodRTCC (has small SRAM)
+| Type       | Mode                           | Notes   |
+| :------------  | :---------------------     | :-------  |
+| Blocking  |                                 ||
+|           | Set clock frequency             ||
+|           | Wait for idle                   ||
+|           | Read register                   ||
+|           | Read non-existant register      | Test NAK handling |
+|           | Write register                  ||
+|           | Write non-existant register     | Test NAK handling |
+|           | Read N of M registers, M >= N   ||
+|           | Read N of M registers, M < N    | Test NAK handling |
+|           | Write N of M registers, M >= N  ||
+|           | Write N of M registers, M < N   | Test NAK handling |
+| Not tested  |                               ||
+|           | Clock stretching                ||
 
 ### I2Cslave
 
@@ -148,20 +149,20 @@ Note: APIs are on host, so used for purposes of describing tested functionality
 |        | Write N of M registers, M < N    | Test NAK handling |
 
 ### QSPImaster
-
-| Type       | Mode                | PMOD    | Notes   |
-| :------------  | :---------------------------    | :-------  | :-------  |
-| Blocking     |                   |       |
-|        | Set configuration          | SF3    | clock rate, cpol, cpha, endianness, cs# |
-|        | Wait for idle            | SF3    ||
-| Non-blocking  |                  |      ||
-|        | Write N bytes in single bit mode  | SF3/DA8  ||
-|        | Write N bytes in dual bit mode  | SF3    ||
-|        | Write N bytes in quad bit mode  | SF3    ||
-|        | Read N bytes in single bit mode  | SF3    ||
-|        | Read N bytes in dual bit mode    | SF3    ||
-|        | Read N bytes in quad bit mode    | SF3    ||
-|        | Write/Read N bytes in single mode  | TBD    ||
+Pmod used for regression testing: PmodSF3 (serial NOR flash memory)
+| Type       | Mode                           | Notes   |
+| :------------  | :---------------------     | :-------  |
+| Blocking     |                              ||
+|        | Set configuration                  | clock rate, cpol, cpha, endianness, cs# |
+|        | Wait for idle                      ||
+| Non-blocking  |                             ||
+|        | Write N bytes in single bit mode   ||
+|        | Write N bytes in dual bit mode     ||
+|        | Write N bytes in quad bit mode     ||
+|        | Read N bytes in single bit mode    ||
+|        | Read N bytes in dual bit mode      ||
+|        | Read N bytes in quad bit mode      ||
+|        | Write/Read N bytes in single mode  ||
 
 ### CAMI
 
