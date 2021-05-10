@@ -32,6 +32,7 @@ help:
 			@echo "lint:           run Verilator lint check"
 			@echo "doc:            generate documentation"
 			@echo "sw:             generate C header files (in ./sw)"
+			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
 			
 clean:
 				(cd docs; make clean)
@@ -40,12 +41,13 @@ clean:
 lint:
 				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 			
-emul:		${IOSCRIPT_OUT}
+nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"
 				@echo "*                                   *"
 				@echo "* setting up nexys specific files   *"
 				@echo "*                                   *"
 				@echo "*************************************"
+				mkdir -p emulation/core-v-mcu-nexys/rtl
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.sv\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
