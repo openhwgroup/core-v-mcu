@@ -56,6 +56,11 @@ nexys-emul:		${IOSCRIPT_OUT}
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+				@echo "*************************************"
+				@echo "*                                   *"
+				@echo "* running Vivado                    *"
+				@echo "*                                   *"
+				@echo "*************************************"
 				(\
 					export BOARD=nexys;\
 					export BOARD_CLOCK_MHZ=100;\
