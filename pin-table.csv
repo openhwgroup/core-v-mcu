@@ -1,16 +1,16 @@
 Xilinx, IO,Index,sysio,pad_mux=0,pad_mux=1,pad_mux=2,pad_mux=3
 UART_TXD_IN,IO_0,0,,uart0_rx,,gpio_0,fpgaio_0
 UART_RXD_OUT,IO_1,1,,uart0_tx,,gpio_1,fpgaio_1
-JB[1],IO_2,2,,0,1,gpio_2,fpgaio_2
-JB[2],IO_3,3,,uart1_tx,uart1_rx,gpio_3,fpgaio_3
-JB[3],IO_4,4,,uart1_rx,uart1_tx,gpio_4,fpgaio_4
-JB[4],IO_5,5,,0,1,gpio_5,fpgaio_5
+JA[1],IO_2,2,,0,1,gpio_2,fpgaio_2
+JA[2],IO_3,3,,uart1_tx,uart1_rx,gpio_3,fpgaio_3
+JA[3],IO_4,4,,uart1_rx,uart1_tx,gpio_4,fpgaio_4
+JA[4],IO_5,5,,0,1,gpio_5,fpgaio_5
 CLK100MHZ,IO_6,6,ref_clk,,,,
 CPU_RESETN,IO_7,7,rstn,,,,
-JA[4],IO_8,8,jtag_tck,,,,
-JA[2],IO_9,9,jtag_tdi,,,,
-JA[3],IO_10,10,jtag_tdo,,,,
-JA[1],IO_11,11,jtag_tms,,,,
+JB[10],IO_8,8,jtag_tck,,,,
+JB[8],IO_9,9,jtag_tdi,,,,
+JB[9],IO_10,10,jtag_tdo,,,,
+JB[7],IO_11,11,jtag_tms,,,,
 SW[0],IO_12,12,jtag_trst,,,,
 JD[3],IO_13,13,,i2cm0_scl,1,0,gpio_0
 JD[4],IO_14,14,,i2cm0_sda,1,0,gpio_1

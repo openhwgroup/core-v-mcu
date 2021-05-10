@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 # Directory where generated hdr files go
-HDR_DIR=hdr
+HDR_DIR=inc
 CSV_MIRROR_DIR=csv-mirror/
 
 DEF_FILES=../rtl/includes/pulp_soc_defines.sv\
