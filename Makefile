@@ -20,7 +20,7 @@ IOSCRIPT_OUT+=fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
 #Must also change the localparam 'L2_BANK_SIZE' in pulp_soc.sv accordingly
-export BANK_SIZE_INTL_SRAM=28672
+export INTERLEAVED_BANK_SIZE=28672
 #Must also change the localparam 'L2_BANK_SIZE_PRI' in pulp_soc.sv accordingly
 export PRIVATE_BANK_SIZE=8192
 
@@ -33,14 +33,14 @@ help:
 			@echo "doc:            generate documentation"
 			@echo "sw:             generate C header files (in ./sw)"
 			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
-			
+
 clean:
 				(cd docs; make clean)
 				(cd sw; make clean)
-				
+
 lint:
 				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
-			
+
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"
 				@echo "*                                   *"
@@ -71,15 +71,15 @@ nexys-emul:		${IOSCRIPT_OUT}
 					export SLOW_CLK_PERIOD_NS=30517;\
 					fusesoc --cores-root . run --target=nexys-a7-100t --setup --build openhwgroup.org:systems:core-v-mcu-emul\
 				) 2>&1 | tee lint.log
-				
+
 .PHONY:docs
 docs:
 				(cd docs; make)
-				
+
 .PHONY:sw
 sw:
 				(cd sw; make)
-				
+
 ${IOSCRIPT_OUT}:	${IOSCRIPT}
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.sv\
@@ -92,8 +92,12 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					--xilinx-core-v-mcu-sv fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
-					
-					
+
+
 .PHONY:bitstream
 bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 				(cd fpga; make nexys rev=nexysA7-100T) 2>&1 | tee vivado.log
+
+download:
+	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
+              build/openhwgroup.org_systems_core-v-mcu-emul_0/nexys-a7-100t-vivado/openhwgroup.org_systems_core-v-mcu-emul_0.runs/impl_1/xilinx_core_v_mcu.bit
