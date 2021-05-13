@@ -101,3 +101,6 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT_IN}
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
 					--pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv
+download:
+	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
+              emulation/core-v-mcu-nexys-a7-100t.bit
