@@ -114,7 +114,7 @@
 		"usable":	true,
 		"type":		"udma",
 		"ports": {
-			"clk"	: "output",
+			"clk"	: "input",
 			"vsync"	: "input",
 			"hsync"	: "input",
 			"data0"	: "input",
