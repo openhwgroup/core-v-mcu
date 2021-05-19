@@ -346,13 +346,13 @@ module soc_peripherals #(
 */
   assign s_events[UDMA_EVENTS-1:0] = s_udma_events;
   // TODO(timsaxe): Check why this is multiply driven.
-  // assign s_events[`N_GPIO+63:64] = s_gpio_event;
+  assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_event;
 
   assign s_events[135] = s_adv_timer_events[0];
   assign s_events[136] = s_adv_timer_events[1];
   assign s_events[137] = s_adv_timer_events[2];
   assign s_events[138] = s_adv_timer_events[3];
-  assign s_events[139] = s_gpio_event;
+  assign s_events[139] = 0;
   assign s_events[140] = fc_hwpe_events_i[0];
   assign s_events[141] = fc_hwpe_events_i[1];
   assign s_events[159:142] = '0;
@@ -367,7 +367,7 @@ module soc_peripherals #(
 
   assign fc_events_o[16] = s_timer_lo_event;
   assign fc_events_o[17] = s_timer_hi_event;
-  assign fc_events_o[18] = s_gpio_event;
+  assign fc_events_o[18] = 0;
   assign fc_events_o[19] = s_adv_timer_events[0];
   assign fc_events_o[20] = s_adv_timer_events[1];
   assign fc_events_o[21] = s_adv_timer_events[2];
