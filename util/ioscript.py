@@ -25,20 +25,22 @@ from datetime import datetime
 #
 parser = argparse.ArgumentParser()
 inputArgs = parser.add_argument_group("input files")
-outputArgs = parser.add_argument_group("output files")
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
+inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
 inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
 inputArgs.add_argument("--pin-table", help="csv filecontaining pin-table")
-outputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
+inputArgs.add_argument("--input-xdc", help="xdc that defines board")
+inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
+
+outputArgs = parser.add_argument_group("output files")
+
 outputArgs.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
 outputArgs.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
 outputArgs.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
 outputArgs.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
 outputArgs.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
-inputArgs.add_argument("--input-xdc", help="xdc that defines board")
 outputArgs.add_argument("--output-xdc", help="output xdc for use in Vivado")
 outputArgs.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
-inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
 outputArgs.add_argument("--reg-def-h", help="register definition C header file (h)")
 outputArgs.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 outputArgs.add_argument("--reg-def-md", help="register definition markdown file (md)")
@@ -170,6 +172,15 @@ if args.periph_bus_defines != None:
                         line[2] = line[2].replace("_", "")
                     per_bus_defines[line[1]] = line[2]
     per_bus_define_file.close()
+    
+####################################################################################
+#
+# Grab peripheral definitions from perdef.json
+#
+####################################################################################
+if args.perdef_json != None:
+  with open(args.perdef_json) as f:
+    perdefs = json.load(f)
 
 ######################################################################
 #
@@ -180,9 +191,6 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
     sysio = {"":""}                                                 # row for each sysio = ['name', 'direction']
     sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysio = [ionum, 'name']
     with open(args.peripheral_defines, 'w') as peripheral_defines_svh:
-        with open(args.perdef_json) as f:
-            perdefs = json.load(f)
-
         write_license_header(peripheral_defines_svh,"")
         peripheral_defines_svh.write("\n")
         peripheral_defines_svh.write("`define BUILD_DATE 32'h%s\n" % datetime.today().strftime("%Y%m%d"))
@@ -722,7 +730,7 @@ if args.pad_frame_sv != None:
                 elif sysio[sysionames[ionum][:-2]] == 'snoop':
                     pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
                         (ionum, ionum, ionum, ionum, ionum, ionum))
-                    pad_frame_sv.write("      assign %s = io_out_i[%d];\n" % (sysionames[ionum], ionum))
+                    pad_frame_sv.write("      assign %s = io_in_o[%d];\n" % (sysionames[ionum], ionum))
                 else:
                     print("ERROR: unknown sysio type '%s'" % sysio[sysionames[ionum][:-2]])
                     error_count = error_count + 1

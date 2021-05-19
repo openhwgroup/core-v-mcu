@@ -134,4 +134,4 @@ module fpga_bootrom
   default: value <= 0;
    endcase
   end
-endmodule    
+endmodule
