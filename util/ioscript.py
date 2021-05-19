@@ -25,6 +25,7 @@ from datetime import datetime
 #
 parser = argparse.ArgumentParser()
 inputArgs = parser.add_argument_group("input files")
+<<<<<<< HEAD
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
 inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
 inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
@@ -34,13 +35,27 @@ inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
 
 outputArgs = parser.add_argument_group("output files")
 
+=======
+outputArgs = parser.add_argument_group("output files")
+inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
+inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
+inputArgs.add_argument("--pin-table", help="csv filecontaining pin-table")
+outputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
+>>>>>>> 76d6b535221df3dc77e6ab4da2e2a43cbfb04a00
 outputArgs.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
 outputArgs.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
 outputArgs.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
 outputArgs.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
 outputArgs.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
+<<<<<<< HEAD
 outputArgs.add_argument("--output-xdc", help="output xdc for use in Vivado")
 outputArgs.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
+=======
+inputArgs.add_argument("--input-xdc", help="xdc that defines board")
+outputArgs.add_argument("--output-xdc", help="output xdc for use in Vivado")
+outputArgs.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
+inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
+>>>>>>> 76d6b535221df3dc77e6ab4da2e2a43cbfb04a00
 outputArgs.add_argument("--reg-def-h", help="register definition C header file (h)")
 outputArgs.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 outputArgs.add_argument("--reg-def-md", help="register definition markdown file (md)")
@@ -172,7 +187,7 @@ if args.periph_bus_defines != None:
                         line[2] = line[2].replace("_", "")
                     per_bus_defines[line[1]] = line[2]
     per_bus_define_file.close()
-    
+
 ####################################################################################
 #
 # Grab peripheral definitions from perdef.json
@@ -1218,7 +1233,7 @@ if args.reg_def_csv != None and args.reg_def_md != None:
 #
 # Write .md file for pin table
 #
-######################################################################    
+######################################################################
 
 if args.pin_table_md != None and args.soc_defines != None and args.pin_table != None:
     print("Writing '%s'" % args.pin_table_md)
