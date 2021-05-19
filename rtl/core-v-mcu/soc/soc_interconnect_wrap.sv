@@ -99,8 +99,8 @@ module soc_interconnect_wrap
   //Everything that is not routed to port 1 or 2 ends up in port 0 by default
   localparam addr_map_rule_t [NR_RULES_L2_DEMUX-1:0] L2_DEMUX_RULES = '{
       '{ idx: 1 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK1_END_ADDR} , //Both , bank0 and bank1 are in the  same address block
-  '{ idx: 1 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}      ,
-        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}, 
+      '{ idx: 1 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}      ,
+        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR},
         '{ idx: 2 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }
   };
 
