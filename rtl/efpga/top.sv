@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 //
 // `include "pulp_soc_defines.sv"
-    module top (
+module top (
     input [5:0] CLK,
     input [3:0] RESET,
     input       lint_REQ,
@@ -214,7 +214,7 @@
   logic launch_p0, launch_p1, launch_p2, launch_p3;
   logic [3:0] p0_fsm, p1_fsm, p2_fsm, p3_fsm;
   logic [11:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
-  logic [7:0]  delay;
+  logic [ 7:0] delay;
 
 
   logic [31:0] last_control;
@@ -1036,8 +1036,7 @@
           if (delay == 0) begin
             lint_GNT <= 1;
             apb_fsm  <= IDLE;
-          end
-          else  begin
+          end else begin
             delay <= delay - 1;
           end
 

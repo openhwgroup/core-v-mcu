@@ -33,7 +33,7 @@ filesets:
     files:
     - fpga/genesys2.tcl
     file_type: tclSource
-    
+
   nexys-xdc:
     files:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
@@ -61,10 +61,10 @@ parameters:
 targets:
   default: &default
     filesets:
-      - emulation-rtl
-      - xilinx-ips
+    - emulation-rtl
+    - xilinx-ips
     toplevel: xilinx_core_v_mcu
-    
+
   genesys2:
     default_tool: vivado
     parameters: [PULP_FPGA_EMUL=true]
@@ -78,7 +78,7 @@ targets:
       vivado:
         part: xc7k325tffg900-2
     toplevel: xilinx_core_v_mcu
-    
+
   nexys-a7-100t:
     <<: *default
     default_tool: vivado

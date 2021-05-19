@@ -25,7 +25,6 @@ from datetime import datetime
 #
 parser = argparse.ArgumentParser()
 inputArgs = parser.add_argument_group("input files")
-<<<<<<< HEAD
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
 inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
 inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
