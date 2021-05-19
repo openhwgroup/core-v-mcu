@@ -1,51 +1,21 @@
-.. core-v-mcu User Manual master file
-   created by Sphinx from Word 08:21 19 Mar 2021
+========================
+CORE-V MCU Documentation
+========================
 
-======================
-CORE-V-MCU User Manual
-======================
+CORE-V MCU is a set of peripherals wrapped around a RISC-V core from the Open Hardware Group.
 
-..  toctree::
-    :caption: Overview
-    :maxdepth: 2
-    :glob:
+This documentation contains material for different audiences.
 
-    doc-src/overview.md
-
-..  toctree::
-    :caption: Contributing
-    :maxdepth: 2
-    :glob:
-
-    github.md
-
-..  toctree::
-    :caption: Pin Table
-    :maxdepth: 2
-    :glob:
-
-    auto-docs/pin-table
-
-..  toctree::
-    :caption: Core Controllers
-    :maxdepth: 1
-    :glob:
+The :doc:`User Manual <user-manual/index>` describes the CORE-V MCU
+The :doc:`Software Based Test Plan <sw-based-tests/index>` provides a list of software based tests that are planned and their status.
+The :doc:`Developers Guide <developers-guide/index>` provides information for developers.
 
 
-    auto-docs/apb_soc_ctrl_reg_defs
-    auto-docs/apb_interrupt_cntrl_reg_defs
-    auto-docs/apb_timer_unit_reg_defs
-    auto-docs/apb_gpio_reg_defs
-    auto-docs/efpga_template_reg_defs
-    auto-docs/udma_ctrl_reg_defs
+.. toctree::
+   :maxdepth: 1
+   :caption: Chapters
+   :hidden:
 
-..  toctree::
-    :caption: Peripheral Controllers
-    :maxdepth: 1
-    :glob:
-
-    auto-docs/udma_uart_reg_defs
-    auto-docs/udma_i2cm_reg_defs
-    auto-docs/udma_qspi_reg_defs
-    auto-docs/udma_sdio_reg_defs
-    auto-docs/udma_camera_reg_defs
+   user-manual/index.rst
+   sw-based-tests/index.rst
+   developers-guide/index.rst

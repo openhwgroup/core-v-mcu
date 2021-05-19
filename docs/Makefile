@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 # Directory where generated md files go
-AUTO_MD_DIR=auto-docs
-CSV_MIRROR_DIR=csv-mirror/
+AUTO_MD_DIR=user-manual/auto-docs
+CSV_MIRROR_DIR=user-manual/csv-mirror/
 
 FOO=$(shell find ../rtl -name '*.csv' -exec mkdir -p ${CSV_MIRROR_DIR} \; -exec cp {} ${CSV_MIRROR_DIR} \;)
 $(info ${FOO})
