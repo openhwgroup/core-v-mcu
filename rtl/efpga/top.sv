@@ -201,9 +201,17 @@ module top (
   logic [79:0] ifpga_out, ifpga_oe;
   logic [31:0] tcdm_result_p0, tcdm_result_p1, tcdm_result_p2, tcdm_result_p3;
   logic [2:0] cnt5, cnt4, cnt3, cnt2, cnt1;
-
+  logic [31:0] m0_m0_odata;
+  logic [31:0] m0_m1_odata;
+  logic [31:0] m0_m0_cdata;
+  logic [31:0] m0_m1_cdata;
+  logic [31:0] m1_m0_odata;
+  logic [31:0] m1_m1_odata;
+  logic [31:0] m1_m0_cdata;
+  logic [31:0] m1_m1_cdata;
   logic saved_REQ;
-  (* mark_debug = "yes" *) logic launch_p0, launch_p1, launch_p2, launch_p3;
+  logic [3:0] l_ADDR;
+  logic launch_p0, launch_p1, launch_p2, launch_p3;
   logic [3:0] p0_fsm, p1_fsm, p2_fsm, p3_fsm;
   logic [11:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
 
@@ -320,14 +328,14 @@ module top (
   assign events_o = fpgaio_in[15:0];  //i_events;
 
 
-  assign m0_m0_oper_in = m0_oper0_rdata;
-  assign m0_m1_oper_in = m0_oper1_rdata;
-  assign m0_m0_coef_in = m0_coef_rdata;
-  assign m0_m1_coef_in = m0_coef_rdata;
-  assign m1_m0_oper_in = m1_oper0_rdata;
-  assign m1_m1_oper_in = m1_oper1_rdata;
-  assign m1_m0_coef_in = m1_coef_rdata;
-  assign m1_m1_coef_in = m1_coef_rdata;
+  assign m0_m0_oper_in = m0_m0_odata;
+  assign m0_m1_oper_in = m0_m1_odata;
+  assign m0_m0_coef_in = m0_m0_cdata;
+  assign m0_m1_coef_in = m0_m1_cdata;
+  assign m1_m0_oper_in = m1_m0_odata;
+  assign m1_m1_oper_in = m1_m1_odata;
+  assign m1_m0_coef_in = m1_m0_cdata;
+  assign m1_m1_coef_in = m1_m1_cdata;
 
   always @(posedge CLK[1] or negedge RESET[1]) begin
     if (RESET[1] == 0) cnt1 <= '0;
@@ -355,6 +363,8 @@ module top (
       lint_GNT <= 0;
       lint_VALID <= 0;
       lint_RDATA <= '0;
+      l_ADDR <= '0;
+
       ifpga_out <= '0;
       ifpga_oe <= '0;
       i_events <= '0;
@@ -425,6 +435,14 @@ module top (
       p2_fsm <= '0;
       p3_fsm <= '0;
       last_control <= '0;
+      m0_m0_odata <= '0;
+      m0_m1_odata <= '0;
+      m0_m0_cdata <= '0;
+      m0_m1_cdata <= '0;
+      m1_m0_odata <= '0;
+      m1_m1_odata <= '0;
+      m1_m0_cdata <= '0;
+      m1_m1_cdata <= '0;
     end // if (RESET[0] == 0)
       else begin
       last_control <= control_in;
@@ -493,7 +511,7 @@ module top (
           end
           tcdm_req_p0 <= 0;
           if (tcdm_valid_p0 == 1) begin
-            if (tcdm_wen_p0) begin  // read
+            if (tcdm_wen_p0 == 1) begin  // read
               m0_oper0_wdata <= tcdm_rdata_p0;
               m0_oper0_we <= 1;
               if (p0_cnt < control_in[23:16]) p0_fsm <= 2;
@@ -545,7 +563,7 @@ module top (
           end
           tcdm_req_p1 <= 0;
           if (tcdm_valid_p1 == 1) begin
-            if (tcdm_wen_p1) begin  // read
+            if (tcdm_wen_p1 == 1) begin  // read
               m0_oper1_we <= 1;
               m0_oper1_wdata <= tcdm_rdata_p1;
               if (p1_cnt < control_in[23:16]) p1_fsm <= 2;
@@ -597,7 +615,7 @@ module top (
           end
           tcdm_req_p2 <= 0;
           if (tcdm_valid_p2 == 1) begin
-            if (tcdm_wen_p2) begin  // read
+            if (tcdm_wen_p2 == 1) begin  // read
               m1_oper0_wdata <= tcdm_rdata_p2;
               m1_oper0_we <= 1;
               if (p2_cnt < control_in[23:16]) p2_fsm <= 2;
@@ -648,7 +666,7 @@ module top (
           end
           tcdm_req_p3 <= 0;
           if (tcdm_valid_p3 == 1) begin
-            if (tcdm_wen_p3) begin  // read
+            if (tcdm_wen_p3 == 1) begin  // read
               m1_oper1_wdata <= tcdm_rdata_p3;
               m1_oper1_we <= 1;
               if (p3_cnt < control_in[23:16]) p3_fsm <= 2;
@@ -701,7 +719,7 @@ module top (
                 m1_oper1_waddr <= m1_oper1_waddr + 4;
               if (tcdm_gnt_p3) begin
                  tcdm_addr_p3 <=  tcdm_addr_p3 +4;
-                 p3_cnt <= p3_cnt + 1;            
+                 p3_cnt <= p3_cnt + 1;
               end
            end //
            //  case: 2
@@ -727,6 +745,7 @@ module top (
           //	      PSLVERR <= 0;
 
           if (lint_REQ & !lint_GNT) begin
+            l_ADDR <= lint_ADDR[3:0];
             if (lint_WEN == 0) begin
               lint_GNT <= 1;
               apb_fsm  <= WRITE;
@@ -771,23 +790,6 @@ module top (
               tcdm_wen_p3  <= lint_WDATA[31];
               tcdm_be_p3   <= ~lint_WDATA[23:20];
             end
-            20'h80: begin
-              tcdm_wdata_p0 <= lint_WDATA;
-              tcdm_req_p0   <= 1;
-            end
-            20'h84: begin
-              tcdm_wdata_p1 <= lint_WDATA;
-              tcdm_req_p1   <= 1;
-            end
-
-            20'h88: begin
-              tcdm_wdata_p2 <= lint_WDATA;
-              tcdm_req_p2   <= 1;
-            end
-            20'h8c: begin
-              tcdm_wdata_p3 <= lint_WDATA;
-              tcdm_req_p3   <= 1;
-            end
             20'h10: begin
               if (lint_BE[3]) m0_m0_control[31:24] <= lint_WDATA[31:24];
               if (lint_BE[2]) m0_m0_control[23:16] <= lint_WDATA[23:16];
@@ -825,6 +827,30 @@ module top (
             20'h54: ifpga_oe[63:32] <= lint_WDATA;
             20'h58: ifpga_oe[79:64] <= lint_WDATA[15:0];
             20'h6c: i_events <= lint_WDATA[15:0];
+            20'h80: begin
+              tcdm_wdata_p0 <= lint_WDATA;
+              tcdm_req_p0   <= 1;
+            end
+            20'h84: begin
+              tcdm_wdata_p1 <= lint_WDATA;
+              tcdm_req_p1   <= 1;
+            end
+            20'h88: begin
+              tcdm_wdata_p2 <= lint_WDATA;
+              tcdm_req_p2   <= 1;
+            end
+            20'h8c: begin
+              tcdm_wdata_p3 <= lint_WDATA;
+              tcdm_req_p3   <= 1;
+            end
+            20'h90: m0_m0_odata <= lint_WDATA;
+            20'h94: m0_m1_odata <= lint_WDATA;
+            20'h98: m0_m0_cdata <= lint_WDATA;
+            20'h9c: m0_m1_cdata <= lint_WDATA;
+            20'ha0: m1_m0_odata <= lint_WDATA;
+            20'ha4: m1_m1_odata <= lint_WDATA;
+            20'ha8: m1_m0_cdata <= lint_WDATA;
+            20'hac: m1_m1_cdata <= lint_WDATA;
 
             20'h200: launch_p0 <= 1;
             20'h204: launch_p1 <= 1;
@@ -835,36 +861,115 @@ module top (
             20'b0000_0001_xxxx_xxxx_xxxx: begin  // m0_oper0_ram
               m0_oper0_waddr <= lint_ADDR[11:0];
               m0_oper0_we <= 1'b1;
-              m0_oper0_wdata <= lint_WDATA;
+              case (m0_oper0_wmode)
+                0, 3: m0_oper0_wdata <= lint_WDATA;
+                1: m0_oper0_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m0_oper0_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase  // case (m0_oper_wmode)
             end
 
             20'b0000_0010_xxxx_xxxx_xxxx: begin  // m0_oper1_ram
               m0_oper1_waddr <= lint_ADDR[11:0];
               m0_oper1_we <= 1'b1;
-              m0_oper1_wdata <= lint_WDATA;
+              case (m0_oper1_wmode)
+                0, 3: m0_oper1_wdata <= lint_WDATA;
+                1: m0_oper1_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m0_oper1_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase
+
             end
 
             20'b0000_0011_xxxx_xxxx_xxxx: begin  // m0_coef_ram
               m0_coef_waddr <= lint_ADDR[11:0];
               m0_coef_we <= 1'b1;
-              m0_coef_wdata <= lint_WDATA;
+              case (m0_coef_wmode)
+                0, 3: m0_coef_wdata <= lint_WDATA;
+                1: m0_coef_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m0_coef_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase  // case (m0_coef_wmode)
             end
 
             20'b0000_0100_xxxx_xxxx_xxxx: begin  // m1_oper0_ram
               m1_oper0_waddr <= lint_ADDR[11:0];
               m1_oper0_we <= 1'b1;
-              m1_oper0_wdata <= lint_WDATA;
+              case (m1_oper0_wmode)
+                0, 3: m1_oper0_wdata <= lint_WDATA;
+                1: m1_oper0_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m1_oper0_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase  // case (m1_oper0_wmode)
             end
 
             20'b0000_0101_xxxx_xxxx_xxxx: begin  // m1_oper1_ram
               m1_oper1_waddr <= lint_ADDR[11:0];
               m1_oper1_we <= 1'b1;
-              m1_oper1_wdata <= lint_WDATA;
+              case (m1_oper1_wmode)
+                0, 3: m1_oper1_wdata <= lint_WDATA;
+                1: m1_oper1_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m1_oper1_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase  // case (m1_oper1_wmode)
             end
             20'b0000_0110_xxxx_xxxx_xxxx: begin  // m1_coef_ram
               m1_coef_waddr <= lint_ADDR[11:0];
               m1_coef_we <= 1'b1;
-              m1_coef_wdata <= lint_WDATA;
+              case (m1_coef_wmode)
+                0, 3: m1_coef_wdata <= lint_WDATA;
+                1: m1_coef_wdata <= l_ADDR[1] ? {16'b0, lint_WDATA[31:16]} : lint_WDATA;
+                2:
+                m1_coef_wdata <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[31:24]
+                } : {
+                  24'b0, lint_WDATA[23:16]
+                }) : (l_ADDR[0] ? {
+                  24'b0, lint_WDATA[15:8]
+                } : {
+                  24'b0, lint_WDATA[7:0]
+                });
+              endcase  // case (m1_coef_wmode)
             end
 
           endcase  // case (lint_ADDR)
@@ -900,6 +1005,15 @@ module top (
             20'h88: lint_RDATA <= tcdm_result_p2;
             20'h8C: lint_RDATA <= tcdm_result_p3;
 
+            20'h90: lint_RDATA <= m0_m0_odata;
+            20'h94: lint_RDATA <= m0_m1_odata;
+            20'h98: lint_RDATA <= m0_m0_cdata;
+            20'h9c: lint_RDATA <= m0_m1_cdata;
+            20'ha0: lint_RDATA <= m1_m0_odata;
+            20'ha4: lint_RDATA <= m1_m1_odata;
+            20'ha8: lint_RDATA <= m1_m0_cdata;
+            20'hac: lint_RDATA <= m1_m1_cdata;
+
             20'h100: lint_RDATA <= m0_m0_dataout;
             20'h104: lint_RDATA <= m0_m1_dataout;
             20'h108: lint_RDATA <= m1_m0_dataout;
@@ -917,12 +1031,91 @@ module top (
           lint_GNT <= 1;
           apb_fsm  <= IDLE;
           casex (lint_ADDR)
-            20'b0000_0001_xxxx_xxxx_xxxx: lint_RDATA <= m0_oper0_rdata;
-            20'b0000_0010_xxxx_xxxx_xxxx: lint_RDATA <= m0_oper1_rdata;
-            20'b0000_0011_xxxx_xxxx_xxxx: lint_RDATA <= m0_coef_rdata;
-            20'b0000_0100_xxxx_xxxx_xxxx: lint_RDATA <= m1_oper0_rdata;
-            20'b0000_0101_xxxx_xxxx_xxxx: lint_RDATA <= m1_oper1_rdata;
-            20'b0000_0110_xxxx_xxxx_xxxx: lint_RDATA <= m1_coef_rdata;
+            20'b0000_0001_xxxx_xxxx_xxxx: begin
+              case (m0_oper0_rmode)
+                0, 3: lint_RDATA <= m0_oper0_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_oper0_rdata[15:0], 16'b0} : m0_oper0_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m0_oper0_rdata[7:0], 24'b0
+                } : {
+                  m0_oper0_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m0_oper0_rdata[23:0], 8'b0
+                } : m0_oper0_rdata;
+              endcase  // case (m0_oper0_rmode)
+            end
+            20'b0000_0010_xxxx_xxxx_xxxx: begin
+              case (m0_oper1_rmode)
+                0, 3: lint_RDATA <= m0_oper1_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_oper1_rdata[15:0], 16'b0} : m0_oper1_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m0_oper1_rdata[7:0], 24'b0
+                } : {
+                  m0_oper1_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m0_oper1_rdata[23:0], 8'b0
+                } : m0_oper1_rdata;
+              endcase  // case (m0_oper1_rmode)
+            end
+
+            20'b0000_0011_xxxx_xxxx_xxxx: begin
+              case (m0_coef_rmode)
+                0, 3: lint_RDATA <= m0_coef_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m0_coef_rdata[15:0], 16'b0} : m0_coef_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m0_coef_rdata[7:0], 24'b0
+                } : {
+                  m0_coef_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m0_coef_rdata[23:0], 8'b0
+                } : m0_coef_rdata;
+              endcase  // case (m0_coef_rmode)
+            end
+            20'b0000_0100_xxxx_xxxx_xxxx: begin
+              case (m1_oper0_rmode)
+                0, 3: lint_RDATA <= m1_oper0_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_oper0_rdata[15:0], 16'b0} : m1_oper0_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m1_oper0_rdata[7:0], 24'b0
+                } : {
+                  m1_oper0_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m1_oper0_rdata[23:0], 8'b0
+                } : m1_oper0_rdata;
+              endcase  // case (m1_oper0_rmode)
+            end
+            20'b0000_0101_xxxx_xxxx_xxxx: begin
+              case (m1_oper1_rmode)
+                0, 3: lint_RDATA <= m1_oper1_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_oper1_rdata[15:0], 16'b0} : m1_oper1_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m1_oper1_rdata[7:0], 24'b0
+                } : {
+                  m1_oper1_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m1_oper1_rdata[23:0], 8'b0
+                } : m1_oper1_rdata;
+              endcase  // case (m1_oper1_rmode)
+            end
+            20'b0000_0110_xxxx_xxxx_xxxx: begin
+              case (m1_coef_rmode)
+                0, 3: lint_RDATA <= m1_coef_rdata;
+                1: lint_RDATA <= l_ADDR[1] ? {m1_coef_rdata[15:0], 16'b0} : m1_coef_rdata;
+                2:
+                lint_RDATA <= l_ADDR[1] ? (l_ADDR[0] ? {
+                  m1_coef_rdata[7:0], 24'b0
+                } : {
+                  m1_coef_rdata[15:0], 16'b0
+                }) : l_ADDR[0] ? {
+                  m1_coef_rdata[23:0], 8'b0
+                } : m1_coef_rdata;
+              endcase  // case (m0_coef_rmode)
+            end
             default: lint_RDATA <= lint_RDATA;
           endcase  // casex (lint_ADDR)
         end  // case: READ_WAIT
@@ -934,8 +1127,4 @@ module top (
 
 
 
-endmodule  // 
-
-
-
-
+endmodule  //

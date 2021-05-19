@@ -164,7 +164,7 @@ module apb_soc_ctrl #(
 
   logic       s_apb_write;
 
-  (* mark_debug = "yes" *)logic [1:0] APB_fsm;
+  logic [1:0] APB_fsm;
   localparam FSM_IDLE = 0, FSM_READ = 1, FSM_WRITE = 2, FSM_WAIT = 3;
 
 

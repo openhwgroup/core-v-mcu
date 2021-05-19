@@ -46,10 +46,10 @@
 		"type":		"udma",
 		"ports": {
 			"clk"	: "output",
-			"csn0"	: "bidir",
-			"csn1"	: "bidir",
-			"csn2"	: "bidir",
-			"csn3"	: "bidir",
+			"csn0"	: "output",
+			"csn1"	: "output",
+			"csn2"	: "output",
+			"csn3"	: "output",
 			"data0"	: "bidir",
 			"data1"	: "bidir",
 			"data2"	: "bidir",
@@ -62,7 +62,7 @@
 		"usable":	true,
 		"type":		"udma",
 		"ports": {
-			"scl"	: "output",
+			"scl"	: "bidir",
 			"sda"	: "bidir"
 		},
 		"udma_tx": ["tx_i2cm" ],

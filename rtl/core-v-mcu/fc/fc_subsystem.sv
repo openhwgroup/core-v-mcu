@@ -12,15 +12,9 @@
 module fc_subsystem #(
     parameter USE_FPU             = 1,
     parameter USE_HWPE            = 1,
-    parameter N_EXT_PERF_COUNTERS = 1,
     parameter EVENT_ID_WIDTH      = 8,
     parameter PER_ID_WIDTH        = 32,
-    parameter NB_HWPE_PORTS       = 4,
-    parameter PULP_SECURE         = 1,
-    parameter TB_RISCV            = 0,
-    parameter CORE_ID             = 4'h0,
-    parameter CLUSTER_ID          = 6'h1F,
-    parameter USE_ZFINX           = 1
+    parameter NB_HWPE_PORTS       = 4
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -52,6 +46,8 @@ module fc_subsystem #(
   logic [ 4:0] core_irq_ack_id;
   logic        core_irq_ack;
   logic [31:0] core_irq_x;
+  logic [31:0] s_irq_o;
+
 
   // Boot address, core id, cluster id, fethc enable and core_status
   logic [31:0] boot_addr;
@@ -168,6 +164,7 @@ module fc_subsystem #(
       .fetch_enable_i   (fetch_en_int),
       .core_sleep_o     ()
   );
+
   assign supervisor_mode_o = 1'b1;
 
   // Ibex and CV32E40P supports 32 additional fast interrupts and reads the interrupt lines directly.
@@ -199,7 +196,7 @@ module fc_subsystem #(
       .core_clock_en_o   (core_clock_en),
       .fetch_en_o        (fetch_en_eu),
       .apb_slave         (apb_slave_eu),
-      .irq_o             (irq_o)
+      .irq_o             (s_irq_o)
   );
 
 

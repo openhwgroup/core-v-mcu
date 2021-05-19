@@ -21,10 +21,6 @@ project = 'CORE-V MCU'
 copyright = '2020-present, OpenHW Group'
 author = 'OpenHW Group Contributors'
 
-# -- Master Document -----------------------------------------------------
-
-master_doc = 'core-v-mcu-user-manual'
-
 
 # -- General configuration ---------------------------------------------------
 
