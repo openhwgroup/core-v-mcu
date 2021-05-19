@@ -730,7 +730,7 @@ if args.pad_frame_sv != None:
                 elif sysio[sysionames[ionum][:-2]] == 'snoop':
                     pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
                         (ionum, ionum, ionum, ionum, ionum, ionum))
-                    pad_frame_sv.write("      assign %s = io_out_i[%d];\n" % (sysionames[ionum], ionum))
+                    pad_frame_sv.write("      assign %s = io_in_o[%d];\n" % (sysionames[ionum], ionum))
                 else:
                     print("ERROR: unknown sysio type '%s'" % sysio[sysionames[ionum][:-2]])
                     error_count = error_count + 1
