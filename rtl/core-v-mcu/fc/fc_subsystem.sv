@@ -10,17 +10,17 @@
 
 
 module fc_subsystem #(
-    parameter             USE_FPU             = 1,
-    parameter             USE_HWPE            = 1,
-    parameter             N_EXT_PERF_COUNTERS = 1,
-    parameter             EVENT_ID_WIDTH      = 8,
-    parameter             PER_ID_WIDTH        = 32,
-    parameter             NB_HWPE_PORTS       = 4,
-    parameter             PULP_SECURE         = 1,
-    parameter             TB_RISCV            = 0,
-    parameter             CORE_ID             = 4'h0,
-    parameter             CLUSTER_ID          = 6'h1F,
-    parameter             USE_ZFINX           = 1
+    parameter USE_FPU             = 1,
+    parameter USE_HWPE            = 1,
+    parameter N_EXT_PERF_COUNTERS = 1,
+    parameter EVENT_ID_WIDTH      = 8,
+    parameter PER_ID_WIDTH        = 32,
+    parameter NB_HWPE_PORTS       = 4,
+    parameter PULP_SECURE         = 1,
+    parameter TB_RISCV            = 0,
+    parameter CORE_ID             = 4'h0,
+    parameter CLUSTER_ID          = 6'h1F,
+    parameter USE_ZFINX           = 1
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -113,63 +113,63 @@ module fc_subsystem #(
   //************ RISCV CORE ********************************
   //********************************************************
 
-    // OpenHW Group CV32E40P
-    assign boot_addr = boot_addr_i;
+  // OpenHW Group CV32E40P
+  assign boot_addr             = boot_addr_i;
 
-    cv32e40p_core #(
-        .PULP_XPULP(1)
-    ) lFC_CORE (
-        .clk_i              (clk_i),
-        .rst_ni             (rst_ni),
-        .pulp_clock_en_i    (core_clock_en),
-        .scan_cg_en_i       (test_en_i),
-        .boot_addr_i        (boot_addr),
-        .mtvec_addr_i       ('0),
-        .dm_halt_addr_i     (32'h1A110800),
-        .hart_id_i          (hart_id),
-        .dm_exception_addr_i('0),
+  cv32e40p_core #(
+      .PULP_XPULP(1)
+  ) lFC_CORE (
+      .clk_i              (clk_i),
+      .rst_ni             (rst_ni),
+      .pulp_clock_en_i    (core_clock_en),
+      .scan_cg_en_i       (test_en_i),
+      .boot_addr_i        (boot_addr),
+      .mtvec_addr_i       ('0),
+      .dm_halt_addr_i     (32'h1A110800),
+      .hart_id_i          (hart_id),
+      .dm_exception_addr_i('0),
 
-        // Instruction Memory Interface
-        .instr_addr_o  (core_instr_addr),
-        .instr_req_o   (core_instr_req),
-        .instr_rdata_i (core_instr_rdata),
-        .instr_gnt_i   (core_instr_gnt),
-        .instr_rvalid_i(core_instr_rvalid),
+      // Instruction Memory Interface
+      .instr_addr_o  (core_instr_addr),
+      .instr_req_o   (core_instr_req),
+      .instr_rdata_i (core_instr_rdata),
+      .instr_gnt_i   (core_instr_gnt),
+      .instr_rvalid_i(core_instr_rvalid),
 
-        // Data memory interface
-        .data_addr_o  (core_data_addr),
-        .data_req_o   (core_data_req),
-        .data_be_o    (core_data_be),
-        .data_rdata_i (core_data_rdata),
-        .data_we_o    (core_data_we),
-        .data_gnt_i   (core_data_gnt),
-        .data_wdata_o (core_data_wdata),
-        .data_rvalid_i(core_data_rvalid),
+      // Data memory interface
+      .data_addr_o  (core_data_addr),
+      .data_req_o   (core_data_req),
+      .data_be_o    (core_data_be),
+      .data_rdata_i (core_data_rdata),
+      .data_we_o    (core_data_we),
+      .data_gnt_i   (core_data_gnt),
+      .data_wdata_o (core_data_wdata),
+      .data_rvalid_i(core_data_rvalid),
 
-        // apu-interconnect
-        // handshake signals
-        .apu_req_o     (),
-        .apu_gnt_i     (1'b1),
-        // request channel
-        .apu_operands_o(),
-        .apu_op_o      (),
-        .apu_flags_o   (),
-        // response channel
-        .apu_rvalid_i  ('0),
-        .apu_result_i  ('0),
-        .apu_flags_i   ('0),
+      // apu-interconnect
+      // handshake signals
+      .apu_req_o     (),
+      .apu_gnt_i     (1'b1),
+      // request channel
+      .apu_operands_o(),
+      .apu_op_o      (),
+      .apu_flags_o   (),
+      // response channel
+      .apu_rvalid_i  ('0),
+      .apu_result_i  ('0),
+      .apu_flags_i   ('0),
 
-        .irq_i    (s_irq_o),
-        .irq_ack_o(core_irq_ack),
-        .irq_id_o (core_irq_ack_id),
+      .irq_i    (s_irq_o),
+      .irq_ack_o(core_irq_ack),
+      .irq_id_o (core_irq_ack_id),
 
-        .debug_req_i      (debug_req_i),
-        .debug_havereset_o(),
-        .debug_running_o  (),
-        .debug_halted_o   (stoptimer_o),
-        .fetch_enable_i   (fetch_en_int),
-        .core_sleep_o     ()
-    );
+      .debug_req_i      (debug_req_i),
+      .debug_havereset_o(),
+      .debug_running_o  (),
+      .debug_halted_o   (stoptimer_o),
+      .fetch_enable_i   (fetch_en_int),
+      .core_sleep_o     ()
+  );
   assign supervisor_mode_o = 1'b1;
 
   // Ibex and CV32E40P supports 32 additional fast interrupts and reads the interrupt lines directly.
