@@ -69,6 +69,12 @@ module i2s_clkws_gen (
    logic                   s_ws_master;
    logic                   s_ws_slave;
 
+   logic                   s_ws_gen_0_en;
+   logic                   s_ws_gen_1_en;
+
+   logic                   s_ws_int_0;
+   logic                   s_ws_int_1;
+
    assign pad_slave_sck_oe = pdm_en_i ? 1'b1 : (slave_en_i & ~sel_slave_ext_i);
    assign pad_slave_ws_oe  = pdm_en_i ? 1'b0 : (slave_en_i & ~sel_slave_ext_i);
    assign pad_slave_ws_o   = pdm_en_i ? 1'b0 : s_ws_slave;

@@ -18,7 +18,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
+/* verilator lint_off REDEFMACRO */
 `define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
 `define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
 `define REG_RX_CFG       5'b00010 //BASEADDR+0x08
@@ -35,6 +35,7 @@
 `define REG_IRQ_EN       5'b01011 //BASEADDR+0x2C
 `define REG_VALID        5'b01100 //BASEADDR+0x30
 `define REG_DATA         5'b01101 //BASEADDR+0x34
+/* verilator lint_on REDEFMACRO */
 
 module udma_uart_reg_if #(
     parameter L2_AWIDTH_NOAL = 12,

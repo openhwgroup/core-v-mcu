@@ -279,7 +279,7 @@ module soc_peripherals #(
 
   logic                                                      s_timer_in_lo_event;
   logic                                                      s_timer_in_hi_event;
-  logic [                    2:0]                            sel_clk_dc_fifo_efpga;
+
   logic                                                      clk_gating_dc_fifo_efpga;
   logic [                    3:0]                            reset_type1_efpga;
   logic                                                      s_efpga_clk;
@@ -346,16 +346,9 @@ module soc_peripherals #(
 */
   assign s_events[UDMA_EVENTS-1:0] = s_udma_events;
   // TODO(timsaxe): Check why this is multiply driven.
-  // assign s_events[`N_GPIO+63:64] = s_gpio_event;
+  assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_event;
 
-  assign s_events[135] = s_adv_timer_events[0];
-  assign s_events[136] = s_adv_timer_events[1];
-  assign s_events[137] = s_adv_timer_events[2];
-  assign s_events[138] = s_adv_timer_events[3];
-  assign s_events[139] = s_gpio_event;
-  assign s_events[140] = fc_hwpe_events_i[0];
-  assign s_events[141] = fc_hwpe_events_i[1];
-  assign s_events[159:142] = '0;
+
 
   assign fc_events_o[6:0] = 7'h0;  //RESERVED for sw events all routed to irq3
   assign fc_events_o[7] = s_timer_lo_event;  // MTIME irq
@@ -367,7 +360,7 @@ module soc_peripherals #(
 
   assign fc_events_o[16] = s_timer_lo_event;
   assign fc_events_o[17] = s_timer_hi_event;
-  assign fc_events_o[18] = s_gpio_event;
+  assign fc_events_o[18] = 0;
   assign fc_events_o[19] = s_adv_timer_events[0];
   assign fc_events_o[20] = s_adv_timer_events[1];
   assign fc_events_o[21] = s_adv_timer_events[2];
@@ -819,16 +812,16 @@ module soc_peripherals #(
       .fpga_clk5_i(fpga_clk_in[5]),
 
 
-      .sel_clk_dc_fifo_efpga_i(sel_clk_dc_fifo_efpga),
-      .clk_gating_dc_fifo_i   (clk_gating_dc_fifo_efpga),
-      .reset_type1_efpga_i    (reset_type1_efpga),
-      .enable_udma_efpga_i    (enable_udma_efpga),
-      .enable_events_efpga_i  (enable_events_efpga),
-      .enable_apb_efpga_i     (enable_apb_efpga),
-      .enable_tcdm3_efpga_i   (enable_tcdm3_efpga),
-      .enable_tcdm2_efpga_i   (enable_tcdm2_efpga),
-      .enable_tcdm1_efpga_i   (enable_tcdm1_efpga),
-      .enable_tcdm0_efpga_i   (enable_tcdm0_efpga),
+
+      .clk_gating_dc_fifo_i (clk_gating_dc_fifo_efpga),
+      .reset_type1_efpga_i  (reset_type1_efpga),
+      .enable_udma_efpga_i  (enable_udma_efpga),
+      .enable_events_efpga_i(enable_events_efpga),
+      .enable_apb_efpga_i   (enable_apb_efpga),
+      .enable_tcdm3_efpga_i (enable_tcdm3_efpga),
+      .enable_tcdm2_efpga_i (enable_tcdm2_efpga),
+      .enable_tcdm1_efpga_i (enable_tcdm1_efpga),
+      .enable_tcdm0_efpga_i (enable_tcdm0_efpga),
 
       .rst_n(rst_ni),
 

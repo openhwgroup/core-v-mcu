@@ -15,7 +15,7 @@ module udma_stream_unit
           input  logic                        tx_ch_gnt_i,
           input  logic                        tx_ch_valid_i,
           input  logic     [DATA_WIDTH-1 : 0] tx_ch_data_i,
-          output logic                        tx_ch_ready_o,  
+          output logic                        tx_ch_ready_o,
           input  logic [STREAM_ID_WIDTH-1 : 0] in_stream_dest_i,
           input  logic     [DATA_WIDTH-1 : 0] in_stream_data_i,
           input  logic                [1 : 0] in_stream_datasize_i,
@@ -29,7 +29,7 @@ module udma_stream_unit
           output logic                        out_stream_sot_o,
           output logic                        out_stream_eot_o,
           input  logic                        out_stream_ready_i,
-          input  logic [L2_AWIDTH_NOAL-1 : 0] spoof_addr_i, 
+          input  logic [L2_AWIDTH_NOAL-1 : 0] spoof_addr_i,
           input  logic [STREAM_ID_WIDTH-1 : 0] spoof_dest_i,
           input  logic                [1 : 0] spoof_datasize_i,
           input  logic                        spoof_req_i,
@@ -46,7 +46,7 @@ module udma_stream_unit
      logic          s_stream_sel;
 
      logic [L2_AWIDTH_NOAL-1:0] r_wr_ptr;
-     logic [L2_AWIDTH_NOAL-1:0] r_rd_ptr; 
+     logic [L2_AWIDTH_NOAL-1:0] r_rd_ptr;
      logic [L2_AWIDTH_NOAL-1:0] r_jump_dst;
      logic [L2_AWIDTH_NOAL-1:0] r_jump_src;
      logic [L2_AWIDTH_NOAL-1:0] s_datasize_toadd;
@@ -69,7 +69,9 @@ module udma_stream_unit
      logic                  s_sample_wr_start;
      logic                  r_err;
      logic                  s_stream_buf_en;
-
+     logic                  s_int_datasize;
+     logic                  s_wr_ptr_guess;
+     logic                  s_is_jump;
      enum logic [1:0] {ST_IDLE,ST_BUF_TRAN,ST_BUF_WAIT,ST_STREAM} s_state,r_state;
 
      assign s_spoof_match  = (spoof_dest_i == INST_ID);
@@ -81,10 +83,10 @@ module udma_stream_unit
      assign s_trans_rd     = s_req & tx_ch_gnt_i;
      assign s_int_datasize = s_stream_sel ? r_datasize : in_stream_datasize_i;
      assign out_stream_data_o     = s_stream_sel ? s_fifo_in_data : in_stream_data_i;
-     assign out_stream_datasize_o = s_stream_sel ? r_datasize : in_stream_datasize_i; 
-     assign out_stream_valid_o    = s_stream_sel ? s_fifo_in_valid : in_stream_valid_i; 
-     assign out_stream_sot_o      = s_stream_sel ? 1'b0 : in_stream_sot_i; 
-     assign out_stream_eot_o      = s_stream_sel ? 1'b0 : in_stream_eot_i; 
+     assign out_stream_datasize_o = s_stream_sel ? r_datasize : in_stream_datasize_i;
+     assign out_stream_valid_o    = s_stream_sel ? s_fifo_in_valid : in_stream_valid_i;
+     assign out_stream_sot_o      = s_stream_sel ? 1'b0 : in_stream_sot_i;
+     assign out_stream_eot_o      = s_stream_sel ? 1'b0 : in_stream_eot_i;
 
      assign s_wr_ptr_guess = r_wr_ptr + s_datasize_toadd;
      assign s_is_jump      = (spoof_addr_i != s_wr_ptr_guess);
@@ -117,14 +119,14 @@ module udma_stream_unit
           .ready_i ( s_fifo_in_ready  )
      );
 
-     always_comb 
+     always_comb
      begin
           s_rd_ptr_next = 'h0;
           if(r_do_jump && s_rd_ptr_jmp_match)
                s_rd_ptr_next = r_jump_dst;
           else
                s_rd_ptr_next = r_rd_ptr + s_datasize_toadd;
-     
+
      end
 
     always_comb
@@ -186,7 +188,7 @@ module udma_stream_unit
                s_stream_sel = 1'b1;
                if(cmd_clr_i)
                     s_state = ST_IDLE;
-               else if(s_trans_wr) 
+               else if(s_trans_wr)
                begin
                     s_sample_wr = 1'b1;
                     s_sample_rd = 1'b1;
@@ -202,9 +204,9 @@ module udma_stream_unit
         endcase
     end
 
-     always_ff @(posedge clk_i or negedge rstn_i) 
-     begin 
-          if(~rstn_i) 
+     always_ff @(posedge clk_i or negedge rstn_i)
+     begin
+          if(~rstn_i)
           begin
                r_wr_ptr      <= 'h0;
                r_rd_ptr      <= 'h0;
@@ -213,10 +215,10 @@ module udma_stream_unit
                r_do_jump     <= 'h0;
                r_err         <= 'h0;
                r_state       <= ST_IDLE;
-          end 
-          else 
+          end
+          else
           begin
-               if(cmd_clr_i) 
+               if(cmd_clr_i)
                begin
                     r_wr_ptr      <= 'h0;
                     r_rd_ptr      <= 'h0;
@@ -226,7 +228,7 @@ module udma_stream_unit
                     r_err         <= 'h0;
                     r_state       <= ST_IDLE;
                end
-               else 
+               else
                begin
                     r_state <= s_state;
 

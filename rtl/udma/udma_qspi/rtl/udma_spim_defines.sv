@@ -19,10 +19,11 @@
 `define SPI_CMD_SETUP_UCS 4'b1110
 
 // SPI Master Registers
-`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00 
+/* verilator lint_off REDEFMACRO */
+`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
 `define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
-`define REG_RX_CFG       5'b00010 //BASEADDR+0x08  
-`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C  
+`define REG_RX_CFG       5'b00010 //BASEADDR+0x08
+`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
 
 `define REG_TX_SADDR     5'b00100 //BASEADDR+0x10
 `define REG_TX_SIZE      5'b00101 //BASEADDR+0x14
@@ -35,6 +36,7 @@
 `define REG_CMD_INTCFG   5'b01011 //BASEADDR+0x2C
 
 `define REG_STATUS       5'b01100 //BASEADDR+0x30
+/* verilator lint_on REDEFMACRO */
 
 `define SPI_WAIT_EVT 2'b00
 `define SPI_WAIT_CYC 2'b01

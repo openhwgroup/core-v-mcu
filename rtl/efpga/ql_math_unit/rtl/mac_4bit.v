@@ -12,7 +12,7 @@ module MAC_4BIT (
   MAC_ACC_RND,
   MAC_ACC_CLEAR,
   MAC_ACC_SAT,
-  MAC_OUT_SEL,  
+  MAC_OUT_SEL,
   MAC_TC,
   acc_ff_rstn
 );
@@ -24,7 +24,7 @@ module MAC_4BIT (
   parameter ACC_WIDTH     = 2*(MULTI_WIDTH+PAD_ZERO) ;
 
 //OUTPUT
-output [7:0] MAC_OUT;
+output [4:0] MAC_OUT;
 
 //INPUT
 input        MAC_ACC_CLK;
@@ -34,7 +34,7 @@ input  [3:0] MAC_COEF_DATA;
 input        MAC_ACC_RND;
 input        MAC_ACC_CLEAR;
 input        MAC_ACC_SAT;
-input  [5:0] MAC_OUT_SEL;  
+input  [5:0] MAC_OUT_SEL;
 input        MAC_TC;
 input        acc_ff_rstn;
 
@@ -42,14 +42,14 @@ input        acc_ff_rstn;
 /*------------------------------*/
 /*                              */
 /*------------------------------*/
-reg  [ 5:0] fMAC_OUT_SEL; 
-reg  [19:0] mux_acc_idata; 
+reg  [ 5:0] fMAC_OUT_SEL;
+reg  [19:0] mux_acc_idata;
 reg  [19:0] fmux_acc_idata;
 reg  [3: 0] MAC_OUT;
-reg  [19:0] is_rounded_value; 
-reg  [19:0] feedback_acc_data;  
+reg  [19:0] is_rounded_value;
+reg  [19:0] feedback_acc_data;
 reg         is_not_saturation;
-reg  [3: 0] acc_data_out_sel; 
+reg  [3: 0] acc_data_out_sel;
 
 wire [19:0] DWMAC_out;
 
@@ -60,7 +60,7 @@ wire [19:0] DWMAC_out;
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : DELAY_OF_MAC_OUT_SEL
   if (~acc_ff_rstn)
     fMAC_OUT_SEL <= #0.2 'h0;
-  else  
+  else
     fMAC_OUT_SEL <= #0.2 MAC_OUT_SEL;
 end //DELAY_OF_MAC_OUT_SEL
 
@@ -68,19 +68,19 @@ end //DELAY_OF_MAC_OUT_SEL
 /*          MAC_UNIT            */
 /*------------------------------*/
    wire [5:0] oper_sign, coef_sign;
-   assign oper_sign = MAC_TC ? {6{MAC_OPER_DATA[3]}} : 4'b0000;
-   assign coef_sign = MAC_TC ? {6{MAC_COEF_DATA[3]}} : 4'b0000;   
-DW02_mac #( 
+   assign oper_sign = MAC_TC ? {6{MAC_OPER_DATA[3]}} : 6'b000000;
+   assign coef_sign = MAC_TC ? {6{MAC_COEF_DATA[3]}} : 6'b000000;
+DW02_mac #(
 .A_width (10),
 .B_width (10)
-)	
-U_DW02_mac (   
-//vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}), 
-//vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}), 
-.A  ({oper_sign,MAC_OPER_DATA[3:0]}), 
-.B  ({coef_sign,MAC_COEF_DATA[3:0]}), 
-.C  (feedback_acc_data[19:0]), 
-.TC (MAC_TC), 
+)
+U_DW02_mac (
+//vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
+//vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
+.A  ({oper_sign,MAC_OPER_DATA[3:0]}),
+.B  ({coef_sign,MAC_COEF_DATA[3:0]}),
+.C  (feedback_acc_data[19:0]),
+.TC (MAC_TC),
 .MAC(DWMAC_out[19:0])
 );
 
@@ -99,12 +99,12 @@ end //MUX_OF_IDATA_ACC
 /*        ACCUMULATOR           */
 /*------------------------------*/
 //vicnent@20181029always@(posedge MAC_ACC_CLK) begin : FF_OF_ACCUMULATOR
-//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;   
+//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;
 
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : FF_OF_ACCUMULATOR
   if (~acc_ff_rstn)
     fmux_acc_idata <= #0.2 24'h0;
-  else  
+  else
     fmux_acc_idata <= #0.2 mux_acc_idata;
 end //FF_OF_ACCUMULATOR
 
@@ -131,18 +131,18 @@ always@(*) begin : ACC_ROUNDED
     6'd16 : is_rounded_value = 20'b0000_1000_0000_0000_0000;
   default: is_rounded_value = 20'h0;
   endcase
-end                             
+end
 
 /*------------------------------*/
 /*         CLR_AND_RND          */
 /*------------------------------*/
 always@(*) begin: CLR_AND_RND
   if (MAC_ACC_CLEAR == 1'b1)
-    feedback_acc_data = 16'h0;
+    feedback_acc_data = 20'h0;
   else if (MAC_ACC_RND == 1'b1)
     feedback_acc_data = is_rounded_value;
   else
-    feedback_acc_data = fmux_acc_idata;  
+    feedback_acc_data = fmux_acc_idata;
 end //CLR_AND_RND
 
 /*------------------------------*/
@@ -223,13 +223,12 @@ always@(*) begin : ACC_SAT_DATA_OUT
         MAC_OUT = 4'hf;
       else if (fmux_acc_idata[19] == 1'b1)
         MAC_OUT = {1'b1,3'h0};
-      else 
+      else
         MAC_OUT = {1'b0,3'h7};
     end
-  else 
-     MAC_OUT = acc_data_out_sel;	  
+  else
+     MAC_OUT = acc_data_out_sel;
 end
 
 
 endmodule
-

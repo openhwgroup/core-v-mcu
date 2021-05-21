@@ -53,19 +53,19 @@ module apb_gpiov2 #(
     output logic [`N_GPIO-1:0] interrupt
 );
 
-  localparam NG_BITS = `LOG2(`N_GPIO) - 1;
+  localparam NG_BITS = `LOG2(128) - 1;
 
   logic [  NG_BITS:0]      r_gpio_select;
 
-  logic [`N_GPIO-1:0]      r_gpio_inten;
-  logic [`N_GPIO-1:0][2:0] r_gpio_inttype;
+  logic [127:0]      r_gpio_inten;
+  logic [127:0][2:0] r_gpio_inttype;
 
-  logic [`N_GPIO-1:0]      r_gpio_out;
-  logic [`N_GPIO-1:0][1:0] r_gpio_dir;
+  logic [127:0]      r_gpio_out;
+  logic [127:0][1:0] r_gpio_dir;
 
   logic [`N_GPIO-1:0]      r_gpio_sync0;
   logic [`N_GPIO-1:0]      r_gpio_sync1;
-  logic [`N_GPIO-1:0]      r_gpio_in;
+  logic [127:0]      r_gpio_in;
 
   logic [`N_GPIO-1:0]      r_gpio_rise;
   logic [`N_GPIO-1:0]      r_gpio_fall;
@@ -76,7 +76,7 @@ module apb_gpiov2 #(
 
   genvar i;
 
-  assign gpio_in_sync = r_gpio_in;
+  assign gpio_in_sync = r_gpio_in[`N_GPIO-1];
   assign PSLVERR = 1'b0;
 
 
@@ -85,13 +85,13 @@ module apb_gpiov2 #(
     for (int i = 0; i < `N_GPIO; i++) begin
       s_is_int_fall[i] = r_gpio_inttype[i][0] & r_gpio_fall[i];  // inttype[0] == 1 ->  fall
       s_is_int_rise[i] = r_gpio_inttype[i][1] & r_gpio_rise[i];  // inttype[1] == 1 ->  rise
-      s_is_int_low[i] =   (r_gpio_inttype[i] == 2'b00) & ~r_gpio_inttype[2] & ~r_gpio_out; // active low int
-      s_is_int_hi[i] =   (r_gpio_inttype[i] == 2'b00) & r_gpio_inttype[2] & r_gpio_out;    // active hi int
+      s_is_int_low[i] =   (r_gpio_inttype[i] == 2'b00) & ~r_gpio_inttype[2] & ~r_gpio_in[i]; // active low int
+      s_is_int_hi[i] =   (r_gpio_inttype[i] == 2'b00) & r_gpio_inttype[2] & r_gpio_in[i];    // active hi int
       interrupt[i] = r_gpio_inten[i] & (s_is_int_fall[i] | s_is_int_rise[i] |
 					   s_is_int_low[i] | s_is_int_hi[i]);
 
       gpio_out[i] = r_gpio_dir[i][0] & r_gpio_out[i];
-      gpio_dir[i] = r_gpio_dir[i][1] ? ~r_gpio_out[i] : r_gpio_dir[i][0];  // Open Drain 
+      gpio_dir[i] = r_gpio_dir[i][1] ? ~r_gpio_out[i] : r_gpio_dir[i][0];  // Open Drain
 
     end
   end
@@ -138,15 +138,13 @@ module apb_gpiov2 #(
                 else r_gpio_out[`N_GPIO-1:0] <= PWDATA[`N_GPIO-1:0];
               end
               `REG_OUT1: begin
-                if (`N_GPIO > 64) r_gpio_out[63:32] <= PWDATA[31:0];
-                else if (`N_GPIO > 32) r_gpio_out[`N_GPIO-1:32] <= PWDATA[`N_GPIO-33:0];
+                if (`N_GPIO > 32) r_gpio_out[63:32] <= PWDATA[31:0];
               end
               `REG_OUT2: begin
-                if (`N_GPIO > 96) r_gpio_out[95:64] <= PWDATA[31:0];
-                else if (`N_GPIO > 64) r_gpio_out[`N_GPIO-1:0] <= PWDATA[`N_GPIO-65:0];
+                if (`N_GPIO > 64) r_gpio_out[95:64] <= PWDATA[31:0];
               end
               `REG_OUT3: begin
-                if (`N_GPIO > 96) r_gpio_out[`N_GPIO-1 : 0] <= PWDATA[`N_GPIO-97 : 0];
+                if (`N_GPIO > 96) r_gpio_out[127 : 96] <= PWDATA[31 : 0];
               end
             endcase  // case (PADDR[11:0])
           end
@@ -164,38 +162,28 @@ module apb_gpiov2 #(
                 PRDATA[NG_BITS:0] <= r_gpio_select;
               end
               `REG_OUT0: begin
-                if (`N_GPIO > 32) PRDATA[31:0] <= r_gpio_out[31:0];
-                else PRDATA[`N_GPIO-1:0] <= r_gpio_out[`N_GPIO-1:0];
+                PRDATA[31:0] <= r_gpio_out[31:0];
               end
               `REG_OUT1: begin
-                if (`N_GPIO > 32)
-                  if (`N_GPIO > 64) PRDATA[31:0] <= r_gpio_out[63:32];
-                  else PRDATA[`N_GPIO-33:0] <= r_gpio_out[`N_GPIO-1 : 32];
+                  PRDATA[31:0] <= r_gpio_out[63:32];
               end
               `REG_OUT2: begin
-                if (`N_GPIO > 64)
-                  if (`N_GPIO > 96) PRDATA[31:0] <= r_gpio_out[95:64];
-                  else PRDATA[`N_GPIO-65:0] <= r_gpio_out[`N_GPIO-1:64];
+                  PRDATA[31:0] <= r_gpio_out[95:64];
               end
               `REG_OUT3: begin
-                if (`N_GPIO > 96) PRDATA[`N_GPIO-97:0] <= r_gpio_out[`N_GPIO-1:96];
+                PRDATA[31:0] <= r_gpio_out[127:96];
               end
               `REG_PIN0: begin
-                if (`N_GPIO > 32) PRDATA[31:0] <= r_gpio_in[31:0];
-                else PRDATA[`N_GPIO-1:0] <= r_gpio_in[`N_GPIO-1:0];
+                PRDATA[31:0] <= r_gpio_in[31:0];
               end
               `REG_PIN1: begin
-                if (`N_GPIO > 32)
-                  if (`N_GPIO > 64) PRDATA[31:0] <= r_gpio_in[63:32];
-                  else PRDATA[`N_GPIO-33:0] <= r_gpio_in[`N_GPIO-1:32];
+                 PRDATA[31:0] <= r_gpio_in[63:32];
               end
               `REG_PIN2: begin
-                if (`N_GPIO > 64)
-                  if (`N_GPIO > 96) PRDATA[31:0] <= r_gpio_in[95:64];
-                  else PRDATA[`N_GPIO-65:0] <= r_gpio_in[`N_GPIO-1:64];
+                 PRDATA[31:0] <= r_gpio_in[95:64];
               end
               `REG_PIN3: begin
-                if (`N_GPIO > 96) PRDATA[`N_GPIO-97:0] <= r_gpio_in[`N_GPIO-1:96];
+                PRDATA[31:0] <= r_gpio_in[127:96];
               end
             endcase  // case (PADDR[11:0]])
           end
@@ -210,7 +198,7 @@ module apb_gpiov2 #(
       r_gpio_sync0 <= '0;
       r_gpio_sync1 <= '0;
     end else begin
-      r_gpio_sync0 <= gpio_in;
+      r_gpio_sync0 <= gpio_in[`N_GPIO-1:0];
       r_gpio_sync1 <= r_gpio_sync0;
       r_gpio_in    <= r_gpio_sync1;
       r_gpio_rise  <=  r_gpio_sync1 & ~r_gpio_in;

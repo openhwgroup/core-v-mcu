@@ -447,7 +447,7 @@ module top (
       m1_m1_cdata <= '0;
       delay <= 0;
     end // if (RESET[0] == 0)
-    else begin
+      else begin
       last_control <= control_in;
       saved_REQ <= lint_REQ;
       m0_m0_clken <= 0;

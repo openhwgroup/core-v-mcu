@@ -92,7 +92,7 @@ module udma_i2s_top
     output logic                [1:0] data_tx_datasize_o,
     input  logic               [31:0] data_tx_i,
     input  logic                      data_tx_valid_i,
-    output logic                      data_tx_ready_o            
+    output logic                      data_tx_ready_o
 
 );
 
@@ -146,8 +146,19 @@ module udma_i2s_top
     logic                      s_sel_master_ext;
     logic                      s_sel_slave_num;
     logic                      s_sel_slave_ext;
+    logic                      s_master_clk_en;
+    logic                      s_slave_clk_en;
+    logic                      s_pdm_clk_en;
+    logic                      s_slave_i2s_en;
+    logic                      s_slave_i2s_2ch;
+    logic                      s_i2s_master_clk;
+    logic                      s_i2s_slave_clk;
+    logic                      s_i2s_pdm_clk;
+    logic                      s_pdm_clk;
+    logic                      s_i2s_master_ws;
+    logic                      s_i2s_slave_ws;
 
-    udma_i2s_reg_if #(
+  udma_i2s_reg_if #(
         .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
         .TRANS_SIZE(TRANS_SIZE)
     ) u_reg_if (
@@ -185,9 +196,9 @@ module udma_i2s_top
         .cfg_tx_bytes_left_i       ( cfg_tx_bytes_left_i    ),
 
         .cfg_master_clk_en_o       ( s_master_clk_en        ),
-        .cfg_slave_clk_en_o        ( s_slave_clk_en         ), 
+        .cfg_slave_clk_en_o        ( s_slave_clk_en         ),
 
-        .cfg_pdm_clk_en_o          ( s_pdm_clk_en           ), 
+        .cfg_pdm_clk_en_o          ( s_pdm_clk_en           ),
 
         .cfg_master_sel_num_o      ( s_sel_master_num       ),
         .cfg_master_sel_ext_o      ( s_sel_master_ext       ),
@@ -239,8 +250,8 @@ module udma_i2s_top
 
     udma_dc_fifo #(32,4) u_dc_fifo_tx
     (
-        .src_clk_i    ( sys_clk_i          ),  
-        .src_rstn_i   ( rstn_i             ),  
+        .src_clk_i    ( sys_clk_i          ),
+        .src_rstn_i   ( rstn_i             ),
         .src_data_i   ( s_data_tx          ),
         .src_valid_i  ( s_data_tx_valid    ),
         .src_ready_o  ( s_data_tx_ready    ),
@@ -253,8 +264,8 @@ module udma_i2s_top
 
     udma_dc_fifo #(32,4) u_dc_fifo_rx
     (
-        .src_clk_i    ( s_i2s_slave_clk    ),  
-        .src_rstn_i   ( rstn_i             ),  
+        .src_clk_i    ( s_i2s_slave_clk    ),
+        .src_rstn_i   ( rstn_i             ),
         .src_data_i   ( s_data_rx_dc       ),
         .src_valid_i  ( s_data_rx_dc_valid ),
         .src_ready_o  ( s_data_rx_dc_ready ),
@@ -264,7 +275,7 @@ module udma_i2s_top
         .dst_valid_o  ( data_rx_valid_o    ),
         .dst_ready_i  ( data_rx_ready_i    )
     );
- 
+
     i2s_clkws_gen i_clkws_gen (
 
         .clk_i             ( periph_clk_i         ),
@@ -312,7 +323,7 @@ module udma_i2s_top
         .ws_slave_o        ( s_i2s_slave_ws       )
     );
 
-    
+
     i2s_txrx i_i2s_txrx (
 
         .rstn_i                     ( rstn_i                 ),
@@ -354,15 +365,14 @@ module udma_i2s_top
         .cfg_master_i2s_bits_word_i ( s_master_i2s_bits_word ),
         .cfg_master_i2s_words_i     ( s_master_i2s_words     ),
 
-        .fifo_rx_data_o             ( s_data_rx_dc           ),         
-        .fifo_rx_data_valid_o       ( s_data_rx_dc_valid     ),   
-        .fifo_rx_data_ready_i       ( s_data_rx_dc_ready     ),   
+        .fifo_rx_data_o             ( s_data_rx_dc           ),
+        .fifo_rx_data_valid_o       ( s_data_rx_dc_valid     ),
+        .fifo_rx_data_ready_i       ( s_data_rx_dc_ready     ),
 
-        .fifo_tx_data_i             ( s_data_tx_dc           ),         
-        .fifo_tx_data_valid_i       ( s_data_tx_dc_valid     ),   
+        .fifo_tx_data_i             ( s_data_tx_dc           ),
+        .fifo_tx_data_valid_i       ( s_data_tx_dc_valid     ),
         .fifo_tx_data_ready_o       ( s_data_tx_dc_ready     )
 
     );
 
 endmodule
-

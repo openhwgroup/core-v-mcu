@@ -8,13 +8,14 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+/* verilator lint_off REDEFMACRO */
 `define I2C_CMD_NONE  3'b000
 `define I2C_CMD_START 3'b001
 `define I2C_CMD_STOP  3'b010
 `define I2C_CMD_WRITE 3'b011
 `define I2C_CMD_READ  3'b100
 `define I2C_CMD_WAIT  3'b101
-
+/* verilator lint_on REDEFMACRO */
 
 
 module udma_i2c_bus_ctrl
