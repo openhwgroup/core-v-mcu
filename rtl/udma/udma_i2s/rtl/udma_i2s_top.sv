@@ -155,7 +155,6 @@ module udma_i2s_top
     logic                      s_i2s_slave_clk;
     logic                      s_i2s_pdm_clk;
     logic                      s_pdm_clk;
-    logic                      s_i2s_pdm_clk;
     logic                      s_i2s_master_ws;
     logic                      s_i2s_slave_ws;
 

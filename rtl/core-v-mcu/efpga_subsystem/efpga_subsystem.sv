@@ -181,20 +181,6 @@ module efpga_subsystem #(
   end
 
 
-`ifndef SYNTHESIS
-
-  always_ff @(posedge asic_clk_i or negedge rst_n) begin
-    if (~rst_n) begin
-      perf_counter_value_o <= '0;
-    end else begin
-      if (enable_perf_counter_efpga_i) perf_counter_value_o <= perf_counter_value_o + 1;
-      if (reset_perf_counter_efpga_i) perf_counter_value_o <= '0;
-    end
-  end
-
-
-
-`endif
   always @(posedge asic_clk_i or negedge rst_n) begin
     if (~rst_n) begin
       wen_p3 <= 1'b1;  // default read
