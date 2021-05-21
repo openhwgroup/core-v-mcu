@@ -19,7 +19,7 @@
  */
 
 `define BUILD_DATE 32'h20210521
-`define BUILD_TIME 32'h00010824
+`define BUILD_TIME 32'h00131500
 
 //  PER_ID definitions
 `define PER_ID_UART      0
