@@ -18,7 +18,6 @@ module efpga_subsystem
     input logic                        fpga_clk4_i,
     input logic                        fpga_clk5_i,
 
-    input logic [2:0]                  sel_clk_dc_fifo_efpga_i,
     input logic                        clk_gating_dc_fifo_i,
     input logic [3:0]                  reset_type1_efpga_i,
     input logic                        enable_udma_efpga_i,
@@ -93,12 +92,6 @@ module efpga_subsystem
     input logic                        efpga_test_M_4_i ,
     input logic                        efpga_test_M_5_i ,
     input logic                        efpga_test_MLATCH_i
-                                       `ifndef SYNTHESIS
-                                       ,
-    input logic                        enable_perf_counter_efpga_i,
-    input logic                        reset_perf_counter_efpga_i,
-    output logic [31:0]                perf_counter_value_o
-                                       `endif
     );
 
 //FCB connections
@@ -132,41 +125,6 @@ module efpga_subsystem
    logic [31:0]                    control_in_d1,control_in_d2, efpga_control_in;
    logic                           control_in_valid;
 
-   always @ (posedge asic_clk_i or negedge rst_n) begin
-      if (~rst_n) begin
-         control_in_valid <= 0;
-         control_in_d1 <= 0;
-         control_in_d2 <= 0;
-      end else begin
-         control_in_d1 <= control_in;
-         control_in_d2 <= control_in_d1;
-         control_in_valid <= (control_in_d2 == control_in) && (control_in_d1 == control_in);
-      end
-   end
-   always @ (posedge s_efpga_clk or negedge rst_n) begin
-      if (~rst_n)
-        efpga_control_in <= 0;
-      else if (control_in_valid)
-        efpga_control_in <= control_in_d1;
-   end
-
-
-`ifndef SYNTHESIS
-
-    always_ff @(posedge asic_clk_i or negedge rst_n) begin
-        if(~rst_n) begin
-             perf_counter_value_o <= '0;
-        end else begin
-             if(enable_perf_counter_efpga_i)
-                perf_counter_value_o <= perf_counter_value_o + 1;
-             if(reset_perf_counter_efpga_i)
-                perf_counter_value_o <= '0;
-        end
-    end
-
-
-
-`endif
 
    XBAR_TCDM_BUS               l2_efpga_tcdm [`N_EFPGA_TCDM_PORTS-1:0]();
    logic [`N_EFPGA_TCDM_PORTS-1:0] tcdm_clk;
@@ -208,6 +166,41 @@ module efpga_subsystem
    assign qualified_valid_p2 = l2_asic_tcdm_o[2].r_valid & wen_p2;
    assign qualified_valid_p1 = l2_asic_tcdm_o[1].r_valid & wen_p1;
    assign qualified_valid_p0 = l2_asic_tcdm_o[0].r_valid & wen_p0;
+   always @ (posedge asic_clk_i or negedge rst_n) begin
+      if (~rst_n) begin
+         control_in_valid <= 0;
+         control_in_d1 <= 0;
+         control_in_d2 <= 0;
+      end else begin
+         control_in_d1 <= control_in;
+         control_in_d2 <= control_in_d1;
+         control_in_valid <= (control_in_d2 == control_in) && (control_in_d1 == control_in);
+      end
+   end
+   always @ (posedge s_efpga_clk or negedge rst_n) begin
+      if (~rst_n)
+        efpga_control_in <= 0;
+      else if (control_in_valid)
+        efpga_control_in <= control_in_d1;
+   end
+
+
+`ifndef SYNTHESIS
+
+    always_ff @(posedge asic_clk_i or negedge rst_n) begin
+        if(~rst_n) begin
+             perf_counter_value_o <= '0;
+        end else begin
+             if(enable_perf_counter_efpga_i)
+                perf_counter_value_o <= perf_counter_value_o + 1;
+             if(reset_perf_counter_efpga_i)
+                perf_counter_value_o <= '0;
+        end
+    end
+
+
+
+`endif
    always @ (posedge asic_clk_i or negedge rst_n) begin
       if (~rst_n) begin
          wen_p3 <= 1'b1;  // default read

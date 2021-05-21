@@ -19,19 +19,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SPI Master Registers
-`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00 
+`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
 `define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
-`define REG_RX_CFG       5'b00010 //BASEADDR+0x08  
-`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C  
+`define REG_RX_CFG       5'b00010 //BASEADDR+0x08
+`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
 
 `define REG_TX_SADDR     5'b00100 //BASEADDR+0x10
 `define REG_TX_SIZE      5'b00101 //BASEADDR+0x14
 `define REG_TX_CFG       5'b00110 //BASEADDR+0x18
 `define REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
 
-`define REG_I2S_CLKCFG_SETUP 5'b01000 //BASEADDR+0x20   
-`define REG_I2S_SLV_SETUP    5'b01001 //BASEADDR+0x24    
-`define REG_I2S_MST_SETUP    5'b01010 //BASEADDR+0x28    
+`define REG_I2S_CLKCFG_SETUP 5'b01000 //BASEADDR+0x20
+`define REG_I2S_SLV_SETUP    5'b01001 //BASEADDR+0x24
+`define REG_I2S_MST_SETUP    5'b01010 //BASEADDR+0x28
 `define REG_I2S_PDM_SETUP    5'b01011 //BASEADDR+0x2C
 
 module udma_i2s_reg_if #(
@@ -171,7 +171,9 @@ module udma_i2s_reg_if #(
     logic                [4:0] s_rd_addr;
 
     logic                      s_update_clk;
+    logic                      s_update;
     logic                      r_update_clk;
+    logic                      cfg_update_clk_o;
 
     assign s_wr_addr = (cfg_valid_i & ~cfg_rwn_i) ? cfg_addr_i : 5'h0;
     assign s_rd_addr = (cfg_valid_i &  cfg_rwn_i) ? cfg_addr_i : 5'h0;
@@ -221,7 +223,7 @@ module udma_i2s_reg_if #(
     assign cfg_master_clk_en_o = r_per_master_clk_en;
     assign cfg_slave_clk_en_o  = r_per_slave_clk_en;
 
-    assign cfg_pdm_clk_en_o = r_pdm_clk_en; 
+    assign cfg_pdm_clk_en_o = r_pdm_clk_en;
 
     edge_propagator i_edgeprop (
         .clk_tx_i  ( clk_i  ),
@@ -232,9 +234,9 @@ module udma_i2s_reg_if #(
         .edge_o    ( s_update )
     );
 
-    always_ff @(posedge periph_clk_i, negedge rstn_i) 
+    always_ff @(posedge periph_clk_i, negedge rstn_i)
     begin
-        if(~rstn_i) 
+        if(~rstn_i)
         begin
             r_per_master_clk_en  <= 'h0;
             r_per_slave_clk_en   <= 'h0;
@@ -266,17 +268,17 @@ module udma_i2s_reg_if #(
     end
 
 
-    always_ff @(posedge clk_i, negedge rstn_i) 
+    always_ff @(posedge clk_i, negedge rstn_i)
     begin
-        if(~rstn_i) 
+        if(~rstn_i)
             r_update_clk <= 1'b0;
         else
             r_update_clk <= s_update_clk;
     end
 
-    always_ff @(posedge clk_i, negedge rstn_i) 
+    always_ff @(posedge clk_i, negedge rstn_i)
     begin
-        if(~rstn_i) 
+        if(~rstn_i)
         begin
             // SPI REGS
             r_rx_startaddr     <= 'h0;
@@ -348,7 +350,7 @@ module udma_i2s_reg_if #(
                     r_tx_datasize    <= cfg_data_i[2:1];
                     r_tx_continuous  <= cfg_data_i[0];
                 end
-                `REG_I2S_CLKCFG_SETUP:  
+                `REG_I2S_CLKCFG_SETUP:
                 begin
                     r_master_sel_num       <= cfg_data_i[31];
                     r_master_sel_ext       <= cfg_data_i[30];
@@ -361,7 +363,7 @@ module udma_i2s_reg_if #(
                     r_slave_gen_clk_div    <= cfg_data_i[15:8];
                     r_master_gen_clk_div   <= cfg_data_i[7:0];
                 end
-                `REG_I2S_SLV_SETUP:   
+                `REG_I2S_SLV_SETUP:
                 begin
                     if(!r_slave_clk_en)
                     begin
@@ -372,7 +374,7 @@ module udma_i2s_reg_if #(
                         r_slave_i2s_words      <= cfg_data_i[2:0];
                     end
                 end
-                `REG_I2S_MST_SETUP:   
+                `REG_I2S_MST_SETUP:
                 begin
                     if(!r_master_clk_en)
                     begin
@@ -414,7 +416,7 @@ module udma_i2s_reg_if #(
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
         `REG_TX_CFG:
             cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,1'b0,r_tx_datasize,r_tx_continuous};
-        `REG_I2S_CLKCFG_SETUP:  
+        `REG_I2S_CLKCFG_SETUP:
             cfg_data_o = {  r_master_sel_num,
                             r_master_sel_ext,
                             r_slave_sel_num,
@@ -425,7 +427,7 @@ module udma_i2s_reg_if #(
                             r_common_gen_clk_div,
                             r_slave_gen_clk_div,
                             r_master_gen_clk_div };
-        `REG_I2S_SLV_SETUP:   
+        `REG_I2S_SLV_SETUP:
             cfg_data_o = {  r_slave_i2s_en,
                             13'h0,
                             r_slave_i2s_2ch,
@@ -434,7 +436,7 @@ module udma_i2s_reg_if #(
                             r_slave_i2s_bits_word,
                             5'h0,
                             r_slave_i2s_words };
-        `REG_I2S_MST_SETUP:   
+        `REG_I2S_MST_SETUP:
             cfg_data_o = {  r_master_i2s_en,
                             13'h0,
                             r_master_i2s_2ch,
@@ -456,4 +458,4 @@ module udma_i2s_reg_if #(
 
     assign cfg_ready_o  = 1'b1;
 
-endmodule 
+endmodule

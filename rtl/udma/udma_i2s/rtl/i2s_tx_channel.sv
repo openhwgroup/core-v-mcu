@@ -32,10 +32,10 @@ module i2s_tx_channel (
 
     output logic                    fifo_err_o,
 
-    input  logic                    cfg_en_i, 
-    input  logic                    cfg_2ch_i, 
-    input  logic              [4:0] cfg_wlen_i, 
-    input  logic              [2:0] cfg_wnum_i, 
+    input  logic                    cfg_en_i,
+    input  logic                    cfg_2ch_i,
+    input  logic              [4:0] cfg_wlen_i,
+    input  logic              [2:0] cfg_wnum_i,
     input  logic                    cfg_lsb_first_i
 );
 
@@ -60,12 +60,14 @@ module i2s_tx_channel (
     logic [2:0]  r_count_word;
 
     logic        s_word_done;
-
+    logic        s_word_done_pre;
     logic        r_started;
+    logic        s_i2s_ch1;
+    logic        s_i2s_ch0;
 
     enum logic [1:0] {ST_START,ST_SAMPLE,ST_WAIT,ST_RUNNING} r_state,s_state;
 
-    assign s_ws_edge = i2s_ws_i ^ r_ws_sync[0]; 
+    assign s_ws_edge = i2s_ws_i ^ r_ws_sync[0];
 
     assign s_word_done     = r_count_bit == cfg_wlen_i;
     assign s_word_done_pre = r_count_bit == (cfg_wlen_i - 1);
@@ -126,12 +128,12 @@ module i2s_tx_channel (
                 end
                 if(s_word_done)
                 begin
-                    s_sample_in = 1'b1;                    
+                    s_sample_in = 1'b1;
                     if(cfg_2ch_i)
-                        s_shiftreg_ch0 = r_shiftreg_shadow; 
+                        s_shiftreg_ch0 = r_shiftreg_shadow;
                     else
-                        s_shiftreg_ch0 = fifo_data_i; 
-                    s_shiftreg_ch1 = fifo_data_i; 
+                        s_shiftreg_ch0 = fifo_data_i;
+                    s_shiftreg_ch1 = fifo_data_i;
                 end
                 else
                 begin
@@ -189,7 +191,7 @@ module i2s_tx_channel (
             begin
                 if (s_word_done)
                     r_count_bit <= 'h0;
-                else 
+                else
                     r_count_bit <= r_count_bit + 1;
             end
         end
@@ -225,4 +227,3 @@ module i2s_tx_channel (
 
 
 endmodule
-

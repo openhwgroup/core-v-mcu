@@ -3965,6 +3965,10 @@ module QL_eFPGA_ArcticPro2_32X32_GF_22 (
       .tcdm_wen_p1(F2A_R_9_2),
       .tcdm_wen_p2(F2A_R_17_2),
       .tcdm_wen_p3(F2A_R_23_2),
+                .tcdm_fmo_p0(A2F_R_5_4),
+                .tcdm_fmo_p1(A2F_R_11_4),
+                .tcdm_fmo_p2(A2F_R_19_4),
+                .tcdm_fmo_p3(A2F_R_25_4),
       .CLK({A2F_CLK5, A2F_CLK4, A2F_CLK3, A2F_CLK2, A2F_CLK1, A2F_CLK0}),
       .control_in({
         A2F_L_23_4,

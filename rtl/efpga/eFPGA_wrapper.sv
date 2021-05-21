@@ -208,7 +208,7 @@ module eFPGA_wrapper (
       .version(version),
       .fpgaio_oe(fpga_oe),  // ouput
       .fpgaio_out(fpga_out),  // ouput
-      .fpgaio_in(fpgo_in),  // input
+      .fpgaio_in(fpga_in),  // input
       .events_o(events_o),  // output
 
       //.PRDATA(),//apb_fpga_prdata),
@@ -405,14 +405,17 @@ module eFPGA_wrapper (
       .m1_coef_wdata(m1_coef_wdata),
       .m1_coef_raddr(m1_coef_raddr),
       .m1_coef_waddr(m1_coef_waddr),
-      .m1_coef_powerdn(m1_coef_powerdn)
-      /*                       
-                                 .fb_spe_out   (test_fb_spe_out),
-                                 .fcb_bl_dout     (fcb_bl_dout),
+      .m1_coef_powerdn(m1_coef_powerdn),
 
-                                 .parallel_cfg    (fcb_pif_en),
-                                 
-                                 
+                              .FB_SPE_OUT_0_   (test_fb_spe_out[0]),
+                              .FB_SPE_OUT_1_   (test_fb_spe_out[1]),
+                              .FB_SPE_OUT_2_   (test_fb_spe_out[2]),
+                              .FB_SPE_OUT_3_   (test_fb_spe_out[3]),
+                              .fcb_bl_dout     (fcb_bl_dout),
+
+                              .PARALLEL_CFG    (fcb_pif_en),
+
+
                                  // Inputs
                                  .M_0_             (M_0_),
                                  .M_1_             (M_1_),
@@ -421,49 +424,15 @@ module eFPGA_wrapper (
                                  .M_4_             (M_4_),
                                  .M_5_             (M_5_),
                                  .MLATCH           (MLATCH),
- 
-                                 .BL_CLK           (fcb_blclk),
-                                 .BL_DIN_0_        (fcb_bl_din[0]),
-                                 .BL_DIN_10_       (fcb_bl_din[10]),
-                                 .BL_DIN_11_       (fcb_bl_din[11]),
-                                 .BL_DIN_12_       (fcb_bl_din[12]),
-                                 .BL_DIN_13_       (fcb_bl_din[13]),
-                                 .BL_DIN_14_       (fcb_bl_din[14]),
-                                 .BL_DIN_15_       (fcb_bl_din[15]),
-                                 .BL_DIN_16_       (fcb_bl_din[16]),
-                                 .BL_DIN_17_       (fcb_bl_din[17]),
-                                 .BL_DIN_18_       (fcb_bl_din[18]),
-                                 .BL_DIN_19_       (fcb_bl_din[19]),
-                                 .BL_DIN_1_        (fcb_bl_din[1]),
-                                 .BL_DIN_20_       (fcb_bl_din[20]),
-                                 .BL_DIN_21_       (fcb_bl_din[21]),
-                                 .BL_DIN_22_       (fcb_bl_din[22]),
-                                 .BL_DIN_23_       (fcb_bl_din[23]),
-                                 .BL_DIN_24_       (fcb_bl_din[24]),
-                                 .BL_DIN_25_       (fcb_bl_din[25]),
-                                 .BL_DIN_26_       (fcb_bl_din[26]),
-                                 .BL_DIN_27_       (fcb_bl_din[27]),
-                                 .BL_DIN_28_       (fcb_bl_din[28]),
-                                 .BL_DIN_29_       (fcb_bl_din[29]),
-                                 .BL_DIN_2_        (fcb_bl_din[2]),
-                                 .BL_DIN_30_       (fcb_bl_din[30]),
-                                 .BL_DIN_31_       (fcb_bl_din[31]),
-                                 .BL_DIN_3_        (fcb_bl_din[3]),
-                                 .BL_DIN_4_        (fcb_bl_din[4]),
-                                 .BL_DIN_5_        (fcb_bl_din[5]),
-                                 .BL_DIN_6_        (fcb_bl_din[6]),
-                                 .BL_DIN_7_        (fcb_bl_din[7]),
-                                 .BL_DIN_8_        (fcb_bl_din[8]),
-                                 .BL_DIN_9_        (fcb_bl_din[9]),
-                                 .BL_PWRGATE_0_    (fcb_bl_pwrgate[0]),
-                                 .BL_PWRGATE_1_    (fcb_bl_pwrgate[1]),
-                                 .BL_PWRGATE_2_    (fcb_bl_pwrgate[2]),
-                                 .BL_PWRGATE_3_    (fcb_bl_pwrgate[3]),
-                                 .CLOAD_DIN_SEL    (fcb_cload_din_sel),
-                                 .DIN_INT_L_ONLY   (fcb_din_int_l_only),
-                                 .DIN_INT_R_ONLY   (fcb_din_int_r_only),
-                                 .DIN_SLC_TB_INT   (fcb_din_slc_tb_int),
-                                 .FB_ISO_ENB       (fcb_fb_iso_enb),
+                                 .fcb_blclk           (fcb_blclk),
+                                 .fcb_bl_din        (fcb_bl_din),
+                                 .fcb_bl_pwrgate    (fcb_bl_pwrgate),
+
+                                 .fcb_cload_din_sel    (fcb_cload_din_sel),
+                                 .fcb_din_int_l_only   (fcb_din_int_l_only),
+                                 .fcb_din_int_r_only   (fcb_din_int_r_only),
+                                 .fcb_din_slc_tb_int   (fcb_din_slc_tb_int),
+                                 .fcb_fb_iso_enb       (fcb_fb_iso_enb),
                                  .FB_SPE_IN_0_     (test_fb_spe_in[0]),
                                  .FB_SPE_IN_1_     (test_fb_spe_in[1]),
                                  .FB_SPE_IN_2_     (test_fb_spe_in[2]),
@@ -484,7 +453,7 @@ module eFPGA_wrapper (
                                  .PROG_1_          (fcb_prog[1]),
                                  .PROG_2_          (fcb_prog[2]),
                                  .PROG_3_          (fcb_prog[3]),
-                                 .PROG_IFX         (fcb_prog_ifx),
+                                 .fcb_prog_ifx         (fcb_prog_ifx),
                                  .PWR_GATE         (fcb_pwr_gate),
                                  .RE               (fcb_re),
                                  .STM              (STM),
@@ -498,34 +467,19 @@ module eFPGA_wrapper (
                                  .VLP_PWRDIS_2_    (fcb_vlp_pwrdis[2]),
                                  .VLP_PWRDIS_3_    (fcb_vlp_pwrdis[3]),
                                  .VLP_PWRDIS_IFX   (fcb_vlp_pwrdis_ifx),
-                                 .VLP_SRDIS_0_     (fcb_vlp_srdis[0]),
-                                 .VLP_SRDIS_1_     (fcb_vlp_srdis[1]),
-                                 .VLP_SRDIS_2_     (fcb_vlp_srdis[2]),
-                                 .VLP_SRDIS_3_     (fcb_vlp_srdis[3]),
-                                 .VLP_SRDIS_IFX    (fcb_vlp_srdis_ifx),
-                                 .WE               (fcb_we),
-                                 .WE_INT           (fcb_we_int),
-                                 .WL_CLK           (fcb_wlclk),
-                                 .WL_CLOAD_SEL_0_  (fcb_wl_cload_sel[0]),
-                                 .WL_CLOAD_SEL_1_  (fcb_wl_cload_sel[1]),
-                                 .WL_CLOAD_SEL_2_  (fcb_wl_cload_sel[2]),
-                                 .WL_DIN_0_        (fcb_wl_din[0]),
-                                 .WL_DIN_1_        (fcb_wl_din[1]),
-                                 .WL_DIN_2_        (fcb_wl_din[2]),
-                                 .WL_DIN_3_        (fcb_wl_din[3]),
-                                 .WL_DIN_4_        (fcb_wl_din[4]),
-                                 .WL_DIN_5_        (fcb_wl_din[5]),
-                                 .WL_EN            (fcb_wl_en),
-                                 .WL_INT_DIN_SEL   (fcb_wl_int_din_sel),
-                                 .WL_PWRGATE_0_    (fcb_wl_pwrgate[0]),
-                                 .WL_PWRGATE_1_    (fcb_wl_pwrgate[1]),
-                                 .WL_RESETB        (fcb_wl_resetb),
-                                 .WL_SEL_0_        (fcb_wl_sel[0]),
-                                 .WL_SEL_1_        (fcb_wl_sel[1]),
-                                 .WL_SEL_2_        (fcb_wl_sel[2]),
-                                 .WL_SEL_3_        (fcb_wl_sel[3]),
-                                 .WL_SEL_TB_INT    (fcb_wl_sel_tb_int),
-*/
+                                 .fcb_vlp_srdis     (fcb_vlp_srdis),
+                                 .fcb_vlp_srdis_ifx    (fcb_vlp_srdis_ifx),
+                                 .fcb_we               (fcb_we),
+                                 .fcb_we_int           (fcb_we_int),
+                                 .fcb_wlclk           (fcb_wlclk),
+                                 .fcb_wl_cload_sel  (fcb_wl_cload_sel),
+                                 .fcb_wl_din        (fcb_wl_din),
+                                 .fcb_wl_en            (fcb_wl_en),
+                                 .fcb_wl_int_din_sel   (fcb_wl_int_din_sel),
+                                 .fcb_wl_pwrgate    (fcb_wl_pwrgate),
+                                 .fcb_wl_resetb        (fcb_wl_resetb),
+                                 .fcb_wl_sel        (fcb_wl_sel),
+                                 .fcb_wl_sel_tb_int    (fcb_wl_sel_tb_int)
   );
 
   A2_MATH_UNIT M0 (
@@ -670,4 +624,3 @@ module eFPGA_wrapper (
 
 
 endmodule
-

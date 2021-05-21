@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 module fcb #(
-    parameter PAR_QLFCB_FB_TAMAR_CFG = 8'b0,  // 
-    parameter PAR_QLFCB_DEFAULT_ON = 1'b1,  // 
-    parameter [7:0] PAR_QLFCB_DEVICE_ID = 8'h21,  // 
+    parameter PAR_QLFCB_FB_TAMAR_CFG = 8'b0,  //
+    parameter PAR_QLFCB_DEFAULT_ON = 1'b1,  //
+    parameter [7:0] PAR_QLFCB_DEVICE_ID = 8'h21,  //
     parameter [10:0] PAR_QLFCB_11BIT_100NS = 11'h00A,  // 1: Default ON, 0: Default Off
     parameter [10:0] PAR_QLFCB_11BIT_200NS = 11'h014,  // Default Assume 100MHz
     parameter [10:0] PAR_QLFCB_11BIT_1US = 11'h064,  // Default Assume 100MHz
@@ -121,7 +121,7 @@ module fcb #(
     output logic fcb_clp_pwr_gate,  //New Added
     output logic fcb_clp_vlp,  //New Added
     output logic fcb_fb_iso_enb,  //JC
-    output logic fcb_pwr_gate,  //JC            
+    output logic fcb_pwr_gate,  //JC
     output logic fcb_set_por,  //JC this signal need to be handle outside by customer's logic
     output logic fcb_clp_set_por,  //POR Signal JC
     output logic fcb_spi_master_status  //New Added
@@ -218,9 +218,9 @@ module fcb #(
   logic [ 7:0] frfu_wrd_cnt_b1;
   logic [ 7:0] frfu_wrd_cnt_b2;
 
-  //----------------------------------------------------------------//    
+  //----------------------------------------------------------------//
   //-- fcbssc Instance                                      --//
-  //----------------------------------------------------------------//    
+  //----------------------------------------------------------------//
   logic [ 7:0] fssc_frfu_cwf_wr_data;
   logic        fssc_frfu_cwf_wr_en;
   logic [ 6:0] fssc_frfu_rd_addr;
@@ -236,6 +236,7 @@ module fcb #(
   logic        fsmc_frfu_clr_rcclk_en;
   logic        fsmc_fmic_clr_spi_master_en;
   logic        fsmc_fmic_fsmc_busy;
+  logic        fsmc_fmic_seq_done;
   logic [ 7:0] fsmc_frfu_cwf_wr_data;
   logic        fsmc_frfu_cwf_wr_en;
   logic [ 6:0] fsmc_frfu_rd_addr;
@@ -246,8 +247,8 @@ module fcb #(
   logic [ 7:0] fsmc_frfu_wr_data;
   logic        fsmc_frfu_wr_en;
   //----------------------------------------------------------------//
-  //-- fcbrwf Instance                                      --// 
-  //----------------------------------------------------------------// 
+  //-- fcbrwf Instance                                      --//
+  //----------------------------------------------------------------//
   logic        frwf_crf_empty;
   logic        frwf_crf_empty_p1;
   logic [31:0] frwf_crf_rd_data;
@@ -271,13 +272,13 @@ module fcb #(
   //logic                         fpmu_frfu_clr_pmu_chip_wu_en ;
 
   //logic [7:0]             	fpmu_frfu_clr_quad_pd_en_b0 ;
-  //logic [7:0]             	fpmu_frfu_clr_quad_pd_en_b1 ; 
-  //logic                         fpmu_frfu_clr_quad_pd_wr_en_b0 ;  
-  //logic                         fpmu_frfu_clr_quad_pd_wr_en_b1 ; 
+  //logic [7:0]             	fpmu_frfu_clr_quad_pd_en_b1 ;
+  //logic                         fpmu_frfu_clr_quad_pd_wr_en_b0 ;
+  //logic                         fpmu_frfu_clr_quad_pd_wr_en_b1 ;
   //logic [7:0]             	fpmu_frfu_clr_quad_wu_en_b0 ;
   //logic [7:0]             	fpmu_frfu_clr_quad_wu_en_b1 ;
-  //logic                         fpmu_frfu_clr_quad_wu_wr_en_b0 ; 
-  //logic                         fpmu_frfu_clr_quad_wu_wr_en_b1 ;        
+  //logic                         fpmu_frfu_clr_quad_wu_wr_en_b0 ;
+  //logic                         fpmu_frfu_clr_quad_wu_wr_en_b1 ;
   logic [ 1:0] fpmu_frfu_pw_sta_00;
   logic [ 1:0] fpmu_frfu_pw_sta_01;
   logic [ 1:0] fpmu_frfu_pw_sta_02;
@@ -356,7 +357,7 @@ module fcb #(
   //logic				frfu_fpmu_prog_pmu_chip_pd_en ;
   //logic				fpmu_frfu_clr_pmu_chip_pd_en ;
   logic [ 1:0] fpmu_frfu_chip_pw_sta;  //     // JC 05232017
-  //logic				frfu_fpmu_prog_pmu_quad_pd_en ;	
+  //logic				frfu_fpmu_prog_pmu_quad_pd_en ;
   //logic				frfu_fpmu_prog_pmu_quad_wu_en ;
   logic        frfu_fpmu_prog_cfg_done;
   logic        frfu_fpmu_clr_cfg_done;
@@ -1120,5 +1121,3 @@ module fcb #(
   //--------------------------------------------------------------------------------//
   `endprotect
 endmodule
-
-

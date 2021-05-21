@@ -8,6 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+/* verilator lint_off REDEFMACRO */
 `define I2C_CMD_START   4'h0
 `define I2C_CMD_STOP    4'h2
 `define I2C_CMD_RD_ACK  4'h4
@@ -17,6 +18,7 @@
 `define I2C_CMD_RPT     4'hC
 `define I2C_CMD_CFG     4'hE
 `define I2C_CMD_WAIT_EV 4'h1
+/* verilator lint_on REDEFMACRO */
 
 `define BUS_CMD_NONE  3'b000
 `define BUS_CMD_START 3'b001

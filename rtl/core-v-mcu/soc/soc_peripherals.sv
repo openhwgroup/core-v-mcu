@@ -279,7 +279,7 @@ module soc_peripherals #(
 
   logic                                                      s_timer_in_lo_event;
   logic                                                      s_timer_in_hi_event;
-  logic [                    2:0]                            sel_clk_dc_fifo_efpga;
+
   logic                                                      clk_gating_dc_fifo_efpga;
   logic [                    3:0]                            reset_type1_efpga;
   logic                                                      s_efpga_clk;
@@ -348,14 +348,7 @@ module soc_peripherals #(
   // TODO(timsaxe): Check why this is multiply driven.
   assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_event;
 
-  assign s_events[135] = s_adv_timer_events[0];
-  assign s_events[136] = s_adv_timer_events[1];
-  assign s_events[137] = s_adv_timer_events[2];
-  assign s_events[138] = s_adv_timer_events[3];
-  assign s_events[139] = 0;
-  assign s_events[140] = fc_hwpe_events_i[0];
-  assign s_events[141] = fc_hwpe_events_i[1];
-  assign s_events[159:142] = '0;
+
 
   assign fc_events_o[6:0] = 7'h0;  //RESERVED for sw events all routed to irq3
   assign fc_events_o[7] = s_timer_lo_event;  // MTIME irq
@@ -819,7 +812,7 @@ module soc_peripherals #(
       .fpga_clk5_i(fpga_clk_in[5]),
 
 
-      .sel_clk_dc_fifo_efpga_i(sel_clk_dc_fifo_efpga),
+
       .clk_gating_dc_fifo_i   (clk_gating_dc_fifo_efpga),
       .reset_type1_efpga_i    (reset_type1_efpga),
       .enable_udma_efpga_i    (enable_udma_efpga),
