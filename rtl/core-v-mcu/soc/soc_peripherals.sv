@@ -813,15 +813,15 @@ module soc_peripherals #(
 
 
 
-      .clk_gating_dc_fifo_i   (clk_gating_dc_fifo_efpga),
-      .reset_type1_efpga_i    (reset_type1_efpga),
-      .enable_udma_efpga_i    (enable_udma_efpga),
-      .enable_events_efpga_i  (enable_events_efpga),
-      .enable_apb_efpga_i     (enable_apb_efpga),
-      .enable_tcdm3_efpga_i   (enable_tcdm3_efpga),
-      .enable_tcdm2_efpga_i   (enable_tcdm2_efpga),
-      .enable_tcdm1_efpga_i   (enable_tcdm1_efpga),
-      .enable_tcdm0_efpga_i   (enable_tcdm0_efpga),
+      .clk_gating_dc_fifo_i (clk_gating_dc_fifo_efpga),
+      .reset_type1_efpga_i  (reset_type1_efpga),
+      .enable_udma_efpga_i  (enable_udma_efpga),
+      .enable_events_efpga_i(enable_events_efpga),
+      .enable_apb_efpga_i   (enable_apb_efpga),
+      .enable_tcdm3_efpga_i (enable_tcdm3_efpga),
+      .enable_tcdm2_efpga_i (enable_tcdm2_efpga),
+      .enable_tcdm1_efpga_i (enable_tcdm1_efpga),
+      .enable_tcdm0_efpga_i (enable_tcdm0_efpga),
 
       .rst_n(rst_ni),
 
