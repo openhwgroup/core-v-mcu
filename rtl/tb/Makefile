@@ -24,3 +24,9 @@ sim:
 					python3 ~/fusesoc/fusesoc/main.py --monochrome --cores-root ../..\
 				       	run --no-export --target=sim --setup\
 				       	--build openhwgroup.org:systems:core-v-mcu-sim)
+
+run-sim:
+				(export PYTHONPATH=~/fusesoc:~/edalize:~/edalize/edalize; \
+					export MODEL_TECH=/data/mentor/Questa/2017_04_26/release_10_6a/questasim/linux_x86_64/;\
+					cd build/openhwgroup.org_systems_core-v-mcu-sim_0/sim-modelsim;\
+					make run) 2>&1 | tee run-sim.log

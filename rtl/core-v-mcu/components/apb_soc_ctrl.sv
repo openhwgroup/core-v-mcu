@@ -72,6 +72,7 @@ module apb_soc_ctrl #(
 ) (
     input  logic                      HCLK,
     input  logic                      HRESETn,
+
     input  logic [APB_ADDR_WIDTH-1:0] PADDR,
     input  logic [              31:0] PWDATA,
     input  logic                      PWRITE,
@@ -99,6 +100,7 @@ module apb_soc_ctrl #(
 
     output logic [31:0] fc_bootaddr_o,
 
+    // eFPGA connections
     output logic [ 2:0] sel_clk_dc_fifo_efpga_o,
     output logic        clk_gating_dc_fifo_o,
     output logic [ 3:0] reset_type1_efpga_o,
@@ -109,6 +111,7 @@ module apb_soc_ctrl #(
     output logic        enable_tcdm2_efpga_o,
     output logic        enable_tcdm1_efpga_o,
     output logic        enable_tcdm0_efpga_o,
+    
     output logic        fc_fetchen_o,
     output logic        sel_hyper_axi_o,
     output logic        cluster_pow_o,  // power cluster
