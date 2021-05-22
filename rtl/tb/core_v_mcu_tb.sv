@@ -21,7 +21,12 @@ module core_v_mcu_tb;
     end: timing_format
 
     // Ports on the core
-    wire [N_IO:0]   io_t;
+    wire [`N_IO-1:0]   io_t;
+
+    // Local variables
+    reg resetn;
+
+    assign io_t[IO_RESETN] = resetn;
 
     // Design Under Test
     core_v_mcu #(
@@ -31,7 +36,7 @@ module core_v_mcu_tb;
     )
     core_v_mcu_i (
     .io (io_t)
-    )
+    );
 
     tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(io_t[IO_REF_CLK]) );
 
@@ -40,8 +45,8 @@ module core_v_mcu_tb;
     end
 
     initial begin:  sys_reset
-        io_t[IO_RESETN] = '0;
-        io_t[IO_RESETN] = #(4*REF_CLK_PERIOD) '1;
+        resetn = 1'b0;
+        resetn = #(4*REF_CLK_PERIOD) 1'b1;
     end
 
     // testbench driver process
