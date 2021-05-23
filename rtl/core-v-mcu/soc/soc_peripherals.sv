@@ -620,8 +620,6 @@ module soc_peripherals #(
   // ██║  ██║██║     ██████╔╝    ███████║╚██████╔╝╚██████╗    ╚██████╗   ██║   ██║  ██║███████╗ //
   // ╚═╝  ╚═╝╚═╝     ╚═════╝     ╚══════╝ ╚═════╝  ╚═════╝     ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝ //
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  if (`N_IO > 64) $error("apb_soc_ctrl doesn't support any other value than NPAD=64");
-  if (`NBIT_PADMUX != 2) $error("apb_soc_ctrl doesn't support any other value than NBIT_PADMUX=2");
   logic [`N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_local;
   logic [  `N_IO:0][`NBIT_PADCFG-1:0] s_pad_cfg_local;
   apb_soc_ctrl #(
@@ -647,20 +645,20 @@ module soc_peripherals #(
       .bootsel_i          (bootsel_i),
       .fc_fetch_en_valid_i(fc_fetch_en_valid_i),
       .fc_fetch_en_i      (fc_fetch_en_i),
-      .status_out(status_out),
-      .version(version),
-      .control_in(control_in),
+      .status_out         (status_out),
+      .version            (version),
+      .control_in         (control_in),
 
-      .pad_cfg_o      (pad_cfg_o),
-      .pad_mux_o      (pad_mux_o),
-      
+      .pad_cfg_o(pad_cfg_o),
+      .pad_mux_o(pad_mux_o),
+
       .soc_jtag_reg_i(soc_jtag_reg_i),
       .soc_jtag_reg_o(soc_jtag_reg_o),
 
       .fc_bootaddr_o(fc_bootaddr_o),
 
       // eFPGA connections
-    .sel_clk_dc_fifo_efpga_o(),
+
       .clk_gating_dc_fifo_o (clk_gating_dc_fifo_efpga),
       .reset_type1_efpga_o  (reset_type1_efpga),
       .enable_udma_efpga_o  (enable_udma_efpga),
@@ -671,9 +669,9 @@ module soc_peripherals #(
       .enable_tcdm1_efpga_o (enable_tcdm1_efpga),
       .enable_tcdm0_efpga_o (enable_tcdm0_efpga),
 
-      .fc_fetchen_o (fc_fetchen_o),
-      .sel_hyper_axi_o(s_sel_hyper_axi),
-      .cluster_pow_o  (cluster_pow_o),
+      .fc_fetchen_o          (fc_fetchen_o),
+      .sel_hyper_axi_o       (s_sel_hyper_axi),
+      .cluster_pow_o         (cluster_pow_o),
       .cluster_byp_o         (cluster_byp_o),
       .cluster_boot_addr_o   (cluster_boot_addr_o),
       .cluster_fetch_enable_o(cluster_fetch_enable_o),

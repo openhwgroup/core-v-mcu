@@ -222,7 +222,7 @@ module soc_clk_rst_gen (
       .clk_sel_i(sel_fll_clk_i),
       .clk_o    (s_clk_cluster)
   );
-`endif // !`ifdef SIMULATION
+`endif  // !`ifdef SIMULATION
 `else  // !`ifndef PULP_FPGA_EMUL
 
   // Use FPGA dependent clock generation module for both clocks

@@ -422,25 +422,25 @@ module efpga_subsystem #(
       // Inputs
       .fcb_sys_clk(asic_clk_i),
       .fcb_sys_rst_n(rst_n),
-      .fcb_spis_clk(efpga_fcb_spis_clk),
+      .fcb_spis_clk(efpga_fcb_spis_clk_i),
       .fcb_spis_rst_n(efpga_fcb_spis_rst_n_i),
       .fcb_sys_stm(efpga_STM_i),  //fcb_sys_stm),
-      .fcb_spim_miso(efpga_fcb_spim_miso_i),
-      .fcb_spim_ckout_in('0),
-      .fcb_spis_mosi('0),
+      .fcb_spim_miso(1'b0),
+      .fcb_spim_ckout_in(1'b0),
+      .fcb_spis_mosi(1'b0),
       .fcb_spis_cs_n(efpga_fcb_spis_cs_n_i),
-      .fcb_pif_vldi(fcb_pif_vldi),
+      .fcb_pif_vldi(efpga_test_fcb_pif_vldi_i),
       .fcb_pif_di_l({
-        efpga_fcb_pif_di_l_3_i,
-        efpga_fcb_pif_di_l_2_i,
-        efpga_fcb_pif_di_l_1_i,
-        efpga_fcb_pif_di_l_0_i
+        efpga_test_fcb_pif_di_l_3_i,
+        efpga_test_fcb_pif_di_l_2_i,
+        efpga_test_fcb_pif_di_l_1_i,
+        efpga_test_fcb_pif_di_l_0_i
       }),
       .fcb_pif_di_h({
-        efpga_fcb_pif_di_h_3_i,
-        efpga_fcb_pif_di_h_2_i,
-        efpga_fcb_pif_di_h_1_i,
-        efpga_fcb_pif_di_h_0_i
+        efpga_test_fcb_pif_di_h_3_i,
+        efpga_test_fcb_pif_di_h_2_i,
+        efpga_test_fcb_pif_di_h_1_i,
+        efpga_test_fcb_pif_di_h_0_i
       }),
       .fcb_spi_mode_en_bo(efpga_fcb_spi_mode_en_bo_i),
       .fcb_pif_en(efpga2fcb_pif_en),
@@ -468,10 +468,10 @@ module efpga_subsystem #(
         efpga_test_FB_SPE_OUT_0_o
       }),
       .test_fb_spe_in({
-        efpga_test_FB_SPE_IN_3_o,
-        efpga_test_FB_SPE_IN_2_o,
-        efpga_test_FB_SPE_IN_1_o,
-        efpga_test_FB_SPE_IN_0_o
+        efpga_test_FB_SPE_IN_3_i,
+        efpga_test_FB_SPE_IN_2_i,
+        efpga_test_FB_SPE_IN_1_i,
+        efpga_test_FB_SPE_IN_0_i
       }),
 
       .MLATCH(efpga_test_MLATCH_i),
