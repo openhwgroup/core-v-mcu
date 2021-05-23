@@ -41,7 +41,7 @@ module core_v_mcu_tb;
     tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(io_t[IO_REF_CLK]) );
 
     initial begin: finish
-        #(1000000ns) $finish();
+        #(2000000ns) $finish();
     end
 
     initial begin:  sys_reset
@@ -52,4 +52,4 @@ module core_v_mcu_tb;
     // testbench driver process
     initial begin: testbench
     end
-endmodule // core_v_mcu_tb
+endmodule : core_v_mcu_tb

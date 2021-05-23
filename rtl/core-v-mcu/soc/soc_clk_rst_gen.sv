@@ -88,6 +88,42 @@ module soc_clk_rst_gen (
 
   // currently, FLLs are not supported for FPGA emulation
 `ifndef PULP_FPGA_EMUL
+`ifdef MODEL_TECH
+  sim_clk_gen i_sim_clk_gen (
+      .ref_clk_i,
+      .rstn_glob_i,
+      .test_mode_i,
+      .shift_enable_i,
+      .soc_clk_o(s_clk_fll_soc),
+      .per_clk_o(s_clk_fll_per),
+      .cluster_clk_o(s_clk_fll_cluster),
+      .soc_cfg_lock_o(soc_fll_slave_lock_o),
+      .soc_cfg_req_i(soc_fll_slave_req_i),
+      .soc_cfg_ack_o(soc_fll_slave_ack_o),
+      .soc_cfg_add_i(soc_fll_slave_add_i),
+      .soc_cfg_data_i(soc_fll_slave_data_i),
+      .soc_cfg_r_data_o(soc_fll_slave_r_data_o),
+      .soc_cfg_wrn_i(soc_fll_slave_wrn_i),
+      .per_cfg_lock_o(per_fll_slave_lock_o),
+      .per_cfg_req_i(per_fll_slave_req_i),
+      .per_cfg_ack_o(per_fll_slave_ack_o),
+      .per_cfg_add_i(per_fll_slave_add_i),
+      .per_cfg_data_i(per_fll_slave_data_i),
+      .per_cfg_r_data_o(per_fll_slave_r_data_o),
+      .per_cfg_wrn_i(per_fll_slave_wrn_i),
+      .cluster_cfg_lock_o(cluster_fll_slave_lock_o),
+      .cluster_cfg_req_i(cluster_fll_slave_req_i),
+      .cluster_cfg_ack_o(cluster_fll_slave_ack_o),
+      .cluster_cfg_add_i(cluster_fll_slave_add_i),
+      .cluster_cfg_data_i(cluster_fll_slave_data_i),
+      .cluster_cfg_r_data_o(cluster_fll_slave_r_data_o),
+      .cluster_cfg_wrn_i(cluster_fll_slave_wrn_i)
+  );
+
+  assign s_clk_soc     = s_clk_fll_soc;
+  assign s_clk_cluster = s_clk_fll_cluster;
+  assign s_clk_per     = s_clk_fll_per;
+`else
   gf22_FLL i_fll_soc (
       .FLLCLK(s_clk_fll_soc),
       .FLLOE (1'b1),
@@ -186,7 +222,7 @@ module soc_clk_rst_gen (
       .clk_sel_i(sel_fll_clk_i),
       .clk_o    (s_clk_cluster)
   );
-
+`endif // !`ifdef SIMULATION
 `else  // !`ifndef PULP_FPGA_EMUL
 
   // Use FPGA dependent clock generation module for both clocks

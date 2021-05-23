@@ -11,6 +11,9 @@ filesets:
   simulation-rtl:
     depend:
     - openhwgroup.org:systems:core-v-mcu
+    files:
+    - sim_clk_gen.sv
+    file_type: systemVerilogSource
   tb-rtl:
     files:
     - core_v_mcu_tb.sv
