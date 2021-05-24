@@ -8,7 +8,6 @@ module efpga_subsystem #(
     parameter APB_FPGA_ADDR_WIDTH = 20
 ) (
     input logic asic_clk_i,
-
     input logic fpga_clk0_i,
     input logic fpga_clk1_i,
     input logic fpga_clk2_i,
@@ -29,10 +28,20 @@ module efpga_subsystem #(
     input logic        rst_n,
     input logic [31:0] control_in,
 
+    /*
+
+                                       CONFIGURATION PORTS
+
+                                       */
+
+    /*
+
+                                       PULP PORTS
+
+                                       */
 
 
-
-    XBAR_TCDM_BUS.Master l2_asic_tcdm_o[`N_EFPGA_TCDM_PORTS-1:0],
+    (* dont_touch = "yes" *) XBAR_TCDM_BUS.Master l2_asic_tcdm_o[`N_EFPGA_TCDM_PORTS-1:0],
     APB_BUS.Slave apbprogram_i,
     XBAR_TCDM_BUS.Slave apbt1_i,
 
@@ -54,7 +63,6 @@ module efpga_subsystem #(
     output logic efpga_fcb_spis_miso_o,
 
     //eFPGA TEST MODE
-
     input logic efpga_STM_i,
 
     output logic efpga_test_FB_SPE_OUT_0_o,
@@ -241,7 +249,6 @@ module efpga_subsystem #(
 
 
 
-
   log_int_dc_slice logint_dc_efpga_apbt1 (
       .push_clk    (asic_clk_i),
       .push_rst_n  (rst_n),
@@ -256,7 +263,6 @@ module efpga_subsystem #(
       .data_r_valid_o(s_lint_VALID),
       .data_r_rdata_o(apbt1_i.r_rdata),
       .data_r_ID_o   (),
-
       .data_req_o  (apbt1_int.req),
       .data_add_o  (apbt1_int.add),
       .data_wen_o  (apbt1_int.wen),
@@ -264,21 +270,19 @@ module efpga_subsystem #(
       .data_be_o   (apbt1_int.be),
       .data_ID_o   (),
       .data_gnt_i  (apbt1_int.gnt),
-
       .data_r_valid_i(apbt1_int.r_valid),
       .data_r_rdata_i(apbt1_int.r_rdata),
       .data_r_ID_i   ('0),
       .pop_clk(s_efpga_clk),
       .pop_rst_n(rst_n),
       .test_cgbypass_i('0)
+
+
   );
   /*
-
       EVENT Propagation from EFPGA to ASIC
 
     */
-
-
   generate
     for (genvar g_event = 0; g_event < `N_EFPGA_EVENTS; g_event++) begin : event_wedge_edge
       pulp_sync_wedge i_wedge_efpga (
@@ -413,25 +417,25 @@ module efpga_subsystem #(
       // Inputs
       .fcb_sys_clk(asic_clk_i),
       .fcb_sys_rst_n(rst_n),
-      .fcb_spis_clk(efpga_fcb_spis_clk),
+      .fcb_spis_clk(efpga_fcb_spis_clk_i),
       .fcb_spis_rst_n(efpga_fcb_spis_rst_n_i),
       .fcb_sys_stm(efpga_STM_i),  //fcb_sys_stm),
-      .fcb_spim_miso(efpga_fcb_spim_miso_i),
-      .fcb_spim_ckout_in('0),
-      .fcb_spis_mosi('0),
+      .fcb_spim_miso(1'b0),
+      .fcb_spim_ckout_in(1'b0),
+      .fcb_spis_mosi(1'b0),
       .fcb_spis_cs_n(efpga_fcb_spis_cs_n_i),
-      .fcb_pif_vldi(fcb_pif_vldi),
+      .fcb_pif_vldi(efpga_test_fcb_pif_vldi_i),
       .fcb_pif_di_l({
-        efpga_fcb_pif_di_l_3_i,
-        efpga_fcb_pif_di_l_2_i,
-        efpga_fcb_pif_di_l_1_i,
-        efpga_fcb_pif_di_l_0_i
+        efpga_test_fcb_pif_di_l_3_i,
+        efpga_test_fcb_pif_di_l_2_i,
+        efpga_test_fcb_pif_di_l_1_i,
+        efpga_test_fcb_pif_di_l_0_i
       }),
       .fcb_pif_di_h({
-        efpga_fcb_pif_di_h_3_i,
-        efpga_fcb_pif_di_h_2_i,
-        efpga_fcb_pif_di_h_1_i,
-        efpga_fcb_pif_di_h_0_i
+        efpga_test_fcb_pif_di_h_3_i,
+        efpga_test_fcb_pif_di_h_2_i,
+        efpga_test_fcb_pif_di_h_1_i,
+        efpga_test_fcb_pif_di_h_0_i
       }),
       .fcb_spi_mode_en_bo(efpga_fcb_spi_mode_en_bo_i),
       .fcb_pif_en(efpga2fcb_pif_en),
@@ -459,10 +463,10 @@ module efpga_subsystem #(
         efpga_test_FB_SPE_OUT_0_o
       }),
       .test_fb_spe_in({
-        efpga_test_FB_SPE_IN_3_o,
-        efpga_test_FB_SPE_IN_2_o,
-        efpga_test_FB_SPE_IN_1_o,
-        efpga_test_FB_SPE_IN_0_o
+        efpga_test_FB_SPE_IN_3_i,
+        efpga_test_FB_SPE_IN_2_i,
+        efpga_test_FB_SPE_IN_1_i,
+        efpga_test_FB_SPE_IN_0_i
       }),
 
       .MLATCH(efpga_test_MLATCH_i),

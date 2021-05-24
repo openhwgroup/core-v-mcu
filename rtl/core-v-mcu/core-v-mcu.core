@@ -98,10 +98,8 @@ targets:
     tools:
       modelsim:
         vlog_options:
-        - -svinputport=compat
         - -override_timescale 1ns/1ps
-        - -suppress 2583
-        - -suppress 13314
+        
 
   lint:
     <<: *default_target
@@ -112,3 +110,7 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
+        - -svinputport=compat
+        - -suppress 25835
+        - -suppress 13314
+        

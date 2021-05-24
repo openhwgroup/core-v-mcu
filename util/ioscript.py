@@ -33,7 +33,6 @@ inputArgs.add_argument("--input-xdc", help="xdc that defines board")
 inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
 
 outputArgs = parser.add_argument_group("output files")
-
 outputArgs.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
 outputArgs.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
 outputArgs.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")

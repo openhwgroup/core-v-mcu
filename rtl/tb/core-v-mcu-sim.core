@@ -1,0 +1,44 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:systems:core-v-mcu-sim
+description: CORE-V MCU Simulation Top.
+
+filesets:
+  simulation-rtl:
+    depend:
+    - openhwgroup.org:systems:core-v-mcu
+    files:
+    - sim_clk_gen.sv
+    file_type: systemVerilogSource
+  tb-rtl:
+    files:
+    - core_v_mcu_tb.sv
+    - tb_clk_gen.sv
+    file_type: systemVerilogSource
+
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+targets:
+  default: &default_target
+    filesets:
+    - simulation-rtl
+    - tb-rtl
+    toplevel: [core_v_mcu_tb]
+
+  sim:
+    <<: *default_target
+    default_tool: modelsim
+    tools:
+      modelsim:
+        vlog_options:
+        - -override_timescale 1ns/1ps
+        vsim_options:
+        - -voptargs="-O1"

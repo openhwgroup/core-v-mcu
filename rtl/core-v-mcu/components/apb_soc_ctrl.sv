@@ -70,8 +70,9 @@ module apb_soc_ctrl #(
     parameter int unsigned N_IO = 64,  // not used... see pulp_soc_defines
     parameter int unsigned IO_IDX_WIDTH = 6  // not used (LOG2 macro below)
 ) (
-    input  logic                      HCLK,
-    input  logic                      HRESETn,
+    input logic HCLK,
+    input logic HRESETn,
+
     input  logic [APB_ADDR_WIDTH-1:0] PADDR,
     input  logic [              31:0] PWDATA,
     input  logic                      PWRITE,
@@ -99,16 +100,18 @@ module apb_soc_ctrl #(
 
     output logic [31:0] fc_bootaddr_o,
 
-    output logic [ 2:0] sel_clk_dc_fifo_efpga_o,
-    output logic        clk_gating_dc_fifo_o,
-    output logic [ 3:0] reset_type1_efpga_o,
-    output logic        enable_udma_efpga_o,
-    output logic        enable_events_efpga_o,
-    output logic        enable_apb_efpga_o,
-    output logic        enable_tcdm3_efpga_o,
-    output logic        enable_tcdm2_efpga_o,
-    output logic        enable_tcdm1_efpga_o,
-    output logic        enable_tcdm0_efpga_o,
+    // eFPGA connections
+
+    output logic       clk_gating_dc_fifo_o,
+    output logic [3:0] reset_type1_efpga_o,
+    output logic       enable_udma_efpga_o,
+    output logic       enable_events_efpga_o,
+    output logic       enable_apb_efpga_o,
+    output logic       enable_tcdm3_efpga_o,
+    output logic       enable_tcdm2_efpga_o,
+    output logic       enable_tcdm1_efpga_o,
+    output logic       enable_tcdm0_efpga_o,
+
     output logic        fc_fetchen_o,
     output logic        sel_hyper_axi_o,
     output logic        cluster_pow_o,  // power cluster
@@ -188,22 +191,22 @@ module apb_soc_ctrl #(
 
   assign clk_div_cluster_data_o = r_clk_div_cluster;
 
-  edge_propagator_tx i_edgeprop_clu (
+  edge_propagator_tx i_edgeprop_clu (  // CLuster logic should be removed?
       .clk_i  (HCLK),
       .rstn_i (HRESETn),
       .valid_i(s_div_cluster_valid),
-      .ack_i  (clk_div_cluster_ack_i),
+      .ack_i  (1'b1),
       .valid_o(clk_div_cluster_valid_o)
   );
 
 
 
-  always_comb begin : proc_id
-    sel_clk_dc_fifo_efpga_o = '0;
-    for (int unsigned i = 0; i < 6; i++) begin
-      if (r_sel_clk_dc_fifo_onehot[i]) sel_clk_dc_fifo_efpga_o = i;
-    end
-  end
+  //  always_comb begin : proc_id
+  //    sel_clk_dc_fifo_efpga_o = '0;
+  //    for (int unsigned i = 0; i < 6; i++) begin
+  //      if (r_sel_clk_dc_fifo_onehot[i]) sel_clk_dc_fifo_efpga_o = i;
+  //    end
+  //  end
 
   assign clk_gating_dc_fifo_o = r_clk_gating_dc_fifo;
 
