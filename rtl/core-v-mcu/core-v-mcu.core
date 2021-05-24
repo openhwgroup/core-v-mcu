@@ -110,5 +110,3 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
-        - -suppress 25835
-        - -suppress 13314
