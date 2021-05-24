@@ -214,6 +214,8 @@ module top (
   logic launch_p0, launch_p1, launch_p2, launch_p3;
   logic [3:0] p0_fsm, p1_fsm, p2_fsm, p3_fsm;
   logic [11:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
+  logic [ 7:0] delay;
+
 
   logic [31:0] last_control;
 
@@ -443,8 +445,9 @@ module top (
       m1_m1_odata <= '0;
       m1_m0_cdata <= '0;
       m1_m1_cdata <= '0;
+      delay <= 0;
     end // if (RESET[0] == 0)
-      else begin
+    else begin
       last_control <= control_in;
       saved_REQ <= lint_REQ;
       m0_m0_clken <= 0;
@@ -744,7 +747,7 @@ module top (
           //	      PREADY <= 0;
           //	      PSLVERR <= 0;
 
-          if (lint_REQ & !lint_GNT) begin
+          if (lint_REQ & !saved_REQ & !lint_GNT) begin
             l_ADDR <= lint_ADDR[3:0];
             if (lint_WEN == 0) begin
               lint_GNT <= 1;
@@ -1019,8 +1022,10 @@ module top (
             20'h108: lint_RDATA <= m1_m0_dataout;
             20'h10C: lint_RDATA <= m1_m1_dataout;
             20'h800: lint_RDATA <= 32'hca11ef3a;
-
-
+            20'h9XX: begin
+              delay <= lint_ADDR[7:0];
+              lint_RDATA[19:0] <= lint_ADDR;
+            end
             20'b0000_0001_xxxx_xxxx_xxxx, 20'b0000_0010_xxxx_xxxx_xxxx, 20'b0000_0011_xxxx_xxxx_xxxx,
 		  20'b0000_0100_xxxx_xxxx_xxxx, 20'b0000_0101_xxxx_xxxx_xxxx, 20'b0000_0110_xxxx_xxxx_xxxx:
             apb_fsm <= READ_WAIT;
@@ -1028,8 +1033,13 @@ module top (
           endcase  // case (lint_ADDR)
         end
         READ_WAIT: begin
-          lint_GNT <= 1;
-          apb_fsm  <= IDLE;
+          if (delay == 0) begin
+            lint_GNT <= 1;
+            apb_fsm  <= IDLE;
+          end else begin
+            delay <= delay - 1;
+          end
+
           casex (lint_ADDR)
             20'b0000_0001_xxxx_xxxx_xxxx: begin
               case (m0_oper0_rmode)

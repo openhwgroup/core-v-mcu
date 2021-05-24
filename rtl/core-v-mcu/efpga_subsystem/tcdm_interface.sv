@@ -65,7 +65,7 @@ module tcdm_interface (
       .fflush(soc_rst),
       .empty(resp_empty),
       .rdata(efpga_rdata),
-      .full(resp_full),
+      .full(),
       .wdata(soc_rdata),
       .almost_empty(),
       .almost_full(),
@@ -74,5 +74,3 @@ module tcdm_interface (
   );
 
 endmodule  // tcdm_interface
-
-

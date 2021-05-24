@@ -276,8 +276,8 @@ always@(*) begin // Empty Flags
   q2 = count < pae_thresh;
    e1 = (raddr_next[A_WIDTH:0] ==  waddr_next[A_WIDTH:0]);
    e2 = (raddr[A_WIDTH:0] == waddr_next[A_WIDTH:0]);
-   o1 = (((raddr_next[A_WIDTH:0] + 1) & {A_WIDTH{1'b1}}) ==  waddr_next[A_WIDTH:0]);
-   o2 = (((raddr[A_WIDTH:0]+1) & {A_WIDTH{1'b1}}) == waddr_next[A_WIDTH:0]);
+   o1 = (((raddr_next[A_WIDTH:0] + 1) & {{1'b0},{A_WIDTH{1'b1}}}) ==  waddr_next[A_WIDTH:0]);
+   o2 = (((raddr[A_WIDTH:0]+1) & {{1'b0},{A_WIDTH{1'b1}}}) == waddr_next[A_WIDTH:0]);
 end // always@ begin
 
 assign empty_next = (ren_in & !empty) ? e1 : e2;
@@ -303,7 +303,7 @@ assign gcout_next  = ((raddr_next) >> 1) ^ (raddr_next);
 
 always@ (posedge rclk or posedge fflush) begin
   if (fflush) begin
-    waddr     <= #`CK2Q 12'h0;
+    waddr     <= #`CK2Q '0;
   end else begin
     waddr     <= #`CK2Q waddr_next;
   end
@@ -312,7 +312,7 @@ end
 always@ (posedge rclk or posedge fflush) begin
   if (fflush) begin
     underflow <= #`CK2Q 1'b0;
-    gcout_reg <= #`CK2Q 12'h0;
+    gcout_reg <= #`CK2Q '0;
 //greg@20191213  end else if (ren_in) begin
   end else if ((ren_in & !empty)) begin
     underflow <= #`CK2Q empty ;          // pop while empty
@@ -356,8 +356,3 @@ assign ren_o     = ren_out;
 assign gcout     = gcout_reg;
    assign out_raddr = ff_raddr[A_WIDTH-1:0];
 endmodule // fifo_pop
-
-
-
-
-

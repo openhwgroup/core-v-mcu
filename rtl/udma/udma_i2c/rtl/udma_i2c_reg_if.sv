@@ -22,7 +22,9 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-// SPI Master Registers
+// I2C Master Registers
+
+/* verilator lint_off REDEFMACRO */
 `define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
 `define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
 `define REG_RX_CFG       5'b00010 //BASEADDR+0x08
@@ -34,7 +36,8 @@
 `define REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
 
 `define REG_STATUS       5'b01000 //BASEADDR+0x20
-`define REG_SETUP        5'b01001 //BASEADDR+0x24
+`define REG_SETUP        5'b01001 //BASEADDR+0x2
+/* verilator lint_on REDEFMACRO */
 
 module udma_i2c_reg_if #(
     parameter L2_AWIDTH_NOAL = 12,

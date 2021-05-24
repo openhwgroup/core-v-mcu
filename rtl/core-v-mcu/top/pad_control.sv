@@ -350,7 +350,7 @@ module pad_control (
                          ((pad_mux_i[39] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[39] == 2'd2) ? gpio_out_i[24] :
                          ((pad_mux_i[39] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_out_o[40] = ((pad_mux_i[40] == 2'd0) ? perio_out_i[`PERIO_CAM0_CLK] :
+  assign io_out_o[40] = ((pad_mux_i[40] == 2'd0) ? 1'b0 :
                          ((pad_mux_i[40] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[40] == 2'd2) ? gpio_out_i[25] :
                          ((pad_mux_i[40] == 2'd3) ? 1'b0 : 1'b0))));
@@ -490,19 +490,19 @@ module pad_control (
                          ((pad_mux_i[25] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[25] == 2'd2) ? gpio_oe_i[10] :
                          ((pad_mux_i[25] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[26] = ((pad_mux_i[26] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_CSN0] :
+  assign io_oe_o[26] = ((pad_mux_i[26] == 2'd0) ? 1'b1 :
                          ((pad_mux_i[26] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[26] == 2'd2) ? gpio_oe_i[11] :
                          ((pad_mux_i[26] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[27] = ((pad_mux_i[27] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_CSN1] :
+  assign io_oe_o[27] = ((pad_mux_i[27] == 2'd0) ? 1'b1 :
                          ((pad_mux_i[27] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[27] == 2'd2) ? gpio_oe_i[12] :
                          ((pad_mux_i[27] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[28] = ((pad_mux_i[28] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_CSN2] :
+  assign io_oe_o[28] = ((pad_mux_i[28] == 2'd0) ? 1'b1 :
                          ((pad_mux_i[28] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[28] == 2'd2) ? gpio_oe_i[13] :
                          ((pad_mux_i[28] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[29] = ((pad_mux_i[29] == 2'd0) ? perio_oe_i[`PERIO_QSPIM0_CSN3] :
+  assign io_oe_o[29] = ((pad_mux_i[29] == 2'd0) ? 1'b1 :
                          ((pad_mux_i[29] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[29] == 2'd2) ? gpio_oe_i[14] :
                          ((pad_mux_i[29] == 2'd3) ? 1'b0 : 1'b0))));
@@ -546,7 +546,7 @@ module pad_control (
                          ((pad_mux_i[39] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[39] == 2'd2) ? gpio_oe_i[24] :
                          ((pad_mux_i[39] == 2'd3) ? 1'b0 : 1'b0))));
-  assign io_oe_o[40] = ((pad_mux_i[40] == 2'd0) ? 1'b1 :
+  assign io_oe_o[40] = ((pad_mux_i[40] == 2'd0) ? 1'b0 :
                          ((pad_mux_i[40] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[40] == 2'd2) ? gpio_oe_i[25] :
                          ((pad_mux_i[40] == 2'd3) ? 1'b0 : 1'b0))));

@@ -188,7 +188,7 @@ module pad_frame (
       .PAD(io[15]),
       .PEN(~pad_cfg_i[15][0])
   );
-  assign bootsel_o = io_out_i[15];
+  assign bootsel_o = io_in_o[15];
 `endif
   pad_functional_pd i_pad_16 (
       .OEN(~io_oe_i[16]),
