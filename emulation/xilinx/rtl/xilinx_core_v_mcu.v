@@ -49,7 +49,7 @@ module xilinx_core_v_mcu
   assign s_io[47:9] = xilinx_io[47:9];
 
   core_v_mcu #(
-    .CORE_TYPE(`CORE_TYPE),
+//    .CORE_TYPE(`CORE_TYPE),
     .USE_FPU(`USE_FPU),
     .USE_HWPE(`USE_HWPE)
   ) i_core_v_mcu (
