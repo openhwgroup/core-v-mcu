@@ -29,20 +29,10 @@ module efpga_subsystem #(
     input logic        rst_n,
     input logic [31:0] control_in,
 
-    /*
-
-                                       CONFIGURATION PORTS
-
-                                       */
-
-    /*
-
-                                       PULP PORTS
-
-                                       */
 
 
-    (* dont_touch = "yes" *) XBAR_TCDM_BUS.Master l2_asic_tcdm_o[`N_EFPGA_TCDM_PORTS-1:0],
+
+    XBAR_TCDM_BUS.Master l2_asic_tcdm_o[`N_EFPGA_TCDM_PORTS-1:0],
     APB_BUS.Slave apbprogram_i,
     XBAR_TCDM_BUS.Slave apbt1_i,
 
@@ -64,6 +54,7 @@ module efpga_subsystem #(
     output logic efpga_fcb_spis_miso_o,
 
     //eFPGA TEST MODE
+
     input logic efpga_STM_i,
 
     output logic efpga_test_FB_SPE_OUT_0_o,
@@ -250,6 +241,7 @@ module efpga_subsystem #(
 
 
 
+
   log_int_dc_slice logint_dc_efpga_apbt1 (
       .push_clk    (asic_clk_i),
       .push_rst_n  (rst_n),
@@ -276,17 +268,16 @@ module efpga_subsystem #(
       .data_r_valid_i(apbt1_int.r_valid),
       .data_r_rdata_i(apbt1_int.r_rdata),
       .data_r_ID_i   ('0),
-
       .pop_clk(s_efpga_clk),
       .pop_rst_n(rst_n),
       .test_cgbypass_i('0)
-
-
   );
   /*
+
       EVENT Propagation from EFPGA to ASIC
 
     */
+
 
   generate
     for (genvar g_event = 0; g_event < `N_EFPGA_EVENTS; g_event++) begin : event_wedge_edge
