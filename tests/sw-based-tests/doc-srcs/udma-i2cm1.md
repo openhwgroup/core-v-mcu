@@ -20,3 +20,4 @@
 |16  | Read N of M registers, M < N  | Blocking Operation  | Yes  | In-Progress  | |
 |17  | Write N of M registers, M >= N  | Blocking Operation  | Yes  | In-Progress  | |
 |18  | Write N of M registers, M < N  | Blocking Operation  | Yes  | In-Progress  | |
+|19  | Read slave device Id  | Non-Blocking Operation  | Yes  | done  | Pass |
