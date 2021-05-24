@@ -31,8 +31,6 @@ module tb_pulp;
 
    /* simulation platform parameters */
 
-   // Choose your core: 0 for RISCY, 1 for ZERORISCY
-   parameter CORE_TYPE            = 0;
    // if RISCY is instantiated (CORE_TYPE == 0), RISCY_FPU enables the FPU
    parameter RISCY_FPU            = 1;
 
@@ -534,7 +532,6 @@ module tb_pulp;
 
    // PULPissimo chip (design under test)
    core_v_mcu #(
-      .CORE_TYPE ( CORE_TYPE ),
       .USE_FPU   ( RISCY_FPU )
    )
    i_dut (

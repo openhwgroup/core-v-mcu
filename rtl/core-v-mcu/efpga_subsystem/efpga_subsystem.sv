@@ -8,7 +8,6 @@ module efpga_subsystem #(
     parameter APB_FPGA_ADDR_WIDTH = 20
 ) (
     input logic asic_clk_i,
-
     input logic fpga_clk0_i,
     input logic fpga_clk1_i,
     input logic fpga_clk2_i,
@@ -264,7 +263,6 @@ module efpga_subsystem #(
       .data_r_valid_o(s_lint_VALID),
       .data_r_rdata_o(apbt1_i.r_rdata),
       .data_r_ID_o   (),
-
       .data_req_o  (apbt1_int.req),
       .data_add_o  (apbt1_int.add),
       .data_wen_o  (apbt1_int.wen),
@@ -272,11 +270,9 @@ module efpga_subsystem #(
       .data_be_o   (apbt1_int.be),
       .data_ID_o   (),
       .data_gnt_i  (apbt1_int.gnt),
-
       .data_r_valid_i(apbt1_int.r_valid),
       .data_r_rdata_i(apbt1_int.r_rdata),
       .data_r_ID_i   ('0),
-
       .pop_clk(s_efpga_clk),
       .pop_rst_n(rst_n),
       .test_cgbypass_i('0)
@@ -287,7 +283,6 @@ module efpga_subsystem #(
       EVENT Propagation from EFPGA to ASIC
 
     */
-
   generate
     for (genvar g_event = 0; g_event < `N_EFPGA_EVENTS; g_event++) begin : event_wedge_edge
       pulp_sync_wedge i_wedge_efpga (
