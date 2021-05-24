@@ -99,7 +99,7 @@ targets:
       modelsim:
         vlog_options:
         - -override_timescale 1ns/1ps
-        
+
 
   lint:
     <<: *default_target
@@ -113,4 +113,4 @@ targets:
         - -svinputport=compat
         - -suppress 25835
         - -suppress 13314
-        
+
