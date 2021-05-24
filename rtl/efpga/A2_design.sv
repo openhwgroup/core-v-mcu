@@ -44,33 +44,6 @@ module A2_design (
     input logic FB_SPE_IN_1_,
     input logic FB_SPE_IN_2_,
     input logic FB_SPE_IN_3_,
-    //    input logic         WE,
-    //    input logic         WE_INT,
-    //    input logic WE_CLK,
-    //    input logic         WL_CLOAD_SEL_0_,
-    //    input logic         WL_CLOAD_SEL_1_,
-    //    input logic         WL_CLOAD_SEL_2_,
-    //    input logic         WL_CLOAD_SEL_3_,
-    //    input logic         WL_DIN_0_,
-    //    input logic         WL_DIN_1_,
-    //    input logic         WL_DIN_2_,
-    //    input logic         WL_DIN_3_,
-    //    input logic         WL_EN,
-    //    input logic         WL_INT_DIN_SEL,
-    //    input logic         WL_PWRGATE_0_,
-    //    input logic         WL_PWRGATE_1_,
-    //    input logic         WL_RESETB,
-    //    input logic         WL_SEL_0_,
-    //    input logic         WL_SEL_1_,
-    //    input logic         WL_SEL_2_,
-    //    input logic         WL_SEL_3_,
-
-
-
-
-
-
-
     output logic FB_SPE_OUT_0_,
     output logic FB_SPE_OUT_1_,
     output logic FB_SPE_OUT_2_,
