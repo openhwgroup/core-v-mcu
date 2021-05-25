@@ -25,9 +25,9 @@ JC[2],IO_22,22,,cam0_hsync,,gpio_15,fpgaio_15
 JC[3],IO_23,23,,i2cm0_scl,,gpio_16,fpgaio_16
 JC[4],IO_24,24,,i2cm0_sda,,gpio_17,fpgaio_17
 JC[7],IO_25,25,,cam0_clk,,gpio_18,fpgaio_18
-JC[8],IO_26,26,,qspim0_csn1,,gpio_19,fpgaio_19
-JC[9],IO_27,27,,qspim0_csn2,,gpio_20,fpgaio_20
-JC[10],IO_28,28,,qspim0_csn3,,gpio_21,fpgaio_21
+JC[8],IO_26,26,,gpio_32,qspim0_csn1,gpio_19,fpgaio_19
+JC[9],IO_27,27,,gpio_49,qspim0_csn2,gpio_20,fpgaio_20
+JC[10],IO_28,28,,gpio_48,qspim0_csn3,gpio_21,fpgaio_21
 JD[1],IO_29,29,,cam0_data0,,gpio_22,fpgaio_22
 JD[2],IO_30,30,,cam0_data1,,gpio_23,fpgaio_23
 JD[3],IO_31,31,,cam0_data2,,gpio_24,fpgaio_24
