@@ -42,6 +42,7 @@ filesets:
   nexys-cfg:
     files:
     - emulation/core-v-mcu-nexys/tcl/common.tcl
+    - emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
   xilinx-ips:

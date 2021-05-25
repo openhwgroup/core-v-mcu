@@ -428,7 +428,7 @@ if args.soc_defines != None and args.cvmcu_h != None:
 if args.soc_defines != None and args.pin_table != None:
     N_IO = int(soc_defines['N_IO'])
     N_PERIO = perio_index
-    N_GPIO = int(soc_defines['N_GPIO'])
+    N_GPIO = int(soc_defines['N_APBIO'])
     N_FPGAIO = int(soc_defines['N_FPGAIO'])
     NBIT_PADMUX = int(soc_defines['NBIT_PADMUX'])
     N_PADSEL = 2**NBIT_PADMUX

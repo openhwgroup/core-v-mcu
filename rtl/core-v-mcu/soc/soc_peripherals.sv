@@ -236,7 +236,7 @@ module soc_peripherals #(
   logic [                   31:0]                            s_gpio_sync;
   logic                                                      s_sel_hyper_axi;
 
-  logic [            `N_GPIO-1:0]                            s_gpio_event;
+  logic [            `N_GPIO-1:0]                            s_gpio_events;
   logic [                    1:0]                            s_spim_event;
   logic                                                      s_uart_event;
   logic                                                      s_i2c_event;
@@ -259,7 +259,7 @@ module soc_peripherals #(
   logic [                  159:0]                            s_events;
 
 
-  logic [     N_EFPGA_EVENTS-1:0]                            s_efpga_hwpe_events;
+  logic [     N_EFPGA_EVENTS-1:0]                            s_efpga_events;
   logic [`N_EFPGA_TCDM_PORTS-1:0]                            tcdm_req;
   logic [`N_EFPGA_TCDM_PORTS-1:0][TCDM_EFPGA_ADDR_WIDTH-1:0] tcdm_addr;
   logic [`N_EFPGA_TCDM_PORTS-1:0]                            tcdm_wen;
@@ -301,52 +301,10 @@ module soc_peripherals #(
 
 
 
-  /*  old pulp interrupts
-    assign s_events[UDMA_EVENTS-1:0]  = s_udma_events;
-    assign s_events[135]              = s_adv_timer_events[0];
-    assign s_events[136]              = s_adv_timer_events[1];
-    assign s_events[137]              = s_adv_timer_events[2];
-    assign s_events[138]              = s_adv_timer_events[3];
-    assign s_events[139]              = s_gpio_event;
-    assign s_events[140]              = s_efpga_hwpe_events[14];
-    assign s_events[141]              = s_efpga_hwpe_events[15];
-    assign s_events[142]              = 1'b0;
-    assign s_events[143]              = 1'b0;
-    assign s_events[159:144]          = '0;
-
-    assign fc_events_o[7:0] = 8'h0; //RESERVED for sw events
-    assign fc_events_o[8]   = dma_pe_evt_i;
-    assign fc_events_o[9]   = dma_pe_irq_i;
-    assign fc_events_o[10]  = s_timer_lo_event;
-    assign fc_events_o[11]  = s_timer_hi_event;
-    assign fc_events_o[12]  = pf_evt_i;
-    assign fc_events_o[13]  = 1'b0;
-    assign fc_events_o[14]  = s_ref_rise_event | s_ref_fall_event;
-    assign fc_events_o[15]  = s_gpio_event;
-    assign fc_events_o[16]  = 1'b0;
-    assign fc_events_o[17]  = s_adv_timer_events[0];
-    assign fc_events_o[18]  = s_adv_timer_events[1];
-    assign fc_events_o[19]  = s_adv_timer_events[2];
-    assign fc_events_o[20]  = s_adv_timer_events[3];
-    assign fc_events_o[21]  = 1'b0;
-    assign fc_events_o[22]  = 1'b0;
-    assign fc_events_o[23]  = 1'b0;
-    assign fc_events_o[24]  = 1'b0;
-    assign fc_events_o[25]  = 1'b0;
-    assign fc_events_o[26]  = 1'b0; // RESERVED for soc event FIFO
-                                    // (many events get implicitely muxed into
-                                    // this interrupt. A user that gets such an
-                                    // interrupt has to check the event unit's
-                                    // registers to see what happened)
-    assign fc_events_o[27]  = 1'b0;
-    assign fc_events_o[28]  = 1'b0;
-    assign fc_events_o[29]  = s_fc_err_events;
-    assign fc_events_o[30]  = s_fc_hp_events[0];
-    assign fc_events_o[31]  = s_fc_hp_events[1];
-*/
   assign s_events[UDMA_EVENTS-1:0] = s_udma_events;
+  assign s_events[UDMA_EVENTS-1:UDMA_EVENTS-N_EFPGA_EVENTS] = s_efpga_events;
   // TODO(timsaxe): Check why this is multiply driven.
-  assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_event;
+  assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_events;
 
 
 
@@ -502,7 +460,7 @@ module soc_peripherals #(
       .gpio_in  (gpio_in_i),
       .gpio_out (gpio_out_o),
       .gpio_dir (gpio_oe_o),
-      .interrupt(s_gpio_event)
+      .interrupt(s_gpio_events)
   );
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -834,7 +792,7 @@ module soc_peripherals #(
       .fpgaio_in_i (fpgaio_in_i),
       .fpgaio_out_o(fpgaio_out_o),
 
-      .efpga_event_o(s_efpga_hwpe_events),
+      .efpga_event_o(s_efpga_events),
 
       //eFPGA SPIS
       .efpga_fcb_spis_rst_n_i    (efpga_fcb_spis_rst_n_i),
