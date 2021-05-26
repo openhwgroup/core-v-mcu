@@ -58,3 +58,27 @@ The resulting documents are accessed using file ./docs/_build/html/index.html
 $ make docs
 ```
 The resulting header files are located in ./sw
+
+## Experimental fuseSoC Support
+
+Run Verilator lint target:
+
+```
+fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
+```
+
+To build Verilator as a library which can be linked into other tools (such as
+the debug server):
+
+```
+fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
+```
+
+The library will be in the `obj_dir` subdirectory of the work root.
+
+Once can sanity check the top-level using QuestaSim:
+
+```
+fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu
+```
+
