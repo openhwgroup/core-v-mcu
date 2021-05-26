@@ -184,9 +184,9 @@ module soc_domain
     output logic [ `N_PERIO-1:0] perio_out_o,
     output logic [ `N_PERIO-1:0] perio_oe_o,
     // Signals to gpio controller
-    input  logic [ `N_APBIO-1:0] gpio_in_i,
-    output logic [ `N_APBIO-1:0] gpio_out_o,
-    output logic [ `N_APBIO-1:0] gpio_oe_o,
+    input  logic [ `N_APBIO-1:0] apbio_in_i,
+    output logic [ `N_APBIO-1:0] apbio_out_o,
+    output logic [ `N_APBIO-1:0] apbio_oe_o,
     // IO signals to efpga
     input  logic [`N_FPGAIO-1:0] fpgaio_in_i,
     output logic [`N_FPGAIO-1:0] fpgaio_out_o,
@@ -617,10 +617,10 @@ module soc_domain
       .perio_in_i  (perio_in_i),
       .perio_out_o (perio_out_o),
       .perio_oe_o  (perio_oe_o),
-      // GPIO signals
-      .gpio_in_i   (gpio_in_i),
-      .gpio_out_o  (gpio_out_o),
-      .gpio_oe_o   (gpio_oe_o),
+      // APBIO signals
+      .apbio_in_i   (apbio_in_i),
+      .apbio_out_o  (apbio_out_o),
+      .apbio_oe_o   (apbio_oe_o),
       // FPGAIO signals
       .fpgaio_out_o(fpgaio_out_o),
       .fpgaio_in_i (fpgaio_in_i),

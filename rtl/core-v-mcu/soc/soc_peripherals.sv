@@ -86,9 +86,9 @@ module soc_peripherals #(
     output logic [ `N_PERIO-1:0]                   perio_out_o,
     output logic [ `N_PERIO-1:0]                   perio_oe_o,
     // GPIO signals
-    input  logic [ `N_APBIO-1:0]                   gpio_in_i,
-    output logic [ `N_APBIO-1:0]                   gpio_out_o,
-    output logic [ `N_APBIO-1:0]                   gpio_oe_o,
+    input  logic [ `N_APBIO-1:0]                   apbio_in_i,
+    output logic [ `N_APBIO-1:0]                   apbio_out_o,
+    output logic [ `N_APBIO-1:0]                   apbio_oe_o,
     // FPGAIO signals
     input  logic [`N_FPGAIO-1:0]                   fpgaio_in_i,
     output logic [`N_FPGAIO-1:0]                   fpgaio_out_o,
@@ -234,7 +234,7 @@ module soc_peripherals #(
   APB_BUS s_apb_fcb_bus ();
   APB_BUS s_apb_i2cs_bus ();
 
-  logic [                   31:0]                            s_gpio_sync;
+  logic [            `N_GPIO-1:0]                            s_gpio_sync;
   logic                                                      s_sel_hyper_axi;
 
   logic [            `N_GPIO-1:0]                            s_gpio_events;
@@ -460,9 +460,9 @@ module soc_peripherals #(
 
       .gpio_in_sync(s_gpio_sync),
 
-      .gpio_in  (gpio_in_i[`N_GPIO-1:0]),
-      .gpio_out (gpio_out_o[`N_GPIO-1:0]),
-      .gpio_dir (gpio_oe_o[`N_GPIO-1:0]),
+      .gpio_in  (apbio_in_i[`N_GPIO-1:0]),
+      .gpio_out (apbio_out_o[`N_GPIO-1:0]),
+      .gpio_dir (apbio_oe_o[`N_GPIO-1:0]),
       .interrupt(s_gpio_events)
   );
 
@@ -663,15 +663,15 @@ module soc_peripherals #(
 
       .events_o(s_adv_timer_events),
 
-      .ch_0_o(gpio_out_o[`N_GPIO+3:`N_GPIO]),  // (timer_ch0_o),
-      .ch_1_o(gpio_out_o[`N_GPIO+7:`N_GPIO+4]),  // (timer_ch1_o),
-      .ch_2_o(gpio_out_o[`N_GPIO+11:`N_GPIO+8]),  // (timer_ch2_o),
-      .ch_3_o(gpio_out_o[`N_GPIO+15:`N_GPIO+12])  // (timer_ch3_o)
+      .ch_0_o(apbio_out_o[`N_GPIO+3:`N_GPIO]),  // (timer_ch0_o),
+      .ch_1_o(apbio_out_o[`N_GPIO+7:`N_GPIO+4]),  // (timer_ch1_o),
+      .ch_2_o(apbio_out_o[`N_GPIO+11:`N_GPIO+8]),  // (timer_ch2_o),
+      .ch_3_o(apbio_out_o[`N_GPIO+15:`N_GPIO+12])  // (timer_ch3_o)
   );
-  assign gpio_oe_o[`N_GPIO+3:`N_GPIO] = 4'b1111;  // timer_ch0 oe
-  assign gpio_oe_o[`N_GPIO+7:`N_GPIO+4] = 4'b1111;  // timer_ch1 oe
-  assign gpio_oe_o[`N_GPIO+11:`N_GPIO+8] = 4'b1111;  // timer_ch2 oe
-  assign gpio_oe_o[`N_GPIO+15:`N_GPIO+12] = 4'b1111;  // timer_ch3 oe
+  assign apbio_oe_o[`N_GPIO+3:`N_GPIO] = 4'b1111;  // timer_ch0 oe
+  assign apbio_oe_o[`N_GPIO+7:`N_GPIO+4] = 4'b1111;  // timer_ch1 oe
+  assign apbio_oe_o[`N_GPIO+11:`N_GPIO+8] = 4'b1111;  // timer_ch2 oe
+  assign apbio_oe_o[`N_GPIO+15:`N_GPIO+12] = 4'b1111;  // timer_ch3 oe
 
   /////////////////////////////////////////////////////////////////////////////////
   // ███████╗██╗   ██╗███████╗███╗   ██╗████████╗     ██████╗ ███████╗███╗   ██╗ //
@@ -862,10 +862,10 @@ module soc_peripherals #(
       .apb_interrupt_o(),
       // .PSLVERR(s_apb_i2cs_bus.pslverr),
 
-      .i2c_scl_i(gpio_in_i[`N_GPIO+16]),
-      .i2c_sda_i(gpio_in_i[`N_GPIO+17]),
-      .i2c_sda_o(gpio_out_o[`N_GPIO+17]),
-      .i2c_sda_oe(gpio_oe_o[`N_GPIO+17]),
+      .i2c_scl_i(apbio_in_i[`N_GPIO+16]),
+      .i2c_sda_i(apbio_in_i[`N_GPIO+17]),
+      .i2c_sda_o(apbio_out_o[`N_GPIO+17]),
+      .i2c_sda_oe(apbio_oe_o[`N_GPIO+17]),
       .i2c_interrupt_o(s_i2cs_event)
   );
 

@@ -438,7 +438,7 @@ if args.soc_defines != None and args.pin_table != None:
     io_out_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
     io_oe_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
     perio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_PERIO)]
-    gpio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
+    apbio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
     fpgaio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_FPGAIO)]
     xilinx_names = ['' for i in range(N_IO)]
     with open(args.pin_table, 'r') as f_pin_table:
@@ -476,11 +476,11 @@ if args.soc_defines != None and args.pin_table != None:
                         print("ERROR: found sysio '%s' as a sel option for IO_%d" % (entry, io_num))
                         error_count = error_count + 1
                     else:
-                        if entry[0:4] == 'gpio':    # gpio
-                            gpio_num = int(entry[5:])
-                            io_out_mux[io_num][sel] = "gpio_out_i[" + str(gpio_num) + "]"
-                            io_oe_mux[io_num][sel] = "gpio_oe_i[" + str(gpio_num) + "]"
-                            gpio_in_mux[gpio_num][sel] = "io_in_i[" + str(io_num) + "]"
+                        if entry[0:5] == 'apbio':    # apbio
+                            apbio_num = int(entry[6:])
+                            io_out_mux[io_num][sel] = "apbio_out_i[" + str(apbio_num) + "]"
+                            io_oe_mux[io_num][sel] = "apbio_oe_i[" + str(apbio_num) + "]"
+                            apbio_in_mux[apbio_num][sel] = "io_in_i[" + str(io_num) + "]"
                         elif entry[0:6] == 'fpgaio':    # fpgaio
                             fpgaio_num = int(entry[7:])
                             io_out_mux[io_num][sel] = "fpgaio_out_i[" + str(fpgaio_num) + "]"
@@ -545,10 +545,10 @@ if args.pad_control_sv != None:
         pad_control_sv.write("    output logic [`N_PERIO-1:0]     perio_in_o,\n")
         pad_control_sv.write("    input  logic [`N_PERIO-1:0]     perio_oe_i,\n")
         pad_control_sv.write("\n")
-        pad_control_sv.write("    // GPIOS\n")
-        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      gpio_out_i,\n")
-        pad_control_sv.write("    output logic [`N_APBIO-1:0]      gpio_in_o,\n")
-        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      gpio_oe_i,\n")
+        pad_control_sv.write("    // APBIOs\n")
+        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      apbio_out_i,\n")
+        pad_control_sv.write("    output logic [`N_APBIO-1:0]      apbio_in_o,\n")
+        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      apbio_oe_i,\n")
         pad_control_sv.write("\n")
         pad_control_sv.write("    // FPGAIOS\n")
         pad_control_sv.write("    input  logic [`N_FPGAIO-1:0]    fpgaio_out_i,\n")
@@ -584,12 +584,12 @@ if args.pad_control_sv != None:
 
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
-        pad_control_sv.write("    // Assign signals to the gpio bus\n")
+        pad_control_sv.write("    // Assign signals to the apbio bus\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         index = -1
-        for row in gpio_in_mux:
+        for row in apbio_in_mux:
             index = index + 1
-            pad_control_sv.write("    assign gpio_in_o[%d] = " %index)
+            pad_control_sv.write("    assign apbio_in_o[%d] = " %index)
             nparen = 0
             for sel in range(len(row)):
                 if row[sel] != '':

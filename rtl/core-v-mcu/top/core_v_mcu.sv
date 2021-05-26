@@ -84,10 +84,10 @@ module core_v_mcu #(
   logic [    `N_PERIO-1:0]                   s_perio_out;
   logic [    `N_PERIO-1:0]                   s_perio_in;
   logic [    `N_PERIO-1:0]                   s_perio_oe;
-  //GPIO
-  logic [    `N_APBIO-1:0]                   s_gpio_out;
-  logic [    `N_APBIO-1:0]                   s_gpio_in;
-  logic [    `N_APBIO-1:0]                   s_gpio_oe;
+  //APBIO
+  logic [    `N_APBIO-1:0]                   s_apbio_out;
+  logic [    `N_APBIO-1:0]                   s_apbio_in;
+  logic [    `N_APBIO-1:0]                   s_apbio_oe;
   // FPGAIO
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_out;
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_in;
@@ -336,9 +336,9 @@ module core_v_mcu #(
       .perio_in_o     (s_perio_in),
       .perio_oe_i     (s_perio_oe),
       // GPIO signals
-      .gpio_out_i     (s_gpio_out),
-      .gpio_in_o      (s_gpio_in),
-      .gpio_oe_i      (s_gpio_oe),
+      .apbio_out_i    (s_apbio_out),
+      .apbio_in_o     (s_apbio_in),
+      .apbio_oe_i     (s_gpio_oe),
       // FPGAIO signals
       .fpgaio_out_i   (s_fpgaio_out),
       .fpgaio_in_o    (s_fpgaio_in),
@@ -524,9 +524,9 @@ module core_v_mcu #(
       .perio_out_o (s_perio_out),
       .perio_oe_o  (s_perio_oe),
       // GPIO signals
-      .gpio_in_i   (s_gpio_in),
-      .gpio_out_o  (s_gpio_out),
-      .gpio_oe_o   (s_gpio_oe),
+      .apbio_in_i   (s_apbio_in),
+      .apbio_out_o  (s_apbio_out),
+      .apbio_oe_o   (s_apbio_oe),
       // FPGAIO signals
       .fpgaio_out_o(s_fpgaio_out),
       .fpgaio_in_i (s_fpgaio_in),
