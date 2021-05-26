@@ -84,11 +84,28 @@ filesets:
     - components/freq_meter.sv
     file_type: systemVerilogSource
 
+  # Scripts for hooks
+  pre_build_scripts:
+    files:
+    - scripts/vedit.sh
+    file_type: user
+
+# A script to modify Verilator pre-build to generate a library, not an
+# executable.
+scripts:
+  pre_build_scripts:
+    cmd:
+    - sh
+    - ../src/openhwgroup.org_systems_core-v-mcu_0/scripts/vedit.sh
+    - openhwgroup.org_systems_core-v-mcu_0.vc
+
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
     - target_sim? (rtl-behavioral)
+    - target_model-lib? (rtl-behavioral)
+    - target_model-lib? (pre_build_scripts)
     - target_lint? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
@@ -100,6 +117,20 @@ targets:
         vlog_options:
         - -override_timescale 1ns/1ps
 
+
+  # A target for a Verilator model as a library.
+  model-lib:
+    <<: *default_target
+    default_tool: verilator
+    toplevel: [core_v_mcu]
+    hooks:
+      pre_build: [pre_build_scripts]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+        - -Wno-fatal
+        - --trace
 
   lint:
     <<: *default_target
