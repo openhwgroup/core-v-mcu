@@ -26,10 +26,13 @@ make with no argments will print a list of the current targets:
 ```
 $ make
 all:            generate build scripts, custom build files, doc and sw header files
+bitstream:      generate nexysA7-100T.bit file for emulation
 lint:           run Verilator lint check
-docs:           generate documentation (./docs/_build/html/index.html)
+doc:            generate documentation
 sw:             generate C header files (in ./sw)
-nexys-emul:     generate bitstream for Nexys-A7-100T (./emulation/core-v-mcu-nexys-a7-100t.bit)
+nexys-emul:     generate bitstream for Nexys-A7-100T emulation)
+buildsim:       build for Questa sim
+sim:            run Questa sim
 ```
 
 ## Building an FPGA Image
@@ -55,7 +58,7 @@ The resulting documents are accessed using file ./docs/_build/html/index.html
 
 ## Building C header files
 ```
-$ make docs
+$ make sw
 ```
 The resulting header files are located in ./sw
 
@@ -63,6 +66,6 @@ The resulting header files are located in ./sw
 ```
 $ make buildsim sim
 ```
-The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and the 'make sim' runs the simulation.
+The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and then 'make sim' runs the simulation.
 
 The test bench used by the simulation is 'core_v_mcu_tb.sv'
