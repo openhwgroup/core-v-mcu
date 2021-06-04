@@ -46,10 +46,10 @@ module safe_domain #(
     output logic [`N_PERIO-1:0] perio_in_o,
     input  logic [`N_PERIO-1:0] perio_oe_i,
 
-    // GPIOS
-    input  logic [`N_GPIO-1:0] gpio_out_i,
-    output logic [`N_GPIO-1:0] gpio_in_o,
-    input  logic [`N_GPIO-1:0] gpio_oe_i,
+    // APBIOS
+    input  logic [`N_APBIO-1:0] apbio_out_i,
+    output logic [`N_APBIO-1:0] apbio_in_o,
+    input  logic [`N_APBIO-1:0] apbio_oe_i,
 
     // FPGAIOS
     input  logic [`N_FPGAIO-1:0] fpgaio_out_i,
@@ -58,12 +58,12 @@ module safe_domain #(
 
 
     // TIMER
-    input logic [3:0] timer0_i,
-    input logic [3:0] timer1_i,
-    input logic [3:0] timer2_i,
-    input logic [3:0] timer3_i,
-    input logic       debug0,
-    input logic       debug1
+    //    input logic [3:0] timer0_i,
+    //    input logic [3:0] timer1_i,
+    //    input logic [3:0] timer2_i,
+    //    input logic [3:0] timer3_i,
+    input logic debug0,
+    input logic debug1
 );
 
   logic                    s_test_clk;
@@ -99,9 +99,9 @@ module safe_domain #(
       .perio_in_o (perio_in_o),
       .perio_oe_i (perio_oe_i),
 
-      .gpio_out_i(gpio_out_i),
-      .gpio_in_o (gpio_in_o),
-      .gpio_oe_i (gpio_oe_i),
+      .apbio_out_i(apbio_out_i),
+      .apbio_in_o (apbio_in_o),
+      .apbio_oe_i (apbio_oe_i),
 
       .fpgaio_out_i(fpgaio_out_i),
       .fpgaio_in_o (fpgaio_in_o),

@@ -1,0 +1,24 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:apb_i2cs
+description: APB I2C SLAVE interface.
+
+filesets:
+  files_rtl:
+    files:
+    - rtl/apb_i2cs.v
+    - rtl/apb_slv_interface.v
+    - rtl/FIFO_sync_256x8.v
+    - rtl/i2c_peripheral_interface.v
+    - rtl/i2c_peripheral_registers.v
+    - rtl/RAM_256x8_behavioral.v
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+    - files_rtl

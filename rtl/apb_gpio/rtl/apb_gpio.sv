@@ -155,8 +155,9 @@ module apb_gpiov2 #(
             PRDATA <= 0;
             case (PADDR[11:0])
               `REG_RDSTAT: begin
-                PRDATA[26:24] <= r_gpio_dir[r_gpio_select];
-                PRDATA[19:16] <= r_gpio_inttype[r_gpio_select];
+                PRDATA[25:24] <= r_gpio_dir[r_gpio_select];
+                PRDATA[19:17] <= r_gpio_inttype[r_gpio_select];
+                PRDATA[16] <= r_gpio_inten[r_gpio_select];
                 PRDATA[12] <= r_gpio_in[r_gpio_select];
                 PRDATA[8] <= r_gpio_out[r_gpio_select];
                 PRDATA[NG_BITS:0] <= r_gpio_select;
