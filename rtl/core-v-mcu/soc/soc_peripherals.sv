@@ -303,9 +303,8 @@ module soc_peripherals #(
 
 
 
-  assign s_events[UDMA_EVENTS-1:0] = s_udma_events;
+  assign s_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0] = s_udma_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0]; // ToDo: Hack that grabs top 16 events (equiv to 4 udma peripherals)
   assign s_events[UDMA_EVENTS-1:UDMA_EVENTS-N_EFPGA_EVENTS] = s_efpga_events;
-  // TODO(timsaxe): Check why this is multiply driven.
   assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_events;
 
 
