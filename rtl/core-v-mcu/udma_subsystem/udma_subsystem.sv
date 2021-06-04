@@ -140,7 +140,7 @@ module udma_subsystem #(
   localparam STREAM_ID_WIDTH = 1;  //$clog2(N_STREAMS)
 
   localparam N_PERIPHS = `N_SPI + `N_HYPER + `N_UART + `N_MRAM + `N_I2C + `N_CAM + `N_I2S + `N_CSI2 + `N_SDIO + `N_JTAG + `N_FILTER + `N_FPGA + N_EXT_PER;
-  if (N_PERIPHS > 28) $error("Too many udma periperals: limit is 28 (32 event channels - 4 for FPGA)")
+  if (N_PERIPHS > 28) $error("Too many udma periperals: limit is 28 (32 event channels - 4 for FPGA)");
 
   //TX Channels
   localparam CH_ID_TX_UART = 0;

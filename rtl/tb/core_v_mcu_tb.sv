@@ -15,6 +15,10 @@ module core_v_mcu_tb;
     localparam IO_RESETN = 7;
      
     localparam  REF_CLK_PERIOD = 10ns;        // period of the external reference clock (100MHz)
+    
+    initial begin
+      $display("***********************************");
+    end
 
     initial begin: timing_format
         $timeformat(-9, 0, "ns", 9);
@@ -44,8 +48,10 @@ module core_v_mcu_tb;
     end
 
     initial begin:  sys_reset
+        $display("asserting reset");
         resetn = 1'b0;
         resetn = #(4*REF_CLK_PERIOD) 1'b1;
+        $display("releasing reset");
     end
 
     // testbench driver process

@@ -48,7 +48,7 @@ sim:
 				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
 .PHONY:buildsim
 buildsim:
-				fusesoc --cores-root . run --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+				fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"

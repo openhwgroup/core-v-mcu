@@ -110,6 +110,8 @@ targets:
       - simulation-rtl
       - rtl-behavioral
       - tb-rtl
+    toplevel:
+      - core_v_mcu_tb
     tools:
       modelsim:
         vlog_options:
