@@ -5,6 +5,9 @@ __pycache__/
 *.bit
 install/
 build/
+buildsim.log
+sim.log
+rtl/tb/run-sim.log
 ./ips
 gmon.out
 modelsim.ini

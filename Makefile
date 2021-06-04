@@ -33,6 +33,8 @@ help:
 			@echo "doc:            generate documentation"
 			@echo "sw:             generate C header files (in ./sw)"
 			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
+			@echo "buildsim:       build for Questa sim"
+			@echo "sim:            run Questa sim"
 
 clean:
 				(cd docs; make clean)
@@ -40,6 +42,13 @@ clean:
 
 lint:
 				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+
+.PHONY:sim
+sim:
+				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+.PHONY:buildsim
+buildsim:
+				fusesoc --cores-root . run --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"

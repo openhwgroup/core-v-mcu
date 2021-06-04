@@ -83,22 +83,39 @@ filesets:
     files:
     - components/freq_meter.sv
     file_type: systemVerilogSource
+    
+  simulation-rtl:
+    files:
+    - ../tb/sim_clk_gen.sv
+    file_type: systemVerilogSource
+    
+  tb-rtl:
+    files:
+    - ../tb/core_v_mcu_tb.sv
+    - ../tb/tb_clk_gen.sv
+    file_type: systemVerilogSource
 
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
-    - target_sim? (rtl-behavioral)
     - target_lint? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
     <<: *default_target
     default_tool: modelsim
+    filesets_append:
+      - simulation-rtl
+      - rtl-behavioral
+      - tb-rtl
     tools:
       modelsim:
         vlog_options:
         - -override_timescale 1ns/1ps
+        - -suppress vlog-2583
+        vsim_options:
+        - -voptargs="-O1"
 
 
   lint:

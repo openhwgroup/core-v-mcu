@@ -30,7 +30,6 @@ module core_v_mcu_tb;
 
     // Design Under Test
     core_v_mcu #(
-        .CORE_TYPE  ( 3 ),
         .USE_FPU    ( 1 ),
         .USE_HWPE   ( 1 )
     )
