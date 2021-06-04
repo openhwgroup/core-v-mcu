@@ -47,7 +47,7 @@ Currently unsupported:
 $ make genesys2
 ```
 
-## Building documenation
+## Building documentation
 ```
 $ make docs
 ```
@@ -58,3 +58,11 @@ The resulting documents are accessed using file ./docs/_build/html/index.html
 $ make docs
 ```
 The resulting header files are located in ./sw
+
+## Running Modelsim/Questasim
+```
+$ make buildsim sim
+```
+The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and the 'make sim' runs the simulation.
+
+The test bench used by the simulation is 'core_v_mcu_tb.sv'
