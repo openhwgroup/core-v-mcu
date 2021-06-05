@@ -87,13 +87,13 @@ filesets:
     
   simulation-rtl:
     files:
-    - ../tb/sim_clk_gen.sv
+    - tb/sim_clk_gen.sv
     file_type: systemVerilogSource
     
   tb-rtl:
     files:
-    - ../tb/core_v_mcu_tb.sv
-    - ../tb/tb_clk_gen.sv
+    - tb/core_v_mcu_tb.sv
+    - tb/tb_clk_gen.sv
     file_type: systemVerilogSource
     
   emulation-rtl:
@@ -130,6 +130,12 @@ filesets:
     - ../../emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+    
 targets:
   default: &default_target
     filesets:
@@ -166,7 +172,7 @@ targets:
         - -Wno-fatal
         
   nexys-a7-100t:
-    <<: *default
+    <<: *default_target
     default_tool: vivado
     description: Digilent Nexys-A7-100T Board
     parameters:
