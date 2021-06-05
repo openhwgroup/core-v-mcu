@@ -24,6 +24,9 @@ from datetime import datetime
 #  Argument handling
 #
 parser = argparse.ArgumentParser()
+parameterArgs = parser.add_argument_group("parameters")
+parameterArgs.add_argument("--emulation-toplevel", help="top level module name to use in emulation wrapper")
+
 inputArgs = parser.add_argument_group("input files")
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
 inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
@@ -848,7 +851,7 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("`include \"pulp_soc_defines.sv\"\n")
         x_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         x_sv.write("\n")
-        x_sv.write("module xilinx_core_v_mcu\n")
+        x_sv.write("module %s\n" % (args.emulation_toplevel))
         x_sv.write("  (\n")
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
         x_sv.write("  );\n")
@@ -862,7 +865,8 @@ if args.xilinx_core_v_mcu_sv != None:
             if sysionames[ionum] != "ref_clk_o" and  sysionames[ionum] != "jtag_tck_o":
                 ionum_end = ionum
             else:                       # break in sequence
-                x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
+                if ionum_end >= 0:
+                    x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
                 ionum_start = ionum+1
                 ionum_end = -1
                 if sysionames[ionum] == "ref_clk_o":
@@ -886,7 +890,6 @@ if args.xilinx_core_v_mcu_sv != None:
             x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
 
         x_sv.write("  core_v_mcu #(\n")
-        x_sv.write("    .CORE_TYPE(`CORE_TYPE),\n")
         x_sv.write("    .USE_FPU(`USE_FPU),\n")
         x_sv.write("    .USE_HWPE(`USE_HWPE)\n")
         x_sv.write("  ) i_core_v_mcu (\n")

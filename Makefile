@@ -24,8 +24,6 @@ export INTERLEAVED_BANK_SIZE=28672
 #Must also change the localparam 'L2_BANK_SIZE_PRI' in pulp_soc.sv accordingly
 export PRIVATE_BANK_SIZE=8192
 
-all:	${IOSCRIPT_OUT} docs sw
-
 help:
 			@echo "all:            generate build scripts, custom build files, doc and sw header files"
 			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
@@ -35,6 +33,9 @@ help:
 			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
 			@echo "buildsim:       build for Questa sim"
 			@echo "sim:            run Questa sim"
+			@echo "clean:          remove generated files"
+			
+all:	${IOSCRIPT_OUT} docs sw
 
 clean:
 				(cd docs; make clean)
@@ -62,6 +63,7 @@ nexys-emul:		${IOSCRIPT_OUT}
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
+					--emulation-toplevel core_v_mcu_nexys\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc

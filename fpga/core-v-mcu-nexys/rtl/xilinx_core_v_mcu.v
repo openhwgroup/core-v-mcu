@@ -20,14 +20,12 @@
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
 
-module xilinx_core_v_mcu
+module None
   (
     inout wire [`N_IO-1:0]  xilinx_io
   );
 
   wire [`N_IO-1:0]  s_io;
-
-  assign s_io[-1:0] = xilinx_io[-1:0];
 
   //JTAG TCK clock buffer (dedicated route is false in constraints)
   IBUF i_tck_iobuf (
@@ -49,7 +47,6 @@ module xilinx_core_v_mcu
   assign s_io[47:6] = xilinx_io[47:6];
 
   core_v_mcu #(
-    .CORE_TYPE(`CORE_TYPE),
     .USE_FPU(`USE_FPU),
     .USE_HWPE(`USE_HWPE)
   ) i_core_v_mcu (
