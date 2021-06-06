@@ -4,7 +4,7 @@ CAPI=2:
 # Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-name: openhwgroup.org:systems:core-v-mcu-orig
+name: openhwgroup.org:systems:core-v-mcu
 description: CORE-V MCU Top.
 
 filesets:
@@ -39,50 +39,50 @@ filesets:
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
-    - ../includes/periph_bus_defines.sv: {is_include_file: true, include_path: ../includes}
-    - ../includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: ../includes}
-    - ../includes/pulp_soc_defines.sv: {is_include_file: true, include_path: ../includes}
-    - ../includes/soc_mem_map.svh: {is_include_file: true, include_path: ../includes}
-    - include/tcdm_macros.svh: {is_include_file: true, include_path: include/}
-    - soc/pkg_soc_interconnect.sv
-    - soc/axi64_2_lint32_wrap.sv
-    - soc/lint_2_axi_wrap.sv
-    - soc/contiguous_crossbar.sv
-    - soc/interleaved_crossbar.sv
-    - soc/tcdm_demux.sv
-    - soc/boot_rom.sv
-    - soc/l2_ram_multi_bank.sv
-    - soc/lint_jtag_wrap.sv
-    - soc/periph_bus_wrap.sv
-    - soc/soc_clk_rst_gen.sv
-    - soc/soc_event_arbiter.sv
-    - soc/soc_event_generator.sv
-    - soc/soc_event_queue.sv
-    - soc/tcdm_error_slave.sv
-    - soc/soc_interconnect.sv
-    - soc/soc_interconnect_wrap.sv
-    - soc/soc_peripherals.sv
-    - udma_subsystem/udma_subsystem.sv
-    - fc/fc_demux.sv
-    - fc/fc_subsystem.sv
-    - fc/fc_hwpe.sv
-    - components/apb_soc_ctrl.sv
-    - components/pulp_interfaces.sv
-    - efpga_subsystem/efpga_subsystem.sv
-    - efpga_subsystem/A2_fifo.sv
-    - efpga_subsystem/A2_fifo_ctl.sv
-    - efpga_subsystem/A2_fifo_ram.sv
-    - efpga_subsystem/tcdm_interface.sv
-    - top/pad_control.sv
-    - top/pad_frame.sv
-    - top/safe_domain.sv
-    - top/soc_domain.sv
-    - top/core_v_mcu.sv
+    - rtl/includes/periph_bus_defines.sv: {is_include_file: true, include_path: ../includes}
+    - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: ../includes}
+    - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: ../includes}
+    - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: ../includes}
+    - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: include/}
+    - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv
+    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
+    - rtl/core-v-mcu/soc/lint_2_axi_wrap.sv
+    - rtl/core-v-mcu/soc/contiguous_crossbar.sv
+    - rtl/core-v-mcu/soc/interleaved_crossbar.sv
+    - rtl/core-v-mcu/soc/tcdm_demux.sv
+    - rtl/core-v-mcu/soc/boot_rom.sv
+    - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
+    - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
+    - rtl/core-v-mcu/soc/periph_bus_wrap.sv
+    - rtl/core-v-mcu/soc/soc_clk_rst_gen.sv
+    - rtl/core-v-mcu/soc/soc_event_arbiter.sv
+    - rtl/core-v-mcu/soc/soc_event_generator.sv
+    - rtl/core-v-mcu/soc/soc_event_queue.sv
+    - rtl/core-v-mcu/soc/tcdm_error_slave.sv
+    - rtl/core-v-mcu/soc/soc_interconnect.sv
+    - rtl/core-v-mcu/soc/soc_interconnect_wrap.sv
+    - rtl/core-v-mcu/soc/soc_peripherals.sv
+    - rtl/core-v-mcu/udma_subsystem/udma_subsystem.sv
+    - rtl/core-v-mcu/fc/fc_demux.sv
+    - rtl/core-v-mcu/fc/fc_subsystem.sv
+    - rtl/core-v-mcu/fc/fc_hwpe.sv
+    - rtl/core-v-mcu/components/apb_soc_ctrl.sv
+    - rtl/core-v-mcu/components/pulp_interfaces.sv
+    - rtl/core-v-mcu/efpga_subsystem/efpga_subsystem.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ctl.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ram.sv
+    - rtl/core-v-mcu/efpga_subsystem/tcdm_interface.sv
+    - rtl/core-v-mcu/top/pad_control.sv
+    - rtl/core-v-mcu/top/pad_frame.sv
+    - rtl/core-v-mcu/top/safe_domain.sv
+    - rtl/core-v-mcu/top/soc_domain.sv
+    - rtl/core-v-mcu/top/core_v_mcu.sv
     file_type: systemVerilogSource
 
   rtl-behavioral:
     files:
-    - components/freq_meter.sv
+    - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
     
   simulation-rtl:
@@ -100,38 +100,38 @@ filesets:
     depend:
     - pulp-platform.org::tech_cells_xilinx
     files:
-    - ../../emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - ../../emulation/xilinx/rtl/fpga_bootrom.sv
-    - ../../emulation/xilinx/rtl/fpga_clk_gen.sv
-    - ../../emulation/xilinx/rtl/fpga_interleaved_ram.sv
-    - ../../emulation/xilinx/rtl/fpga_private_ram.sv
-    - ../../emulation/xilinx/rtl/fpga_slow_clk_gen.sv
-    - ../../emulation/xilinx/rtl/pad_functional_xilinx.sv
-    - ../../emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
+    - emulation/xilinx/rtl/fpga_bootrom.sv
+    - emulation/xilinx/rtl/fpga_clk_gen.sv
+    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
+    - emulation/xilinx/rtl/fpga_private_ram.sv
+    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
+    - emulation/xilinx/rtl/pad_functional_xilinx.sv
+    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     file_type: systemVerilogSource
   
   xilinx-ips:
     files:
-    - ../../emulation/xilinx/ips/xilinx_clk_mngr.tcl
-    - ../../emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
-    - ../../emulation/xilinx/ips/xilinx_interleaved_ram.tcl
-    - ../../emulation/xilinx/ips/xilinx_private_ram.tcl
+    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
+    - emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
     
   nexys-rtl:
     files:
-    - ../../emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+    - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
     file_type: systemVerilogSource
     
   nexys-xdc:
     files:
-    - ../../emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+    - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
 
   nexys-cfg:
     files:
-    - ../../emulation/core-v-mcu-nexys/tcl/common.tcl
-    - ../../emulation/core-v-mcu-nexys/tcl/flatten.tcl
+    - emulation/core-v-mcu-nexys/tcl/common.tcl
+    - emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
 parameters:
