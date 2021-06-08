@@ -84,18 +84,18 @@ filesets:
     files:
     - components/freq_meter.sv
     file_type: systemVerilogSource
-    
+
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
     file_type: systemVerilogSource
-    
+
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
     - tb/tb_clk_gen.sv
     file_type: systemVerilogSource
-    
+
   emulation-rtl:
     depend:
     - pulp-platform.org::tech_cells_xilinx
@@ -109,7 +109,7 @@ filesets:
     - ../../emulation/xilinx/rtl/pad_functional_xilinx.sv
     - ../../emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     file_type: systemVerilogSource
-  
+
   xilinx-ips:
     files:
     - ../../emulation/xilinx/ips/xilinx_clk_mngr.tcl
@@ -117,12 +117,12 @@ filesets:
     - ../../emulation/xilinx/ips/xilinx_interleaved_ram.tcl
     - ../../emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
-    
+
   nexys-rtl:
     files:
     - ../../emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
     file_type: systemVerilogSource
-    
+
   nexys-xdc:
     files:
     - ../../emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
@@ -139,11 +139,29 @@ parameters:
     datatype: bool
     paramtype: vlogdefine
     default: true
-    
+
+  # Scripts for hooks
+  pre_build_scripts:
+    files:
+    - scripts/vedit.sh
+    file_type: user
+
+# A script to modify Verilator pre-build to generate a library, not an
+# executable.
+scripts:
+  pre_build_scripts:
+    cmd:
+    - sh
+    - ../src/openhwgroup.org_systems_core-v-mcu_0/scripts/vedit.sh
+    - openhwgroup.org_systems_core-v-mcu_0.vc
+
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
+    - target_sim? (rtl-behavioral)
+    - target_model-lib? (rtl-behavioral)
+    - target_model-lib? (pre_build_scripts)
     - target_lint? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
@@ -165,6 +183,20 @@ targets:
         - -voptargs="-O1"
 
 
+  # A target for a Verilator model as a library.
+  model-lib:
+    <<: *default_target
+    default_tool: verilator
+    toplevel: [core_v_mcu]
+    hooks:
+      pre_build: [pre_build_scripts]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+        - -Wno-fatal
+        - --trace
+
   lint:
     <<: *default_target
     default_tool: verilator
@@ -174,7 +206,7 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
-        
+
   nexys-a7-100t:
     <<: *default_target
     default_tool: vivado
