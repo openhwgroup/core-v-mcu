@@ -64,8 +64,34 @@ The resulting header files are located in ./sw
 
 ## Running Modelsim/Questasim
 ```
+
 $ make buildsim sim
 ```
 The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and then 'make sim' runs the simulation.
 
 The test bench used by the simulation is 'core_v_mcu_tb.sv'
+
+The resulting header files are located in ./sw
+
+## Experimental fuseSoC Support
+
+Run Verilator lint target:
+
+```
+fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
+```
+
+To build Verilator as a library which can be linked into other tools (such as
+the debug server):
+
+```
+fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
+```
+
+The library will be in the `obj_dir` subdirectory of the work root.
+
+Once can sanity check the top-level using QuestaSim:
+
+```
+fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu
+```
