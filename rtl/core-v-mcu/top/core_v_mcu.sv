@@ -338,7 +338,7 @@ module core_v_mcu #(
       // GPIO signals
       .apbio_out_i    (s_apbio_out),
       .apbio_in_o     (s_apbio_in),
-      .apbio_oe_i     (s_gpio_oe),
+      .apbio_oe_i     (s_apbio_oe),
       // FPGAIO signals
       .fpgaio_out_i   (s_fpgaio_out),
       .fpgaio_in_o    (s_fpgaio_in),

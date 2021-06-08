@@ -8,9 +8,9 @@ CLK100MHZ,IO_5,5,ref_clk,,,,
 CPU_RESETN,IO_6,6,rstn,,,,
 UART_TXD_IN,IO_7,7,,uart0_rx,,apbio_0,fpgaio_0
 UART_RXD_OUT,IO_8,8,,uart0_tx,,apbio_1,fpgaio_1
-JB[1],IO_9,9,,uart1_rx,,apbio_2,fpgaio_2
-JB[2],IO_10,10,,uart1_tx,,apbio_3,fpgaio_3
-LED[0],IO_11,11,,1,0,apbio_4,fpgaio_4
+JB[2],IO_9,9,,uart1_tx,,apbio_2,fpgaio_2
+JB[3],IO_10,10,,uart1_rx,,apbio_3,fpgaio_3
+LED[0],IO_11,11,,apbio_32,apbio_47,apbio_4,fpgaio_4
 JB[4],IO_12,12,,0,,apbio_5,fpgaio_5
 XA_P[1],Jxadc[1],13,,qspim0_csn0,,apbio_6,fpgaio_6
 XA_P[2],Jxadc[2],14,,qspim0_data0,,apbio_7,fpgaio_7
