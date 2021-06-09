@@ -34,7 +34,7 @@ help:
 			@echo "buildsim:       build for Questa sim"
 			@echo "sim:            run Questa sim"
 			@echo "clean:          remove generated files"
-			
+
 all:	${IOSCRIPT_OUT} docs sw
 
 clean:
@@ -112,4 +112,4 @@ bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 
 download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
-              build/openhwgroup.org_systems_core-v-mcu-emul_0/nexys-a7-100t-vivado/openhwgroup.org_systems_core-v-mcu-emul_0.runs/impl_1/xilinx_core_v_mcu.bit
+             emulation/core_v_mcu_nexys.bit
