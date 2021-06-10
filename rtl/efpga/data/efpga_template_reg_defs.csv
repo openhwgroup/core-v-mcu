@@ -409,14 +409,26 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0xAC,M1_M1_CDATA,,,,,
 ,cdata,31,0,RW,,Sets the coeficient data for math unit 1 multiplier 1
 ,,,,,,
-0x3000,M0_OPER0[0x400],,,,,
+0x100,M0_M0_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 0 multiplier 0
 ,,,,,,
-0x4000,M0_OPER1[0x400],,,,,
+0x104,M0_M1_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 0 multiplier 1
 ,,,,,,
-0x5000,M0_COEF[0x400],,,,,
+0x108,M1_M0_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 1 multiplier 0
 ,,,,,,
-0x6000,M1_OPER0[0x400],,,,,
+0x10C,M1_M01MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 1 multiplier 1
 ,,,,,,
-0x7000,M1_OPER1[0x400],,,,,
+0x1000,M0_OPER0[0x400],,,,,
 ,,,,,,
-0x8000,M1_COEF[0x400],,,,,
+0x2000,M0_OPER1[0x400],,,,,
+,,,,,,
+0x3000,M0_COEF[0x400],,,,,
+,,,,,,
+0x4000,M1_OPER0[0x400],,,,,
+,,,,,,
+0x5000,M1_OPER1[0x400],,,,,
+,,,,,,
+0x6000,M1_COEF[0x400],,,,,
