@@ -97,6 +97,18 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,m1_oper0_wmode,3,2,RW,0x0,Math Unit 1 operand 1 RAM write mode
 ,m1_oper0_rmode,1,0,RW,0x0,Math Unit 1 operand 1 RAM read mode
 ,,,,,,
+0x30,M0_M0_CLKEN,,,,,
+,m0_m0_clken,0,0,WO,-,Math Unit 0 Multiplier 0 Clock enable
+,,,,,,
+0x34,M0_M1_CLKEN,,,,,
+,m0_m1_clken,0,0,WO,-,Math Unit 0 Multiplier 1 Clock enable
+,,,,,,
+0x38,M1_M0_CLKEN,,,,,
+,m1_m0_clken,0,0,WO,-,Math Unit 1 Multiplier 0 Clock enable
+,,,,,,
+0x3C,M1_M1_CLKEN,,,,,
+,m1_m1_clken,0,0,WO,-,Math Unit 1 Multiplier 1 Clock enable
+,,,,,,
 0x40,FPGAIO_OUT31_00,,,,,
 ,fpgaio_o_31,31,31,RW,0x0,Sets the fpgio output bit 31
 ,fpgaio_o_30,30,30,RW,0x0,Sets the fpgio output bit 30
