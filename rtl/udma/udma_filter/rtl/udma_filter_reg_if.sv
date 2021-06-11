@@ -19,31 +19,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SPI Master Registers
-`define REG_TX_CH0_ADD  5'b00000 //BASEADDR+0x00
-`define REG_TX_CH0_CFG  5'b00001 //BASEADDR+0x04
-`define REG_TX_CH0_LEN0 5'b00010 //BASEADDR+0x08
-`define REG_TX_CH0_LEN1 5'b00011 //BASEADDR+0x0C
-`define REG_TX_CH0_LEN2 5'b00100 //BASEADDR+0x10
-`define REG_TX_CH1_ADD  5'b00101 //BASEADDR+0x14
-`define REG_TX_CH1_CFG  5'b00110 //BASEADDR+0x18
-`define REG_TX_CH1_LEN0 5'b00111 //BASEADDR+0x1C
-`define REG_TX_CH1_LEN1 5'b01000 //BASEADDR+0x20
-`define REG_TX_CH1_LEN2 5'b01001 //BASEADDR+0x24
-`define REG_RX_CH_ADD   5'b01010 //BASEADDR+0x28
-`define REG_RX_CH_CFG   5'b01011 //BASEADDR+0x2C
-`define REG_RX_CH_LEN0  5'b01100 //BASEADDR+0x30
-`define REG_RX_CH_LEN1  5'b01101 //BASEADDR+0x34
-`define REG_RX_CH_LEN2  5'b01110 //BASEADDR+0x38
-`define REG_AU_CFG      5'b01111 //BASEADDR+0x3C
-`define REG_AU_REG0     5'b10000 //BASEADDR+0x40
-`define REG_AU_REG1     5'b10001 //BASEADDR+0x44
-`define REG_BINCU_TH    5'b10010 //BASEADDR+0x48
-`define REG_BINCU_CNT   5'b10011 //BASEADDR+0x4C
-`define REG_BINCU_SETUP 5'b10100 //BASEADDR+0x50
-`define REG_BINCU_VAL   5'b10101 //BASEADDR+0x54
-`define REG_FILT        5'b10110 //BASEADDR+0x58
-`define REG_FILT_CMD    5'b10111 //BASEADDR+0x5C
-`define REG_STATUS      5'b11000 //BASEADDR+0x60
+`define UDMA_FILTER_REG_TX_CH0_ADD  5'b00000 //BASEADDR+0x00
+`define UDMA_FILTER_REG_TX_CH0_CFG  5'b00001 //BASEADDR+0x04
+`define UDMA_FILTER_REG_TX_CH0_LEN0 5'b00010 //BASEADDR+0x08
+`define UDMA_FILTER_REG_TX_CH0_LEN1 5'b00011 //BASEADDR+0x0C
+`define UDMA_FILTER_REG_TX_CH0_LEN2 5'b00100 //BASEADDR+0x10
+`define UDMA_FILTER_REG_TX_CH1_ADD  5'b00101 //BASEADDR+0x14
+`define UDMA_FILTER_REG_TX_CH1_CFG  5'b00110 //BASEADDR+0x18
+`define UDMA_FILTER_REG_TX_CH1_LEN0 5'b00111 //BASEADDR+0x1C
+`define UDMA_FILTER_REG_TX_CH1_LEN1 5'b01000 //BASEADDR+0x20
+`define UDMA_FILTER_REG_TX_CH1_LEN2 5'b01001 //BASEADDR+0x24
+`define UDMA_FILTER_REG_RX_CH_ADD   5'b01010 //BASEADDR+0x28
+`define UDMA_FILTER_REG_RX_CH_CFG   5'b01011 //BASEADDR+0x2C
+`define UDMA_FILTER_REG_RX_CH_LEN0  5'b01100 //BASEADDR+0x30
+`define UDMA_FILTER_REG_RX_CH_LEN1  5'b01101 //BASEADDR+0x34
+`define UDMA_FILTER_REG_RX_CH_LEN2  5'b01110 //BASEADDR+0x38
+`define UDMA_FILTER_REG_AU_CFG      5'b01111 //BASEADDR+0x3C
+`define UDMA_FILTER_REG_AU_REG0     5'b10000 //BASEADDR+0x40
+`define UDMA_FILTER_REG_AU_REG1     5'b10001 //BASEADDR+0x44
+`define UDMA_FILTER_REG_BINCU_TH    5'b10010 //BASEADDR+0x48
+`define UDMA_FILTER_REG_BINCU_CNT   5'b10011 //BASEADDR+0x4C
+`define UDMA_FILTER_REG_BINCU_SETUP 5'b10100 //BASEADDR+0x50
+`define UDMA_FILTER_REG_BINCU_VAL   5'b10101 //BASEADDR+0x54
+`define UDMA_FILTER_REG_FILT        5'b10110 //BASEADDR+0x58
+`define UDMA_FILTER_REG_FILT_CMD    5'b10111 //BASEADDR+0x5C
+`define UDMA_FILTER_REG_STATUS      5'b11000 //BASEADDR+0x60
 
 module udma_filter_reg_if
   #(
@@ -366,7 +366,7 @@ module udma_filter_reg_if
            if (filter_done_i)
              r_filter_done <= 1'b1;
 
-            if (cfg_valid_i && !cfg_rwn_i && (s_wr_addr == `REG_FILT_CMD) && cfg_data_i[0])
+            if (cfg_valid_i && !cfg_rwn_i && (s_wr_addr == `UDMA_FILTER_REG_FILT_CMD) && cfg_data_i[0])
                 r_filter_start <= 1'b1;
             else
                 r_filter_start <= 1'b0;
@@ -374,102 +374,102 @@ module udma_filter_reg_if
             if (cfg_valid_i & ~cfg_rwn_i)
             begin
                 case (s_wr_addr)
-                `REG_TX_CH0_ADD:
+                `UDMA_FILTER_REG_TX_CH0_ADD:
                 begin
                     r_filter_tx_start_addr[0] <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
                 end
-                `REG_TX_CH0_CFG:
+                `UDMA_FILTER_REG_TX_CH0_CFG:
                 begin
                    r_filter_tx_datasize[0] <= cfg_data_i[1:0];
                    r_filter_tx_mode[0]     <= cfg_data_i[9:8];
                 end
-                `REG_TX_CH0_LEN0:
+                `UDMA_FILTER_REG_TX_CH0_LEN0:
                 begin
                     r_filter_tx_len0[0] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_TX_CH0_LEN1:
+                `UDMA_FILTER_REG_TX_CH0_LEN1:
                 begin
                     r_filter_tx_len1[0] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_TX_CH0_LEN2:
+                `UDMA_FILTER_REG_TX_CH0_LEN2:
                 begin
                     r_filter_tx_len2[0] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_TX_CH1_ADD:
+                `UDMA_FILTER_REG_TX_CH1_ADD:
                 begin
                     r_filter_tx_start_addr[1] <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
                 end
-                `REG_TX_CH1_CFG:
+                `UDMA_FILTER_REG_TX_CH1_CFG:
                 begin
                    r_filter_tx_datasize[1] <= cfg_data_i[1:0];
                    r_filter_tx_mode[1]     <= cfg_data_i[9:8];
                 end
-                `REG_TX_CH1_LEN0:
+                `UDMA_FILTER_REG_TX_CH1_LEN0:
                 begin
                     r_filter_tx_len0[1] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_TX_CH1_LEN1:
+                `UDMA_FILTER_REG_TX_CH1_LEN1:
                 begin
                     r_filter_tx_len1[1] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_TX_CH1_LEN2:
+                `UDMA_FILTER_REG_TX_CH1_LEN2:
                 begin
                     r_filter_tx_len2[1] <= cfg_data_i[TRANS_SIZE-1:0];
                 end
-                `REG_RX_CH_ADD:
+                `UDMA_FILTER_REG_RX_CH_ADD:
                 begin
                     r_filter_rx_start_addr <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
                 end
-                `REG_RX_CH_CFG:
+                `UDMA_FILTER_REG_RX_CH_CFG:
                 begin
                    r_filter_rx_datasize <= cfg_data_i[1:0];
                    r_filter_rx_mode     <= cfg_data_i[9:8];
                 end
-                `REG_RX_CH_LEN0:
+                `UDMA_FILTER_REG_RX_CH_LEN0:
                 begin
                     r_filter_rx_len0 <= cfg_data_i[15:0];
                 end
-                `REG_RX_CH_LEN1:
+                `UDMA_FILTER_REG_RX_CH_LEN1:
                 begin
                     r_filter_rx_len1 <= cfg_data_i[15:0];
                 end
-                `REG_RX_CH_LEN2:
+                `UDMA_FILTER_REG_RX_CH_LEN2:
                 begin
                     r_filter_rx_len2 <= cfg_data_i[15:0];
                 end
-                `REG_AU_CFG:
+                `UDMA_FILTER_REG_AU_CFG:
                 begin
                     r_au_use_signed        <= cfg_data_i[0];
                     r_au_bypass            <= cfg_data_i[1];
                     r_au_mode              <= cfg_data_i[11:8];
                     r_au_shift             <= cfg_data_i[20:16];
                 end
-                `REG_AU_REG0:
+                `UDMA_FILTER_REG_AU_REG0:
                 begin
                     r_au_reg0 <= cfg_data_i;
                 end
-                `REG_AU_REG1:
+                `UDMA_FILTER_REG_AU_REG1:
                 begin
                     r_au_reg1 <= cfg_data_i;
                 end
-                `REG_BINCU_TH:
+                `UDMA_FILTER_REG_BINCU_TH:
                 begin
                     r_bincu_threshold <= cfg_data_i;
                 end
-                `REG_BINCU_SETUP:
+                `UDMA_FILTER_REG_BINCU_SETUP:
                 begin
                     r_bincu_datasize <= cfg_data_i[1:0];
                 end
-                `REG_BINCU_CNT:
+                `UDMA_FILTER_REG_BINCU_CNT:
                 begin
                     r_bincu_counter    <= cfg_data_i[TRANS_SIZE-1:0];
                     r_bincu_en_counter <= cfg_data_i[31];
                 end
-                `REG_FILT:
+                `UDMA_FILTER_REG_FILT:
                 begin
                     r_filter_mode <= cfg_data_i[3:0];
                 end
-                `REG_STATUS:
+                `UDMA_FILTER_REG_STATUS:
                 begin
                    if (cfg_data_i[0])
                      r_filter_done <= 1'b0;
@@ -483,70 +483,70 @@ module udma_filter_reg_if
     begin
         cfg_data_o = 32'h0;
         case (s_rd_addr)
-        `REG_TX_CH0_ADD:
+        `UDMA_FILTER_REG_TX_CH0_ADD:
             cfg_data_o[L2_AWIDTH_NOAL-1:0] =r_commit_filter_tx_start_addr[0];
-        `REG_TX_CH0_CFG:
+        `UDMA_FILTER_REG_TX_CH0_CFG:
         begin
             cfg_data_o[9:8] = r_commit_filter_tx_mode[0];
             cfg_data_o[1:0] = r_commit_filter_tx_datasize[0];
         end
-        `REG_TX_CH0_LEN0:
+        `UDMA_FILTER_REG_TX_CH0_LEN0:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len0[0];
-        `REG_TX_CH0_LEN1:
+        `UDMA_FILTER_REG_TX_CH0_LEN1:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len1[0];
-        `REG_TX_CH0_LEN2:
+        `UDMA_FILTER_REG_TX_CH0_LEN2:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len2[0];
-        `REG_TX_CH1_ADD:
+        `UDMA_FILTER_REG_TX_CH1_ADD:
             cfg_data_o[L2_AWIDTH_NOAL-1:0] = r_commit_filter_tx_start_addr[1];
-        `REG_TX_CH1_CFG:
+        `UDMA_FILTER_REG_TX_CH1_CFG:
         begin
            cfg_data_o[1:0] = r_commit_filter_tx_datasize[1];
            cfg_data_o[9:8] = r_commit_filter_tx_mode[1]    ;
         end
-        `REG_TX_CH1_LEN0:
+        `UDMA_FILTER_REG_TX_CH1_LEN0:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len0[1];
-        `REG_TX_CH1_LEN1:
+        `UDMA_FILTER_REG_TX_CH1_LEN1:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len1[1];
-        `REG_TX_CH1_LEN2:
+        `UDMA_FILTER_REG_TX_CH1_LEN2:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len2[1];
-        `REG_RX_CH_ADD:
+        `UDMA_FILTER_REG_RX_CH_ADD:
             cfg_data_o[L2_AWIDTH_NOAL-1:0] = r_commit_filter_rx_start_addr[1];
-        `REG_RX_CH_CFG:
+        `UDMA_FILTER_REG_RX_CH_CFG:
         begin
            cfg_data_o[1:0] = r_commit_filter_rx_datasize[1];
            cfg_data_o[9:8] = r_commit_filter_rx_mode[1]    ;
         end
-        `REG_RX_CH_LEN0:
+        `UDMA_FILTER_REG_RX_CH_LEN0:
             cfg_data_o[15:0] = r_commit_filter_rx_len0[1];
-        `REG_RX_CH_LEN1:
+        `UDMA_FILTER_REG_RX_CH_LEN1:
             cfg_data_o[15:0] = r_commit_filter_rx_len1[1];
-        `REG_RX_CH_LEN2:
+        `UDMA_FILTER_REG_RX_CH_LEN2:
             cfg_data_o[15:0] = r_commit_filter_rx_len2[1];
-        `REG_AU_CFG:
+        `UDMA_FILTER_REG_AU_CFG:
         begin
             cfg_data_o[0]     = r_commit_au_use_signed;
             cfg_data_o[1]     = r_commit_au_bypass    ;
             cfg_data_o[11:8]  = r_commit_au_mode      ;
             cfg_data_o[20:16] = r_commit_au_shift     ;
         end
-        `REG_AU_REG0:
+        `UDMA_FILTER_REG_AU_REG0:
             cfg_data_o = r_commit_au_reg0;
-        `REG_AU_REG1:
+        `UDMA_FILTER_REG_AU_REG1:
             cfg_data_o = r_commit_au_reg1;
-        `REG_BINCU_TH:
+        `UDMA_FILTER_REG_BINCU_TH:
             cfg_data_o = r_commit_bincu_threshold;
-        `REG_BINCU_SETUP:
+        `UDMA_FILTER_REG_BINCU_SETUP:
             cfg_data_o[1:0] = r_commit_bincu_datasize;
-        `REG_BINCU_VAL:
+        `UDMA_FILTER_REG_BINCU_VAL:
             cfg_data_o[TRANS_SIZE-1:0] = bincu_counter_i;
-        `REG_BINCU_CNT:
+        `UDMA_FILTER_REG_BINCU_CNT:
         begin
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_bincu_counter;
             cfg_data_o[31] = r_commit_bincu_en_counter;
         end
-        `REG_FILT:
+        `UDMA_FILTER_REG_FILT:
             cfg_data_o[3:0] = r_commit_filter_mode;
-        `REG_STATUS:
+        `UDMA_FILTER_REG_STATUS:
             cfg_data_o[0]   = r_filter_done;
         default:
             cfg_data_o = 'h0;
