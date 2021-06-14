@@ -84,18 +84,18 @@ filesets:
     files:
     - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
-    
+
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
     file_type: systemVerilogSource
-    
+
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
     - tb/tb_clk_gen.sv
     file_type: systemVerilogSource
-    
+
   emulation-rtl:
     depend:
     - pulp-platform.org::tech_cells_xilinx
@@ -109,7 +109,7 @@ filesets:
     - emulation/xilinx/rtl/pad_functional_xilinx.sv
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     file_type: systemVerilogSource
-  
+
   xilinx-ips:
     files:
     - emulation/xilinx/ips/xilinx_clk_mngr.tcl
@@ -117,12 +117,12 @@ filesets:
     - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
     - emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
-    
+
   nexys-rtl:
     files:
     - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
     file_type: systemVerilogSource
-    
+
   nexys-xdc:
     files:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
@@ -139,7 +139,7 @@ parameters:
     datatype: bool
     paramtype: vlogdefine
     default: true
-    
+
 targets:
   default: &default_target
     filesets:
@@ -151,11 +151,11 @@ targets:
     <<: *default_target
     default_tool: modelsim
     filesets_append:
-      - simulation-rtl
-      - rtl-behavioral
-      - tb-rtl
+    - simulation-rtl
+    - rtl-behavioral
+    - tb-rtl
     toplevel:
-      - core_v_mcu_tb
+    - core_v_mcu_tb
     tools:
       modelsim:
         vlog_options:
@@ -174,7 +174,7 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
-        
+
   nexys-a7-100t:
     <<: *default_target
     default_tool: vivado
