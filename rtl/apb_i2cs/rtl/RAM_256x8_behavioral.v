@@ -1,3 +1,7 @@
+// Copyright 2021 QuickLogic
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
 /* ----------------------------------------------------------------------------
 RAM_256x8_behavioaral.v
 
@@ -5,8 +9,7 @@ Synchronous RAM behavioral model. Can be synthesized but may not produce
 optimal results for the targeted technology. May be replaced with an
 instantiated RAM block for the technology/device being targetd.
 
-This RAM block has been designed to mimic a RAM block for QuickLogic's S3B
-device (with no registered output). Write data is clocked in on the positive
+Write data is clocked in on the positive
 edge of the write clock. The read address is clocked in on the positive
 edge of the read clock, and read data is available after that clock edge.
 
@@ -49,4 +52,3 @@ module RAM_256x8_behavioral (
   assign rd_data = ram_data_out;
 
 endmodule
-

@@ -1,3 +1,6 @@
+// Copyright 2021 QuickLogic
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 /* ----------------------------------------------------------------------------
 i2c_peripheral_interface.v
 
@@ -125,7 +128,7 @@ module i2c_peripheral_interface (
   // // sdaDelayed is only used for start stop detection
   // // Because sda hold time from scl falling is 0nS
   // // sda must be delayed with respect to scl to avoid incorrect
-  // // detection of start/stop at scl falling edge. 
+  // // detection of start/stop at scl falling edge.
   reg [SCL_DELAY_LEN_MAX-1:0] scl_delay_pipe;
   reg [SDA_DELAY_LEN_MAX-1:0] sda_delay_pipe;
 
@@ -419,11 +422,11 @@ endmodule
 //// <http://www.opencores.org/cores//>                           ////
 ////                                                              ////
 //// Module Description:                                          ////
-//// You will need to modify this file to implement your 
+//// You will need to modify this file to implement your
 //// interface.
 ////                                                              ////
 //// To Do:                                                       ////
-//// 
+////
 ////                                                              ////
 //// Author(s):                                                   ////
 //// - Steve Fielding, sfielding@base2designs.com                 ////
@@ -454,4 +457,3 @@ endmodule
 //// from <http://www.opencores.org/lgpl.shtml>                   ////
 ////                                                              ////
 //////////////////////////////////////////////////////////////////////
-

@@ -1,3 +1,6 @@
+// Copyright 2021 QuickLogic
+// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 module apb_slave_interface (
     apb_pclk_i,
@@ -118,4 +121,3 @@ module apb_slave_interface (
   assign apb_reg_rd_byte_complete_o = apb_reg_rd_byte_complete;
 
 endmodule
-
