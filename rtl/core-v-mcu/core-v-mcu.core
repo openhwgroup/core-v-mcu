@@ -90,6 +90,12 @@ filesets:
     - scripts/vedit.sh
     file_type: user
 
+  # Waiver file
+  verilator-waiver:
+    files:
+    - verilator.waiver
+    file_type: vlt
+
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
 scripts:
@@ -107,6 +113,7 @@ targets:
     - target_model-lib? (rtl-behavioral)
     - target_model-lib? (pre_build_scripts)
     - target_lint? (rtl-behavioral)
+    - tool_verilator? (verilator-waiver)
     toplevel: [core_v_mcu]
 
   sim:
@@ -130,6 +137,7 @@ targets:
         mode: cc
         verilator_options:
         - -Wno-fatal
+        - -Wno-UNOPTFLAT
         - --trace
 
   lint:
@@ -140,4 +148,5 @@ targets:
       verilator:
         mode: lint-only
         verilator_options:
-        - -Wno-fatal
+        - -Wno-UNOPTFLAT
+        - -Wall

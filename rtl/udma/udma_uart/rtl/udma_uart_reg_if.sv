@@ -19,22 +19,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /* verilator lint_off REDEFMACRO */
-`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
-`define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
-`define REG_RX_CFG       5'b00010 //BASEADDR+0x08
-`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
+`define UART_REG_RX_SADDR     5'b00000 //BASEADDR+0x00
+`define UART_REG_RX_SIZE      5'b00001 //BASEADDR+0x04
+`define UART_REG_RX_CFG       5'b00010 //BASEADDR+0x08
+`define UART_REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
 
-`define REG_TX_SADDR     5'b00100 //BASEADDR+0x10
-`define REG_TX_SIZE      5'b00101 //BASEADDR+0x14
-`define REG_TX_CFG       5'b00110 //BASEADDR+0x18
-`define REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
+`define UART_REG_TX_SADDR     5'b00100 //BASEADDR+0x10
+`define UART_REG_TX_SIZE      5'b00101 //BASEADDR+0x14
+`define UART_REG_TX_CFG       5'b00110 //BASEADDR+0x18
+`define UART_REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
 
-`define REG_STATUS       5'b01000 //BASEADDR+0x20
-`define REG_UART_SETUP   5'b01001 //BASEADDR+0x24
-`define REG_ERROR        5'b01010 //BASEADDR+0x28
-`define REG_IRQ_EN       5'b01011 //BASEADDR+0x2C
-`define REG_VALID        5'b01100 //BASEADDR+0x30
-`define REG_DATA         5'b01101 //BASEADDR+0x34
+`define UART_REG_STATUS       5'b01000 //BASEADDR+0x20
+`define UART_REG_UART_SETUP   5'b01001 //BASEADDR+0x24
+`define UART_REG_ERROR        5'b01010 //BASEADDR+0x28
+`define UART_REG_IRQ_EN       5'b01011 //BASEADDR+0x2C
+`define UART_REG_VALID        5'b01100 //BASEADDR+0x30
+`define UART_REG_DATA         5'b01101 //BASEADDR+0x34
 /* verilator lint_on REDEFMACRO */
 
 module udma_uart_reg_if #(
@@ -220,28 +220,28 @@ module udma_uart_reg_if #(
             if (cfg_valid_i & ~cfg_rwn_i)
             begin
                 case (s_wr_addr)
-                `REG_RX_SADDR:
+                `UART_REG_RX_SADDR:
                     r_rx_startaddr    <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_RX_SIZE:
+                `UART_REG_RX_SIZE:
                     r_rx_size         <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_RX_CFG:
+                `UART_REG_RX_CFG:
                 begin
                     r_rx_clr           = cfg_data_i[6];
                     r_rx_en            = cfg_data_i[4];
                     r_rx_continuous   <= cfg_data_i[0];
                 end
-                `REG_TX_SADDR:
+                `UART_REG_TX_SADDR:
                     r_tx_startaddr    <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_TX_SIZE:
+                `UART_REG_TX_SIZE:
                     r_tx_size         <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_TX_CFG:
+                `UART_REG_TX_CFG:
                 begin
                     r_tx_clr           = cfg_data_i[6];
                     r_tx_en            = cfg_data_i[4];
                     r_tx_continuous   <= cfg_data_i[0];
                 end
 
-                `REG_UART_SETUP:
+                `UART_REG_UART_SETUP:
                 begin
                     r_uart_div        <= cfg_data_i[31:16];
                     r_uart_en_rx      <= cfg_data_i[9];
@@ -252,7 +252,7 @@ module udma_uart_reg_if #(
                     r_uart_bits       <= cfg_data_i[2:1];
                     r_uart_parity_en  <= cfg_data_i[0];
                 end
-                `REG_IRQ_EN:
+                `UART_REG_IRQ_EN:
                   begin
                     r_uart_err_irq_en <= cfg_data_i[1];
                     r_uart_rx_irq_en  <= cfg_data_i[0];
@@ -270,32 +270,32 @@ module udma_uart_reg_if #(
         s_rx_valid_clr = 1'b0;
 
         case (s_rd_addr)
-        `REG_RX_SADDR:
+        `UART_REG_RX_SADDR:
             cfg_data_o = cfg_rx_curr_addr_i;
-        `REG_RX_SIZE:
+        `UART_REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
-        `REG_RX_CFG:
+        `UART_REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,3'h0,r_rx_continuous};
-        `REG_TX_SADDR:
+        `UART_REG_TX_SADDR:
             cfg_data_o = cfg_tx_curr_addr_i;
-        `REG_TX_SIZE:
+        `UART_REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
-        `REG_TX_CFG:
+        `UART_REG_TX_CFG:
             cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,3'h0,r_tx_continuous};
-        `REG_UART_SETUP:
+        `UART_REG_UART_SETUP:
             cfg_data_o = {r_uart_div, 6'h0, r_uart_en_rx, r_uart_en_tx, 2'h0, r_uart_rx_clean_fifo, r_uart_rx_polling_en, r_uart_stop_bits,r_uart_bits, r_uart_parity_en};
-        `REG_STATUS:
+        `UART_REG_STATUS:
             cfg_data_o = {30'h0,status_i};
-        `REG_ERROR:
+        `UART_REG_ERROR:
          begin
             cfg_data_o = {30'h0,r_err_parity,r_err_overflow};
             s_err_clr = 1'b1;
          end
-        `REG_IRQ_EN:
+        `UART_REG_IRQ_EN:
             cfg_data_o = {30'h0, r_uart_err_irq_en, r_uart_rx_irq_en};
-        `REG_VALID:
+        `UART_REG_VALID:
             cfg_data_o = {31'h0, r_uart_rx_data_valid};
-        `REG_DATA:
+        `UART_REG_DATA:
           begin
              cfg_data_o     = {24'h0, r_uart_rx_data};
              s_rx_valid_clr = 1'b1;
