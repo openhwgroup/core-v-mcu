@@ -22,27 +22,30 @@ module fc_subsystem #(
     parameter CLUSTER_ID          = 6'h1F,
     parameter USE_ZFINX           = 1
 ) (
-    input logic clk_i,
-    input logic rst_ni,
-    input logic test_en_i,
+    input logic                      clk_i,
+    input logic                      rst_ni,
+    input logic                      test_en_i,
 
-    XBAR_TCDM_BUS.Master l2_data_master,
-    XBAR_TCDM_BUS.Master l2_instr_master,
-    XBAR_TCDM_BUS.Master l2_hwpe_master [NB_HWPE_PORTS-1:0],
-    APB_BUS.Slave        apb_slave_eu,
-    APB_BUS.Slave        apb_slave_hwpe,
+                                     XBAR_TCDM_BUS.Master l2_data_master,
+                                     XBAR_TCDM_BUS.Master l2_instr_master,
+                                     XBAR_TCDM_BUS.Master l2_hwpe_master [NB_HWPE_PORTS-1:0],
+                                     APB_BUS.Slave apb_slave_eu,
+                                     APB_BUS.Slave apb_slave_hwpe,
 
-    input logic        fetch_en_i,
-    input logic [31:0] boot_addr_i,
-    input logic        debug_req_i,
+    input logic                      fetch_en_i,
+    input logic [31:0]               boot_addr_i,
+    input logic                      debug_req_i,
 
-    input logic event_fifo_valid_i,
-    output logic event_fifo_fulln_o,
-    input logic [EVENT_ID_WIDTH-1:0] event_fifo_data_i,  // goes indirectly to core interrupt
-    input logic [31:0] events_i,  // goes directly to core interrupt, should be called irqs
-    output logic [1:0] hwpe_events_o,
-    output logic stoptimer_o,
-    output logic supervisor_mode_o
+    input logic                      event_fifo_valid_i,
+    output logic                     event_fifo_fulln_o,
+    input logic [EVENT_ID_WIDTH-1:0] event_fifo_data_i, // goes indirectly to core interrupt
+    input logic [31:0]               events_i, // goes directly to core interrupt, should be called irqs
+    output [ 4:0] core_irq_ack_id_o,
+    output        core_irq_ack_o,
+
+    output logic [1:0]               hwpe_events_o,
+    output logic                     stoptimer_o,
+    output logic                     supervisor_mode_o
 );
 
   // Interrupt signals
@@ -76,6 +79,9 @@ module fc_subsystem #(
   logic       core_data_we;
   logic [3:0] core_data_be;
   logic is_scm_instr_req, is_scm_data_req;
+
+ logic             [31:0] r_int;
+ logic             [31:0] r_int_next;
 
   assign perf_counters_int = 1'b0;
   assign fetch_en_int = fetch_en_eu & fetch_en_i;
@@ -116,12 +122,30 @@ module fc_subsystem #(
   // OpenHW Group CV32E40P
   assign boot_addr             = boot_addr_i;
 
+  always_ff @(posedge clk_i, negedge rst_ni) begin
+    if (~rst_ni)
+      r_int <= 0;
+    else begin
+      for (int i=0;i<32;i++) begin
+        if (core_irq_ack_o && (core_irq_ack_id_o == i))
+          r_int[i] = 0;
+        else
+//          if (i == 11)
+  //          r_int[i] = s_irq_o[11];
+    //      else
+            r_int[i] = events_i[i];
+      end
+    end
+  end // always_ff @ (posedge clk_i, negedge rst_ni)
+
+
+
   cv32e40p_core #(
       .PULP_XPULP(1)
   ) lFC_CORE (
       .clk_i              (clk_i),
       .rst_ni             (rst_ni),
-      .pulp_clock_en_i    (core_clock_en),
+      .pulp_clock_en_i    (1'b1),
       .scan_cg_en_i       (test_en_i),
       .boot_addr_i        (boot_addr),
       .mtvec_addr_i       ('0),
@@ -159,15 +183,15 @@ module fc_subsystem #(
       .apu_result_i  ('0),
       .apu_flags_i   ('0),
 
-      .irq_i    (s_irq_o),
-      .irq_ack_o(core_irq_ack),
-      .irq_id_o (core_irq_ack_id),
+      .irq_i    (r_int), //(s_irq_o),
+      .irq_ack_o(core_irq_ack_o),
+      .irq_id_o (core_irq_ack_id_o),
 
       .debug_req_i      (debug_req_i),
       .debug_havereset_o(),
       .debug_running_o  (),
       .debug_halted_o   (stoptimer_o),
-      .fetch_enable_i   (fetch_en_int),
+      .fetch_enable_i   (fetch_en_i),
       .core_sleep_o     ()
   );
   assign supervisor_mode_o = 1'b1;
@@ -180,7 +204,7 @@ module fc_subsystem #(
       core_irq_x[core_irq_id] = 1'b1;
     end
   end
-
+/*
   apb_interrupt_cntrl #(
       .PER_ID_WIDTH(PER_ID_WIDTH),
       .FIFO_PIN(11)
@@ -195,15 +219,18 @@ module fc_subsystem #(
       .core_secure_mode_i(1'b0),
       .core_irq_id_o     (core_irq_id),
       .core_irq_req_o    (core_irq_req),
-      .core_irq_ack_i    (core_irq_ack),
-      .core_irq_id_i     (core_irq_ack_id),
-      .core_irq_sec_o    (  /* SECURE IRQ */),
+      .core_irq_ack_i    (core_irq_ack_o),
+      .core_irq_id_i     (core_irq_ack_id_o),
+      .core_irq_sec_o    (),//   SECURE IRQ
       .core_clock_en_o   (core_clock_en),
       .fetch_en_o        (fetch_en_eu),
       .apb_slave         (apb_slave_eu),
       .irq_o             (s_irq_o)
   );
-
+ */
+    assign apb_slave_eu.prdata = '0;
+    assign apb_slave_eu.pready = '0;
+    assign apb_slave_eu.pslverr = '0;
 
 
   if (USE_HWPE) begin : fc_hwpe_gen

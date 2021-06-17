@@ -74,9 +74,9 @@ module periph_bus_wrap #(
   assign s_start_addr[5] = `SOC_EVENT_GEN_START_ADDR;
   assign s_end_addr[5]   = `SOC_EVENT_GEN_END_ADDR;
 
-  `APB_ASSIGN_MASTER(s_masters[6], eu_master);
-  assign s_start_addr[6] = `EU_START_ADDR;
-  assign s_end_addr[6]   = `EU_END_ADDR;
+  `APB_ASSIGN_MASTER(s_masters[12], eu_master);
+  assign s_start_addr[12] = `EU_START_ADDR;
+  assign s_end_addr[12]   = `EU_END_ADDR;
 
   `APB_ASSIGN_MASTER(s_masters[7], timer_master);
   assign s_start_addr[7] = `TIMER_START_ADDR;
@@ -98,9 +98,9 @@ module periph_bus_wrap #(
   assign s_start_addr[11] = `EFPGA_CONFIG_START_ADDR;
   assign s_end_addr[11]   = `EFPGA_CONFIG_END_ADDR;
 
-  `APB_ASSIGN_MASTER(s_masters[12], i2cs_master);
-  assign s_start_addr[12] = `I2CS_START_ADDR;
-  assign s_end_addr[12]   = `I2CS_END_ADDR;
+  `APB_ASSIGN_MASTER(s_masters[6], i2cs_master);
+  assign s_start_addr[6] = `I2CS_START_ADDR;
+  assign s_end_addr[6]   = `I2CS_END_ADDR;
 
 
 

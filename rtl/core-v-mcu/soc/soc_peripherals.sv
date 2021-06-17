@@ -41,6 +41,9 @@ module soc_peripherals #(
     // write to the fc fetch enable register
     input  logic        fc_fetch_en_valid_i,
     input  logic        fc_fetch_en_i,
+    input [4:0] core_irq_ack_id_i,
+    input core_irq_ack_i,
+
 
     // SLAVE PORTS
     // APB SLAVE PORT
@@ -93,59 +96,6 @@ module soc_peripherals #(
     input  logic [`N_FPGAIO-1:0]                   fpgaio_in_i,
     output logic [`N_FPGAIO-1:0]                   fpgaio_out_o,
     output logic [`N_FPGAIO-1:0]                   fpgaio_oe_o,
-    // Timer signals
-    //    output logic [          3:0]                   timer_ch0_o,
-    //    output logic [          3:0]                   timer_ch1_o,
-    //    output logic [          3:0]                   timer_ch2_o,
-    //    output logic [          3:0]                   timer_ch3_o,
-
-    // //CAMERA
-    // input  logic                       cam_clk_i,
-    // input  logic [7:0]                 cam_data_i,
-    // input  logic                       cam_hsync_i,
-    // input  logic                       cam_vsync_i,
-
-    // //UART
-    // // output logic [N_UART-1:0]          uart_tx,
-    // // input  logic [N_UART-1:0]          uart_rx,
-    // output logic           uart_tx,
-    // input  logic           uart_rx,
-
-
-    // //I2C
-    // input  logic [N_I2C-1:0]           i2c_scl_i,
-    // output logic [N_I2C-1:0]           i2c_scl_o,
-    // output logic [N_I2C-1:0]           i2c_scl_oe_o,
-    // input  logic [N_I2C-1:0]           i2c_sda_i,
-    // output logic [N_I2C-1:0]           i2c_sda_o,
-    // output logic [N_I2C-1:0]           i2c_sda_oe_o,
-
-    // //I2S
-    // input  logic                       i2s_slave_sd0_i,
-    // input  logic                       i2s_slave_sd1_i,
-    // input  logic                       i2s_slave_ws_i,
-    // output logic                       i2s_slave_ws_o,
-    // output logic                       i2s_slave_ws_oe,
-    // input  logic                       i2s_slave_sck_i,
-    // output logic                       i2s_slave_sck_o,
-    // output logic                       i2s_slave_sck_oe,
-
-    // //SPI
-    // output logic [N_SPI-1:0]           spi_clk_o,
-    // output logic [N_SPI-1:0][3:0]      spi_csn_o,
-    // output logic [N_SPI-1:0][3:0]      spi_oen_o,
-    // output logic [N_SPI-1:0][3:0]      spi_sdo_o,
-    // input  logic [N_SPI-1:0][3:0]      spi_sdi_i,
-
-    // //SDIO
-    // output logic                       sdclk_o,
-    // output logic                       sdcmd_o,
-    // input  logic                       sdcmd_i,
-    // output logic                       sdcmd_oen_o,
-    // output logic                 [3:0] sddata_o,
-    // input  logic                 [3:0] sddata_i,
-    // output logic                 [3:0] sddata_oen_o,
-
 
     //eFPGA SPIS
     input  logic efpga_fcb_spis_rst_n_i,
@@ -300,6 +250,7 @@ module soc_peripherals #(
 
   logic [31:0] control_in, status_out;
   logic [7:0] version;
+  logic       event_fifo_valid;
 
 
 
@@ -314,7 +265,8 @@ module soc_peripherals #(
   assign fc_events_o[8] = 0;  //dma_pe_evt_i; // unused core-v-mcu
   assign fc_events_o[9] = 0;  //dma_pe_irq_i; // unused core-v-mcu
   assign fc_events_o[10] = 0;  //pf_evt_i;  // unused core-v-mcu
-  assign fc_events_o[11] = 1'b0;  // Machine irq - from event_fifo
+  assign fc_events_o[11] = event_fifo_valid;
+
   assign fc_events_o[15:12] = 4'b0000;
 
   assign fc_events_o[16] = s_timer_lo_event;
@@ -532,44 +484,6 @@ module soc_peripherals #(
       .perio_out_o(perio_out_o),
       .perio_oe_o (perio_oe_o)
 
-      // .spi_clk          ( spi_clk_o            ),
-      // .spi_csn          ( spi_csn_o            ),
-      // .spi_oen          ( spi_oen_o            ),
-      // .spi_sdo          ( spi_sdo_o            ),
-      // .spi_sdi          ( spi_sdi_i            ),
-
-      // .sdio_clk_o       ( sdclk_o              ),
-      // .sdio_cmd_o       ( sdcmd_o              ),
-      // .sdio_cmd_i       ( sdcmd_i              ),
-      // .sdio_cmd_oen_o   ( sdcmd_oen_o          ),
-      // .sdio_data_o      ( sddata_o             ),
-      // .sdio_data_i      ( sddata_i             ),
-      // .sdio_data_oen_o  ( sddata_oen_o         ),
-
-      // .cam_clk_i        ( cam_clk_i            ),
-      // .cam_data_i       ( cam_data_i           ),
-      // .cam_hsync_i      ( cam_hsync_i          ),
-      // .cam_vsync_i      ( cam_vsync_i          ),
-
-      // .i2s_slave_sd0_i  ( i2s_slave_sd0_i      ),
-      // .i2s_slave_sd1_i  ( i2s_slave_sd1_i      ),
-      // .i2s_slave_ws_i   ( i2s_slave_ws_i       ),
-      // .i2s_slave_ws_o   ( i2s_slave_ws_o       ),
-      // .i2s_slave_ws_oe  ( i2s_slave_ws_oe      ),
-      // .i2s_slave_sck_i  ( i2s_slave_sck_i      ),
-      // .i2s_slave_sck_o  ( i2s_slave_sck_o      ),
-      // .i2s_slave_sck_oe ( i2s_slave_sck_oe     ),
-
-      // .uart_rx_i        ( uart_rx              ),
-      // .uart_tx_o        ( uart_tx              ),
-
-      // .i2c_scl_i        ( i2c_scl_i            ),
-      // .i2c_scl_o        ( i2c_scl_o            ),
-      // .i2c_scl_oe       ( i2c_scl_oe_o         ),
-      // .i2c_sda_i        ( i2c_sda_i            ),
-      // .i2c_sda_o        ( i2c_sda_o            ),
-      // .i2c_sda_oe       ( i2c_sda_oe_o         )
-
   );
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -706,7 +620,9 @@ module soc_peripherals #(
       .per_events_i    (s_events),
       .err_event_o     (s_fc_err_events),
       .fc_events_o     (s_fc_hp_events),
-
+      .core_irq_ack_id_i(core_irq_ack_id_i),
+      .core_irq_ack_i  (core_irq_ack_i),
+                .event_fifo_valid_o(event_fifo_valid),
       .fc_event_valid_o(fc_event_valid_o),
       .fc_event_data_o (fc_event_data_o),
       .fc_event_ready_i(fc_event_ready_i),
