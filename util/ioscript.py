@@ -738,7 +738,7 @@ if args.pad_frame_sv != None:
                     error_count = error_count + 1
                 pad_frame_sv.write("    `endif\n")
             else:
-                pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
+                pad_frame_sv.write("    pad_functional_pu i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
                     (ionum, ionum, ionum, ionum, ionum, ionum))
         pad_frame_sv.write("\n")
         pad_frame_sv.write("endmodule\n")
