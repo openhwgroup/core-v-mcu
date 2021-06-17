@@ -32,10 +32,10 @@ module i2c_peripheral_registers (
   input rst_i;
 
   // APB reg interface
-  input [31:0] apb_reg_waddr_i;
+  input [11:0] apb_reg_waddr_i;
   input [31:0] apb_reg_wdata_i;
   input apb_reg_wrenable_i;
-  input [31:0] apb_reg_raddr_i;
+  input [11:0] apb_reg_raddr_i;
   output [31:0] apb_reg_rdata_o;
   input apb_reg_rd_byte_complete_i;
 
@@ -66,10 +66,10 @@ module i2c_peripheral_registers (
   wire        rst_i;
 
   // APB reg interface
-  wire [31:0] apb_reg_waddr_i;
+  wire [11:0] apb_reg_waddr_i;
   wire [31:0] apb_reg_wdata_i;
   wire        apb_reg_wrenable_i;
-  wire [31:0] apb_reg_raddr_i;
+  wire [11:0] apb_reg_raddr_i;
   wire [31:0] apb_reg_rdata_o;
   wire        apb_reg_rd_byte_complete_i;
 
@@ -494,4 +494,3 @@ module i2c_peripheral_registers (
 
 
 endmodule
-
