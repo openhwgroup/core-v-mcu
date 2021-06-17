@@ -150,7 +150,7 @@ module i2c_peripheral_registers (
 
 
   wire       apb_reg_write_enable;
-  assign apb_reg_write_enable = (apb_reg_waddr_i[31:10] == 22'b0 && apb_reg_wrenable_i);
+  assign apb_reg_write_enable = (apb_reg_waddr_i[11:10] == 2'b0 && apb_reg_wrenable_i);
 
 
   // assigments to the individual registers
