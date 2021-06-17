@@ -203,7 +203,7 @@ module i2c_peripheral_registers (
         if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10) reg_0x11 <= 1'b1;
         else reg_0x11 <= 1'b0;
         1'b1:
-        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[31:10]==22'b0 &&
+          if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[11:10]==2'b0 &&
                                 apb_reg_raddr_i[9:2]==8'h10 && apb_reg_raddr_i[1:0]==2'b0)
           reg_0x11 <= 1'b0;
         else reg_0x11 <= 1'b1;
