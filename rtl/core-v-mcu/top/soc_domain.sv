@@ -787,7 +787,7 @@ module soc_domain
 `endif
 
   fc_subsystem #(
-      .USE_HWPE  (USE_HWPE)
+      .USE_HWPE(USE_HWPE)
   ) fc_subsystem_i (
       .clk_i (s_soc_clk),
       .rst_ni(s_soc_rstn),
