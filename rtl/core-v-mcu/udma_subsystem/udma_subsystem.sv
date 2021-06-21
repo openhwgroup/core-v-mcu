@@ -265,6 +265,7 @@ module udma_subsystem #(
   logic   [           `N_SPI-1:0]                        s_spi_eot;
   logic   [           `N_I2C-1:0]                        s_i2c_evt;
   logic   [          `N_UART-1:0]                        s_uart_evt;
+  logic   [          `N_UART-1:0]                        s_uart_err;
 
   logic   [                  3:0]                        s_trigger_events;
 
@@ -280,7 +281,7 @@ module udma_subsystem #(
 
   assign s_cam_evt     = 1'b0;
   assign s_i2s_evt     = 1'b0;
-  assign s_uart_evt    = 1'b0;
+  //assign s_uart_evt    = 1'b0;
 
   assign events_o      = s_events;
 
@@ -419,8 +420,8 @@ module udma_subsystem #(
     for (g_uart = 0; g_uart < `N_UART; g_uart++) begin : i_uart_gen
       assign s_events[4*(PER_ID_UART+g_uart)+0] = s_rx_ch_events[CH_ID_RX_UART+g_uart];
       assign s_events[4*(PER_ID_UART+g_uart)+1] = s_tx_ch_events[CH_ID_TX_UART+g_uart];
-      assign s_events[4*(PER_ID_UART+g_uart)+2] = 1'b0;
-      assign s_events[4*(PER_ID_UART+g_uart)+3] = 1'b0;
+      assign s_events[4*(PER_ID_UART+g_uart)+2] = s_uart_evt[g_uart];
+      assign s_events[4*(PER_ID_UART+g_uart)+3] = s_uart_err[g_uart];
 
       assign s_rx_cfg_stream[CH_ID_RX_UART+g_uart] = 'h0;
       assign s_rx_cfg_stream_id[CH_ID_RX_UART+g_uart] = 'h0;
@@ -442,8 +443,8 @@ module udma_subsystem #(
           .uart_tx_o(perio_out_o[`PERIO_UART0_TX+`PERIO_UART_NPORTS*g_uart]),
           .uart_rx_i(perio_in_i[`PERIO_UART0_RX+`PERIO_UART_NPORTS*g_uart]),
 
-          .rx_char_event_o(),
-          .err_event_o(),
+          .rx_char_event_o(s_uart_evt[g_uart]),
+          .err_event_o(s_uart_err[g_uart]),
 
           .cfg_data_i (s_periph_data_to),
           .cfg_addr_i (s_periph_addr),

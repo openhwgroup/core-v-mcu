@@ -150,7 +150,7 @@ module i2c_peripheral_registers (
 
 
   wire       apb_reg_write_enable;
-  assign apb_reg_write_enable = (apb_reg_waddr_i[31:10] == 22'b0 && apb_reg_wrenable_i);
+  assign apb_reg_write_enable = (apb_reg_waddr_i[11:10] == 2'b0 && apb_reg_wrenable_i);
 
 
   // assigments to the individual registers
@@ -203,7 +203,7 @@ module i2c_peripheral_registers (
         if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10) reg_0x11 <= 1'b1;
         else reg_0x11 <= 1'b0;
         1'b1:
-        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[31:10]==22'b0 &&
+        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[11:10]==2'b0 &&
                                 apb_reg_raddr_i[9:2]==8'h10 && apb_reg_raddr_i[1:0]==2'b0)
           reg_0x11 <= 1'b0;
         else reg_0x11 <= 1'b1;
@@ -232,7 +232,7 @@ module i2c_peripheral_registers (
       end
 
       // reg_0x21 - fifo read port
-      if (apb_reg_waddr_i[31:10]==22'h0 && apb_reg_waddr_i[9:2]==8'h21 &&
+      if (apb_reg_waddr_i[11:10]==2'h0 && apb_reg_waddr_i[9:2]==8'h21 &&
                     apb_reg_waddr_i[1:0]==2'b0 && apb_reg_rd_byte_complete_i)
         fifo_i2c_to_apb_pop <= 1'b1;
       else fifo_i2c_to_apb_pop <= 1'b0;
@@ -367,7 +367,7 @@ module i2c_peripheral_registers (
 
   // read mux for APB interface
   always @(*)
-    if (apb_reg_raddr_i[31:10] == 22'b0)
+    if (apb_reg_raddr_i[11:10] == 2'b0)
       case (apb_reg_rd_index)
         8'h00:   apb_reg_rdata_muxed <= {1'b0, reg_0x00[6:0]};
         8'h01:   apb_reg_rdata_muxed <= {7'b0, reg_0x01};
