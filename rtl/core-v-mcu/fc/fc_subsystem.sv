@@ -75,17 +75,17 @@ module fc_subsystem #(
   logic is_scm_instr_req, is_scm_data_req;
 
   // APU Core to FP Wrapper
-  logic                               apu_req;
-  logic [    APU_NARGS_CPU-1:0][31:0] apu_operands;
-  logic [      APU_WOP_CPU-1:0]       apu_op;
-  logic [ APU_NDSFLAGS_CPU-1:0]       apu_flags;
+  logic                              apu_req;
+  logic [   APU_NARGS_CPU-1:0][31:0] apu_operands;
+  logic [     APU_WOP_CPU-1:0]       apu_op;
+  logic [APU_NDSFLAGS_CPU-1:0]       apu_flags;
 
 
   // APU FP Wrapper to Core
-  logic                               apu_gnt;
-  logic                               apu_rvalid;
-  logic [                 31:0]       apu_rdata;
-  logic [ APU_NUSFLAGS_CPU-1:0]       apu_rflags;
+  logic                              apu_gnt;
+  logic                              apu_rvalid;
+  logic [                31:0]       apu_rdata;
+  logic [APU_NUSFLAGS_CPU-1:0]       apu_rflags;
 
   assign perf_counters_int = 1'b0;
   assign fetch_en_int = fetch_en_eu & fetch_en_i;
