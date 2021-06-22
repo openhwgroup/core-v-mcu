@@ -180,66 +180,17 @@ module soc_domain
     output logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
 
     // Signals to pad frame
-    input  logic [ `N_PERIO-1:0] perio_in_i,
-    output logic [ `N_PERIO-1:0] perio_out_o,
-    output logic [ `N_PERIO-1:0] perio_oe_o,
+    input logic [`N_PERIO-1:0] perio_in_i,
+    output logic [`N_PERIO-1:0] perio_out_o,
+    output logic [`N_PERIO-1:0] perio_oe_o,
     // Signals to gpio controller
-    input  logic [ `N_APBIO-1:0] apbio_in_i,
-    output logic [ `N_APBIO-1:0] apbio_out_o,
-    output logic [ `N_APBIO-1:0] apbio_oe_o,
+    input logic [`N_APBIO-1:0] apbio_in_i,
+    output logic [`N_APBIO-1:0] apbio_out_o,
+    output logic [`N_APBIO-1:0] apbio_oe_o,
     // IO signals to efpga
-    input  logic [`N_FPGAIO-1:0] fpgaio_in_i,
+    input logic [`N_FPGAIO-1:0] fpgaio_in_i,
     output logic [`N_FPGAIO-1:0] fpgaio_out_o,
     output logic [`N_FPGAIO-1:0] fpgaio_oe_o,
-    // Timers
-    //    output logic [ 3:0] 			timer_ch0_o,
-    //    output logic [ 3:0] 			timer_ch1_o,
-    //    output logic [ 3:0] 			timer_ch2_o,
-    //    output logic [ 3:0] 			timer_ch3_o,
-
-    // output logic [191:0]                  gpio_cfg_o,
-    // output logic                          uart_tx_o,
-    // input  logic                          uart_rx_i,
-    // input  logic                          cam_clk_i,
-    // input  logic [7:0]                    cam_data_i,
-    // input  logic                          cam_hsync_i,
-    // input  logic                          cam_vsync_i,
-    // output logic [3:0]                    timer_ch0_o,
-    // output logic [3:0]                    timer_ch1_o,
-    // output logic [3:0]                    timer_ch2_o,
-    // output logic [3:0]                    timer_ch3_o,
-
-    // input  logic [N_I2C-1:0]              i2c_scl_i,
-    // output logic [N_I2C-1:0]              i2c_scl_o,
-    // output logic [N_I2C-1:0]              i2c_scl_oe_o,
-    // input  logic [N_I2C-1:0]              i2c_sda_i,
-    // output logic [N_I2C-1:0]              i2c_sda_o,
-    // output logic [N_I2C-1:0]              i2c_sda_oe_o,
-
-    // input  logic                          i2s_slave_sd0_i,
-    // input  logic                          i2s_slave_sd1_i,
-    // input  logic                          i2s_slave_ws_i,
-    // output logic                          i2s_slave_ws_o,
-    // output logic                          i2s_slave_ws_oe,
-    // input  logic                          i2s_slave_sck_i,
-    // output logic                          i2s_slave_sck_o,
-    // output logic                          i2s_slave_sck_oe,
-
-    // output logic [N_SPI-1:0]              spi_clk_o,
-    // output logic [N_SPI-1:0][3:0]         spi_csn_o,
-    // output logic [N_SPI-1:0][3:0]         spi_oen_o,
-    // output logic [N_SPI-1:0][3:0]         spi_sdo_o,
-    // input  logic [N_SPI-1:0][3:0]         spi_sdi_i,
-
-    // output logic                          sdio_clk_o,
-    // output logic                          sdio_cmd_o,
-    // input  logic                          sdio_cmd_i,
-    // output logic                          sdio_cmd_oen_o,
-    // output logic                    [3:0] sdio_data_o,
-    // input  logic                    [3:0] sdio_data_i,
-    // output logic                    [3:0] sdio_data_oen_o,
-
-
     ///////////////////////////////////////////////////
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
@@ -311,8 +262,9 @@ module soc_domain
   localparam FLL_ADDR_WIDTH = 32;
   localparam FLL_DATA_WIDTH = 32;
   localparam NB_L2_BANKS = `NB_L2_CHANNELS;
-  //The L2 parameter do not influence the size of the memories. Change them in the l2_ram_multibank. This parameters
-  //are only here to save area in the uDMA by only storing relevant bits.
+  // The L2 parameter do not influence the size of the memories.
+  // Change them in the l2_ram_multibank. This parameters
+  // are only here to save area in the uDMA by only storing relevant bits.
   localparam L2_BANK_SIZE = 29184;  // in 32-bit words
   localparam L2_MEM_ADDR_WIDTH = $clog2(
       L2_BANK_SIZE * NB_L2_BANKS
@@ -393,9 +345,6 @@ module soc_domain
   logic                                               s_cl_event_valid;
   logic                                               s_cl_event_ready;
 
-  logic            [EVNT_WIDTH-1:0]                   s_fc_event_data;
-  logic                                               s_fc_event_valid;
-  logic                                               s_fc_event_ready;
 
   logic            [           7:0]           [31:0]  s_apb_mpu_rules;
   logic                                               s_supervisor_mode;
@@ -447,8 +396,8 @@ module soc_domain
 
   logic spi_master0_csn3, spi_master0_csn2;
 
-  APB_BUS s_apb_eu_bus ();
-  APB_BUS s_apb_hwpe_bus ();
+  //  APB_BUS s_apb_eu_bus ();
+  //  APB_BUS s_apb_hwpe_bus ();
   APB_BUS s_apb_debug_bus ();
 
   AXI_BUS #(
@@ -500,12 +449,6 @@ module soc_domain
 
   XBAR_TCDM_BUS s_lint_efpga_bus[`N_EFPGA_TCDM_PORTS-1:0] ();
   XBAR_TCDM_BUS s_lint_efpga_apbt1_bus ();
-
-`ifdef REMAP_ADDRESS
-  logic [3:0] base_addr_int;
-  assign base_addr_int = 4'b0001; //FIXME attach this signal somewhere in the soc peripherals --> IGOR
-`endif
-
 
 
   logic s_cluster_isolate_dc;
@@ -588,9 +531,9 @@ module soc_domain
 
       .apb_slave(s_apb_periph_bus),
 
-      .apb_eu_master   (s_apb_eu_bus),
+      //      .apb_eu_master   (s_apb_eu_bus),
       .apb_debug_master(s_apb_debug_bus),
-      .apb_hwpe_master (s_apb_hwpe_bus),
+      //      .apb_hwpe_master (s_apb_hwpe_bus),
 
       .l2_rx_master(s_lint_udma_rx_bus),
       .l2_tx_master(s_lint_udma_tx_bus),
@@ -601,10 +544,10 @@ module soc_domain
       .soc_jtag_reg_i(soc_jtag_reg_tap),
       .soc_jtag_reg_o(soc_jtag_reg_soc),
 
-      .fc_hwpe_events_i(s_fc_hwpe_events),
-      .fc_events_o     (s_fc_events),
-      .core_irq_ack_id_i (s_core_irq_ack_id),
-      .core_irq_ack_i (s_core_irq_ack),
+      .fc_hwpe_events_i (s_fc_hwpe_events),
+      .fc_events_o      (s_fc_events),
+      .core_irq_ack_id_i(s_core_irq_ack_id),
+      .core_irq_ack_i   (s_core_irq_ack),
 
       .dma_pe_evt_i(s_dma_pe_evt),
       .dma_pe_irq_i(s_dma_pe_irq),
@@ -737,9 +680,6 @@ module soc_domain
       .cl_event_valid_o(s_cl_event_valid),
       .cl_event_ready_i(s_cl_event_ready),
 
-      .fc_event_data_o (s_fc_event_data),
-      .fc_event_valid_o(s_fc_event_valid),
-      .fc_event_ready_i(s_fc_event_ready),
 
       .cluster_pow_o         (cluster_pow_o),
       .cluster_byp_o         (cluster_byp_o),
@@ -798,29 +738,18 @@ module soc_domain
       .USE_HWPE  (USE_HWPE),
       .USE_ZFINX (USE_ZFINX)
   ) fc_subsystem_i (
-      .clk_i (s_soc_clk),
-      .rst_ni(s_soc_rstn),
-
-      .test_en_i(dft_test_mode_i),
-
-      .boot_addr_i(s_fc_bootaddr),
-
-      .fetch_en_i(s_fc_fetchen),
-
-      .l2_data_master    (s_lint_fc_data_bus),
-      .l2_instr_master   (s_lint_fc_instr_bus),
-      .l2_hwpe_master    (s_lint_hwpe_bus),
-      .apb_slave_eu      (s_apb_eu_bus),
-      .apb_slave_hwpe    (s_apb_hwpe_bus),
-      .debug_req_i       (dm_debug_req[FC_CORE_MHARTID]),
-      .stoptimer_o       (s_stoptimer),
-      .event_fifo_valid_i(s_fc_event_valid),
-      .event_fifo_fulln_o(s_fc_event_ready),
-      .event_fifo_data_i (s_fc_event_data),
-      .events_i          (s_fc_events),
-      .hwpe_events_o     (s_fc_hwpe_events),
-      .core_irq_ack_id_o (s_core_irq_ack_id),
-      .core_irq_ack_o    (s_core_irq_ack),
+      .clk_i            (s_soc_clk),
+      .rst_ni           (s_soc_rstn),
+      .test_en_i        (dft_test_mode_i),
+      .boot_addr_i      (s_fc_bootaddr),
+      .fetch_en_i       (s_fc_fetchen),
+      .l2_data_master   (s_lint_fc_data_bus),
+      .l2_instr_master  (s_lint_fc_instr_bus),
+      .debug_req_i      (dm_debug_req[FC_CORE_MHARTID]),
+      .stoptimer_o      (s_stoptimer),
+      .events_i         (s_fc_events),
+      .core_irq_ack_id_o(s_core_irq_ack_id),
+      .core_irq_ack_o   (s_core_irq_ack),
 
       .supervisor_mode_o(s_supervisor_mode)
   );
@@ -1016,29 +945,6 @@ module soc_domain
       slave_valid <= slave_grant;
     end
   end
-
-  //********************************************************
-  //*** PAD AND GPIO CONFIGURATION SIGNALS PACK ************
-  //********************************************************
-
-  // for (genvar i = 0; i < 32; i++) begin : gen_gpio_cfg_outer
-  // for (genvar j = 0; j < 6; j++) begin : gen_gpip_cfg_inner
-  // assign gpio_cfg_o[j+6*i] = s_gpio_cfg[i][j];
-  // end
-  // end
-
-  // for (genvar i = 0; i < 64; i++) begin : gen_pad_mux_outer
-  // for (genvar j = 0; j < 2; j++) begin : gen_pad_mux_innter
-  // assign pad_mux_o[j+2*i] = s_pad_mux[i][j];
-  // end
-  // end
-
-  // for (genvar i = 0; i < 64; i++) begin : gen_pad_cfg_outer
-  // for (genvar j = 0; j < 6; j++) begin : gen_pad_cfg_inner
-  // assign pad_cfg_o[j+6*i] = s_pad_cfg[i][j];
-  // end
-  // end
-
 
 
 endmodule

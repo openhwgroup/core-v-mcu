@@ -125,7 +125,7 @@ module i2c_peripheral_interface (
   // // sdaDelayed is only used for start stop detection
   // // Because sda hold time from scl falling is 0nS
   // // sda must be delayed with respect to scl to avoid incorrect
-  // // detection of start/stop at scl falling edge. 
+  // // detection of start/stop at scl falling edge.
   reg [SCL_DELAY_LEN_MAX-1:0] scl_delay_pipe;
   reg [SDA_DELAY_LEN_MAX-1:0] sda_delay_pipe;
 
@@ -159,10 +159,10 @@ module i2c_peripheral_interface (
 
 
   // I2C protocol state machine
-  wire       scl_sm;
-  wire       sda_sm;
-  reg        scl_sm_r1;
-  reg  [3:0] i2c_state;
+  (* mark_debug = "true" *)   wire       scl_sm;
+  (* mark_debug = "true" *)   wire       sda_sm;
+  (* mark_debug = "true" *)   reg        scl_sm_r1;
+  (* mark_debug = "true" *)   reg  [3:0] i2c_state;
   localparam [3:0] ST_IDLE = 4'h0;
   localparam [3:0] ST_DEVADDR = 4'h1;
   localparam [3:0] ST_DEVADDRACK = 4'h2;
@@ -176,9 +176,9 @@ module i2c_peripheral_interface (
 
   reg       bit_xfer;
   reg       bit_rcvd;
-  reg [3:0] bit_cnt;
+  (* mark_debug = "true" *) reg [3:0] bit_cnt;
   reg [7:0] in_byte;
-  reg [7:0] out_byte;
+  (* mark_debug = "true" *)   reg [7:0] out_byte;
   reg       xfer_type_rd_wrn;
   reg [7:0] reg_addr;
   reg [7:0] reg_wdata;
@@ -419,11 +419,11 @@ endmodule
 //// <http://www.opencores.org/cores//>                           ////
 ////                                                              ////
 //// Module Description:                                          ////
-//// You will need to modify this file to implement your 
+//// You will need to modify this file to implement your
 //// interface.
 ////                                                              ////
 //// To Do:                                                       ////
-//// 
+////
 ////                                                              ////
 //// Author(s):                                                   ////
 //// - Steve Fielding, sfielding@base2designs.com                 ////
@@ -454,4 +454,3 @@ endmodule
 //// from <http://www.opencores.org/lgpl.shtml>                   ////
 ////                                                              ////
 //////////////////////////////////////////////////////////////////////
-

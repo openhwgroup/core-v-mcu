@@ -38,7 +38,7 @@ module apb_i2cs (
   // APB interface
   input apb_pclk_i;
   input apb_presetn_i;
-  input [31:0] apb_paddr_i;
+  input [11:0] apb_paddr_i;
   input apb_psel_i;
   input apb_penable_i;
   input apb_pwrite_i;
@@ -57,7 +57,7 @@ module apb_i2cs (
 
   wire        apb_pclk_i;
   wire        apb_presetn_i;
-  wire [31:0] apb_paddr_i;
+  wire [11:0] apb_paddr_i;
   wire        apb_psel_i;
   wire        apb_penable_i;
   wire        apb_pwrite_i;
@@ -92,10 +92,10 @@ module apb_i2cs (
   wire [ 7:0] i2c_reg_rddata;
   wire        i2c_reg_rd_byte_complete;
 
-  wire [31:0] apb_reg_waddr;
+  wire [11:0] apb_reg_waddr;
   wire [31:0] apb_reg_wdata;
   wire        apb_reg_wrenable;
-  wire [31:0] apb_reg_raddr;
+  wire [11:0] apb_reg_raddr;
   wire [31:0] apb_reg_rdata;
   wire        apb_reg_rd_byte_complete;
 

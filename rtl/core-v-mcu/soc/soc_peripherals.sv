@@ -27,59 +27,44 @@ module soc_peripherals #(
     input logic       ref_clk_i,
     input logic       slow_clk_i,
 
-    input  logic        sel_fll_clk_i,
-    input  logic        dft_test_mode_i,
-    input  logic        dft_cg_enable_i,
-    output logic [31:0] fc_bootaddr_o,
-    output logic        fc_fetchen_o,
-    input  logic [ 7:0] soc_jtag_reg_i,
-    output logic [ 7:0] soc_jtag_reg_o,
-    input  logic        stoptimer_i,
-    input  logic        boot_l2_i,
-    input  logic        bootsel_i,
+    input  logic                 sel_fll_clk_i,
+    input  logic                 dft_test_mode_i,
+    input  logic                 dft_cg_enable_i,
+    output logic          [31:0] fc_bootaddr_o,
+    output logic                 fc_fetchen_o,
+    input  logic          [ 7:0] soc_jtag_reg_i,
+    output logic          [ 7:0] soc_jtag_reg_o,
+    input  logic                 stoptimer_i,
+    input  logic                 boot_l2_i,
+    input  logic                 bootsel_i,
     // fc fetch enable can be controlled through this signal or through an APB
     // write to the fc fetch enable register
-    input  logic        fc_fetch_en_valid_i,
-    input  logic        fc_fetch_en_i,
-    input [4:0] core_irq_ack_id_i,
-    input core_irq_ack_i,
-
-
+    input  logic                 fc_fetch_en_valid_i,
+    input  logic                 fc_fetch_en_i,
+    input                 [ 4:0] core_irq_ack_id_i,
+    input                        core_irq_ack_i,
     // SLAVE PORTS
     // APB SLAVE PORT
-    APB_BUS.Slave  apb_slave,
-    APB_BUS.Master apb_eu_master,
-    APB_BUS.Master apb_hwpe_master,
-    APB_BUS.Master apb_debug_master,
+           APB_BUS.Slave         apb_slave,
+           APB_BUS.Master        apb_debug_master,
 
     // FABRIC CONTROLLER MASTER REFILL PORT
-    XBAR_TCDM_BUS.Master l2_rx_master,
-    XBAR_TCDM_BUS.Master l2_tx_master,
+           XBAR_TCDM_BUS.Master        l2_rx_master,
+           XBAR_TCDM_BUS.Master        l2_tx_master,
     // MASTER PORT TO SOC FLL
-    FLL_BUS.Master       soc_fll_master,
+           FLL_BUS.Master              soc_fll_master,
     // MASTER PORT TO PER FLL
-    FLL_BUS.Master       per_fll_master,
+           FLL_BUS.Master              per_fll_master,
     // MASTER PORT TO CLUSTER FLL
-    FLL_BUS.Master       cluster_fll_master,
+           FLL_BUS.Master              cluster_fll_master,
     // MASTER PORT TO L2 from eFPGA
-    XBAR_TCDM_BUS.Master l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
-
-           XBAR_TCDM_BUS.Slave        efpga_apbt1_slave,
-    /*
-    input  logic                       jtag_req_valid_i,
-    output logic                       debug_req_ready_o,
-    input  logic                       jtag_resp_ready_i,
-    output logic                       jtag_resp_valid_o,
-    input  dm::dmi_req_t               jtag_dmi_req_i,
-    output dm::dmi_resp_t              debug_resp_o,
-    output logic                       ndmreset_o,
-    output logic                       dm_debug_req_o,
-*/
-    input  logic                      dma_pe_evt_i,
-    input  logic                      dma_pe_irq_i,
-    input  logic                      pf_evt_i,
-    input  logic               [ 1:0] fc_hwpe_events_i,
-    output logic               [31:0] fc_events_o,
+           XBAR_TCDM_BUS.Master        l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
+           XBAR_TCDM_BUS.Slave         efpga_apbt1_slave,
+    input  logic                       dma_pe_evt_i,
+    input  logic                       dma_pe_irq_i,
+    input  logic                       pf_evt_i,
+    input  logic                [ 1:0] fc_hwpe_events_i,
+    output logic                [31:0] fc_events_o,
 
     // Pad control signals
     output logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
@@ -148,9 +133,6 @@ module soc_peripherals #(
     output logic [EVNT_WIDTH-1:0] cl_event_data_o,
     output logic                  cl_event_valid_o,
     input  logic                  cl_event_ready_i,
-    output logic [EVNT_WIDTH-1:0] fc_event_data_o,
-    output logic                  fc_event_valid_o,
-    input  logic                  fc_event_ready_i,
 
     output logic        cluster_pow_o,
     output logic        cluster_byp_o,  // bypass cluster
@@ -319,9 +301,7 @@ module soc_peripherals #(
       .soc_ctrl_master    (s_soc_ctrl_bus),
       .adv_timer_master   (s_adv_timer_bus),
       .soc_evnt_gen_master(s_soc_evnt_gen_bus),
-      .eu_master          (apb_eu_master),
       .mmap_debug_master  (apb_debug_master),
-      .hwpe_master        (apb_hwpe_master),
       .timer_master       (s_apb_timer_bus),
       .stdout_master      (s_stdout_bus),
       .fcb_master         (s_apb_fcb_bus),
@@ -614,24 +594,21 @@ module soc_peripherals #(
       .PREADY (s_soc_evnt_gen_bus.pready),
       .PSLVERR(s_soc_evnt_gen_bus.pslverr),
 
-      .low_speed_clk_i (slow_clk_i),
-      .timer_event_lo_o(s_timer_in_lo_event),
-      .timer_event_hi_o(s_timer_in_hi_event),
-      .per_events_i    (s_events),
-      .err_event_o     (s_fc_err_events),
-      .fc_events_o     (s_fc_hp_events),
-      .core_irq_ack_id_i(core_irq_ack_id_i),
-      .core_irq_ack_i  (core_irq_ack_i),
-                .event_fifo_valid_o(event_fifo_valid),
-      .fc_event_valid_o(fc_event_valid_o),
-      .fc_event_data_o (fc_event_data_o),
-      .fc_event_ready_i(fc_event_ready_i),
-      .cl_event_valid_o(cl_event_valid_o),
-      .cl_event_data_o (cl_event_data_o),
-      .cl_event_ready_i(cl_event_ready_i),
-      .pr_event_valid_o(s_pr_event_valid),
-      .pr_event_data_o (s_pr_event_data),
-      .pr_event_ready_i(s_pr_event_ready)
+      .low_speed_clk_i   (slow_clk_i),
+      .timer_event_lo_o  (s_timer_in_lo_event),
+      .timer_event_hi_o  (s_timer_in_hi_event),
+      .per_events_i      (s_events),
+      .err_event_o       (s_fc_err_events),
+      .fc_events_o       (s_fc_hp_events),
+      .core_irq_ack_id_i (core_irq_ack_id_i),
+      .core_irq_ack_i    (core_irq_ack_i),
+      .event_fifo_valid_o(event_fifo_valid),
+      .cl_event_valid_o  (cl_event_valid_o),
+      .cl_event_data_o   (cl_event_data_o),
+      .cl_event_ready_i  (cl_event_ready_i),
+      .pr_event_valid_o  (s_pr_event_valid),
+      .pr_event_data_o   (s_pr_event_data),
+      .pr_event_ready_i  (s_pr_event_ready)
   );
 
   /////////////////////////////////////////////////////////////////////////

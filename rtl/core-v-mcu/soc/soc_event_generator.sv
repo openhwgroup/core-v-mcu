@@ -53,34 +53,31 @@ module soc_event_generator #(
     parameter EVNT_WIDTH     = 8,
     parameter FC_EVENT_POS   = 3
 ) (
-    input logic                      HCLK,
-    input logic                      HRESETn,
-    input logic [APB_ADDR_WIDTH-1:0] PADDR,
-    input logic [ 31:0]              PWDATA,
-    input logic                      PWRITE,
-    input logic                      PSEL,
-    input logic                      PENABLE,
-    output logic [ 31:0]             PRDATA,
-    output logic                     PREADY,
-    output logic                     PSLVERR,
-    input logic                      low_speed_clk_i,
-    input logic [ PER_EVNT_NUM-1:0]  per_events_i, // events coming from peripherals
-    output logic [ 1:0]              fc_events_o, // events going to the FC EU
-input [4:0]                          core_irq_ack_id_i,
-    input                            core_irq_ack_i,
-   output event_fifo_valid_o,
-    output logic                     err_event_o,
-    output logic                     timer_event_lo_o,
-    output logic                     timer_event_hi_o,
-    output logic                     fc_event_valid_o,
-    output logic [ EVNT_WIDTH-1:0]   fc_event_data_o,
-    input logic                      fc_event_ready_i,
-    output logic                     cl_event_valid_o,
-    output logic [ EVNT_WIDTH-1:0]   cl_event_data_o,
-    input logic                      cl_event_ready_i,
-    output logic                     pr_event_valid_o,
-    output logic [ EVNT_WIDTH-1:0]   pr_event_data_o,
-    input logic                      pr_event_ready_i
+    input  logic                      HCLK,
+    input  logic                      HRESETn,
+    input  logic [APB_ADDR_WIDTH-1:0] PADDR,
+    input  logic [              31:0] PWDATA,
+    input  logic                      PWRITE,
+    input  logic                      PSEL,
+    input  logic                      PENABLE,
+    output logic [              31:0] PRDATA,
+    output logic                      PREADY,
+    output logic                      PSLVERR,
+    input  logic                      low_speed_clk_i,
+    input  logic [  PER_EVNT_NUM-1:0] per_events_i,  // events coming from peripherals
+    output logic [               1:0] fc_events_o,  // events going to the FC EU
+    input        [               4:0] core_irq_ack_id_i,
+    input                             core_irq_ack_i,
+    output                            event_fifo_valid_o,
+    output logic                      err_event_o,
+    output logic                      timer_event_lo_o,
+    output logic                      timer_event_hi_o,
+    output logic                      cl_event_valid_o,
+    output logic [    EVNT_WIDTH-1:0] cl_event_data_o,
+    input  logic                      cl_event_ready_i,
+    output logic                      pr_event_valid_o,
+    output logic [    EVNT_WIDTH-1:0] pr_event_data_o,
+    input  logic                      pr_event_ready_i
 );
 
   genvar j;
@@ -123,11 +120,17 @@ input [4:0]                          core_irq_ack_id_i,
   logic                    s_ls_rise;
 
   logic [APB_EVNT_NUM-1:0] r_apb_events;
-  logic [EVNT_WIDTH-1:0]   r_fifo_event;
-  logic [EVNT_WIDTH-1:0]   s_event_fifo_data;
+  logic [  EVNT_WIDTH-1:0] r_fifo_event;
+  logic [  EVNT_WIDTH-1:0] s_event_fifo_data;
   logic                    s_event_fifo_valid;
   logic                    s_event_fifo_ready;
   logic                    fc_event_ready;
+
+  logic                    fc_event_valid_o;
+
+  logic [  EVNT_WIDTH-1:0] fc_event_data_o;
+
+  logic                    fc_event_ready_i;
 
 
 
@@ -356,38 +359,33 @@ input [4:0]                          core_irq_ack_id_i,
     endcase
   end
 
-  assign PREADY  = 1'b1;
+  assign PREADY = 1'b1;
   assign PSLVERR = 1'b0;
 
-  assign s_event_fifo_ready =  (core_irq_ack_i && (core_irq_ack_id_i == 11));
+  assign s_event_fifo_ready = (core_irq_ack_i && (core_irq_ack_id_i == 11));
 
-  always_ff @(posedge HCLK, negedge HRESETn)
-  begin
-    if(~HRESETn)
-      r_fifo_event <= '0;
-    else
-      if (s_event_fifo_valid && s_event_fifo_ready)
-        r_fifo_event <= s_event_fifo_data;
+  always_ff @(posedge HCLK, negedge HRESETn) begin
+    if (~HRESETn) r_fifo_event <= '0;
+    else if (s_event_fifo_valid && s_event_fifo_ready) r_fifo_event <= s_event_fifo_data;
   end
 
   assign event_fifo_valid_o = s_event_fifo_valid;
 
-   generic_fifo
-  #(
-    .DATA_WIDTH(8),
-    .DATA_DEPTH(4)
+  generic_fifo #(
+      .DATA_WIDTH(8),
+      .DATA_DEPTH(4)
   ) i_event_fifo1 (
-    .clk     ( HCLK ),
-    .rst_n   ( HRESETn ),
+      .clk  (HCLK),
+      .rst_n(HRESETn),
 
-    .data_i  ( fc_event_data_o  ),
-    .valid_i ( fc_event_valid_o ),
-    .grant_o ( fc_event_ready ),
+      .data_i (fc_event_data_o),
+      .valid_i(fc_event_valid_o),
+      .grant_o(fc_event_ready),
 
-    .data_o  ( s_event_fifo_data  ),
-    .valid_o ( s_event_fifo_valid ),
-    .grant_i ( s_event_fifo_ready ),
+      .data_o (s_event_fifo_data),
+      .valid_o(s_event_fifo_valid),
+      .grant_i(s_event_fifo_ready),
 
-    .test_mode_i()
+      .test_mode_i()
   );
 endmodule  // soc_event_generator
