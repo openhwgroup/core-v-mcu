@@ -228,7 +228,7 @@ module udma_uart_top #(
     );
 
 
-    udma_dc_fifo #(8,8) u_dc_fifo_rx
+    udma_dc_fifo #(8,4) u_dc_fifo_rx
     (
         .src_clk_i    ( periph_clk_i       ),
         .src_rstn_i   ( rstn_i & ~s_uart_rx_clean_fifo ),

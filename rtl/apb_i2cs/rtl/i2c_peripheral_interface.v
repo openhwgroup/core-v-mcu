@@ -36,17 +36,17 @@ module i2c_peripheral_interface (
   //  100MHz system clock. These parameters can be adjusted if a different
   //  system clock rate is used (e.g. for a 200MHz system clock, these parameters
   //  should all be doubled).
-  parameter integer I2C_DEBOUNCE_LEN_MAX = 20;
-  parameter integer SCL_DELAY_LEN_MAX = 20;
-  parameter integer SDA_DELAY_LEN_MAX = 8;
+  parameter integer I2C_DEBOUNCE_LEN_MAX = 2;
+  parameter integer SCL_DELAY_LEN_MAX = 2;
+  parameter integer SDA_DELAY_LEN_MAX = 2;
 
   input clk_i;
   input rst_i;
 
   // i2c pins
-  input i2c_scl_i;
-  input i2c_sda_i;
-  output i2c_sda_o;
+ input i2c_scl_i;
+ input i2c_sda_i;
+ output i2c_sda_o;
 
   // interface to registers
   input [6:0] i2c_dev_addr_i;
@@ -125,7 +125,7 @@ module i2c_peripheral_interface (
   // // sdaDelayed is only used for start stop detection
   // // Because sda hold time from scl falling is 0nS
   // // sda must be delayed with respect to scl to avoid incorrect
-  // // detection of start/stop at scl falling edge. 
+  // // detection of start/stop at scl falling edge.
   reg [SCL_DELAY_LEN_MAX-1:0] scl_delay_pipe;
   reg [SDA_DELAY_LEN_MAX-1:0] sda_delay_pipe;
 
@@ -377,7 +377,7 @@ module i2c_peripheral_interface (
           end else begin
             // check for NACK
             if (bit_xfer) begin
-              if (bit_rcvd == 1'b0) begin  // NACK
+              if (bit_rcvd == 1'b1) begin  // NACK
                 i2c_state <= ST_WTSTOP;
               end else begin  // ACK
                 out_byte  <= i2c_reg_rddata_i;
@@ -419,11 +419,11 @@ endmodule
 //// <http://www.opencores.org/cores//>                           ////
 ////                                                              ////
 //// Module Description:                                          ////
-//// You will need to modify this file to implement your 
+//// You will need to modify this file to implement your
 //// interface.
 ////                                                              ////
 //// To Do:                                                       ////
-//// 
+////
 ////                                                              ////
 //// Author(s):                                                   ////
 //// - Steve Fielding, sfielding@base2designs.com                 ////
@@ -454,4 +454,3 @@ endmodule
 //// from <http://www.opencores.org/lgpl.shtml>                   ////
 ////                                                              ////
 //////////////////////////////////////////////////////////////////////
-
