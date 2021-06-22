@@ -21,7 +21,7 @@ module apb_slave_interface (
 
   input apb_pclk_i;
   input apb_preset_i;
-  input [31:0] apb_paddr_i;
+  input [11:0] apb_paddr_i;
   input apb_psel_i;
   input apb_penable_i;
   input apb_pwrite_i;
@@ -63,10 +63,10 @@ module apb_slave_interface (
 
   reg         pready_reg;
 
-  reg  [31:0] apb_reg_waddr;
+  reg  [11:0] apb_reg_waddr;
   reg  [31:0] apb_reg_wdata;
   reg         apb_reg_wrenable;
-  wire [31:0] apb_reg_raddr;
+  wire [11:0] apb_reg_raddr;
   reg         apb_reg_rd_byte_complete;
 
 

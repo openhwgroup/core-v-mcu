@@ -1,6 +1,6 @@
 /*
  * This is a generated file
- * 
+ *
  * Copyright 2021 QuickLogic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-`define BUILD_DATE 32'h20210617
-`define BUILD_TIME 32'h00130501
+`define BUILD_DATE 32'h20210622
+`define BUILD_TIME 32'h00151912
 
 //  PER_ID definitions
 `define PER_ID_UART      0

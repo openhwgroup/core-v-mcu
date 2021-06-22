@@ -744,7 +744,7 @@ module soc_peripherals #(
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(rst_ni),
 
-      .apb_paddr_i  (s_apb_i2cs_bus.paddr),
+      .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
       .apb_pwrite_i (s_apb_i2cs_bus.pwrite),
       .apb_psel_i   (s_apb_i2cs_bus.psel),

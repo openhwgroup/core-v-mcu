@@ -49,6 +49,8 @@ Currently unsupported:
 ```
 $ make genesys2
 ```
+Extra note for building on ubuntu - Vivado tools from Xilinx may require a larger swap size that the system default.
+The swap size can be increased by searching for "increase swapfile in ubuntu" and add your release.
 
 ## Building documentation
 ```

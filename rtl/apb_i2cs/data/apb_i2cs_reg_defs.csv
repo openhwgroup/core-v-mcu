@@ -1,0 +1,107 @@
+Module,APB_I2CS,,,,,
+,Memory address: I2CS_START_ADDR(`I2CS_START_ADDR),,,,,
+Register,Offset/Field,MSB,LSB,Type,Default,Description
+0x000,I2CS_DEV_ADDRESS,,,,,
+,RESERVED,7,7,RW,,"Reserved"
+,SLAVE_ADDR,6,0,RW,0x6F,"I2C Device Address"
+0x004,I2CS_ENABLE,,,,,
+,RESERVED,7,1,RW,,
+,IP_ENABLE,0,0,RW,,
+0x008,I2CS_DEBOUNCE_LENGTH,,,,,represents the number of system clocks over which each I2C line (SCL and SDA) should be debounced
+,DEB_LEN,7,0,RW,0x14,
+0x00C,I2CS_SCL_DELAY_LENGTH,,,,,represents the number of system clocksover which the SCL line will be delayed relative to the SDA line
+,SCL_DLY_LEN,7,0,RW,0x14,
+0x010,I2CS_SDA_DELAY_LENGTH,,,,,represents the number of system clocks over which the SDA line will be delayed relative to the SCL line
+,SDA_DLY_LEN,7,0,RW,0x14,
+0x040,I2CS_MSG_I2C_APB,,,,,This register provides a method for passing a single-byte message from the I2C interface to the APB interface.
+,I2C_TO_APB,7,0,RW,0x00,
+0x044,I2CS_MSG_I2C_APB_STATUS,,,,,This register provides a method for passing a single-byte message from the I2C interface to the APB interface.
+,RESERVED,7,1,RW,,"Reserved"
+,I2C_TO_APB_STATUS,0,0,RW,0x00,
+0x048,I2CS_MSG_APB_I2C,,,,,This register provides a method for passing a single-byte message from the APB interface to the I2C interface.
+,APB_TO_I2C,7,0,RW,0x00,
+0x04C,I2CS_MSG_APB_I2C_STATUS,,,,,This register provides a method for passing a single-byte message from the APB interface to the I2C interface.
+,RESERVED,7,1,RW,,"Reserved"
+,APB_TO_I2C_STATUS,0,0,RW,0x00,
+0x080,I2CS_FIFO_I2C_APB_WRITE_DATA_PORT,,,,,This is the write data port for the I2CtoAPB FIFO.
+,I2C_APB_WRITE_DATA_PORT,31,0,RW,,
+0x084,I2CS_FIFO_I2C_APB_WRITE_DATA_PORT,,,,,This is the read data port for the I2CtoAPB FIFO.
+,I2C_APB_READ_DATA_PORT,31,0,RW,,
+0x088,I2CS_FIFO_I2C_APB_FLUSH,,,,,
+,RESERVED,7,1,RW,,"Reserved"
+,ENABLE,0,0,RW,,"Writing a 1 to this register bit will flush the I2CtoAPB FIFO, clearing all contents and rendering the FIFO to be empty"
+0x08C,I2CS_FIFO_I2C_APB_WRITE_FLAGS,,,,,
+,RESERVED,7,3,RW,,"Reserved"
+,FLAGS,2,0,RW,,
+0x090,I2CS_FIFO_I2C_APB_READ_FLAGS,,,,,
+,RESERVED,7,3,RW,,"Reserved"
+,FLAGS,2,0,RW,,
+0x0C0,I2CS_FIFO_APB_I2C_WRITE_DATA_PORT,,,,,This is the write data port for the APBtoI2C FIFO.
+,I2C_APB_WRITE_DATA_PORT,31,0,RW,,
+0x0C4,I2CS_FIFO_APB_I2C_WRITE_DATA_PORT,,,,,This is the read data port for the APBtoI2C FIFO.
+,I2C_APB_READ_DATA_PORT,31,0,RW,,
+0x0C8,I2CS_FIFO_APB_I2C_FLUSH,,,,,
+,RESERVED,7,1,RW,,"Reserved"
+,ENABLE,0,0,RW,,"Writing a 1 to this register bit will flush the APBtoI2C FIFO, clearing all contents and rendering the FIFO to be empty"
+0x0CC,I2CS_FIFO_APB_I2C_WRITE_FLAGS,,,,,
+,RESERVED,7,3,R,,"Reserved"
+,FLAGS,2,0,R,,
+0x0D0,I2CS_FIFO_APB_I2C_READ_FLAGS,,,,,
+,RESERVED,7,3,R,,"Reserved"
+,FLAGS,2,0,R,,
+0x100,I2CS_INTERRUPT_STATUS,,,,,
+,RESERVED,7,3,R,,"Reserved"
+,I2C_APB_FIFO_WRITE_STATUS,2,2,R,,
+,APB_I2C_FIFO_READ_STATUS,1,1,R,,
+,APB_I2C_MESSAGE_AVAILABLE,0,0,R,,
+0x104,I2CS_INTERRUPT_ENABLE,,,,,
+,RESERVED,7,3,RW,,"Reserved"
+,I2C_APB_FIFO_WRITE_STATUS_INT_ENABLE,2,2,RW,,
+,APB_I2C_FIFO_READ_STATUS_INT_ENABLE,1,1,RW,,
+,APB_I2C_MESSAGE_AVAILABLE_INT_ENABLE,0,0,RW,,
+0x108,I2CS_INTERRUPT_I2C_APB_WRITE_FLAGS_SELECT,,,,,
+,WRITE_FLAG_FULL,7,7,RW,,
+,WRITE_FLAG_1_SPACE_AVAIL,6,6,RW,,
+,WRITE_FLAG_2_3_SPACE_AVAIL,5,5,RW,,
+,WRITE_FLAG_4_7_SPACE_AVAIL,4,4,RW,,
+,WRITE_FLAG_8_31_SPACE_AVAIL,3,3,RW,,
+,WRITE_FLAG_32_63_SPACE_AVAIL,2,2,RW,,
+,WRITE_FLAG_64_127_SPACE_AVAIL,1,1,RW,,
+,WRITE_FLAG_128_SPACE_AVAIL,0,0,RW,,
+0x10C,I2CS_INTERRUPT_APB_I2C_READ_FLAGS_SELECT,,,,,
+,READ_FLAG_128_SPACE_AVAIL,7,7,RW,,
+,READ_FLAG_64_127_SPACE_AVAIL,6,6,RW,,
+,READ_FLAG_32_63_SPACE_AVAIL,5,5,RW,,
+,READ_FLAG_8_31_SPACE_AVAIL,4,4,RW,,
+,READ_FLAG_4_7_SPACE_AVAIL,3,3,RW,,
+,READ_FLAG_2_3_SPACE_AVAIL,2,2,RW,,
+,READ_FLAG_1_SPACE_AVAIL,1,1,RW,,
+,READ_FLAG_EMPTY,0,0,RW,,
+0x140,I2CS_INTERRUPT_TO_APB_STATUS,,,,,
+,RESERVED,7,3,RW,,
+,APB_I2C_FIFO_WRITE_STATUS,2,2,RW,,
+,I2C_APB_FIFO_READ_STATUS,1,1,RW,,
+,NEW_I2C_APB_MSG_AVAIL,0,0,RW,,
+0x144,I2CS_INTERRUPT_TO_APB_ENABLE,,,,,
+,RESERVED,7,3,RW,,
+,APB_I2C_FIFO_WRITE_STATUS_ENABLE,2,2,RW,,
+,I2C_APB_FIFO_READ_STATUS_ENABLE,1,1,RW,,
+,NEW_I2C_APB_MSG_AVAIL_ENABLE,0,0,RW,,
+0x148,I2CS_INTERRUPT_APB_I2C_WRITE_FLAGS_SELECT,,,,,
+,WRITE_FLAG_FULL,7,7,RW,,
+,WRITE_FLAG_1_SPACE_AVAIL,6,6,RW,,
+,WRITE_FLAG_2_3_SPACE_AVAIL,5,5,RW,,
+,WRITE_FLAG_4_7_SPACE_AVAIL,4,4,RW,,
+,WRITE_FLAG_8_31_SPACE_AVAIL,3,3,RW,,
+,WRITE_FLAG_32_63_SPACE_AVAIL,2,2,RW,,
+,WRITE_FLAG_64_127_SPACE_AVAIL,1,1,RW,,
+,WRITE_FLAG_128_SPACE_AVAIL,0,0,RW,,
+0x14C,I2CS_INTERRUPT_I2C_APB_READ_FLAGS_SELECT,,,,,
+,READ_FLAG_128_SPACE_AVAIL,7,7,RW,,
+,READ_FLAG_64_127_SPACE_AVAIL,6,6,RW,,
+,READ_FLAG_32_63_SPACE_AVAIL,5,5,RW,,
+,READ_FLAG_8_31_SPACE_AVAIL,4,4,RW,,
+,READ_FLAG_4_7_SPACE_AVAIL,3,3,RW,,
+,READ_FLAG_2_3_SPACE_AVAIL,2,2,RW,,
+,READ_FLAG_1_SPACE_AVAIL,1,1,RW,,
+,READ_FLAG_EMPTY,0,0,RW,,

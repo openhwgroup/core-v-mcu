@@ -67,7 +67,7 @@ module udma_uart_top #(
     input  logic               [31:0] data_tx_i,
     input  logic                      data_tx_valid_i,
     output logic                      data_tx_ready_o,
-             
+
     output logic                [1:0] data_rx_datasize_o,
     output logic               [31:0] data_rx_o,
     output logic                      data_rx_valid_o,
@@ -200,8 +200,8 @@ module udma_uart_top #(
 
     udma_dc_fifo #(8,4) u_dc_fifo_tx
     (
-        .src_clk_i    ( sys_clk_i          ),  
-        .src_rstn_i   ( rstn_i             ),  
+        .src_clk_i    ( sys_clk_i          ),
+        .src_rstn_i   ( rstn_i             ),
         .src_data_i   ( s_data_tx          ),
         .src_valid_i  ( s_data_tx_valid    ),
         .src_ready_o  ( s_data_tx_ready    ),
@@ -230,8 +230,8 @@ module udma_uart_top #(
 
     udma_dc_fifo #(8,4) u_dc_fifo_rx
     (
-        .src_clk_i    ( periph_clk_i       ),  
-        .src_rstn_i   ( rstn_i & ~s_uart_rx_clean_fifo ),  
+        .src_clk_i    ( periph_clk_i       ),
+        .src_rstn_i   ( rstn_i & ~s_uart_rx_clean_fifo ),
         .src_data_i   ( s_data_rx_dc       ),
         .src_valid_i  ( s_data_rx_dc_valid ),
         .src_ready_o  ( s_data_rx_dc_ready ),
@@ -293,20 +293,20 @@ module udma_uart_top #(
     assign s_uart_tx_sample = r_uart_en_tx_sync[1] & ! r_uart_en_tx_sync[2];
     assign s_uart_rx_sample = r_uart_en_rx_sync[1] & ! r_uart_en_rx_sync[2];
 
-    always_ff @(posedge sys_clk_i or negedge rstn_i) 
+    always_ff @(posedge sys_clk_i or negedge rstn_i)
     begin
-        if(~rstn_i) 
+        if(~rstn_i)
         begin
             r_status_sync <= 0;
-        end 
-        else 
+        end
+        else
         begin
             r_status_sync[0] <= s_uart_status;
             r_status_sync[1] <= r_status_sync[0];
         end
     end
 
-    always_ff @(posedge periph_clk_i or negedge rstn_i) 
+    always_ff @(posedge periph_clk_i or negedge rstn_i)
     begin
         if(~rstn_i) begin
             r_uart_en_tx_sync <= 0;
