@@ -46,6 +46,7 @@ fc:
     fc/fc_demux.sv,
     fc/fc_subsystem.sv,
     fc/fc_hwpe.sv,
+    fc/cv32e40p_fp_wrapper.sv,
   ]
 
 components:

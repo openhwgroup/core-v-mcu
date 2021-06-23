@@ -8,24 +8,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`define I2C_CMD_START   4'h0
-`define I2C_CMD_STOP    4'h2
-`define I2C_CMD_RD_ACK  4'h4
-`define I2C_CMD_RD_NACK 4'h6
-`define I2C_CMD_WR      4'h8
-`define I2C_CMD_WAIT    4'hA
-`define I2C_CMD_RPT     4'hC
-`define I2C_CMD_CFG     4'hE
-`define I2C_CMD_WAIT_EV 4'h1
-
-`define BUS_CMD_NONE  3'b000
-`define BUS_CMD_START 3'b001
-`define BUS_CMD_STOP  3'b010
-`define BUS_CMD_WRITE 3'b011
-`define BUS_CMD_READ  3'b100
-`define BUS_CMD_WAIT  3'b101
-
-
 module udma_i2c_top #(
     parameter L2_AWIDTH_NOAL = 12,
     parameter TRANS_SIZE     = 16

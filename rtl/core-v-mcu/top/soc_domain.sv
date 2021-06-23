@@ -38,7 +38,6 @@ module soc_domain
     parameter int unsigned N_UART = 1,
     parameter int unsigned N_SPI = 1,
     parameter int unsigned N_I2C = 2,
-    parameter USE_ZFINX = 1,
     parameter bit ISOLATE_CLUSTER_CDC = 0,
     parameter AXI_STRB_WIDTH_IN = AXI_DATA_IN_WIDTH / 8,
     parameter AXI_STRB_WIDTH_OUT = AXI_DATA_OUT_WIDTH / 8 // If 0, ties the cluster <-> soc AXI CDC isolation signal to 0 statically
@@ -788,11 +787,7 @@ module soc_domain
 `endif
 
   fc_subsystem #(
-      .USE_FPU   (USE_FPU),
-      .CORE_ID   (FC_CORE_CORE_ID),
-      .CLUSTER_ID(FC_CORE_CLUSTER_ID),
-      .USE_HWPE  (USE_HWPE),
-      .USE_ZFINX (USE_ZFINX)
+      .USE_HWPE(USE_HWPE)
   ) fc_subsystem_i (
       .clk_i (s_soc_clk),
       .rst_ni(s_soc_rstn),

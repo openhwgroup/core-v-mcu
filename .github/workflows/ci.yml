@@ -28,4 +28,4 @@ jobs:
         sudo apt install verilator-4.100
     - name: Run Lint
       run: |
-        fusesoc --cores-root . run --target=lint --setup --build --run openhwgroup.org:systems:core-v-mcu
+        ./util/verilog-lint
