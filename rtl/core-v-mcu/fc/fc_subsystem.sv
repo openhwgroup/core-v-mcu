@@ -127,6 +127,7 @@ module fc_subsystem #(
   assign boot_addr             = boot_addr_i;
 
   cv32e40p_core #(
+      .FPU(`USE_FPU),
       .PULP_XPULP(1)
   ) lFC_CORE (
       .clk_i              (clk_i),
