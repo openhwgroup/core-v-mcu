@@ -327,7 +327,7 @@ module top (
 
   assign fpgaio_out = ifpga_out;
   assign fpgaio_oe = ifpga_oe;
-  assign events_o = fpgaio_in[15:0];  //i_events;
+  assign events_o = i_events;
 
 
   assign m0_m0_oper_in = m0_m0_odata;

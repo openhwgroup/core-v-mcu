@@ -159,10 +159,10 @@ module i2c_peripheral_interface (
 
 
   // I2C protocol state machine
-  (* mark_debug = "true" *)   wire       scl_sm;
-  (* mark_debug = "true" *)   wire       sda_sm;
-  (* mark_debug = "true" *)   reg        scl_sm_r1;
-  (* mark_debug = "true" *)   reg  [3:0] i2c_state;
+  wire       scl_sm;
+  wire       sda_sm;
+  reg        scl_sm_r1;
+  reg  [3:0] i2c_state;
   localparam [3:0] ST_IDLE = 4'h0;
   localparam [3:0] ST_DEVADDR = 4'h1;
   localparam [3:0] ST_DEVADDRACK = 4'h2;
@@ -176,9 +176,9 @@ module i2c_peripheral_interface (
 
   reg       bit_xfer;
   reg       bit_rcvd;
-  (* mark_debug = "true" *) reg [3:0] bit_cnt;
+  reg [3:0] bit_cnt;
   reg [7:0] in_byte;
-  (* mark_debug = "true" *)   reg [7:0] out_byte;
+  reg [7:0] out_byte;
   reg       xfer_type_rd_wrn;
   reg [7:0] reg_addr;
   reg [7:0] reg_wdata;

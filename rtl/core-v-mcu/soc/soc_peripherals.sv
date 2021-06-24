@@ -253,20 +253,20 @@ module soc_peripherals #(
 
   assign fc_events_o[16] = s_timer_lo_event;
   assign fc_events_o[17] = s_timer_hi_event;
-  assign fc_events_o[18] = s_i2cs_event;
-  assign fc_events_o[19] = s_adv_timer_events[0];
-  assign fc_events_o[20] = s_adv_timer_events[1];
-  assign fc_events_o[21] = s_adv_timer_events[2];
-  assign fc_events_o[22] = s_adv_timer_events[3];
-  assign fc_events_o[23] = s_ref_rise_event | s_ref_fall_event;
-  assign fc_events_o[24] = 1'b0;
-  assign fc_events_o[25] = 1'b0;
-  assign fc_events_o[26] = 1'b0;
-  assign fc_events_o[27] = 1'b0;
-  assign fc_events_o[28] = 1'b0;
-  assign fc_events_o[29] = s_fc_err_events;
-  assign fc_events_o[30] = s_fc_hp_events[0];
-  assign fc_events_o[31] = s_fc_hp_events[1];
+  assign fc_events_o[18] = s_ref_rise_event;
+  assign fc_events_o[19] = s_ref_fall_event;
+  assign fc_events_o[20] = s_i2cs_event;
+  assign fc_events_o[21] = s_adv_timer_events[0];
+  assign fc_events_o[22] = s_adv_timer_events[1];
+  assign fc_events_o[23] = s_adv_timer_events[2];
+  assign fc_events_o[24] = s_adv_timer_events[3];
+  assign fc_events_o[25] = s_efpga_events[0];
+  assign fc_events_o[26] = s_efpga_events[1];
+  assign fc_events_o[27] = s_efpga_events[2];
+  assign fc_events_o[28] = s_efpga_events[3];
+  assign fc_events_o[29] = s_efpga_events[4];
+  assign fc_events_o[30] = s_efpga_events[5];
+  assign fc_events_o[31] = s_fc_err_events;
   pulp_sync_wedge i_ref_clk_sync (
       .clk_i   (clk_i),
       .rstn_i  (rst_ni),
