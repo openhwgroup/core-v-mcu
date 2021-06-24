@@ -4460,3 +4460,5 @@ lint_off -rule UNOPTFLAT -file "*../src/pulp-platform.org__common_cells_1.20.0/s
 lint_off -rule UNOPTFLAT -file "*../src/pulp-platform.org__common_cells_1.20.0/src/rr_arb_tree.sv" -match "Signal unoptimizable: Feedback to clock or circular logic: 'core_v_mcu.i_soc_domain.i_soc_interconnect_wrap.i_soc_interconnect.i_interleaved_xbar.i_xbar.gen_outputs[2].gen_rr_arb_tree.i_rr_arb_tree.gen_arbiter.data_nodes'"
 lint_off -rule UNOPTFLAT -file "*../src/pulp-platform.org__common_cells_1.20.0/src/rr_arb_tree.sv" -match "Signal unoptimizable: Feedback to clock or circular logic: 'core_v_mcu.i_soc_domain.i_soc_interconnect_wrap.i_soc_interconnect.i_interleaved_xbar.i_xbar.gen_outputs[3].gen_rr_arb_tree.i_rr_arb_tree.gen_arbiter.data_nodes'"
 lint_off -rule UNUSED -file "*../src/pulp-platform.org__fpu_div_sqrt_mvp_0/pulp_platform_fpu_div_sqrt_mvp/hdl/iteration_div_sqrt_mvp.sv" -match "Signal is not used: 'Div_start_dly_SI'"
+// Only affects this one file, and only when building a real model.
+lint_off --rule BLKANDNBLK -file "*../src/pulp-platform.org__fpnew_0/pulp_platform_fpnew/src/fpnew_divsqrt_multi.sv"
