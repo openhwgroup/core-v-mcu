@@ -4462,3 +4462,9 @@ lint_off -rule UNOPTFLAT -file "*../src/pulp-platform.org__common_cells_1.20.0/s
 lint_off -rule UNUSED -file "*../src/pulp-platform.org__fpu_div_sqrt_mvp_0/pulp_platform_fpu_div_sqrt_mvp/hdl/iteration_div_sqrt_mvp.sv" -match "Signal is not used: 'Div_start_dly_SI'"
 // Only affects this one file, and only when building a real model.
 lint_off --rule BLKANDNBLK -file "*../src/pulp-platform.org__fpnew_0/pulp_platform_fpnew/src/fpnew_divsqrt_multi.sv"
+// Rules for new Verilator top level wrapper
+lint_off --rule UNUSED -file "*../src/openhwgroup.org_systems_core-v-mcu_0/top/core_v_mcu.sv" -match "Signal is not used: 's_pad_cfg'"
+lint_off --rule UNUSED -file "*../src/openhwgroup.org_systems_core-v-mcu_0/top/core_v_mcu.sv" -match "Signal is not used: 's_io_out'"
+lint_off --rule UNUSED -file "*../src/openhwgroup.org_systems_core-v-mcu_0/top/core_v_mcu.sv" -match "Signal is not used: 's_io_oe'"
+lint_off --rule UNDRIVEN -file "*../src/openhwgroup.org_systems_core-v-mcu_0/top/core_v_mcu.sv" -match "Signal is not driven: 's_io_in'"
+lint_off --rule UNUSED -file "*../src/openhwgroup.org_systems_core-v-mcu_0/top/core_v_mcu.sv" -match "Bits of signal are not used: 'io_pos'[47:16,14:13,10,6:0]"
