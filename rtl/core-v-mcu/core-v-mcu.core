@@ -99,6 +99,12 @@ filesets:
     - verilator.waiver
     file_type: vlt
 
+  # Verilator wrapper
+  verilator_wrapper:
+    files:
+    - top/core_v_mcu_wrapper.sv
+    file_type: systemVerilogSource
+
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
 scripts:
@@ -115,9 +121,9 @@ targets:
     - target_sim? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
     - target_model-lib? (pre_build_scripts)
+    - target_model-lib? (verilator_wrapper)
     - target_lint? (rtl-behavioral)
     - tool_verilator? (verilator-waiver)
-    toplevel: [core_v_mcu]
 
   sim:
     <<: *default_target
@@ -126,13 +132,15 @@ targets:
       modelsim:
         vlog_options:
         - -override_timescale 1ns/1ps
+    toplevel: [core_v_mcu]
 
-
-  # A target for a Verilator model as a library.
+  # A target for a Verilator model as a library.  Note that we do not disable
+  # UNOPTFLAT warnings, since these will affect performance, so we want to see
+  # them.
   model-lib:
     <<: *default_target
     default_tool: verilator
-    toplevel: [core_v_mcu]
+    toplevel: [core_v_mcu_wrapper]
     hooks:
       pre_build: [pre_build_scripts]
     tools:
@@ -140,7 +148,6 @@ targets:
         mode: cc
         verilator_options:
         - -Wno-fatal
-        - -Wno-UNOPTFLAT
         - --trace
 
   lint:
