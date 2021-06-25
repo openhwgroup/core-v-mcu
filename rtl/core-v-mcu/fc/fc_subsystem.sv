@@ -15,12 +15,7 @@ module fc_subsystem #(
     parameter N_EXT_PERF_COUNTERS = 1,
     parameter EVENT_ID_WIDTH      = 8,
     parameter PER_ID_WIDTH        = 32,
-    parameter NB_HWPE_PORTS       = 4,
-    parameter PULP_SECURE         = 1,
-    parameter TB_RISCV            = 0,
-    parameter CORE_ID             = 4'h0,
-    parameter CLUSTER_ID          = 6'h1F,
-    parameter USE_ZFINX           = 1
+    parameter NB_HWPE_PORTS       = 4
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -40,6 +35,8 @@ module fc_subsystem #(
     output logic stoptimer_o,
     output logic supervisor_mode_o
 );
+
+  import cv32e40p_apu_core_pkg::*;
 
   // Interrupt signals
   logic        core_irq_req;
@@ -73,8 +70,22 @@ module fc_subsystem #(
   logic [3:0] core_data_be;
   logic is_scm_instr_req, is_scm_data_req;
 
+
   logic [31:0] r_int;
-  logic [31:0] r_int_next;
+
+
+  // APU Core to FP Wrapper
+  logic                              apu_req;
+  logic [   APU_NARGS_CPU-1:0][31:0] apu_operands;
+  logic [     APU_WOP_CPU-1:0]       apu_op;
+  logic [APU_NDSFLAGS_CPU-1:0]       apu_flags;
+
+
+  // APU FP Wrapper to Core
+  logic                              apu_gnt;
+  logic                              apu_rvalid;
+  logic [                31:0]       apu_rdata;
+  logic [APU_NUSFLAGS_CPU-1:0]       apu_rflags;
 
   assign perf_counters_int = 1'b0;
   assign fetch_en_int = fetch_en_eu & fetch_en_i;
@@ -128,6 +139,7 @@ module fc_subsystem #(
 
 
   cv32e40p_core #(
+      .FPU(`USE_FPU),
       .PULP_XPULP(1)
   ) lFC_CORE (
       .clk_i              (clk_i),
@@ -159,16 +171,15 @@ module fc_subsystem #(
 
       // apu-interconnect
       // handshake signals
-      .apu_req_o     (),
-      .apu_gnt_i     (1'b1),
-      // request channel
-      .apu_operands_o(),
-      .apu_op_o      (),
-      .apu_flags_o   (),
-      // response channel
-      .apu_rvalid_i  ('0),
-      .apu_result_i  ('0),
-      .apu_flags_i   ('0),
+      .apu_req_o     (apu_req),
+      .apu_gnt_i     (apu_gnt),
+      .apu_operands_o(apu_operands),
+      .apu_op_o      (apu_op),
+      .apu_flags_o   (apu_flags),
+      .apu_rvalid_i  (apu_rvalid),
+      .apu_result_i  (apu_rdata),
+      .apu_flags_i   (apu_rflags),
+
 
       .irq_i    (r_int),
       .irq_ack_o(core_irq_ack_o),
@@ -182,5 +193,18 @@ module fc_subsystem #(
       .core_sleep_o     ()
   );
   assign supervisor_mode_o = 1'b1;
+
+  cv32e40p_fp_wrapper fp_wrapper_i (
+      .clk_i         (clk_i),
+      .rst_ni        (rst_ni),
+      .apu_req_i     (apu_req),
+      .apu_gnt_o     (apu_gnt),
+      .apu_operands_i(apu_operands),
+      .apu_op_i      (apu_op),
+      .apu_flags_i   (apu_flags),
+      .apu_rvalid_o  (apu_rvalid),
+      .apu_rdata_o   (apu_rdata),
+      .apu_rflags_o  (apu_rflags)
+  );
 
 endmodule

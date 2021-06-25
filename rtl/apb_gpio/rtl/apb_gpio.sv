@@ -58,15 +58,15 @@ module apb_gpiov2 #(
 
   logic [  NG_BITS:0]      r_gpio_select;
 
-  logic [127:0]      r_gpio_inten;
-  logic [127:0][2:0] r_gpio_inttype;
+  logic [`N_GPIO:0]      r_gpio_inten;
+  logic [`N_GPIO:0][2:0] r_gpio_inttype;
 
-  logic [127:0]      r_gpio_out;
-  logic [127:0][1:0] r_gpio_dir;
+  logic [`N_GPIO:0]      r_gpio_out;
+  logic [`N_GPIO:0][1:0] r_gpio_dir;
 
   logic [`N_GPIO-1:0]      r_gpio_sync0;
   logic [`N_GPIO-1:0]      r_gpio_sync1;
-  logic [127:0]      r_gpio_in;
+  logic [`N_GPIO:0]      r_gpio_in;
 
   logic [`N_GPIO-1:0]      r_gpio_rise;
   logic [`N_GPIO-1:0]      r_gpio_fall;
@@ -143,6 +143,7 @@ module apb_gpiov2 #(
                 if (`N_GPIO > 32) r_gpio_out[31:0] <= PWDATA[31:0];
                 else r_gpio_out[`N_GPIO-1:0] <= PWDATA[`N_GPIO-1:0];
               end
+/*
               `REG_OUT1: begin
                 if (`N_GPIO > 32) r_gpio_out[63:32] <= PWDATA[31:0];
               end
@@ -152,6 +153,7 @@ module apb_gpiov2 #(
               `REG_OUT3: begin
                 if (`N_GPIO > 96) r_gpio_out[127 : 96] <= PWDATA[31 : 0];
               end
+*/
               `REG_INTACK: begin
                 s_block_int[PWDATA[7:0]] <= 0;
               end
@@ -175,7 +177,8 @@ module apb_gpiov2 #(
               `REG_OUT0: begin
                 PRDATA[31:0] <= r_gpio_out[31:0];
               end
-              `REG_OUT1: begin
+/*
+               `REG_OUT1: begin
                   PRDATA[31:0] <= r_gpio_out[63:32];
               end
               `REG_OUT2: begin
@@ -184,10 +187,12 @@ module apb_gpiov2 #(
               `REG_OUT3: begin
                 PRDATA[31:0] <= r_gpio_out[127:96];
               end
+*/
               `REG_PIN0: begin
                 PRDATA[31:0] <= r_gpio_in[31:0];
               end
-              `REG_PIN1: begin
+/*
+               `REG_PIN1: begin
                  PRDATA[31:0] <= r_gpio_in[63:32];
               end
               `REG_PIN2: begin
@@ -196,7 +201,8 @@ module apb_gpiov2 #(
               `REG_PIN3: begin
                 PRDATA[31:0] <= r_gpio_in[127:96];
               end
-            endcase  // case (PADDR[11:0]])
+ */
+           endcase  // case (PADDR[11:0]])
           end
         end  // else: !if(PWRITE)
       end  // if (PSEL && PENABLE)

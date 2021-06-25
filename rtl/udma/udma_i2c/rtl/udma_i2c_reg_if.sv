@@ -24,20 +24,18 @@
 
 // I2C Master Registers
 
-/* verilator lint_off REDEFMACRO */
-`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
-`define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
-`define REG_RX_CFG       5'b00010 //BASEADDR+0x08
-`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
+`define I2C_REG_RX_SADDR     5'b00000 //BASEADDR+0x00
+`define I2C_REG_RX_SIZE      5'b00001 //BASEADDR+0x04
+`define I2C_REG_RX_CFG       5'b00010 //BASEADDR+0x08
+`define I2C_REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
 
-`define REG_TX_SADDR     5'b00100 //BASEADDR+0x10
-`define REG_TX_SIZE      5'b00101 //BASEADDR+0x14
-`define REG_TX_CFG       5'b00110 //BASEADDR+0x18
-`define REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
+`define I2C_REG_TX_SADDR     5'b00100 //BASEADDR+0x10
+`define I2C_REG_TX_SIZE      5'b00101 //BASEADDR+0x14
+`define I2C_REG_TX_CFG       5'b00110 //BASEADDR+0x18
+`define I2C_REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
 
-`define REG_STATUS       5'b01000 //BASEADDR+0x20
-`define REG_SETUP        5'b01001 //BASEADDR+0x2
-/* verilator lint_on REDEFMACRO */
+`define I2C_REG_STATUS       5'b01000 //BASEADDR+0x20
+`define I2C_REG_SETUP        5'b01001 //BASEADDR+0x2
 
 module udma_i2c_reg_if #(
     parameter L2_AWIDTH_NOAL = 12,
@@ -146,34 +144,34 @@ module udma_i2c_reg_if #(
             if (cfg_valid_i & ~cfg_rwn_i)
             begin
                 case (s_wr_addr)
-                `REG_RX_SADDR:
+                `I2C_REG_RX_SADDR:
                     r_rx_startaddr   <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_RX_SIZE:
+                `I2C_REG_RX_SIZE:
                     r_rx_size        <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_RX_CFG:
+                `I2C_REG_RX_CFG:
                 begin
                     r_rx_clr          = cfg_data_i[5];
                     r_rx_en           = cfg_data_i[4];
                     r_rx_continuous  <= cfg_data_i[0];
                 end
-                `REG_TX_SADDR:
+                `I2C_REG_TX_SADDR:
                     r_tx_startaddr   <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_TX_SIZE:
+                `I2C_REG_TX_SIZE:
                     r_tx_size        <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_TX_CFG:
+                `I2C_REG_TX_CFG:
                 begin
                     r_tx_clr          = cfg_data_i[5];
                     r_tx_en           = cfg_data_i[4];
                     r_tx_continuous  <= cfg_data_i[0];
                 end
-                `REG_SETUP:
+                `I2C_REG_SETUP:
                 begin
                     r_do_rst         <= cfg_data_i[0];
                 end
 
                 endcase
             end
-            if(cfg_valid_i && cfg_rwn_i && (s_rd_addr == `REG_STATUS))
+            if(cfg_valid_i && cfg_rwn_i && (s_rd_addr == `I2C_REG_STATUS))
             begin
                 r_busy <= 0;
                 r_al   <= 0;
@@ -192,21 +190,21 @@ module udma_i2c_reg_if #(
     begin
         cfg_data_o = 32'h0;
         case (s_rd_addr)
-        `REG_RX_SADDR:
+        `I2C_REG_RX_SADDR:
             cfg_data_o = cfg_rx_curr_addr_i;
-        `REG_RX_SIZE:
+        `I2C_REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
-        `REG_RX_CFG:
+        `I2C_REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,3'h0,r_rx_continuous};
-        `REG_TX_SADDR:
+        `I2C_REG_TX_SADDR:
             cfg_data_o = cfg_tx_curr_addr_i;
-        `REG_TX_SIZE:
+        `I2C_REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
-        `REG_TX_CFG:
+        `I2C_REG_TX_CFG:
             cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,3'h0,r_tx_continuous};
-        `REG_SETUP:
+        `I2C_REG_SETUP:
             cfg_data_o = {31'h0,r_do_rst};
-        `REG_STATUS:
+        `I2C_REG_STATUS:
             cfg_data_o = {30'h0,r_al,r_busy};
         default:
             cfg_data_o = 'h0;
