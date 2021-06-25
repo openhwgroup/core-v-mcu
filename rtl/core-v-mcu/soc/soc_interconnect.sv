@@ -273,20 +273,24 @@ module soc_interconnect
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   localparam xbar_cfg_t AXI_XBAR_CFG = '{
-                                                    NoSlvPorts: NR_MASTER_PORTS,
-                                                    NoMstPorts: NR_AXI_SLAVE_PORTS,
-                                                    MaxMstTrans: 1,       //The TCDM ports do not support
-  //outstanding transactiions anyways
-  MaxSlvTrans: 4,  //Allow up to 4 in-flight transactions
-  //per slave port
-  FallThrough: 1,  //Use the reccomended default config
-  LatencyMode: axi_pkg::CUT_MST_PORTS,
-                                                    AxiIdWidthSlvPorts: AXI_MASTER_ID_WIDTH,
-                                                    AxiIdUsedSlvPorts: AXI_MASTER_ID_WIDTH,
-                                                    AxiAddrWidth: BUS_ADDR_WIDTH,
-                                                    AxiDataWidth: BUS_DATA_WIDTH,
-                                                    NoAddrRules: NR_ADDR_RULES_AXI_SLAVE_PORTS
-                                                    };
+      NoSlvPorts: NR_MASTER_PORTS,
+      NoMstPorts: NR_AXI_SLAVE_PORTS,
+      MaxMstTrans: 1,  //The TCDM ports do not support
+              //outstanding transactiions anyways
+              MaxSlvTrans
+:
+          4,  //Allow up to 4 in-flight transactions
+              //per slave port
+              FallThrough
+:
+          1,  //Use the reccomended default config
+      LatencyMode: axi_pkg::CUT_MST_PORTS,
+      AxiIdWidthSlvPorts: AXI_MASTER_ID_WIDTH,
+      AxiIdUsedSlvPorts: AXI_MASTER_ID_WIDTH,
+      AxiAddrWidth: BUS_ADDR_WIDTH,
+      AxiDataWidth: BUS_DATA_WIDTH,
+      NoAddrRules: NR_ADDR_RULES_AXI_SLAVE_PORTS
+  };
 
   //Reverse interface array ordering since axi_xbar uses big-endian ordering of the arrays
   AXI_BUS #(

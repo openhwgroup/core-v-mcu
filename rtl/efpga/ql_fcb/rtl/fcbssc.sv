@@ -6,30 +6,30 @@ module fcbssc (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic       fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic       fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic       fcb_spis_clk,  //Clock for SPIS Slave Interface
-    input  logic       fcb_spis_rst_n,  //Reset for SPIS slave Interface, it is a
-    input  logic       fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic       fcb_spis_mosi,  //SPI Slave MOSI
-    input  logic       fcb_spis_cs_n,  //SPI Slave Chip Select
-    input  logic       fcb_spi_mode_en_bo,  //1'b1 : SPI Master/Slave is Enable. 1'b0
-    input  logic [7:0] frfu_sfr_rd_data,  //SFR Read Data
-    input  logic       frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    input  logic       fmic_spi_master_en,  //1'b1: Enable SPI Master Mode, 1'b0: Ena
+    input  logic       fcb_sys_clk,            //Main Clock for FCB except SPI Slave Int
+    input  logic       fcb_sys_rst_n,          //Main Reset for FCB except SPI Slave int
+    input  logic       fcb_spis_clk,           //Clock for SPIS Slave Interface
+    input  logic       fcb_spis_rst_n,         //Reset for SPIS slave Interface, it is a
+    input  logic       fcb_sys_stm,            //1'b1 : Put the module into Test Mode
+    input  logic       fcb_spis_mosi,          //SPI Slave MOSI
+    input  logic       fcb_spis_cs_n,          //SPI Slave Chip Select
+    input  logic       fcb_spi_mode_en_bo,     //1'b1 : SPI Master/Slave is Enable. 1'b0
+    input  logic [7:0] frfu_sfr_rd_data,       //SFR Read Data
+    input  logic       frfu_cwf_full,          //Full Flag of Cfg Write FIFO
+    input  logic       fmic_spi_master_en,     //1'b1: Enable SPI Master Mode, 1'b0: Ena
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic       fcb_spis_miso,  //SPI Slave MISO
-    output logic       fcb_spis_miso_en,  //SPI Slave MISO output enable
-    output logic [6:0] fssc_frfu_wr_addr,  //SFR Write Address
-    output logic       fssc_frfu_wr_en,  //SFR Write Enable
-    output logic [7:0] fssc_frfu_wr_data,  //SFR Write Data
-    output logic       fssc_frfu_spis_on,  //SPI Slave is ON
-    output logic [6:0] fssc_frfu_rd_addr,  //SFR Read Address
-    output logic       fssc_frfu_rd_en,  //SFR Read Enable
+    output logic       fcb_spis_miso,          //SPI Slave MISO
+    output logic       fcb_spis_miso_en,       //SPI Slave MISO output enable
+    output logic [6:0] fssc_frfu_wr_addr,      //SFR Write Address
+    output logic       fssc_frfu_wr_en,        //SFR Write Enable
+    output logic [7:0] fssc_frfu_wr_data,      //SFR Write Data
+    output logic       fssc_frfu_spis_on,      //SPI Slave is ON
+    output logic [6:0] fssc_frfu_rd_addr,      //SFR Read Address
+    output logic       fssc_frfu_rd_en,        //SFR Read Enable
     output logic [7:0] fssc_frfu_cwf_wr_data,  //Write Data of Cfg Write FIFO
-    output logic       fssc_frfu_cwf_wr_en  //Write Enable to indicate the whole 32-B
+    output logic       fssc_frfu_cwf_wr_en     //Write Enable to indicate the whole 32-B
 );
 
   //------------------------------------------------------------------------//

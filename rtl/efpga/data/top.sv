@@ -9,7 +9,7 @@ module top (
     input       lint_REQ,
     lint_WEN,
 
-    input        [19:0] lint_ADDR,  //PADDR,
+    input        [19:0] lint_ADDR,   //PADDR,
     input        [31:0] lint_WDATA,  //PWDATA,
     input        [ 3:0] lint_BE,
     output logic        lint_VALID,

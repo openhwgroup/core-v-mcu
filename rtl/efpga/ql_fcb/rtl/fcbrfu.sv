@@ -53,7 +53,7 @@ module fcbrfu #(
     //input logic                   fpmu_frfu_clr_quad_pd_wr_en_b1 ,   //Clear Enable, Once Asserted, the corres
 
     input logic [7:0] fcb_device_id_bo,
-    input logic       fcb_clp_mode_en_bo,  //JC 01262017
+    input logic       fcb_clp_mode_en_bo,             //JC 01262017
     input logic       fcb_vlp,
     input logic       fmic_frfu_set_pmu_chip_vlp_en,
     input logic       fmic_frfu_set_pmu_chip_wu_en,
@@ -77,20 +77,20 @@ module fcbrfu #(
     input logic [1:0] fpmu_frfu_pw_sta_32,
     input logic [1:0] fpmu_frfu_pw_sta_33,
     input logic       fsmc_frfu_set_fb_cfg_done,
-    input logic       fsmc_frfu_clr_rcclk_en,  //Clear RC CLK Enable
-    input logic       ffsr_frfu_rfifo_empty_p1,  //Empty Plus 1 Flag of Read FIFO
+    input logic       fsmc_frfu_clr_rcclk_en,         //Clear RC CLK Enable
+    input logic       ffsr_frfu_rfifo_empty_p1,       //Empty Plus 1 Flag of Read FIFO
 
-    input  logic       fclp_frfu_clear_vlp_en,  //Clear VLP EN Bit
-    input  logic       fclp_frfu_clear_vlp_wu_en,  //Clear VLP WU EN Bit
-    input  logic       fclp_frfu_clear_pd_en,  //Clear PD Enable
-    input  logic       fclp_frfu_clear_pd_wu_en,  //Clear PD WU Enable
-    input  logic [1:0] fclp_frfu_clp_pw_sta,  //Macro's Power Status
-    input  logic       fclp_frfu_clear_cfg_done,  //Clear the CFG Done.
-    input  logic       fsmc_frfu_set_pd,  //JC
-    input  logic       fsmc_frfu_set_clp_pd,  //JC
+    input  logic       fclp_frfu_clear_vlp_en,      //Clear VLP EN Bit
+    input  logic       fclp_frfu_clear_vlp_wu_en,   //Clear VLP WU EN Bit
+    input  logic       fclp_frfu_clear_pd_en,       //Clear PD Enable
+    input  logic       fclp_frfu_clear_pd_wu_en,    //Clear PD WU Enable
+    input  logic [1:0] fclp_frfu_clp_pw_sta,        //Macro's Power Status
+    input  logic       fclp_frfu_clear_cfg_done,    //Clear the CFG Done.
+    input  logic       fsmc_frfu_set_pd,            //JC
+    input  logic       fsmc_frfu_set_clp_pd,        //JC
     //input logic			fpmu_frfu_clr_pmu_chip_pd_en ,	//JC
-    input  logic [1:0] fpmu_frfu_chip_pw_sta,  //JC 05232017
-    input  logic       fpmu_frfu_clr_cfg_done,  //JC
+    input  logic [1:0] fpmu_frfu_chip_pw_sta,       //JC 05232017
+    input  logic       fpmu_frfu_clr_cfg_done,      //JC
     input  logic       fpmu_frfu_clr_pmu_chip_cmd,  //JC, Latest One
     input  logic       fpmu_frfu_pmu_busy,
     input  logic       fsmc_frfu_set_quad_pd,
@@ -107,33 +107,33 @@ module fcbrfu #(
     output logic [7:0] frfu_fpmu_prog_sd_0,
     output logic [7:0] frfu_fpmu_prog_sd_1,
 
-    output logic        frfu_fpmu_fb_cfg_done,  // JC
+    output logic        frfu_fpmu_fb_cfg_done,        // JC
     output logic        frfu_fpmu_prog_pmu_chip_cmd,  //JC
-    output logic [ 3:0] frfu_fpmu_pmu_chip_cmd,  //JC
-    output logic        frfu_fpmu_prog_cfg_done,  //JC
+    output logic [ 3:0] frfu_fpmu_pmu_chip_cmd,       //JC
+    output logic        frfu_fpmu_prog_cfg_done,      //JC
     output logic        frfu_fpmu_clr_cfg_done,
     //output logic			frfu_fpmu_prog_pmu_quad_pd_en, 	//JC
     //output logic			frfu_fpmu_prog_pmu_quad_wu_en, 	//JC
     //output logic			frfu_fpmu_pmu_chip_pd_en ,	//JC
     output logic [ 7:0] frfu_fsmc_spim_ckb_0,
     output logic [ 7:0] frfu_fsmc_spim_ckb_1,
-    output logic [ 7:0] frfu_bl_pw_cfg_0,  //
-    output logic [ 7:0] frfu_bl_pw_cfg_1,  //
-    output logic [ 7:0] frfu_wl_pw_cfg,  //
-    output logic        frfu_ffsr_rfifo_rd_en,  //Read Enable of Read FIFO
-    output logic [31:0] frfu_ffsr_wfifo_wdata,  //Write Data Of write FIFO
-    output logic        frfu_ffsr_wfifo_wr_en,  //Write Enable Of Write FIFO
-    output logic [ 1:0] frfu_ffsr_blclk_sut,  //JC 07
-    output logic [ 1:0] frfu_ffsr_wlclk_sut,  //JC 07
-    output logic [ 1:0] frfu_ffsr_wlen_sut,  //JC 07
-    output logic [ 7:0] frfu_sfr_rd_data,  //SFR Read Data
-    output logic        frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    output logic [31:0] frfu_frwf_crf_wr_data,  //Write Data of Cfg Read FIFO
-    output logic        frfu_frwf_crf_wr_en,  //Write Enable of Cfg Read FIFO
-    output logic [ 7:0] frfu_fsmc_spim_device_id,  //
-    output logic        frfu_fsmc_checksum_status,  //CheckSum Status
-    output logic        fcb_fb_cfg_done,  //Indicate the Fabric Configuration is do
-    output logic        frfu_fsmc_pending_pd_req,  //Pending Power Down Request
+    output logic [ 7:0] frfu_bl_pw_cfg_0,             //
+    output logic [ 7:0] frfu_bl_pw_cfg_1,             //
+    output logic [ 7:0] frfu_wl_pw_cfg,               //
+    output logic        frfu_ffsr_rfifo_rd_en,        //Read Enable of Read FIFO
+    output logic [31:0] frfu_ffsr_wfifo_wdata,        //Write Data Of write FIFO
+    output logic        frfu_ffsr_wfifo_wr_en,        //Write Enable Of Write FIFO
+    output logic [ 1:0] frfu_ffsr_blclk_sut,          //JC 07
+    output logic [ 1:0] frfu_ffsr_wlclk_sut,          //JC 07
+    output logic [ 1:0] frfu_ffsr_wlen_sut,           //JC 07
+    output logic [ 7:0] frfu_sfr_rd_data,             //SFR Read Data
+    output logic        frfu_cwf_full,                //Full Flag of Cfg Write FIFO
+    output logic [31:0] frfu_frwf_crf_wr_data,        //Write Data of Cfg Read FIFO
+    output logic        frfu_frwf_crf_wr_en,          //Write Enable of Cfg Read FIFO
+    output logic [ 7:0] frfu_fsmc_spim_device_id,     //
+    output logic        frfu_fsmc_checksum_status,    //CheckSum Status
+    output logic        fcb_fb_cfg_done,              //Indicate the Fabric Configuration is do
+    output logic        frfu_fsmc_pending_pd_req,     //Pending Power Down Request
     output logic [ 7:0] frfu_ffsr_bl_cnt_h,
     output logic [ 7:0] frfu_ffsr_bl_cnt_l,
     output logic [ 3:0] frfu_ffsr_cfg_wrp_ccnt,
@@ -193,19 +193,19 @@ module fcbrfu #(
     //--								--//
     //----------------------------------------------------------------//
     output logic [1:0] frfu_ffsr_wlblclk_cfg,
-    output logic       frfu_fsmc_checksum_enable,  // How to generate it
+    output logic       frfu_fsmc_checksum_enable,   // How to generate it
     //output logic 	                frfu_fpmu_prog_quad_wu_en_b1 ,  //Pulse
     //output logic 	                frfu_fpmu_prog_quad_wu_en_b1 ,  //Pulse
     //output logic                  frfu_fpmu_prog_pmu_chip_wu_en ,     //Pulse for both VLP and PD JC
     //output logic                  frfu_fpmu_prog_pmu_chip_vlp_en ,        //Pulse
     //output logic                  frfu_fpmu_prog_pmu_chip_pd_en ,         //Pulse JC
-    output logic       frfu_fclp_cfg_done,  //Configure Done Signal, Used to Clear LT
-    output logic       frfu_fclp_clp_vlp_wu_en,  //VLP WU enable
-    output logic       frfu_fclp_clp_vlp_en,  //VLP Enable
-    output logic       frfu_fclp_clp_pd_wu_en,  //PD WU enable
-    output logic       frfu_fclp_clp_pd_en,  //PD enable
-    output logic [1:0] frfu_fpmu_pmu_time_ctl,  //Internal Timing Configure 
-    output logic [1:0] frfu_fclp_clp_time_ctl  //Internal Timing Configure 
+    output logic       frfu_fclp_cfg_done,          //Configure Done Signal, Used to Clear LT
+    output logic       frfu_fclp_clp_vlp_wu_en,     //VLP WU enable
+    output logic       frfu_fclp_clp_vlp_en,        //VLP Enable
+    output logic       frfu_fclp_clp_pd_wu_en,      //PD WU enable
+    output logic       frfu_fclp_clp_pd_en,         //PD enable
+    output logic [1:0] frfu_fpmu_pmu_time_ctl,      //Internal Timing Configure 
+    output logic [1:0] frfu_fclp_clp_time_ctl       //Internal Timing Configure 
 );
 
   //--------------------------------------------------------------------------------//

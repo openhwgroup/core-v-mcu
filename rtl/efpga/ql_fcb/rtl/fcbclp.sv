@@ -14,42 +14,42 @@ module fcbclp #(
     //----------------------------------------------------------------//
     //-- CLK							--//
     //----------------------------------------------------------------//
-    input  logic       fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic       fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
+    input  logic       fcb_sys_clk,                //Main Clock for FCB except SPI Slave Int
+    input  logic       fcb_sys_rst_n,              //Main Reset for FCB except SPI Slave int
     //----------------------------------------------------------------//
     //-- Comment							--//
     //----------------------------------------------------------------//
-    input  logic       fcb_clp_mode_en_bo,  //Enable Chip Level 
-    input  logic       frfu_fclp_cfg_done,  //Configure Done Signal, Used to Clear LT
-    input  logic       frfu_fclp_clp_vlp_wu_en,  //VLP WU enable
-    input  logic       frfu_fclp_clp_vlp_en,  //VLP Enable
-    input  logic       frfu_fclp_clp_pd_wu_en,  //PD WU enable
-    input  logic       frfu_fclp_clp_pd_en,  //PD enable
-    input  logic [1:0] frfu_fclp_clp_time_ctl,  //Internal Timing Configure
-    input  logic       fcb_sys_stm,  //JC
-    input  logic       fcb_pif_en,  //JC
-    input  logic       fcb_fb_default_on_bo,  //eFPGA Macro Default Power State
+    input  logic       fcb_clp_mode_en_bo,         //Enable Chip Level 
+    input  logic       frfu_fclp_cfg_done,         //Configure Done Signal, Used to Clear LT
+    input  logic       frfu_fclp_clp_vlp_wu_en,    //VLP WU enable
+    input  logic       frfu_fclp_clp_vlp_en,       //VLP Enable
+    input  logic       frfu_fclp_clp_pd_wu_en,     //PD WU enable
+    input  logic       frfu_fclp_clp_pd_en,        //PD enable
+    input  logic [1:0] frfu_fclp_clp_time_ctl,     //Internal Timing Configure
+    input  logic       fcb_sys_stm,                //JC
+    input  logic       fcb_pif_en,                 //JC
+    input  logic       fcb_fb_default_on_bo,       //eFPGA Macro Default Power State
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
     //----------------------------------------------------------------//
     //-- Comment							--//
     //----------------------------------------------------------------//
-    output logic       fcb_clp_set_por,  //POR Signal
-    output logic       fcb_clp_lth_enb,  //LTH_ENB Signal
-    output logic       fcb_clp_cfg_enb,  //CFG_ENB Signal
-    output logic       fcb_clp_pwr_gate,  //Chip Level Power Gate Control
-    output logic       fcb_clp_vlp,  //Chip Level VLP Control
-    output logic       fcb_clp_cfg_done,  //Chip Level Configure Done
-    output logic       fcb_clp_cfg_done_n,  //Inverse signal of FCB_CLP_CFG_DONE
-    output logic       fclp_frfu_clear_vlp_en,  //Clear VLP EN Bit
+    output logic       fcb_clp_set_por,            //POR Signal
+    output logic       fcb_clp_lth_enb,            //LTH_ENB Signal
+    output logic       fcb_clp_cfg_enb,            //CFG_ENB Signal
+    output logic       fcb_clp_pwr_gate,           //Chip Level Power Gate Control
+    output logic       fcb_clp_vlp,                //Chip Level VLP Control
+    output logic       fcb_clp_cfg_done,           //Chip Level Configure Done
+    output logic       fcb_clp_cfg_done_n,         //Inverse signal of FCB_CLP_CFG_DONE
+    output logic       fclp_frfu_clear_vlp_en,     //Clear VLP EN Bit
     output logic       fclp_frfu_clear_vlp_wu_en,  //Clear VLP WU EN Bit
-    output logic       fclp_frfu_clear_pd_en,  //Clear PD Enable
-    output logic       fclp_frfu_clear_pd_wu_en,  //Clear PD WU Enable
-    output logic [1:0] fclp_frfu_clp_pw_sta,  //Macro's Power Status
-    output logic       fclp_clp_busy,  //CLP Busy
+    output logic       fclp_frfu_clear_pd_en,      //Clear PD Enable
+    output logic       fclp_frfu_clear_pd_wu_en,   //Clear PD WU Enable
+    output logic [1:0] fclp_frfu_clp_pw_sta,       //Macro's Power Status
+    output logic       fclp_clp_busy,              //CLP Busy
     output logic       fclp_frfu_fb_cfg_cleanup,
-    output logic       fclp_frfu_clear_cfg_done  //Clear the CFG Done.
+    output logic       fclp_frfu_clear_cfg_done    //Clear the CFG Done.
 );
 
   //------------------------------------------------------------------------//

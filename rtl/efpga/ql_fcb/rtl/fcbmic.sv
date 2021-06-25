@@ -6,48 +6,48 @@ module fcbmic (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input logic       fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input logic       fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input logic       fcb_spis_clk,  //Clock for SPIS Slave Interface
-    input logic       fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input logic       fcb_spis_cs_n,  //SPI Slave Chip Select
-    input logic       fcb_vlp,  //1'b1 Put the FB Macro into VLP Mode. 1'
-    input logic       fcb_spi_mode_en_bo,  //1'b1 : SPI Master/Slave is Enable. 1'b0
-    input logic       fcb_pif_en,  //1'b1 : Enable the PIF mode. Note this b
-    input logic       fcb_pif_8b_mode_bo,  //1'b1 : PIF DI/DO are 8 bits and in Simp
-    input logic       fcb_spi_master_en,  //1'b1: Enable SPI Master Mode, 1'b0: Ena
-    input logic       fsmc_fmic_clr_spi_master_en,  //Clear SPI_MASTER_EN and Switch the mode
-    input logic       frfu_fmic_done_op_mask_n,  //CFG Flag, 0x0 Mask the Cfg Output
-    input logic       ffsr_fmic_fsr_busy,  //Indicate the FSR is Busy
-    input logic       fpmu_fmic_pmu_busy,  //Indicate the PMU is Busy
-    input logic [3:0] frfu_fmic_io_sv_180,  //
-    input logic       fsmc_fmic_fsmc_busy,  //FSMC Busy
-    input logic       frfu_fmic_rc_clk_en,  //RC Clock Enable
+    input logic       fcb_sys_clk,                   //Main Clock for FCB except SPI Slave Int
+    input logic       fcb_sys_rst_n,                 //Main Reset for FCB except SPI Slave int
+    input logic       fcb_spis_clk,                  //Clock for SPIS Slave Interface
+    input logic       fcb_sys_stm,                   //1'b1 : Put the module into Test Mode
+    input logic       fcb_spis_cs_n,                 //SPI Slave Chip Select
+    input logic       fcb_vlp,                       //1'b1 Put the FB Macro into VLP Mode. 1'
+    input logic       fcb_spi_mode_en_bo,            //1'b1 : SPI Master/Slave is Enable. 1'b0
+    input logic       fcb_pif_en,                    //1'b1 : Enable the PIF mode. Note this b
+    input logic       fcb_pif_8b_mode_bo,            //1'b1 : PIF DI/DO are 8 bits and in Simp
+    input logic       fcb_spi_master_en,             //1'b1: Enable SPI Master Mode, 1'b0: Ena
+    input logic       fsmc_fmic_clr_spi_master_en,   //Clear SPI_MASTER_EN and Switch the mode
+    input logic       frfu_fmic_done_op_mask_n,      //CFG Flag, 0x0 Mask the Cfg Output
+    input logic       ffsr_fmic_fsr_busy,            //Indicate the FSR is Busy
+    input logic       fpmu_fmic_pmu_busy,            //Indicate the PMU is Busy
+    input logic [3:0] frfu_fmic_io_sv_180,           //
+    input logic       fsmc_fmic_fsmc_busy,           //FSMC Busy
+    input logic       frfu_fmic_rc_clk_en,           //RC Clock Enable
     input logic       fcb_fb_cfg_done,
     input logic       frfu_fmic_vlp_pin_en,
     input logic       frfu_fmic_fb_cfg_done,
     input logic       fclp_clp_busy,
-    input logic       frfu_fpmu_pmu_chip_vlp_en,  //JC
+    input logic       frfu_fpmu_pmu_chip_vlp_en,     //JC
     input logic       frfu_fpmu_pmu_chip_vlp_wu_en,  //JC
-    input logic [1:0] fclp_frfu_clp_pw_sta,  //JC
-    input logic       fcb_clp_mode_en_bo,  //JC
-    input logic       frfu_fclp_clp_vlp_wu_en,  //JC 01262017
-    input logic       frfu_fclp_clp_vlp_en,  //JC 01262017
-    input logic       fcb_vlp_pwrdis_ifx,  //JC 01262017
-    input logic       fsmc_fmic_seq_done,  //JC
+    input logic [1:0] fclp_frfu_clp_pw_sta,          //JC
+    input logic       fcb_clp_mode_en_bo,            //JC
+    input logic       frfu_fclp_clp_vlp_wu_en,       //JC 01262017
+    input logic       frfu_fclp_clp_vlp_en,          //JC 01262017
+    input logic       fcb_vlp_pwrdis_ifx,            //JC 01262017
+    input logic       fsmc_fmic_seq_done,            //JC
 
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
 
-    output logic       fmic_frfu_set_rc_clk_en,  //Set RC Clock Enable Register
-    output logic       fmic_frfu_set_pmu_chip_wu_en,  //SET Whole Chip WakeUp Enable
+    output logic       fmic_frfu_set_rc_clk_en,        //Set RC Clock Enable Register
+    output logic       fmic_frfu_set_pmu_chip_wu_en,   //SET Whole Chip WakeUp Enable
     output logic       fmic_frfu_set_pmu_chip_vlp_en,  //SET Whole Chip VLP Enable
-    output logic       fmic_spi_master_en,  //1'b1: Enable SPI Master Mode, 1'b0: Ena
-    output logic       fcb_cfg_done,  //Cfg Done
-    output logic       fcb_cfg_done_en,  //Cfg Done Output Enable
-    output logic       fcb_sysclk_en,  //1'b1 : Turn on the RC/SYS clock. Note:
-    output logic [3:0] fcb_io_sv_180  //Select the IO Supply Voltage, 0x0 : 3.3
+    output logic       fmic_spi_master_en,             //1'b1: Enable SPI Master Mode, 1'b0: Ena
+    output logic       fcb_cfg_done,                   //Cfg Done
+    output logic       fcb_cfg_done_en,                //Cfg Done Output Enable
+    output logic       fcb_sysclk_en,                  //1'b1 : Turn on the RC/SYS clock. Note:
+    output logic [3:0] fcb_io_sv_180                   //Select the IO Supply Voltage, 0x0 : 3.3
 );
 
   //------------------------------------------------------------------------//

@@ -203,7 +203,7 @@ module soc_peripherals #(
     input  logic                  fc_event_ready_i,
 
     output logic        cluster_pow_o,
-    output logic        cluster_byp_o,  // bypass cluster
+    output logic        cluster_byp_o,           // bypass cluster
     output logic [63:0] cluster_boot_addr_o,
     output logic        cluster_fetch_enable_o,
     output logic        cluster_rstn_o,

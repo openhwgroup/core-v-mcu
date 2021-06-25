@@ -362,10 +362,13 @@ module soc_domain
 
 
   localparam dm::hartinfo_t RI5CY_HARTINFO = '{
-       zero1:        '0,
-       nscratch:      2, // Debug module needs at least two scratch regs
-  zero0: '0, dataaccess: 1'b1,  // data registers are memory mapped in the debugger
-  datasize: dm::DataCount, dataaddr: dm::DataAddr};
+      zero1: '0,
+      nscratch: 2,  // Debug module needs at least two scratch regs
+      zero0: '0,
+      dataaccess: 1'b1,  // data registers are memory mapped in the debugger
+      datasize: dm::DataCount,
+      dataaddr: dm::DataAddr
+  };
 
   dm::hartinfo_t [                 NrHarts-1:0      ] hartinfo;
 
