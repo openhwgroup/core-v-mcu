@@ -1,6 +1,12 @@
-// Copyright 2021 QuickLogic
-// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// Copyright 2021 QuickLogic.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the “License”); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
 
 module apb_slave_interface (
     apb_pclk_i,
@@ -24,7 +30,7 @@ module apb_slave_interface (
 
   input apb_pclk_i;
   input apb_preset_i;
-  input [31:0] apb_paddr_i;
+  input [11:0] apb_paddr_i;
   input apb_psel_i;
   input apb_penable_i;
   input apb_pwrite_i;
@@ -33,17 +39,17 @@ module apb_slave_interface (
   output [31:0] apb_prdata_o;
 
   // interface to register module
-  output [31:0] apb_reg_waddr_o;
+  output [11:0] apb_reg_waddr_o;
   output [31:0] apb_reg_wdata_o;
   output apb_reg_wrenable_o;
-  output [31:0] apb_reg_raddr_o;
+  output [11:0] apb_reg_raddr_o;
   input [31:0] apb_reg_rdata_i;
   output apb_reg_rd_byte_complete_o;
 
 
   wire        apb_pclk_i;
   wire        apb_preset_i;
-  wire [31:0] apb_paddr_i;
+  wire [11:0] apb_paddr_i;
   wire        apb_psel_i;
   wire        apb_penable_i;
   wire        apb_pwrite_i;
@@ -52,10 +58,10 @@ module apb_slave_interface (
   wire [31:0] apb_prdata_o;
 
   // interface to register module
-  wire [31:0] apb_reg_waddr_o;
+  wire [11:0] apb_reg_waddr_o;
   wire [31:0] apb_reg_wdata_o;
   wire        apb_reg_wrenable_o;
-  wire [31:0] apb_reg_raddr_o;
+  wire [11:0] apb_reg_raddr_o;
   wire [31:0] apb_reg_rdata_i;
   wire        apb_reg_rd_byte_complete_o;
 
@@ -66,10 +72,10 @@ module apb_slave_interface (
 
   reg         pready_reg;
 
-  reg  [31:0] apb_reg_waddr;
+  reg  [11:0] apb_reg_waddr;
   reg  [31:0] apb_reg_wdata;
   reg         apb_reg_wrenable;
-  wire [31:0] apb_reg_raddr;
+  wire [11:0] apb_reg_raddr;
   reg         apb_reg_rd_byte_complete;
 
 

@@ -1,6 +1,12 @@
-// Copyright 2021 QuickLogic
-// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
-// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+// Copyright 2021 QuickLogic.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the “License”); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_registers (
     clk_i,
@@ -35,10 +41,10 @@ module i2c_peripheral_registers (
   input rst_i;
 
   // APB reg interface
-  input [31:0] apb_reg_waddr_i;
+  input [11:0] apb_reg_waddr_i;
   input [31:0] apb_reg_wdata_i;
   input apb_reg_wrenable_i;
-  input [31:0] apb_reg_raddr_i;
+  input [11:0] apb_reg_raddr_i;
   output [31:0] apb_reg_rdata_o;
   input apb_reg_rd_byte_complete_i;
 
@@ -69,10 +75,10 @@ module i2c_peripheral_registers (
   wire        rst_i;
 
   // APB reg interface
-  wire [31:0] apb_reg_waddr_i;
+  wire [11:0] apb_reg_waddr_i;
   wire [31:0] apb_reg_wdata_i;
   wire        apb_reg_wrenable_i;
-  wire [31:0] apb_reg_raddr_i;
+  wire [11:0] apb_reg_raddr_i;
   wire [31:0] apb_reg_rdata_o;
   wire        apb_reg_rd_byte_complete_i;
 
@@ -153,7 +159,7 @@ module i2c_peripheral_registers (
 
 
   wire       apb_reg_write_enable;
-  assign apb_reg_write_enable = (apb_reg_waddr_i[31:10] == 22'b0 && apb_reg_wrenable_i);
+  assign apb_reg_write_enable = (apb_reg_waddr_i[11:10] == 2'b0 && apb_reg_wrenable_i);
 
 
   // assigments to the individual registers
@@ -206,8 +212,8 @@ module i2c_peripheral_registers (
         if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10) reg_0x11 <= 1'b1;
         else reg_0x11 <= 1'b0;
         1'b1:
-        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[31:10]==22'b0 &&
-                                apb_reg_raddr_i[9:2]==8'h10 && apb_reg_raddr_i[1:0]==2'b0)
+        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[11:10]==2'b0 &&
+            apb_reg_raddr_i[9:2]==8'h10 && apb_reg_raddr_i[1:0]==2'b0)
           reg_0x11 <= 1'b0;
         else reg_0x11 <= 1'b1;
         default: reg_0x11 <= 1'bx;
@@ -235,7 +241,7 @@ module i2c_peripheral_registers (
       end
 
       // reg_0x21 - fifo read port
-      if (apb_reg_waddr_i[31:10]==22'h0 && apb_reg_waddr_i[9:2]==8'h21 &&
+      if (apb_reg_waddr_i[11:10]==2'h0 && apb_reg_waddr_i[9:2]==8'h21 &&
                     apb_reg_waddr_i[1:0]==2'b0 && apb_reg_rd_byte_complete_i)
         fifo_i2c_to_apb_pop <= 1'b1;
       else fifo_i2c_to_apb_pop <= 1'b0;
@@ -370,7 +376,7 @@ module i2c_peripheral_registers (
 
   // read mux for APB interface
   always @(*)
-    if (apb_reg_raddr_i[31:10] == 22'b0)
+    if (apb_reg_raddr_i[11:10] == 2'b0)
       case (apb_reg_rd_index)
         8'h00:   apb_reg_rdata_muxed <= {1'b0, reg_0x00[6:0]};
         8'h01:   apb_reg_rdata_muxed <= {7'b0, reg_0x01};
