@@ -116,7 +116,6 @@ module i2c_peripheral_interface (
 
 
 
-
   // start stop detection
   reg start_detect;  // start or repeated start
   reg stop_detect;

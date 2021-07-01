@@ -21,7 +21,7 @@ module qf_rfm_f #(
 );
 
 
-  parameter PAR_DLY = 1'b1;
+  localparam PAR_DLY = 1'b1;
   reg [PAR_MEMORY_WIDTH_BIT-1:0] memory_data[2**PAR_MEMORY_DEPTH_BIT-1:0];
 
   //----------------------------------------------------------------//
