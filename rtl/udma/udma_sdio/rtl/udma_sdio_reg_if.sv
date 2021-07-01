@@ -19,28 +19,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SPI Master Registers
-`define REG_RX_SADDR     5'b00000 //BASEADDR+0x00
-`define REG_RX_SIZE      5'b00001 //BASEADDR+0x04
-`define REG_RX_CFG       5'b00010 //BASEADDR+0x08
-`define REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
+`define SDIO_REG_RX_SADDR     5'b00000 //BASEADDR+0x00
+`define SDIO_REG_RX_SIZE      5'b00001 //BASEADDR+0x04
+`define SDIO_REG_RX_CFG       5'b00010 //BASEADDR+0x08
+`define SDIO_REG_RX_INTCFG    5'b00011 //BASEADDR+0x0C
 
-`define REG_TX_SADDR     5'b00100 //BASEADDR+0x10
-`define REG_TX_SIZE      5'b00101 //BASEADDR+0x14
-`define REG_TX_CFG       5'b00110 //BASEADDR+0x18
-`define REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
+`define SDIO_REG_TX_SADDR     5'b00100 //BASEADDR+0x10
+`define SDIO_REG_TX_SIZE      5'b00101 //BASEADDR+0x14
+`define SDIO_REG_TX_CFG       5'b00110 //BASEADDR+0x18
+`define SDIO_REG_TX_INTCFG    5'b00111 //BASEADDR+0x1C
 
-`define REG_CMD_OP       5'b01000 //BASEADDR+0x20
-`define REG_CMD_ARG      5'b01001 //BASEADDR+0x24
-`define REG_DATA_SETUP   5'b01010 //BASEADDR+0x28
-`define REG_START        5'b01011 //BASEADDR+0x2C
+`define SDIO_REG_CMD_OP       5'b01000 //BASEADDR+0x20
+`define SDIO_REG_CMD_ARG      5'b01001 //BASEADDR+0x24
+`define SDIO_REG_DATA_SETUP   5'b01010 //BASEADDR+0x28
+`define SDIO_REG_START        5'b01011 //BASEADDR+0x2C
 
-`define REG_RSP0         5'b01100 //BASEADDR+0x30
-`define REG_RSP1         5'b01101 //BASEADDR+0x34
-`define REG_RSP2         5'b01110 //BASEADDR+0x38
-`define REG_RSP3         5'b01111 //BASEADDR+0x3C
+`define SDIO_REG_RSP0         5'b01100 //BASEADDR+0x30
+`define SDIO_REG_RSP1         5'b01101 //BASEADDR+0x34
+`define SDIO_REG_RSP2         5'b01110 //BASEADDR+0x38
+`define SDIO_REG_RSP3         5'b01111 //BASEADDR+0x3C
 
-`define REG_CLK_DIV      5'b10000 //BASEADDR+0x40
-`define REG_STATUS       5'b10001 //BASEADDR+0x44
+`define SDIO_REG_CLK_DIV      5'b10000 //BASEADDR+0x40
+`define SDIO_REG_STATUS       5'b10001 //BASEADDR+0x44
 
 module udma_sdio_reg_if #(
                           parameter L2_AWIDTH_NOAL = 12,
@@ -230,36 +230,36 @@ module udma_sdio_reg_if #(
             if (cfg_valid_i & ~cfg_rwn_i)
             begin
                 case (s_wr_addr)
-                `REG_RX_SADDR:
+                `SDIO_REG_RX_SADDR:
                     r_rx_startaddr   <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_RX_SIZE:
+                `SDIO_REG_RX_SIZE:
                     r_rx_size        <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_RX_CFG:
+                `SDIO_REG_RX_CFG:
                 begin
                     r_rx_clr          = cfg_data_i[5];
                     r_rx_en           = cfg_data_i[4];
                     r_rx_continuous  <= cfg_data_i[0];
                 end
-                `REG_TX_SADDR:
+                `SDIO_REG_TX_SADDR:
                     r_tx_startaddr   <= cfg_data_i[L2_AWIDTH_NOAL-1:0];
-                `REG_TX_SIZE:
+                `SDIO_REG_TX_SIZE:
                     r_tx_size        <= cfg_data_i[TRANS_SIZE-1:0];
-                `REG_TX_CFG:
+                `SDIO_REG_TX_CFG:
                 begin
                     r_tx_clr          = cfg_data_i[5];
                     r_tx_en           = cfg_data_i[4];
                     r_tx_continuous  <= cfg_data_i[0];
                 end
-                `REG_CMD_OP:
+                `SDIO_REG_CMD_OP:
                 begin
                     r_cmd_op         <= cfg_data_i[13:8];
                     r_cmd_rsp_type   <= cfg_data_i[2:0];
                 end
-                `REG_CMD_ARG:
+                `SDIO_REG_CMD_ARG:
                 begin
                     r_cmd_arg        <= cfg_data_i;
                 end
-                `REG_DATA_SETUP:
+                `SDIO_REG_DATA_SETUP:
                 begin
                     r_data_en         <= cfg_data_i[0];
                     r_data_rwn        <= cfg_data_i[1];
@@ -267,16 +267,16 @@ module udma_sdio_reg_if #(
                     r_data_block_num  <= cfg_data_i[15:8];
                     r_data_block_size <= cfg_data_i[25:16];
                 end
-                `REG_START:
+                `SDIO_REG_START:
                 begin
                     r_sdio_start      = cfg_data_i[0];
                 end
-                `REG_CLK_DIV:
+                `SDIO_REG_CLK_DIV:
                 begin
                     r_clk_div_valid   <= cfg_data_i[8];
                     r_clk_div_data    <= cfg_data_i[7:0];
                 end
-                `REG_STATUS:
+                `SDIO_REG_STATUS:
                 begin
                    if (cfg_data_i[0])
                      r_eot <= 1'b0;
@@ -292,29 +292,29 @@ module udma_sdio_reg_if #(
     begin
         cfg_data_o = 32'h0;
         case (s_rd_addr)
-        `REG_RX_SADDR:
+        `SDIO_REG_RX_SADDR:
             cfg_data_o = cfg_rx_curr_addr_i;
-        `REG_RX_SIZE:
+        `SDIO_REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
-        `REG_RX_CFG:
+        `SDIO_REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,3'h0,r_rx_continuous};
-        `REG_TX_SADDR:
+        `SDIO_REG_TX_SADDR:
             cfg_data_o = cfg_tx_curr_addr_i;
-        `REG_TX_SIZE:
+        `SDIO_REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
-        `REG_TX_CFG:
+        `SDIO_REG_TX_CFG:
             cfg_data_o = {26'h0,cfg_tx_pending_i,cfg_tx_en_i,3'h0,r_tx_continuous};
-        `REG_RSP0:
+        `SDIO_REG_RSP0:
             cfg_data_o = cfg_rsp_data_i[31:0];
-        `REG_RSP1:
+        `SDIO_REG_RSP1:
             cfg_data_o = cfg_rsp_data_i[63:32];
-        `REG_RSP2:
+        `SDIO_REG_RSP2:
             cfg_data_o = cfg_rsp_data_i[95:64];
-        `REG_RSP3:
+        `SDIO_REG_RSP3:
             cfg_data_o = cfg_rsp_data_i[127:96];
-        `REG_CLK_DIV:
+        `SDIO_REG_CLK_DIV:
             cfg_data_o = {23'h0, r_clk_div_valid, r_clk_div_data};
-        `REG_STATUS:
+        `SDIO_REG_STATUS:
             cfg_data_o = { r_status, 14'h0, r_err, r_eot };
         default:
             cfg_data_o = 'h0;

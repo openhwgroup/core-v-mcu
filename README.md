@@ -95,3 +95,29 @@ Once can sanity check the top-level using QuestaSim:
 ```
 fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu
 ```
+
+## Contributing: Pre-commit checks
+
+If you are submitting a pull-request, it will be subject to pre-commit checks.  The two that most likely cause problems are the Verilator Lint check and the Verible format check.
+
+### Verilator lint check
+
+The system will run
+```
+fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
+```
+If your changes introduce any more Verilator lint warnings, you either need to fix these, or, if appropriate, add a rule to ignore them to `rtl/core-v-mcu/verilator.waiver`.
+
+### Verible format check
+
+Standard formating is enforced by [Verible](https://github.com/google/verible).  The command used is
+```
+util/format-verible
+```
+at the top level of the repository, which will correct the format of any file. The check will fail if any file is changed.
+
+Two important things to note.
+
+1.  If you do not have Verible installed (which is likely), then `util/format-verible` will silently do nothing.
+
+2.  You must install the correct version of Verible, currently v0.0-1051-gd4cd328.  GitHub has [prebuilt versions](https://github.com/google/verible/releases/tag/v0.0-1051-gd4cd328).  The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
