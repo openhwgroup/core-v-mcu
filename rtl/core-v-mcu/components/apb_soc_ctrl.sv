@@ -328,7 +328,7 @@ module apb_soc_ctrl #(
             `REG_BUILD_TIME: PRDATA <= `BUILD_TIME;
             `REG_CORESTATUS: PRDATA <= r_corestatus;
             `REG_CS_RO: PRDATA <= r_corestatus;
-            `REG_BOOTSEL: PRDATA <= {30'h0, r_bootsel};
+            `REG_BOOTSEL: PRDATA <= {bootsel_i, 29'h0, r_bootsel};
             `REG_CLKSEL: PRDATA <= {31'h0, sel_fll_clk_i};
             `REG_CLUSTER_CTRL:
             PRDATA <= {

@@ -110,6 +110,10 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 				(cd fpga; make nexys rev=nexysA7-100T) 2>&1 | tee vivado.log
 
-download:
+download0:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
+             emulation/core_v_mcu_nexys.bit
+
+download1:
+	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit

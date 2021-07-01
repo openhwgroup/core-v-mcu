@@ -71,7 +71,7 @@ module fc_subsystem #(
   logic is_scm_instr_req, is_scm_data_req;
 
 
-  logic [31:0] r_int;
+  logic [                31:0]       r_int;
 
 
   // APU Core to FP Wrapper

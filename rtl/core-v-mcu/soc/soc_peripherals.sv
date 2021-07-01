@@ -83,52 +83,49 @@ module soc_peripherals #(
     output logic [`N_FPGAIO-1:0]                   fpgaio_oe_o,
 
     //eFPGA SPIS
-    input  logic efpga_fcb_spis_rst_n_i,
-    input  logic efpga_fcb_spis_mosi_i,
-    input  logic efpga_fcb_spis_cs_n_i,
-    input  logic efpga_fcb_spis_clk_i,
-    input  logic efpga_fcb_spi_mode_en_bo_i,
-    output logic efpga_fcb_spis_miso_en_o,
-    output logic efpga_fcb_spis_miso_o,
+    //    input  logic efpga_fcb_spis_rst_n_i,
+    //    input  logic efpga_fcb_spis_mosi_i,
+    //    input  logic efpga_fcb_spis_cs_n_i,
+    //    input  logic efpga_fcb_spis_clk_i,
+    //    input  logic efpga_fcb_spi_mode_en_bo_i,
+    //    output logic efpga_fcb_spis_miso_en_o,
+    //    output logic efpga_fcb_spis_miso_o,
 
     //eFPGA TEST MODE
-    input  logic efpga_STM_i,
-    output logic efpga_test_fcb_pif_vldo_en_o,
-    output logic efpga_test_fcb_pif_vldo_o,
-    output logic efpga_test_fcb_pif_do_l_en_o,
-    output logic efpga_test_fcb_pif_do_l_0_o,
-    output logic efpga_test_fcb_pif_do_l_1_o,
-    output logic efpga_test_fcb_pif_do_l_2_o,
-    output logic efpga_test_fcb_pif_do_l_3_o,
-    output logic efpga_test_fcb_pif_do_h_en_o,
-    output logic efpga_test_fcb_pif_do_h_0_o,
-    output logic efpga_test_fcb_pif_do_h_1_o,
-    output logic efpga_test_fcb_pif_do_h_2_o,
-    output logic efpga_test_fcb_pif_do_h_3_o,
-    output logic efpga_test_FB_SPE_OUT_0_o,
-    output logic efpga_test_FB_SPE_OUT_1_o,
-    output logic efpga_test_FB_SPE_OUT_2_o,
-    output logic efpga_test_FB_SPE_OUT_3_o,
-    input  logic efpga_test_fcb_pif_vldi_i,
-    input  logic efpga_test_fcb_pif_di_l_0_i,
-    input  logic efpga_test_fcb_pif_di_l_1_i,
-    input  logic efpga_test_fcb_pif_di_l_2_i,
-    input  logic efpga_test_fcb_pif_di_l_3_i,
-    input  logic efpga_test_fcb_pif_di_h_0_i,
-    input  logic efpga_test_fcb_pif_di_h_1_i,
-    input  logic efpga_test_fcb_pif_di_h_2_i,
-    input  logic efpga_test_fcb_pif_di_h_3_i,
-    input  logic efpga_test_FB_SPE_IN_0_i,
-    input  logic efpga_test_FB_SPE_IN_1_i,
-    input  logic efpga_test_FB_SPE_IN_2_i,
-    input  logic efpga_test_FB_SPE_IN_3_i,
-    input  logic efpga_test_M_0_i,
-    input  logic efpga_test_M_1_i,
-    input  logic efpga_test_M_2_i,
-    input  logic efpga_test_M_3_i,
-    input  logic efpga_test_M_4_i,
-    input  logic efpga_test_M_5_i,
-    input  logic efpga_test_MLATCH_i,
+    input  [20:0] testio_i,
+    output [15:0] testio_o,
+    //    input logic                                 efpga_STM_i,
+    //    output logic                                efpga_test_fcb_pif_vldo_en_o,
+    //    output logic                                efpga_test_fcb_pif_vldo_o,
+    //    output logic                                efpga_test_fcb_pif_do_l_en_o,
+    //    output logic [3:0]                          efpga_test_fcb_pif_do_l_o,
+    //    output logic efpga_test_fcb_pif_do_l_1_o,
+    //    output logic efpga_test_fcb_pif_do_l_2_o,
+    //    output logic efpga_test_fcb_pif_do_l_3_o,
+    //    output logic                                efpga_test_fcb_pif_do_h_en_o,
+    //    output logic [3:0]                          efpga_test_fcb_pif_do_h_o,
+    //    output logic efpga_test_fcb_pif_do_h_1_o,
+    //    output logic efpga_test_fcb_pif_do_h_2_o,
+    //    output logic efpga_test_fcb_pif_do_h_3_o,
+    //    output logic [3:0]                          efpga_test_FB_SPE_OUT_o,
+    //    output logic efpga_test_FB_SPE_OUT_1_o,
+    //    output logic efpga_test_FB_SPE_OUT_2_o,
+    //    output logic efpga_test_FB_SPE_OUT_3_o,
+    //   input logic                                 efpga_test_fcb_pif_vldi_i,
+    //   input logic [3:0]                           efpga_test_fcb_pif_di_l_i,
+    //    input  logic efpga_test_fcb_pif_di_l_1_i,
+    //    input  logic efpga_test_fcb_pif_di_l_2_i,
+    //    input  logic efpga_test_fcb_pif_di_l_3_i,
+    //   input logic [3:0]                           efpga_test_fcb_pif_di_h_i,
+    //    input  logic efpga_test_fcb_pif_di_h_1_i,
+    //    input  logic efpga_test_fcb_pif_di_h_2_i,
+    //    input  logic efpga_test_fcb_pif_di_h_3_i,
+    //   input logic [3:0]                           efpga_test_FB_SPE_IN_i,
+    //    input  logic efpga_test_FB_SPE_IN_1_i,
+    //    input  logic efpga_test_FB_SPE_IN_2_i,
+    //    input  logic efpga_test_FB_SPE_IN_3_i,
+    //   input logic [5:0]                           efpga_test_M_i,
+    //   input logic                                 efpga_test_MLATCH_i,
 
     output logic [EVNT_WIDTH-1:0] cl_event_data_o,
     output logic                  cl_event_valid_o,
@@ -236,11 +233,9 @@ module soc_peripherals #(
 
 
 
-  assign s_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0] = s_udma_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0]; // ToDo: Hack that grabs top 16 events (equiv to 4 udma peripherals)
-  assign s_events[UDMA_EVENTS-1:UDMA_EVENTS-N_EFPGA_EVENTS] = s_efpga_events;
-  assign s_events[UDMA_EVENTS-1+`N_GPIO:UDMA_EVENTS] = s_gpio_events;
-
-
+  assign s_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0] = s_udma_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0]; // 111 - 0
+  assign s_events[UDMA_EVENTS-1:UDMA_EVENTS-N_EFPGA_EVENTS] = s_efpga_events[N_EFPGA_EVENTS-1:0];  // 127 - 112
+  assign s_events[UDMA_EVENTS+`N_GPIO-1:UDMA_EVENTS] = s_gpio_events[`N_GPIO-1:0];  // 159 - 128
 
   assign fc_events_o[6:0] = 7'h0;  //RESERVED for sw events all routed to irq3
   assign fc_events_o[7] = s_timer_lo_event;  // MTIME irq
@@ -694,41 +689,32 @@ module soc_peripherals #(
       .efpga_event_o(s_efpga_events),
 
       //eFPGA SPIS
-      .efpga_fcb_spis_rst_n_i    (efpga_fcb_spis_rst_n_i),
-      .efpga_fcb_spis_mosi_i     (efpga_fcb_spis_mosi_i),
-      .efpga_fcb_spis_cs_n_i     (efpga_fcb_spis_cs_n_i),
-      .efpga_fcb_spis_clk_i      (efpga_fcb_spis_clk_i),
-      .efpga_fcb_spi_mode_en_bo_i(efpga_fcb_spi_mode_en_bo_i),
-      .efpga_fcb_spis_miso_en_o  (efpga_fcb_spis_miso_en_o),
-      .efpga_fcb_spis_miso_o     (efpga_fcb_spis_miso_o),
+      //      .efpga_fcb_spis_rst_n_i    (efpga_fcb_spis_rst_n_i),
+      //      .efpga_fcb_spis_mosi_i     (efpga_fcb_spis_mosi_i),
+      //      .efpga_fcb_spis_cs_n_i     (efpga_fcb_spis_cs_n_i),
+      //      .efpga_fcb_spis_clk_i      (efpga_fcb_spis_clk_i),
+      //      .efpga_fcb_spi_mode_en_bo_i(efpga_fcb_spi_mode_en_bo_i),
+      //      .efpga_fcb_spis_miso_en_o  (efpga_fcb_spis_miso_en_o),
+      //      .efpga_fcb_spis_miso_o     (efpga_fcb_spis_miso_o),
 
       //eFPGA TEST MODE
+      .testio_i(testio_i),
+      .testio_o(testio_o)
+      /*
       .efpga_STM_i(efpga_STM_i),
 
-      .efpga_test_FB_SPE_OUT_0_o  (efpga_test_FB_SPE_OUT_0_o),
-      .efpga_test_FB_SPE_OUT_1_o  (efpga_test_FB_SPE_OUT_1_o),
-      .efpga_test_FB_SPE_OUT_2_o  (efpga_test_FB_SPE_OUT_2_o),
-      .efpga_test_FB_SPE_OUT_3_o  (efpga_test_FB_SPE_OUT_3_o),
+      .efpga_test_FB_SPE_OUT_o  (efpga_test_FB_SPE_OUT_o),
+      .efpga_test_fcb_pif_do_l_en_o(efpga_test_fcb_pif_do_l_en),
+      .efpga_test_fcb_pif_do_l_o(efpga_test_fcb_pif_do_l_o),
+      .efpga_test_fcb_pif_do_h_en_o(efpga_test_fcb_pif_do_h_en),
+      .efpga_test_fcb_pif_do_h_o(efpga_test_fcb_pif_do_h_o),
       .efpga_test_fcb_pif_vldi_i  (efpga_test_fcb_pif_vldi_i),
-      .efpga_test_fcb_pif_di_l_0_i(efpga_test_fcb_pif_di_l_0_i),
-      .efpga_test_fcb_pif_di_l_1_i(efpga_test_fcb_pif_di_l_1_i),
-      .efpga_test_fcb_pif_di_l_2_i(efpga_test_fcb_pif_di_l_2_i),
-      .efpga_test_fcb_pif_di_l_3_i(efpga_test_fcb_pif_di_l_3_i),
-      .efpga_test_fcb_pif_di_h_0_i(efpga_test_fcb_pif_di_h_0_i),
-      .efpga_test_fcb_pif_di_h_1_i(efpga_test_fcb_pif_di_h_1_i),
-      .efpga_test_fcb_pif_di_h_2_i(efpga_test_fcb_pif_di_h_2_i),
-      .efpga_test_fcb_pif_di_h_3_i(efpga_test_fcb_pif_di_h_3_i),
-      .efpga_test_FB_SPE_IN_0_i   (efpga_test_FB_SPE_IN_0_i),
-      .efpga_test_FB_SPE_IN_1_i   (efpga_test_FB_SPE_IN_1_i),
-      .efpga_test_FB_SPE_IN_2_i   (efpga_test_FB_SPE_IN_2_i),
-      .efpga_test_FB_SPE_IN_3_i   (efpga_test_FB_SPE_IN_3_i),
-      .efpga_test_M_0_i           (efpga_test_M_0_i),
-      .efpga_test_M_1_i           (efpga_test_M_1_i),
-      .efpga_test_M_2_i           (efpga_test_M_2_i),
-      .efpga_test_M_3_i           (efpga_test_M_3_i),
-      .efpga_test_M_4_i           (efpga_test_M_4_i),
-      .efpga_test_M_5_i           (efpga_test_M_5_i),
+      .efpga_test_fcb_pif_di_l_i(efpga_test_fcb_pif_di_l_i),
+      .efpga_test_fcb_pif_di_h_i(efpga_test_fcb_pif_di_h_i),
+      .efpga_test_FB_SPE_IN_i   (efpga_test_FB_SPE_IN_i),
+      .efpga_test_M_i           (efpga_test_M_i),
       .efpga_test_MLATCH_i        (efpga_test_MLATCH_i)
+ */
   );
 
   ///////////////////////////////////////////////////////////////
