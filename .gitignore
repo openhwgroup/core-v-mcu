@@ -17,4 +17,4 @@ nexys-emul.log
 sw/inc/
 sw/csv-mirror/
 emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
-emulation/core-v-mcu-nexys/rtl/
+emulation/core-v-mcu-nexys/rtl

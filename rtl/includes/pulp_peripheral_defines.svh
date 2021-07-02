@@ -1,6 +1,6 @@
 /*
  * This is a generated file
- *
+ * 
  * Copyright 2021 QuickLogic
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
  */
 
 `define BUILD_DATE 32'h20210702
-`define BUILD_TIME 32'h00115143
+`define BUILD_TIME 32'h00162039
 
 //  PER_ID definitions
 `define PER_ID_UART      0
