@@ -88,8 +88,8 @@ module i2c_peripheral_interface (
 
   always @(posedge rst or posedge clk) begin
     if (rst == 1) begin
-      scl_d <= 3'b1111;
-      sda_d <= 3'b1111;
+      scl_d <= 3'b111;
+      sda_d <= 3'b111;
       scl_cs <= 1;
       scl_ls <= 1;
       sda_cs <= 1;

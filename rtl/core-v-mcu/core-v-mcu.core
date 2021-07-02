@@ -137,12 +137,6 @@ filesets:
     - ../../emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
-parameters:
-  PULP_FPGA_EMUL:
-    datatype: bool
-    paramtype: vlogdefine
-    default: true
-
   # Scripts for hooks
   pre_build_scripts:
     files:
@@ -160,6 +154,14 @@ parameters:
     files:
     - top/core_v_mcu_wrapper.sv
     file_type: systemVerilogSource
+
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+
 
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
