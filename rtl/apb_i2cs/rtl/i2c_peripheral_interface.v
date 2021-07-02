@@ -109,11 +109,7 @@ module i2c_peripheral_interface (
         default: sda_cs <= scl_cs;
       endcase // case (sda_d)
       scl_ls <= scl_cs;
-<<<<<<< HEAD
       sda_ls <= sda_cs;
-=======
-      sda_ls <= sda_ls;
->>>>>>> 0bcd9926e980b1faf41bf64c9f9df35d6c90a770
     end // else: !if(rst == 1)
   end // always @ (posedge rst or posedge clk)
 
@@ -134,17 +130,9 @@ module i2c_peripheral_interface (
       stop_detect <= scl_cs ?  ~sda_ls & sda_cs : 0;
     end
   end
-<<<<<<< HEAD
-
-
-
-  // I2C protocol state machine
-(* mark_debug = "true" *)  reg  [3:0] i2c_state;
-=======
 
   // I2C protocol state machine
   reg  [3:0] i2c_state;
->>>>>>> 0bcd9926e980b1faf41bf64c9f9df35d6c90a770
   localparam [3:0] ST_IDLE = 4'h0;
   localparam [3:0] ST_DEVADDR = 4'h1;
   localparam [3:0] ST_DEVADDRACK = 4'h2;
