@@ -30,16 +30,6 @@ module i2c_peripheral_interface (
     i2c_reg_rd_byte_complete_o
 );
 
-  // These parameters represent the maximum length for the debounce/delay shift
-  //  registers. The actual lengths to be used are programmable via registers,
-  //  and are fed into this module from the register module. The default lengths
-  //  for these shift registers, below, represent appropriate lengths for a
-  //  100MHz system clock. These parameters can be adjusted if a different
-  //  system clock rate is used (e.g. for a 200MHz system clock, these parameters
-  //  should all be doubled).
-  parameter integer I2C_DEBOUNCE_LEN_MAX = 2;
-  parameter integer SCL_DELAY_LEN_MAX = 2;
-  parameter integer SDA_DELAY_LEN_MAX = 2;
 
   input clk_i;
   input rst_i;
@@ -119,7 +109,11 @@ module i2c_peripheral_interface (
         default: sda_cs <= scl_cs;
       endcase // case (sda_d)
       scl_ls <= scl_cs;
+<<<<<<< HEAD
       sda_ls <= sda_cs;
+=======
+      sda_ls <= sda_ls;
+>>>>>>> 0bcd9926e980b1faf41bf64c9f9df35d6c90a770
     end // else: !if(rst == 1)
   end // always @ (posedge rst or posedge clk)
 
@@ -140,11 +134,17 @@ module i2c_peripheral_interface (
       stop_detect <= scl_cs ?  ~sda_ls & sda_cs : 0;
     end
   end
+<<<<<<< HEAD
 
 
 
   // I2C protocol state machine
 (* mark_debug = "true" *)  reg  [3:0] i2c_state;
+=======
+
+  // I2C protocol state machine
+  reg  [3:0] i2c_state;
+>>>>>>> 0bcd9926e980b1faf41bf64c9f9df35d6c90a770
   localparam [3:0] ST_IDLE = 4'h0;
   localparam [3:0] ST_DEVADDR = 4'h1;
   localparam [3:0] ST_DEVADDRACK = 4'h2;

@@ -26,6 +26,7 @@ export PRIVATE_BANK_SIZE=8192
 
 help:
 			@echo "all:            generate build scripts, custom build files, doc and sw header files"
+			@echo "src:            set up all generated source files"
 			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
 			@echo "lint:           run Verilator lint check"
 			@echo "doc:            generate documentation"
@@ -35,7 +36,9 @@ help:
 			@echo "sim:            run Questa sim"
 			@echo "clean:          remove generated files"
 
-all:	${IOSCRIPT_OUT} docs sw
+all:		${IOSCRIPT_OUT} docs sw
+
+src:		${IOSCRIPT_OUT}
 
 clean:
 				(cd docs; make clean)

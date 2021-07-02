@@ -59,4 +59,3 @@ module RAM_256x8_behavioral (
   assign rd_data = ram_data_out;
 
 endmodule
-

@@ -252,6 +252,20 @@ module core_v_mcu #(
   logic                                      debug1;
   logic                                      debug0;
 
+`ifdef VERILATOR
+  logic [`N_IO-1:0] io_pos;
+
+  assign s_ref_clk = io[6];
+  assign s_rstn = (io[6] == 1) ? io[7] : io_pos[7];
+  assign s_jtag_tck = (io[6] == 1) ? io[8] : io_pos[8];
+  assign s_jtag_tdi = (io[6] == 1) ? io[9] : io_pos[9];
+  assign io[10] = s_jtag_tdo;
+  assign s_jtag_tms = (io[6] == 1) ? io[11] : io_pos[11];
+  assign s_jtag_trst = (io[6] == 1) ? io[12] : io_pos[12];
+  assign s_bootsel = (io[6] == 1) ? io[15] : io_pos[15];
+
+  always @(posedge io[6]) io_pos <= io;
+`else
   //
   // PAD FRAME
   //
@@ -275,6 +289,7 @@ module core_v_mcu #(
       // pad signals
       .io(io)  // pad wires
   );
+`endif
 
   //
   // SAFE DOMAIN
