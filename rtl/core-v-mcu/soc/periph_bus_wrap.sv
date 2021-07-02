@@ -24,10 +24,8 @@ module periph_bus_wrap #(
     APB_BUS.Master soc_ctrl_master,
     APB_BUS.Master adv_timer_master,
     APB_BUS.Master soc_evnt_gen_master,
-    APB_BUS.Master eu_master,
     APB_BUS.Master mmap_debug_master,
     APB_BUS.Master timer_master,
-    APB_BUS.Master hwpe_master,
     APB_BUS.Master fcb_master,
     APB_BUS.Master stdout_master,
     APB_BUS.Master i2cs_master
@@ -74,17 +72,17 @@ module periph_bus_wrap #(
   assign s_start_addr[5] = `SOC_EVENT_GEN_START_ADDR;
   assign s_end_addr[5]   = `SOC_EVENT_GEN_END_ADDR;
 
-  `APB_ASSIGN_MASTER(s_masters[6], eu_master);
-  assign s_start_addr[6] = `EU_START_ADDR;
-  assign s_end_addr[6]   = `EU_END_ADDR;
+  `APB_ASSIGN_MASTER(s_masters[6], i2cs_master);
+  assign s_start_addr[6] = `I2CS_START_ADDR;
+  assign s_end_addr[6]   = `I2CS_END_ADDR;
 
   `APB_ASSIGN_MASTER(s_masters[7], timer_master);
   assign s_start_addr[7] = `TIMER_START_ADDR;
   assign s_end_addr[7]   = `TIMER_END_ADDR;
 
-  `APB_ASSIGN_MASTER(s_masters[8], hwpe_master);
-  assign s_start_addr[8] = `HWPE_START_ADDR;
-  assign s_end_addr[8]   = `HWPE_END_ADDR;
+  `APB_ASSIGN_MASTER(s_masters[8], fcb_master);
+  assign s_start_addr[8] = `EFPGA_CONFIG_START_ADDR;
+  assign s_end_addr[8]   = `EFPGA_CONFIG_END_ADDR;
 
   `APB_ASSIGN_MASTER(s_masters[9], stdout_master);
   assign s_start_addr[9] = `STDOUT_START_ADDR;
@@ -93,15 +91,6 @@ module periph_bus_wrap #(
   `APB_ASSIGN_MASTER(s_masters[10], mmap_debug_master);
   assign s_start_addr[10] = `DEBUG_START_ADDR;
   assign s_end_addr[10]   = `DEBUG_END_ADDR;
-
-  `APB_ASSIGN_MASTER(s_masters[11], fcb_master);
-  assign s_start_addr[11] = `EFPGA_CONFIG_START_ADDR;
-  assign s_end_addr[11]   = `EFPGA_CONFIG_END_ADDR;
-
-  `APB_ASSIGN_MASTER(s_masters[12], i2cs_master);
-  assign s_start_addr[12] = `I2CS_START_ADDR;
-  assign s_end_addr[12]   = `I2CS_END_ADDR;
-
 
 
   //********************************************************

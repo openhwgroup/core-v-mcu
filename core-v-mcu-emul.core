@@ -93,12 +93,3 @@ targets:
       vivado:
         part: xc7a100tcsg324-1
     toplevel: xilinx_core_v_mcu
-
-
-
-
-
-
-
-
-

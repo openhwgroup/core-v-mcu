@@ -1,7 +1,0 @@
-apb_interrupt_cntrl:
-  incdirs: [
-  ]
-  files: [
-    apb_interrupt_cntrl.sv,
-  ]
-

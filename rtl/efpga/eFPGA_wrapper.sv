@@ -4,16 +4,11 @@
 `include "pulp_soc_defines.sv"
 module eFPGA_wrapper (
     output logic [ 3:0] test_fb_spe_out,
-    input        [ 3:0] test_fb_spe_in,
+    input  logic [ 3:0] test_fb_spe_in,
     input  logic        MLATCH,
-    POR,
-    STM,
-    input  logic        M_0_,
-    M_1_,
-    M_2_,
-    M_3_,
-    M_4_,
-    M_5_,
+    input  logic        POR,
+    input  logic        STM,
+    input  logic [ 5:0] M,
     input  logic [31:0] fcb_bl_din,
     output logic [31:0] fcb_bl_dout,
     input  logic [15:0] fcb_bl_pwrgate,
@@ -200,7 +195,7 @@ module eFPGA_wrapper (
 
   A2_design Arnold2_Design (  // use this to go to A2F/F2A
       //top Arnold2_Design (  // use this to connect rtl directly
-      // ouputs to FCB
+
 
       // SOC signals
       .control_in(control_in),
@@ -210,10 +205,6 @@ module eFPGA_wrapper (
       .fpgaio_out(fpga_out),  // ouput
       .fpgaio_in(fpga_in),  // input
       .events_o(events_o),  // output
-
-      //.PRDATA(),//apb_fpga_prdata),
-      //.PREADY(),//apb_fpga_ready_o),
-      //.PSLVERR(),//apb_fpga_pslverr_o),
       .lint_RDATA(lint_RDATA),
       .lint_GNT(lint_GNT),
       .lint_VALID(lint_VALID),
@@ -250,11 +241,6 @@ module eFPGA_wrapper (
       .lint_WDATA(lint_WDATA),
       .lint_WEN(lint_WEN),
       .lint_REQ(lint_REQ),
-      //.PWDATA(apb_fpga_pwdata_i),
-      //.PADDR(apb_fpga_addr_i),
-      //.PENABLE(apb_fpga_enable_i),
-      //.PSEL(apb_fpga_psel_i),
-      //.PWRITE(apb_fpga_pwrite_i),
       .RESET({RESET_LB, RESET_LT, RESET_RT, RESET_RB}),
       .tcdm_rdata_p3(tcdm_rdata_p3),
       .tcdm_rdata_p2(tcdm_rdata_p2),
@@ -370,7 +356,6 @@ module eFPGA_wrapper (
       .m1_m1_outsel(m1_m1_outsel),
       .m1_m1_dataout(m1_m1_dataout),
 
-
       .m1_oper0_rclk(m1_oper0_rclk),
       .m1_oper0_wclk(m1_oper0_wclk),
       .m1_oper0_we(m1_oper0_we),
@@ -406,23 +391,13 @@ module eFPGA_wrapper (
       .m1_coef_raddr(m1_coef_raddr),
       .m1_coef_waddr(m1_coef_waddr),
       .m1_coef_powerdn(m1_coef_powerdn),
-
-      .FB_SPE_OUT_0_(test_fb_spe_out[0]),
-      .FB_SPE_OUT_1_(test_fb_spe_out[1]),
-      .FB_SPE_OUT_2_(test_fb_spe_out[2]),
-      .FB_SPE_OUT_3_(test_fb_spe_out[3]),
-      .fcb_bl_dout  (fcb_bl_dout),
-
+      // outpust to FCB
+      .FB_SPE_OUT(test_fb_spe_out),
+      .fcb_bl_dout(fcb_bl_dout),
       .PARALLEL_CFG(fcb_pif_en),
 
-
       // Inputs
-      .M_0_          (M_0_),
-      .M_1_          (M_1_),
-      .M_2_          (M_2_),
-      .M_3_          (M_3_),
-      .M_4_          (M_4_),
-      .M_5_          (M_5_),
+      .M             (M),
       .MLATCH        (MLATCH),
       .fcb_blclk     (fcb_blclk),
       .fcb_bl_din    (fcb_bl_din),
@@ -433,10 +408,7 @@ module eFPGA_wrapper (
       .fcb_din_int_r_only(fcb_din_int_r_only),
       .fcb_din_slc_tb_int(fcb_din_slc_tb_int),
       .fcb_fb_iso_enb    (fcb_fb_iso_enb),
-      .FB_SPE_IN_0_      (test_fb_spe_in[0]),
-      .FB_SPE_IN_1_      (test_fb_spe_in[1]),
-      .FB_SPE_IN_2_      (test_fb_spe_in[2]),
-      .FB_SPE_IN_3_      (test_fb_spe_in[3]),
+      .FB_SPE_IN         (test_fb_spe_in),
       .fcb_iso_en        (fcb_iso_en),
       .NB                (),
       .PB                (),

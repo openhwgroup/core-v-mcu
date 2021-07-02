@@ -20,7 +20,6 @@ filesets:
     - openhwgroup.org:ip:apb_fll_if
     - openhwgroup.org:ip:apb_gpio
     - openhwgroup.org:ip:apb_i2cs
-    - openhwgroup.org:ip:apb_interrupt_cntrl
     - openhwgroup.org:ip:apb_node
     - openhwgroup.org:ip:apb2apbcomp
     - openhwgroup.org:ip:apb2per
