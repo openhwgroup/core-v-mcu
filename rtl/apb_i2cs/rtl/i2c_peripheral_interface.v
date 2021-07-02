@@ -1,11 +1,12 @@
-/* ----------------------------------------------------------------------------
-i2c_peripheral_interface.v
-
-Based on the opencores i2c slave written by Steve Fielding (refer to the
-original copyright information appended to the end of this file).
-
-
----------------------------------------------------------------------------- */
+// Copyright 2021 QuickLogic.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the “License”); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_interface (
     clk_i,
@@ -55,8 +56,8 @@ module i2c_peripheral_interface (
   input [7:0] i2c_scl_delay_len_i;
   input [7:0] i2c_sda_delay_len_i;
   output [7:0] i2c_reg_addr_o;
-  output [7:0] i2c_reg_wdata_o;
-  output i2c_reg_wrenable_o;
+(* mark_debug = "true" *)  output [7:0] i2c_reg_wdata_o;
+(* mark_debug = "true" *)  output i2c_reg_wrenable_o;
   input [7:0] i2c_reg_rddata_i;
   output i2c_reg_rd_byte_complete_o;
 
@@ -72,9 +73,6 @@ module i2c_peripheral_interface (
   // interface to registers
   wire [6:0] i2c_dev_addr_i;
   wire       i2c_enabled_i;
-  wire [7:0] i2c_debounce_len_i;
-  wire [7:0] i2c_scl_delay_len_i;
-  wire [7:0] i2c_sda_delay_len_i;
   wire [7:0] i2c_reg_addr_o;
   wire [7:0] i2c_reg_wdata_o;
   wire       i2c_reg_wrenable_o;
@@ -93,76 +91,60 @@ module i2c_peripheral_interface (
   assign rst = rst_i;
 
 
-  // debounce the I2C lines
-  reg [I2C_DEBOUNCE_LEN_MAX-1:0] scl_deb_pipe;
-  reg [I2C_DEBOUNCE_LEN_MAX-1:0] sda_deb_pipe;
-  reg                            scl_deb;
-  reg                            sda_deb;
+  // sample the I2C lines
 
-  always @(posedge rst or posedge clk)
-    if (rst) begin
-      scl_deb_pipe <= {I2C_DEBOUNCE_LEN_MAX{1'b1}};
-      sda_deb_pipe <= {I2C_DEBOUNCE_LEN_MAX{1'b1}};
-      scl_deb <= 1'b1;
-      sda_deb <= 1'b1;
-    end else begin
-      scl_deb_pipe <= {scl_deb_pipe[I2C_DEBOUNCE_LEN_MAX-2:0], i2c_scl_i};
-      sda_deb_pipe <= {sda_deb_pipe[I2C_DEBOUNCE_LEN_MAX-2:0], i2c_sda_i};
+  reg [2:0]                      scl_d, sda_d;
+  reg                            scl_cs,scl_ls, sda_cs, sda_ls;
 
-      if (&scl_deb_pipe[I2C_DEBOUNCE_LEN_MAX-1:1] == 1'b1) scl_deb <= 1'b1;
-      else if (|scl_deb_pipe[I2C_DEBOUNCE_LEN_MAX-1:1] == 1'b0) scl_deb <= 1'b0;
-      else scl_deb <= scl_deb;
-
-      if (&sda_deb_pipe[I2C_DEBOUNCE_LEN_MAX-1:1] == 1'b1) sda_deb <= 1'b1;
-      else if (|sda_deb_pipe[I2C_DEBOUNCE_LEN_MAX-1:1] == 1'b0) sda_deb <= 1'b0;
-      else sda_deb <= sda_deb;
+  always @(posedge rst or posedge clk) begin
+    if (rst == 1) begin
+      scl_d <= 3'b111;
+      sda_d <= 3'b111;
+      scl_cs <= 1;
+      scl_ls <= 1;
+      sda_cs <= 1;
+      sda_ls <= 1;
     end
+    else begin
+      scl_d <= {scl_d[1:0],i2c_scl_i};
+      sda_d <= {sda_d[1:0],i2c_sda_i};
+      case (scl_d)
+        3'b000: scl_cs <= 0;
+        3'b111: scl_cs <= 1;
+        default: scl_cs <= scl_cs;
+      endcase // case (scl_d)
+      case (sda_d)
+        3'b000: sda_cs <= 0;
+        3'b111: sda_cs <= 1;
+        default: sda_cs <= scl_cs;
+      endcase // case (sda_d)
+      scl_ls <= scl_cs;
+      sda_ls <= sda_cs;
+    end // else: !if(rst == 1)
+  end // always @ (posedge rst or posedge clk)
 
 
-  // delay the scl and sda signals
-  // from the opencores IP written by Steve Fielding:
-  // // sclDelayed is used as a delayed sampling clock
-  // // sdaDelayed is only used for start stop detection
-  // // Because sda hold time from scl falling is 0nS
-  // // sda must be delayed with respect to scl to avoid incorrect
-  // // detection of start/stop at scl falling edge.
-  reg [SCL_DELAY_LEN_MAX-1:0] scl_delay_pipe;
-  reg [SDA_DELAY_LEN_MAX-1:0] sda_delay_pipe;
 
-  always @(posedge rst or posedge clk)
-    if (rst) begin
-      scl_delay_pipe <= {SCL_DELAY_LEN_MAX{1'b1}};
-      sda_delay_pipe <= {SDA_DELAY_LEN_MAX{1'b1}};
-    end else begin
-      scl_delay_pipe <= {scl_delay_pipe[SCL_DELAY_LEN_MAX-2:0], scl_deb};
-      sda_delay_pipe <= {sda_delay_pipe[SDA_DELAY_LEN_MAX-2:0], sda_deb};
-    end
 
 
   // start stop detection
   reg start_detect;  // start or repeated start
   reg stop_detect;
 
-  always @(posedge rst or posedge clk)
+  always @(posedge rst or posedge clk) begin
     if (rst) begin
       start_detect <= 1'b0;
       stop_detect  <= 1'b0;
     end else begin
-      if (scl_deb == 1'b1 && sda_delay_pipe[SDA_DELAY_LEN_MAX-2] == 1'b0 && sda_delay_pipe[SDA_DELAY_LEN_MAX-1] == 1'b1)
-        start_detect <= 1'b1;
-      else start_detect <= 1'b0;
-
-      if (scl_deb == 1'b1 && sda_delay_pipe[SDA_DELAY_LEN_MAX-2] == 1'b1 && sda_delay_pipe[SDA_DELAY_LEN_MAX-1] == 1'b0)
-        stop_detect <= 1'b1;
-      else stop_detect <= 1'b0;
+      start_detect <= scl_cs ? sda_ls & ~sda_cs : 0;
+      stop_detect <= scl_cs ?  ~sda_ls & sda_cs : 0;
     end
+  end
+
 
 
   // I2C protocol state machine
-  wire       scl_sm;
-  wire       sda_sm;
-  reg        scl_sm_r1;
-  reg  [3:0] i2c_state;
+(* mark_debug = "true" *)  reg  [3:0] i2c_state;
   localparam [3:0] ST_IDLE = 4'h0;
   localparam [3:0] ST_DEVADDR = 4'h1;
   localparam [3:0] ST_DEVADDRACK = 4'h2;
@@ -185,21 +167,15 @@ module i2c_peripheral_interface (
   reg       reg_wenable;
   reg       reg_rcomplete;
 
-  assign scl_sm = scl_delay_pipe[SCL_DELAY_LEN_MAX-1];
-  assign sda_sm = sda_deb;
-
-  always @(posedge rst or posedge clk)
-    if (rst) scl_sm_r1 <= 1'b0;
-    else scl_sm_r1 <= scl_sm;
 
   always @(posedge rst or posedge clk)
     if (rst) begin
       bit_xfer <= 1'b0;
       bit_rcvd <= 1'b0;
     end else begin
-      if (scl_sm && !scl_sm_r1) begin
+      if (scl_cs && ~scl_ls) begin
         bit_xfer <= 1'b1;
-        bit_rcvd <= sda_sm;
+        bit_rcvd <= sda_cs;
       end else begin
         bit_xfer <= 1'b0;
         bit_rcvd <= bit_rcvd;
@@ -242,7 +218,7 @@ module i2c_peripheral_interface (
           if (stop_detect) begin
             i2c_state <= ST_IDLE;
           end else begin
-            if ((bit_cnt == 8) && (!scl_sm && scl_sm_r1)) begin
+            if ((bit_cnt == 8) && (!scl_cs && scl_ls)) begin
               if (in_byte[7:1] == i2c_dev_addr_i) begin
                 bit_cnt <= 0;
                 i2c_state <= ST_DEVADDRACK;
@@ -261,7 +237,7 @@ module i2c_peripheral_interface (
           if (stop_detect) begin
             i2c_state <= ST_IDLE;
           end else begin
-            if (!scl_sm && scl_sm_r1) begin
+            if (!scl_cs && scl_ls) begin
               sda_out <= 1'b1;  // release ACK
               if (xfer_type_rd_wrn == 1'b1) begin
                 i2c_state <= ST_REGRDATA;
@@ -290,7 +266,7 @@ module i2c_peripheral_interface (
               i2c_state <= ST_DEVADDR;
               bit_cnt   <= 0;
             end else begin
-              if ((bit_cnt == 8) && (!scl_sm && scl_sm_r1)) begin
+              if ((bit_cnt == 8) && (!scl_cs && scl_ls)) begin
                 reg_addr  <= in_byte;
                 i2c_state <= ST_REGADDRACK;
               end
@@ -304,7 +280,7 @@ module i2c_peripheral_interface (
           if (stop_detect) begin
             i2c_state <= ST_IDLE;
           end else begin
-            if (!scl_sm && scl_sm_r1) begin
+            if (!scl_cs && scl_ls) begin
               sda_out   <= 1'b1;  // release ACK
               i2c_state <= ST_REGWDATA;
             end
@@ -326,7 +302,7 @@ module i2c_peripheral_interface (
               i2c_state <= ST_DEVADDR;
               bit_cnt   <= 0;
             end else begin
-              if ((bit_cnt == 8) && (!scl_sm && scl_sm_r1)) begin
+              if ((bit_cnt == 8) && (!scl_cs && scl_ls)) begin
                 i2c_reg_wrenable <= 1'b1;
                 i2c_state <= ST_REGWDATAACK;
               end
@@ -341,7 +317,7 @@ module i2c_peripheral_interface (
           if (stop_detect) begin
             i2c_state <= ST_IDLE;
           end else begin
-            if (!scl_sm && scl_sm_r1) begin
+            if (!scl_cs && scl_ls) begin
               sda_out   <= 1'b1;  // release ACK
               i2c_state <= ST_REGWDATA;
             end
@@ -360,7 +336,7 @@ module i2c_peripheral_interface (
               bit_cnt <= 0;
               i2c_rd_byte_complete <= 1'b1;
             end else begin
-              if (!scl_sm && scl_sm_r1) begin
+              if (!scl_cs && scl_ls) begin
                 out_byte <= {out_byte[6:0], 1'b0};
                 bit_cnt  <= bit_cnt + 1;
               end
@@ -405,52 +381,7 @@ module i2c_peripheral_interface (
   assign i2c_sda_o = sda_out;
   assign i2c_reg_addr_o = reg_addr;
   assign i2c_reg_wdata_o = in_byte;
-
+  assign i2c_reg_wrenable_o  = i2c_reg_wrenable;
   assign i2c_reg_rd_byte_complete_o = i2c_rd_byte_complete;
 
 endmodule
-
-
-//////////////////////////////////////////////////////////////////////
-////                                                              ////
-//// i2cSlave.v                                                   ////
-////                                                              ////
-//// This file is part of the i2cSlave opencores effort.
-//// <http://www.opencores.org/cores//>                           ////
-////                                                              ////
-//// Module Description:                                          ////
-//// You will need to modify this file to implement your
-//// interface.
-////                                                              ////
-//// To Do:                                                       ////
-////
-////                                                              ////
-//// Author(s):                                                   ////
-//// - Steve Fielding, sfielding@base2designs.com                 ////
-////                                                              ////
-//////////////////////////////////////////////////////////////////////
-////                                                              ////
-//// Copyright (C) 2008 Steve Fielding and OPENCORES.ORG          ////
-////                                                              ////
-//// This source file may be used and distributed without         ////
-//// restriction provided that this copyright statement is not    ////
-//// removed from the file and that any derivative work contains  ////
-//// the original copyright notice and the associated disclaimer. ////
-////                                                              ////
-//// This source file is free software; you can redistribute it   ////
-//// and/or modify it under the terms of the GNU Lesser General   ////
-//// Public License as published by the Free Software Foundation; ////
-//// either version 2.1 of the License, or (at your option) any   ////
-//// later version.                                               ////
-////                                                              ////
-//// This source is distributed in the hope that it will be       ////
-//// useful, but WITHOUT ANY WARRANTY; without even the implied   ////
-//// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR      ////
-//// PURPOSE. See the GNU Lesser General Public License for more  ////
-//// details.                                                     ////
-////                                                              ////
-//// You should have received a copy of the GNU Lesser General    ////
-//// Public License along with this source; if not, download it   ////
-//// from <http://www.opencores.org/lgpl.shtml>                   ////
-////                                                              ////
-//////////////////////////////////////////////////////////////////////

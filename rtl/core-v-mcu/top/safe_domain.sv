@@ -147,18 +147,4 @@ module safe_domain #(
   assign test_mode_o     = 1'b0;
   assign mode_select_o   = 1'b0;
 
-  // //********************************************************
-  // //*** PAD AND GPIO CONFIGURATION SIGNALS PACK ************
-  // //********************************************************
-
-  // generate
-  // for (i=0; i<32; i++)
-  // begin : GEN_GPIO_CFG_I
-  // for (j=0; j<6; j++)
-  // begin : GEN_GPIO_CFG_J
-  // assign s_gpio_cfg[i][j] = gpio_cfg_i[j+6*i];
-  // end
-  // end
-  // endgenerate
-
 endmodule  // safe_domain

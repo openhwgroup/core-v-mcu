@@ -327,17 +327,6 @@ module core_v_mcu #(
   logic [20:0] testio_i;  //
   logic [15:0] testio_o;  //
   assign testio_i = '0;
-  /*
-  assign efpga_fcb_spi_mode_en_bo = 0;
-  assign s_in_stm                 = 0;
-  assign fpga_test_fcb_pif_vldi   = 0;
-  assign fpga_test_fcb_pif_di_l = '0;
-  assign fpga_test_fcb_pif_di_h = '0;
-  assign fpga_test_FB_SPE_IN    = '0;
-  assign fpga_test_M            = '0;
-  assign fpga_test_MLATCH         = 0;
-
-*/
   soc_domain #(
       .USE_FPU           (USE_FPU),
       .USE_HWPE          (USE_HWPE),
@@ -486,12 +475,8 @@ module core_v_mcu #(
       .fpgaio_oe_o (s_fpgaio_oe),
 
       .fpga_clk_in({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
-      //      .timer_ch0_o(s_timer0),
-      //      .timer_ch1_o(s_timer1),
-      //      .timer_ch2_o(s_timer2),
-      //      .timer_ch3_o(s_timer3),
-      .cluster_busy_i(s_cluster_busy),
 
+      .cluster_busy_i(s_cluster_busy),
       .cluster_events_wt_o(s_event_writetoken),
       .cluster_events_rp_i(s_event_readpointer),
       .cluster_events_da_o(s_event_dataasync),
@@ -511,27 +496,6 @@ module core_v_mcu #(
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o)
-      /*
-      .efpga_test_fcb_pif_vldo_en_o(efpga_test_fcb_pif_vldo_en),
-      .efpga_test_fcb_pif_vldo_o   (efpga_test_fcb_pif_vldo),
-      .efpga_test_fcb_pif_do_l_en_o(efpga_test_fcb_pif_do_l_en),
-      .efpga_test_fcb_pif_do_l_o (efpga_test_fcb_pif_do_l),
-      .efpga_test_fcb_pif_do_h_en_o(efpga_test_fcb_pif_do_h_en),
-      .efpga_test_fcb_pif_do_h_o (efpga_test_fcb_pif_do_h),
-      .efpga_test_FB_SPE_OUT_o   (efpga_test_FB_SPE_OUT),
-
-      .efpga_STM_i                 (s_in_stm),
-      .efpga_test_fcb_pif_vldi_i  (efpga_test_fcb_pif_vldi),
-      .efpga_test_fcb_pif_di_l_i(efpga_test_fcb_pif_di_l),
-      .efpga_test_fcb_pif_di_h_i(efpga_test_fcb_pif_di_h),
-      .efpga_test_FB_SPE_IN_i   (efpga_test_FB_SPE_IN),
-      .efpga_test_M_i           (efpga_test_M),
-      .efpga_test_MLATCH_i        (efpga_test_MLATCH)
-
-
-
-*/
-
 
   );
 

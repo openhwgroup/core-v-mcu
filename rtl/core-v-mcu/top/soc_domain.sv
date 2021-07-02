@@ -209,22 +209,6 @@ module soc_domain
     //eFPGA TEST MODE
     input        [        20:0] testio_i,
     output       [        15:0] testio_o,
-    /*
-    input logic                                 efpga_STM_i,
-    output logic                                efpga_test_fcb_pif_vldo_en_o,
-    output logic                                efpga_test_fcb_pif_vldo_o,
-    output logic                                efpga_test_fcb_pif_do_l_en_o,
-    output logic [3:0]                          efpga_test_fcb_pif_do_l_o,
-    output logic                                efpga_test_fcb_pif_do_h_en_o,
-    output logic [3:0]                          efpga_test_fcb_pif_do_h_o,
-    output logic [3:0]                          efpga_test_FB_SPE_OUT_o,
-    input logic                                 efpga_test_fcb_pif_vldi_i,
-    input logic [3:0]                           efpga_test_fcb_pif_di_l_i,
-    input logic [3:0]                           efpga_test_fcb_pif_di_h_i,
-    input logic [3:0]                           efpga_test_FB_SPE_IN_i,
-    input logic [5:0]                           efpga_test_M_i,
-    input logic                                 efpga_test_MLATCH_i,
-*/
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
     // From JTAG Tap Controller to axi_dcb module    //
@@ -555,32 +539,10 @@ module soc_domain
       // other FPGA signals
       .fpga_clk_in(fpga_clk_in),
 
-      //eFPGA SPIS
-      //      .efpga_fcb_spis_rst_n_i    (efpga_fcb_spis_rst_n_i),
-      //      .efpga_fcb_spis_mosi_i     (efpga_fcb_spis_mosi_i),
-      //      .efpga_fcb_spis_cs_n_i     (efpga_fcb_spis_cs_n_i),
-      //      .efpga_fcb_spis_clk_i      (efpga_fcb_spis_clk_i),
-      //      .efpga_fcb_spi_mode_en_bo_i(efpga_fcb_spi_mode_en_bo_i),
-      //      .efpga_fcb_spis_miso_en_o  (efpga_fcb_spis_miso_en_o),
-      //      .efpga_fcb_spis_miso_o     (efpga_fcb_spis_miso_o),
 
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o),
-      //      .efpga_STM_i                 (efpga_STM_i),
-      //      .efpga_test_fcb_pif_vldo_en_o(efpga_test_fcb_pif_vldo_en_o),
-      //      .efpga_test_fcb_pif_vldo_o   (efpga_test_fcb_pif_vldo_o),
-      //      .efpga_test_fcb_pif_do_l_en_o(efpga_test_fcb_pif_do_l_en_o),
-      //      .efpga_test_fcb_pif_do_l_o (efpga_test_fcb_pif_do_l_o),
-      //      .efpga_test_fcb_pif_do_h_en_o(efpga_test_fcb_pif_do_h_en_o),
-      //      .efpga_test_fcb_pif_do_h_o (efpga_test_fcb_pif_do_h_o),
-      //      .efpga_test_FB_SPE_OUT_o   (efpga_test_FB_SPE_OUT_o),
-      //      .efpga_test_fcb_pif_vldi_i   (efpga_test_fcb_pif_vldi_i),
-      //      .efpga_test_fcb_pif_di_l_i (efpga_test_fcb_pif_di_l_i),
-      //      .efpga_test_fcb_pif_di_h_i (efpga_test_fcb_pif_di_h_i),
-      //      .efpga_test_FB_SPE_IN_i    (efpga_test_FB_SPE_IN_i),
-      //      .efpga_test_M_i            (efpga_test_M_i),
-      //      .efpga_test_MLATCH_i         (efpga_test_MLATCH_i),
 
       .cl_event_data_o (s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),

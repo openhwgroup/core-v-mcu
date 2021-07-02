@@ -1,3 +1,12 @@
+// Copyright 2021 QuickLogic.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the “License”); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+// or agreed to in writing, software, hardware and materials distributed under
+// this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
+// specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_registers (
     clk_i,
@@ -79,9 +88,9 @@ module i2c_peripheral_registers (
   wire [ 7:0] i2c_debounce_len_o;
   wire [ 7:0] i2c_scl_delay_len_o;
   wire [ 7:0] i2c_sda_delay_len_o;
-  wire [ 7:0] i2c_reg_addr_i;
-  wire [ 7:0] i2c_reg_wdata_i;
-  wire        i2c_reg_wrenable_i;
+//  wire [ 7:0] i2c_reg_addr_i;
+//  wire [ 7:0] i2c_reg_wdata_i;
+//  (* mark_debug = "true"*) wire        i2c_reg_wrenable_i;
   wire [ 7:0] i2c_reg_rddata_o;
   wire        i2c_reg_rd_byte_complete_i;
 
@@ -125,7 +134,7 @@ module i2c_peripheral_registers (
   reg  [7:0] reg_0x02;  // i2c debounce len
   reg  [7:0] reg_0x03;  // i2c scl delay len
   reg  [7:0] reg_0x04;  // i2c sda delay len
-  reg  [7:0] reg_0x10;  // single-byte msg i2c-to-apb
+  (* mark_debug = "true" *)reg  [7:0] reg_0x10;  // single-byte msg i2c-to-apb
   reg        reg_0x11;  // single-byte msg i2c-to-apb status
   reg  [7:0] reg_0x12;  // single-byte msg apb-to-i2c
   reg        reg_0x13;  // single-byte msg apb-to-i2c status

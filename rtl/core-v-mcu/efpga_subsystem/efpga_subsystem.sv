@@ -43,19 +43,6 @@ module efpga_subsystem #(
     //eFPGA TEST MODE
     output logic [15:0] testio_o,
     input  logic [20:0] testio_i
-    //    output logic                       efpga_test_fcb_pif_do_l_en_o,
-    //    output logic [3:0]                 efpga_test_fcb_pif_do_l_o,
-    //    output logic                       efpga_test_fcb_pif_do_h_en_o,
-    //    output logic [3:0]                 efpga_test_fcb_pif_do_h_o,
-    //    output logic [3:0]                 efpga_test_FB_SPE_OUT_o,
-
-    //    input logic                        efpga_STM_i,
-    //    input logic                        efpga_test_fcb_pif_vldi_i,
-    //    input logic [3:0]                  efpga_test_fcb_pif_di_l_i,
-    //    input logic [3:0]                  efpga_test_fcb_pif_di_h_i,
-    //    input logic [3:0]                  efpga_test_FB_SPE_IN_i,
-    //    input logic [5:0]                  efpga_test_M_i,
-    //    input logic                        efpga_test_MLATCH_i
 );
 
   // FCB Test

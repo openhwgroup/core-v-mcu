@@ -76,7 +76,7 @@
 
 //PARAMETERS
 `define CORE_TYPE     3   // 3 for cv32e40p , 0, pulp, 1 for IBEX RV32IMC (formeryly ZERORI5CY), 2 for IBEX RV32EC (formerly MICRORI5CY)
-`define USE_FPU       1
+`define USE_FPU       0
 `define USE_HWPE      0
 `define NB_CLUSTERS   0
 `define NB_CORES      0
