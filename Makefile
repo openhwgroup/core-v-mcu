@@ -9,7 +9,7 @@ IOSCRIPT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT+=rtl/includes/periph_bus_defines.sv
 IOSCRIPT+=pin-table.csv
 IOSCRIPT+=perdef.json
-IOSCRIPT+=emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+#IOSCRIPT+=emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
 IOSCRIPT+=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
