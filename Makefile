@@ -117,6 +117,6 @@ download0:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
 
-download1:
+download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
