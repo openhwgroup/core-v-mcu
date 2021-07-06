@@ -329,10 +329,7 @@ module core_v_mcu #(
       // FPGAIO signals
       .fpgaio_out_i   (s_fpgaio_out),
       .fpgaio_in_o    (s_fpgaio_in),
-      .fpgaio_oe_i    (s_fpgaio_oe),
-      // Timer signals
-      .debug0         (s_debug0),
-      .debug1         (s_debug1)
+      .fpgaio_oe_i    (s_fpgaio_oe)
   );
 
   //

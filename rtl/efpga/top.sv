@@ -213,7 +213,7 @@ module top (
   logic [3:0] l_ADDR;
   logic launch_p0, launch_p1, launch_p2, launch_p3;
   logic [3:0] p0_fsm, p1_fsm, p2_fsm, p3_fsm;
-  logic [11:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
+  logic [7:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
   logic [ 7:0] delay;
 
 

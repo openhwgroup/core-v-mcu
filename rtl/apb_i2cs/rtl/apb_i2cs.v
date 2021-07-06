@@ -119,7 +119,7 @@ module apb_i2cs (
 
   assign i2c_scl_in = i2c_scl_i;
   assign i2c_sda_in = i2c_sda_i;
-  assign I2c_sda_o  = 1'b0;
+  assign i2c_sda_o  = 1'b0;
   assign i2c_sda_oe = ~i2c_sda_out; // oe is active high
 
 

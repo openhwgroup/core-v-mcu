@@ -42,7 +42,6 @@ module A2_design (
     input               tcdm_fmo_p3,
     input  logic [ 3:0] FB_SPE_IN,
     output logic [ 3:0] FB_SPE_OUT,
-    output              PARALLEL_CFG,
     output logic        NB,
     output logic        PB,
     input  logic        MLATCH,
@@ -84,6 +83,7 @@ module A2_design (
     input  logic        fcb_wl_sel_tb_int,
     input  logic        fcb_wlclk,
 
+    input logic fcb_fb_cfg_done,
     output [31:0] m0_m0_oper_in,
     output        m0_m0_osel,
     output [31:0] m0_m0_coef_in,
@@ -249,7 +249,6 @@ module A2_design (
 );
 
 
-  assign nfcb_pif_en = 1'b0;  //TODO:  this is probably wrong
 
   QL_eFPGA_ArcticPro2_32X32_GF_22 A2 (
       .A2F_CLK0(CLK[0]),
@@ -1259,7 +1258,7 @@ module A2_design (
       .DIN_INT_L_ONLY(fcb_din_int_l_only),
       .DIN_INT_R_ONLY(fcb_din_int_r_only),
       .DIN_SLC_TB_INT(fcb_din_slc_tb_int),
-      .FB_CFG_DONE(FB_CFG_DONE),
+      .FB_CFG_DONE(fcb_fb_cfg_done),
       .FB_ISO_ENB(fcb_fb_iso_enb),
       .FB_SPE_IN_0_(FB_SPE_IN[0]),
       .FB_SPE_IN_1_(FB_SPE_IN[1]),
@@ -1278,7 +1277,7 @@ module A2_design (
       .M_5_(M[5]),
       .NB(NB),
       .PB(PB),
-      .PCHG_B(fcb_chng_b),
+      .PCHG_B(fcb_pchg_b),
       .PI_PWR_0_(fcb_pi_pwr[0]),
       .PI_PWR_1_(fcb_pi_pwr[1]),
       .PI_PWR_2_(fcb_pi_pwr[2]),
@@ -4111,7 +4110,7 @@ module A2_design (
       .FB_SPE_OUT_1_(FB_SPE_OUT[1]),
       .FB_SPE_OUT_2_(FB_SPE_OUT[2]),
       .FB_SPE_OUT_3_(FB_SPE_OUT[3]),
-      .PARALLEL_CFG(PARALLEL_CFG)
+      .PARALLEL_CFG(fcb_pif_en)
   );
 
 endmodule

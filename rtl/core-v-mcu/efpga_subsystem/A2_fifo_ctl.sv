@@ -32,8 +32,8 @@ wire [A_WIDTH:0]   poptopush0;
 
 always@(posedge rclk or posedge fflush ) begin
   if (fflush) begin
-    pushtopop1 <= #`CK2Q 12'h0;
-    pushtopop2 <= #`CK2Q 12'h0;
+    pushtopop1 <= #`CK2Q '0;
+    pushtopop2 <= #`CK2Q '0;
   end else begin
    pushtopop1 <= #`CK2Q pushtopop0;
    pushtopop2 <= #`CK2Q pushtopop1;
@@ -42,8 +42,8 @@ end // always@ (posedge rclk or posedge fflush )
 
 always@(posedge wclk or posedge fflush ) begin
   if (fflush) begin
-    poptopush1 <= #`CK2Q 12'h0;
-    poptopush2 <= #`CK2Q 12'h0;
+    poptopush1 <= #`CK2Q '0;
+    poptopush2 <= #`CK2Q '0;
   end else begin
     poptopush1 <= #`CK2Q poptopush0;
     poptopush2 <= #`CK2Q poptopush1;
@@ -185,9 +185,9 @@ parameter A_WIDTH = 2 )
 
    always@ (posedge wclk or posedge fflush) begin
       if (fflush) begin
-	 waddr     <= #`CK2Q 12'h0;
+	 waddr     <= #`CK2Q '0;
 
-	 gcout_reg <= #`CK2Q 12'h0;
+	 gcout_reg <= #`CK2Q '0;
       end else if (wen == 1'b1) begin
 	 waddr     <= #`CK2Q waddr_next;
 	 gcout_reg <= #`CK2Q gcout_next;

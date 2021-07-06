@@ -149,7 +149,7 @@ module TPRAM_WRAP (
             efpga_w_data = {EFPGA_TPRAM_W_DATA[7:0], EFPGA_TPRAM_W_DATA[31:8]};
             tpram_bit_write = 64'hff00_0000_0000_0000;
           end
-          default: efpga_w_data = 64'h0;
+          default: efpga_w_data = 32'h0;
         endcase
       end // end of if (EFPGA_TPRAM_W_MODE == BYTE_MODE))
     else if (EFPGA_TPRAM_W_MODE == WORD_MODE) begin
@@ -175,42 +175,42 @@ module TPRAM_WRAP (
       end // end of if (EFPGA_TPRAM_W_MODE == WORD_MODE))
     else if (EFPGA_TPRAM_W_MODE == DWORD_MODE ) begin
         case (EFPGA_TPRAM_W_ADDR[2])
-          2'h0: begin
+          1'h0: begin
             efpga_w_data = EFPGA_TPRAM_W_DATA;
             tpram_bit_write = 64'h0000_0000_ffff_ffff;
           end
-          2'h1: begin
+          1'h1: begin
             efpga_w_data = EFPGA_TPRAM_W_DATA;
             tpram_bit_write = 64'hffff_ffff_0000_0000;
           end
-          default: efpga_w_data = 64'h0;
+          default: efpga_w_data = 32'h0;
         endcase
       end // end of if (EFPGA_TPRAM_W_MODE == DWORD_MODE))
     else begin // DEFAULT is RESV_W_MODE
         case (EFPGA_TPRAM_W_ADDR[2])
-          2'h0: begin
+          1'h0: begin
             efpga_w_data = EFPGA_TPRAM_W_DATA;
             tpram_bit_write = 64'h0000_0000_ffff_ffff;
           end
-          2'h1: begin
+          1'h1: begin
             efpga_w_data = EFPGA_TPRAM_W_DATA;
             tpram_bit_write = 64'hffff_ffff_0000_0000;
           end
-          default: efpga_w_data = 64'h0;
+          default: efpga_w_data = 32'h0;
         endcase
       end
     end
   else if (EFPGA_TPRAM_WE && EFPGA_TPRAM_WDSEL) begin  // overide mode -- data from math block is always 32-bits
       case (EFPGA_TPRAM_W_ADDR[2])
-        2'h0: begin
+        1'h0: begin
           efpga_w_data = EFPGA_TPRAM_W_DATA;
           tpram_bit_write = 64'h0000_0000_ffff_ffff;
         end
-        2'h1: begin
+        1'h1: begin
           efpga_w_data = EFPGA_TPRAM_W_DATA;
           tpram_bit_write = 64'hffff_ffff_0000_0000;
         end
-        default: efpga_w_data = 64'h0;
+        default: efpga_w_data = 32'h0;
       endcase
     end else begin
       efpga_w_data = 32'h0;
@@ -269,4 +269,3 @@ module TPRAM_WRAP (
   assign TPRAM_EFPGA_R_DATA = efpga_r_data;
 
 endmodule
-

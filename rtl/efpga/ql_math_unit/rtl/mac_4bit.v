@@ -24,7 +24,7 @@ module MAC_4BIT (
   parameter ACC_WIDTH     = 2*(MULTI_WIDTH+PAD_ZERO) ;
 
 //OUTPUT
-output [4:0] MAC_OUT;
+output [3:0] MAC_OUT;
 
 //INPUT
 input        MAC_ACC_CLK;

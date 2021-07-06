@@ -110,9 +110,18 @@ module efpga_subsystem #(
   logic        fcb2efpga_vlp_srdis_ifx;
   logic [15:0] fcb2efpga_vlp_pwrdis;
   logic        fcb2efpga_vlp_pwrdis_ifx;
+  logic        fcb2efpga_wlclk;
+  logic        fcb2efpga_wl_resetb;
+  logic        fcb2efpga_wl_en;
+  logic        fcb2efpga_wl_int_din_sel;
+  logic        fcb2efpga_wl_sel_tb_int;
+  logic        fcb2efpga_fb_iso_enb;
+  logic        fcb2efpga_pwr_gate;
+  logic        efpga2fcb_pif_en;
 
 
-  logic        fcb_cfg_done;
+
+  logic        fcb_fb_cfg_done;
   logic        efpga_clock;
 
   logic [31:0] control_in_d1, control_in_d2, efpga_control_in;
@@ -343,9 +352,9 @@ module efpga_subsystem #(
       .fcb_pif_vldo(efpga_fcb_pif_vldo_o),  //done
       .fcb_pif_vldo_en(efpga_fcb_pif_vldo_en_o),  //done
       .fcb_pif_do_l(efpga_test_fcb_pif_do_l_o),
-      .fcb_pif_do_l_en(efpga_fcb_pif_do_l_en_o),  //done
+      .fcb_pif_do_l_en(efpga_test_fcb_pif_do_l_en_o),  //done
       .fcb_pif_do_h(efpga_test_fcb_pif_do_h_o),
-      .fcb_pif_do_h_en(efpga_fcb_pif_do_h_en_o),  //done
+      .fcb_pif_do_h_en(efpga_test_fcb_pif_do_h_en_o),  //done
       .fcb_apbs_pready(apbprogram_i.pready),  //(fcb_apbs_pready), //done
       .fcb_apbs_prdata(apbprogram_i.prdata),  //(fcb_apbs_prdata[31:0]), //done
       .fcb_apbs_pslverr(apbprogram_i.pslverr),  //(fcb_apbs_pslverr), //done
@@ -389,7 +398,7 @@ module efpga_subsystem #(
       .fcb_apbm_mclk(),
       .fcb_rst(),  //done
       .fcb_sysclk_en(),  // done
-      .fcb_fb_cfg_done(),
+      .fcb_fb_cfg_done(fcb_fb_cfg_done),
       .fcb_clp_cfg_done_n(),
       .fcb_clp_cfg_enb(),
       .fcb_clp_lth_enb(),
@@ -449,6 +458,7 @@ module efpga_subsystem #(
       .fcb_din_int_r_only(fcb2efpga_din_int_r_only),  //done
       .fcb_din_slc_tb_int(fcb2efpga_din_slc_tb_int),  //done
       .fcb_fb_iso_enb    (fcb2efpga_fb_iso_enb),
+      .fcb_fb_cfg_done    (fcb_fb_cfg_done),
       .fcb_iso_en        (fcb2efpga_iso_en[15:0]),
       .fcb_pchg_b        (fcb2efpga_pchg_b),  //done
       .fcb_pi_pwr        (fcb2efpga_pi_pwr[15:0]),
@@ -470,7 +480,7 @@ module efpga_subsystem #(
       .fcb_wl_en         (fcb2efpga_wl_en),
       .fcb_wl_int_din_sel(fcb2efpga_wl_int_din_sel),
       .fcb_wl_pwrgate    (fcb2efpga_wl_pwrgate[7:0]),
-      .fcb_wl_resetb     (fcb2efpga_wl_resetb),
+      .fcb_wl_resetb     (fcb2efpga_wl_reseb),
       .fcb_wl_sel        (fcb2efpga_wl_sel[15:0]),
       .fcb_wl_sel_tb_int (fcb2efpga_wl_sel_tb_int),
       .fcb_wlclk         (fcb2efpga_wlclk),

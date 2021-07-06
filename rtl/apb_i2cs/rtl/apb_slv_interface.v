@@ -67,6 +67,8 @@ module apb_slave_interface (
 
 
   wire        clk;
+  wire        rst;
+
   assign clk = apb_pclk_i;
   assign rst = apb_preset_i;
 
