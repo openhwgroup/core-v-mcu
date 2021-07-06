@@ -130,10 +130,8 @@ module fc_subsystem #(
     if (~rst_ni) r_int <= 0;
     else begin
       for (int i = 0; i < 32; i++) begin
-        if (core_irq_ack_o && (core_irq_ack_id_o == i))
-          r_int[i] <= 0;
-        else
-          r_int[i] <= events_i[i] | r_int[i];
+        if (core_irq_ack_o && (core_irq_ack_id_o == i)) r_int[i] <= 0;
+        else r_int[i] <= events_i[i] | r_int[i];
       end
     end
   end  // always_ff @ (posedge clk_i, negedge rst_ni)
