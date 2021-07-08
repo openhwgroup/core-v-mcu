@@ -53,6 +53,18 @@ $ make docs
 ```
 The resulting documents are accessed using file ./docs/_build/html/index.html
 
+### Documentation of the Debug Unit
+
+At present the details of the debug unit are not incorporated in the main
+documentation.  The top level interface is an IEEE 1149.1 compliant JTAG Test
+Access port.  It implements the reference JTAG Debug Transport Module
+documented in Section 6.1 of the [RISC-V Debug Interface, version
+0.13.2](https://riscv.org/wp-content/uploads/2019/03/riscv-debug-release.pdf).
+
+The RISC-V Debug Interface has many optional features.  Those enabled for the
+CORE-V MCU are documented in the [PULP Platform Debug
+Unit](https://github.com/pulp-platform/riscv-dbg).
+
 ## Building C header files
 ```
 $ make docs
