@@ -57,7 +57,7 @@ module efpga_subsystem #(
 
 
   assign testio_o[3:0]  = efpga_test_fcb_pif_do_l_o;
-  assign testio_o[7:3]  = efpga_test_fcb_pif_do_h_o;
+  assign testio_o[7:4]  = efpga_test_fcb_pif_do_h_o;
   assign testio_o[11:8] = efpga_test_FB_SPE_OUT_o;
   assign testio_o[12]   = efpga_test_fcb_pif_do_l_en_o;
   assign testio_o[13]   = efpga_test_fcb_pif_do_h_en_o;
@@ -208,9 +208,9 @@ module efpga_subsystem #(
           .efpga_rst(reset_hi),
           .efpga_clk(tcdm_clk[g_tcdm]),
           .efpga_req(tcdm_req_fpga_gated[g_tcdm]),
-          .efpga_gnt(tcdm_gnt_fpga[g_tcdm]),
+          .efpga_gnt(l2_efpga_tcdm[g_tcdm].gnt),//(tcdm_gnt_fpga[g_tcdm]),
           .efpga_fmo(tcdm_fmo_fpga[g_tcdm]),
-          .efpga_valid(tcdm_valid_fpga[g_tcdm]),
+          .efpga_valid(l2_efpga_tcdm[g_tcdm].r_valid),//(tcdm_valid_fpga[g_tcdm]),
           .efpga_req_data({
             tcdm_wen_fpga[g_tcdm],
             tcdm_addr_fpga[g_tcdm][APB_FPGA_ADDR_WIDTH-1:0],
@@ -223,7 +223,7 @@ module efpga_subsystem #(
             l2_asic_tcdm_o[g_tcdm].be,
             l2_asic_tcdm_o[g_tcdm].wdata
           }),
-          .efpga_rdata(tcdm_rdata_fpga[g_tcdm]),
+          .efpga_rdata(l2_efpga_tcdm[g_tcdm].r_rdata),//(tcdm_rdata_fpga[g_tcdm]),
           .soc_rdata(l2_asic_tcdm_o[g_tcdm].r_rdata),
           .soc_rst(reset_hi),
           .soc_clk(asic_clk_i),
@@ -412,17 +412,17 @@ module efpga_subsystem #(
       // Inputs
       .fcb_sys_clk(asic_clk_i),
       .fcb_sys_rst_n(rst_n),
-      .fcb_spis_clk(0),
-      .fcb_spis_rst_n(0),
+      .fcb_spis_clk(1'b0),
+      .fcb_spis_rst_n(1'b0),
       .fcb_sys_stm(efpga_STM_i),  //fcb_sys_stm),
       .fcb_spim_miso(1'b0),
       .fcb_spim_ckout_in(1'b0),
       .fcb_spis_mosi(1'b0),
-      .fcb_spis_cs_n(0),
+      .fcb_spis_cs_n(1'b0),
       .fcb_pif_vldi(efpga_test_fcb_pif_vldi_i),
       .fcb_pif_di_l(efpga_test_fcb_pif_di_l_i),
       .fcb_pif_di_h(efpga_test_fcb_pif_di_h_i),
-      .fcb_spi_mode_en_bo(0),
+      .fcb_spi_mode_en_bo(1'b0),
       .fcb_pif_en(efpga2fcb_pif_en),
       .fcb_pif_8b_mode_bo(1'b1),
       .fcb_apbs_pprot(3'b000),
@@ -435,7 +435,7 @@ module efpga_subsystem #(
       .fcb_bl_dout(efpga2fcb_bl_dout[31:0]),
       .fcb_apbm_prdata_0('0),
       .fcb_apbm_prdata_1('0),
-      .fcb_spi_master_en(0)
+      .fcb_spi_master_en(1'b0)
   );
 
   eFPGA_wrapper eFPGA_wrapper (
