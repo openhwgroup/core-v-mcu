@@ -580,7 +580,7 @@ if args.pad_control_sv != None:
                     io_num = row[sel][8:-1]
                     pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(io_num, NBIT_PADMUX, sel, row[sel]))
                     nparen = nparen + 1
-            pad_control_sv.write(" 1'b0")
+            pad_control_sv.write(" 1'b1")
             for i in range(nparen):
                 pad_control_sv.write(")")
             pad_control_sv.write(";\n")

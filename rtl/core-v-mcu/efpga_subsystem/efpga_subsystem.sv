@@ -254,7 +254,8 @@ module efpga_subsystem #(
 
 
 
-  log_int_dc_slice logint_dc_efpga_apbt1 (
+  log_int_dc_slice # (.ADDR_WIDTH(20))
+  logint_dc_efpga_apbt1 (
       .push_clk    (asic_clk_i),
       .push_rst_n  (rst_n),
       .data_req_i  (s_lint_REQ),
@@ -262,7 +263,7 @@ module efpga_subsystem #(
       .data_wen_i  (apbt1_i.wen),
       .data_wdata_i(apbt1_i.wdata),
       .data_be_i   (apbt1_i.be),
-      .data_ID_i   ('0),
+      .data_ID_i   (4'b0000),
       .data_gnt_o  (s_lint_GNT),
 
       .data_r_valid_o(s_lint_VALID),
