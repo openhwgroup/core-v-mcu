@@ -270,7 +270,7 @@ module efpga_subsystem #(
       .data_r_rdata_o(apbt1_i.r_rdata),
       .data_r_ID_o   (),
       .data_req_o  (apbt1_int.req),
-      .data_add_o  (apbt1_int.add),
+      .data_add_o  (apbt1_int.add[19:0]),
       .data_wen_o  (apbt1_int.wen),
       .data_wdata_o(apbt1_int.wdata),
       .data_be_o   (apbt1_int.be),

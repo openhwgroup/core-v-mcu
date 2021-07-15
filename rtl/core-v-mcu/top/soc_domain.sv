@@ -26,7 +26,7 @@ module soc_domain
     parameter AXI_USER_WIDTH = 6,
     parameter BUFFER_WIDTH = 8,
     parameter EVNT_WIDTH = 8,
-    parameter NB_CORES = 8,
+    parameter NB_CORES = 1, // was 8
     parameter NB_HWPE_PORTS = 4,
     parameter NGPIO = 43,
     parameter NPAD = 64,  //Must not be changed as other parts
@@ -257,7 +257,7 @@ module soc_domain
   //  This mask will be used to generated only the flip flop needed and the constant-propagator engine of the synthesizer
   //  will remove the other flip flops and related logic.
 
-  localparam NrHarts = 1024;
+  localparam NrHarts = 1; // was 1024
 
   // this is a constant expression
   function logic [NrHarts-1:0] SEL_HARTS_FX();
