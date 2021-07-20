@@ -46,8 +46,8 @@ module i2c_peripheral_interface (
   input [7:0] i2c_scl_delay_len_i;
   input [7:0] i2c_sda_delay_len_i;
   output [7:0] i2c_reg_addr_o;
-(* mark_debug = "true" *)  output [7:0] i2c_reg_wdata_o;
-(* mark_debug = "true" *)  output i2c_reg_wrenable_o;
+  output [7:0] i2c_reg_wdata_o;
+  output i2c_reg_wrenable_o;
   input [7:0] i2c_reg_rddata_i;
   output i2c_reg_rd_byte_complete_o;
 

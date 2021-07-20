@@ -24,6 +24,10 @@ module apb_node_wrap #(
 )(
         input logic                                      clk_i,
         input logic                                      rst_ni,
+(* mark_debug = "true" *)  input logic rto_i,
+(* mark_debug = "true" *)  output logic start_rto_o,
+(* mark_debug = "true" *)  output logic [NB_MASTER-1:0] peripheral_rto_o,
+
         // Slave Port
         APB_BUS.Slave                                    apb_slave,
         // Master Ports
@@ -41,6 +45,14 @@ module apb_node_wrap #(
     logic [NB_MASTER-1:0][APB_DATA_WIDTH-1:0] prdata;
     logic [NB_MASTER-1:0]                     pready;
     logic [NB_MASTER-1:0]                     pslverr;
+
+  logic                                       slave_pready;
+  assign apb_slave.pready = rto_i | slave_pready;
+
+  assign start_rto_o = apb_slave.psel; // start ready timer
+  assign peripheral_rto_o = rto_i ? psel : '0;  // report which peripheral timed out
+
+
 
     for (genvar i = 0; i < NB_MASTER; i++) begin
         assign apb_masters[i].penable = penable[i];
@@ -64,7 +76,7 @@ module apb_node_wrap #(
 	.psel_i         ( apb_slave.psel    ),
         .pwdata_i       ( apb_slave.pwdata  ),
         .prdata_o       ( apb_slave.prdata  ),
-        .pready_o       ( apb_slave.pready  ),
+        .pready_o       ( slave_pready  ),
         .pslverr_o      ( apb_slave.pslverr ),
 
         .penable_o      ( penable           ),

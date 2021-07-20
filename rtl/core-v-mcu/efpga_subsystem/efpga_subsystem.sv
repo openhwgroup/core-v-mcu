@@ -81,7 +81,8 @@ module efpga_subsystem #(
   assign efpga_test_fcb_pif_di_l_i = testio_i[3:0];
   assign efpga_test_fcb_pif_di_h_i = testio_i[7:4];
   assign efpga_test_FB_SPE_IN_i = testio_i[11:8];
-  assign efpga_test_M_i = testio_i[18:12];
+  assign efpga_test_M_i = testio_i[17:12];
+  assign efpga_test_MLATCH_i = testio_i[18];
   assign efpga_test_fcb_pif_vldi_i = testio_i[19];
   assign efpga_STM_i = testio_i[20];
 
@@ -208,9 +209,9 @@ module efpga_subsystem #(
           .efpga_rst(reset_hi),
           .efpga_clk(tcdm_clk[g_tcdm]),
           .efpga_req(tcdm_req_fpga_gated[g_tcdm]),
-          .efpga_gnt(l2_efpga_tcdm[g_tcdm].gnt),//(tcdm_gnt_fpga[g_tcdm]),
+          .efpga_gnt(l2_efpga_tcdm[g_tcdm].gnt),  //(tcdm_gnt_fpga[g_tcdm]),
           .efpga_fmo(tcdm_fmo_fpga[g_tcdm]),
-          .efpga_valid(l2_efpga_tcdm[g_tcdm].r_valid),//(tcdm_valid_fpga[g_tcdm]),
+          .efpga_valid(l2_efpga_tcdm[g_tcdm].r_valid),  //(tcdm_valid_fpga[g_tcdm]),
           .efpga_req_data({
             tcdm_wen_fpga[g_tcdm],
             tcdm_addr_fpga[g_tcdm][APB_FPGA_ADDR_WIDTH-1:0],
@@ -223,7 +224,7 @@ module efpga_subsystem #(
             l2_asic_tcdm_o[g_tcdm].be,
             l2_asic_tcdm_o[g_tcdm].wdata
           }),
-          .efpga_rdata(l2_efpga_tcdm[g_tcdm].r_rdata),//(tcdm_rdata_fpga[g_tcdm]),
+          .efpga_rdata(l2_efpga_tcdm[g_tcdm].r_rdata),  //(tcdm_rdata_fpga[g_tcdm]),
           .soc_rdata(l2_asic_tcdm_o[g_tcdm].r_rdata),
           .soc_rst(reset_hi),
           .soc_clk(asic_clk_i),
@@ -254,8 +255,9 @@ module efpga_subsystem #(
 
 
 
-  log_int_dc_slice # (.ADDR_WIDTH(20))
-  logint_dc_efpga_apbt1 (
+  log_int_dc_slice #(
+      .ADDR_WIDTH(20)
+  ) logint_dc_efpga_apbt1 (
       .push_clk    (asic_clk_i),
       .push_rst_n  (rst_n),
       .data_req_i  (s_lint_REQ),

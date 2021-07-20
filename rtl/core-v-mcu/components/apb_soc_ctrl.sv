@@ -39,7 +39,8 @@
 `define REG_CS_RO       12'hC0 //BASEADDR+0xC0 32bit RO GP used during testing to return EOC(bit[31]) and status(bit[30:0])
 `define REG_BOOTSEL 12'hC4 //BASEADDR+0xC4 bootsel
 `define REG_CLKSEL 12'hC8 //BASEADDR+0xC8 clocksel
-
+`define RTO_PERIPHERAL 12'hE0
+`define RTO_COUNT 12'hE4
 `define RESET_TYPE1_EFPGA 12'hE8 //BASEADDR+0xE8
 `define ENABLE_IN_OUT_EFPGA 12'hEC //BASEADDR+0xEC
 `define EFPGA_CONTROL 12'hF0
@@ -112,14 +113,18 @@ module apb_soc_ctrl #(
     output logic       enable_tcdm1_efpga_o,
     output logic       enable_tcdm0_efpga_o,
 
-    output logic        fc_fetchen_o,
-    output logic        sel_hyper_axi_o,
-    output logic        cluster_pow_o,  // power cluster
-    output logic        cluster_byp_o,  // bypass cluster
-    output logic [63:0] cluster_boot_addr_o,
-    output logic        cluster_fetch_enable_o,
-    output logic        cluster_rstn_o,
-    output logic        cluster_irq_o
+    output logic                  fc_fetchen_o,
+    output logic                  sel_hyper_axi_o,
+    output logic                  cluster_pow_o,  // power cluster
+    output logic                  cluster_byp_o,  // bypass cluster
+    output logic [          63:0] cluster_boot_addr_o,
+    output logic                  cluster_fetch_enable_o,
+    output logic                  cluster_rstn_o,
+    output logic                  cluster_irq_o,
+    output logic                  rto_o,
+    input  logic                  start_rto_i,
+    input  logic [`NB_MASTER-1:0] peripheral_rto_i
+
 );
   localparam IDX_WIDTH = `LOG2(`N_IO);
   localparam CONFIG = 12'h4??;
@@ -160,14 +165,18 @@ module apb_soc_ctrl #(
   logic [              7:0]                   r_clk_div_cluster;
   logic s_div_cluster_valid, s_div_cluster_sel;
 
-  logic [5:0] r_sel_clk_dc_fifo_onehot;
-  logic       r_clk_gating_dc_fifo;
-  logic [3:0] r_reset_type1_efpga;
-  logic [5:0] r_enable_inout_efpga;
+  logic [ 5:0] r_sel_clk_dc_fifo_onehot;
+  logic        r_clk_gating_dc_fifo;
+  logic [ 3:0] r_reset_type1_efpga;
+  logic [ 5:0] r_enable_inout_efpga;
 
-  logic       s_apb_write;
+  logic        s_apb_write;
 
-  logic [1:0] APB_fsm;
+  (* mark_debug = "true" *)logic [19:0] ready_timeout_count;
+  (* mark_debug = "true" *)logic [31:0] rto_count_reg;
+  (* mark_debug = "true" *)logic [31:0] periph_rto_reg;
+
+  logic [ 1:0] APB_fsm;
   localparam FSM_IDLE = 0, FSM_READ = 1, FSM_WRITE = 2, FSM_WAIT = 3;
 
 
@@ -249,8 +258,19 @@ module apb_soc_ctrl #(
       PREADY                   <= '0;
       PSLVERR                  <= '0;
       control_in               <= '0;
+      ready_timeout_count      <= 20'h000ff;
+      rto_count_reg            <= {12'h0, 20'h000ff};
+      periph_rto_reg           <= 32'h0;
+      rto_o                    <= 1'b0;
 
     end else begin
+
+      if (start_rto_i == 1) ready_timeout_count <= ready_timeout_count - 1;
+      else ready_timeout_count <= rto_count_reg[19:0];
+      if (ready_timeout_count == 0) rto_o <= 1'b1;
+      else rto_o <= 1'b0;
+      periph_rto_reg[`NB_MASTER-1:0] <= periph_rto_reg[`NB_MASTER-1:0] | peripheral_rto_i;
+
       r_jtag_regi_sync[1] <= soc_jtag_reg_i;
       r_jtag_regi_sync[0] <= r_jtag_regi_sync[1];
 
@@ -291,7 +311,8 @@ module apb_soc_ctrl #(
             `REG_CLUSTER_IRQ: r_cluster_irq <= PWDATA[0];
             `REG_CLUSTER_BOOT_ADDR0: r_cluster_boot[31:0] <= PWDATA;
             `REG_CLUSTER_BOOT_ADDR1: r_cluster_boot[63:32] <= PWDATA;
-
+            `RTO_PERIPHERAL: periph_rto_reg <= 32'h0;
+            `RTO_COUNT: rto_count_reg <= {PWDATA[19:4], 4'hf};
             `RESET_TYPE1_EFPGA: r_reset_type1_efpga <= PWDATA[3:0];
             `ENABLE_IN_OUT_EFPGA: r_enable_inout_efpga <= PWDATA[5:0];
             `EFPGA_CONTROL: control_in <= PWDATA;
@@ -339,6 +360,8 @@ module apb_soc_ctrl #(
             `REG_CLUSTER_IRQ: PRDATA <= {31'b0, r_cluster_irq};
             `REG_CLUSTER_BOOT_ADDR0: PRDATA <= r_cluster_boot[31:0];
             `REG_CLUSTER_BOOT_ADDR1: PRDATA <= r_cluster_boot[63:32];
+            `RTO_PERIPHERAL: PRDATA <= periph_rto_reg;
+            `RTO_COUNT: PRDATA <= rto_count_reg;
             `RESET_TYPE1_EFPGA: PRDATA <= {28'b0, r_reset_type1_efpga};
             `ENABLE_IN_OUT_EFPGA: PRDATA <= {26'b0, r_enable_inout_efpga};
             `EFPGA_CONTROL: PRDATA <= control_in;

@@ -134,7 +134,7 @@ module i2c_peripheral_registers (
   reg  [7:0] reg_0x02;  // i2c debounce len
   reg  [7:0] reg_0x03;  // i2c scl delay len
   reg  [7:0] reg_0x04;  // i2c sda delay len
-  (* mark_debug = "true" *)reg  [7:0] reg_0x10;  // single-byte msg i2c-to-apb
+  reg  [7:0] reg_0x10;  // single-byte msg i2c-to-apb
   reg        reg_0x11;  // single-byte msg i2c-to-apb status
   reg  [7:0] reg_0x12;  // single-byte msg apb-to-i2c
   reg        reg_0x13;  // single-byte msg apb-to-i2c status

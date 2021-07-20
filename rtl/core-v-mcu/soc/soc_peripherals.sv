@@ -187,8 +187,12 @@ module soc_peripherals #(
   logic [                   31:0]                            perf_counter_value_x;
 
   logic [31:0] control_in, status_out;
-  logic [7:0] version;
-  logic       event_fifo_valid;
+  logic [           7:0] version;
+  logic                  event_fifo_valid;
+
+  logic                  s_rto;
+  logic                  s_start_rto;
+  logic [`NB_MASTER-1:0] s_peripheral_rto;
 
 
 
@@ -240,12 +244,17 @@ module soc_peripherals #(
   // ██║     ███████╗██║  ██║██║██║     ██║  ██║    ██████╔╝╚██████╔╝███████║    ╚███╔███╔╝██║  ██║██║  ██║██║      //
   // ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝  ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝      //
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   periph_bus_wrap #(
       .APB_ADDR_WIDTH(32),
       .APB_DATA_WIDTH(32)
   ) periph_bus_i (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
+
+      .rto_i(s_rto),
+      .start_rto_o(s_start_rto),
+      .peripheral_rto_o(s_peripheral_rto),
 
       .apb_slave(apb_slave),
 
@@ -484,7 +493,11 @@ module soc_peripherals #(
       .cluster_boot_addr_o   (cluster_boot_addr_o),
       .cluster_fetch_enable_o(cluster_fetch_enable_o),
       .cluster_rstn_o        (cluster_rstn_o),
-      .cluster_irq_o         (cluster_irq_o)
+      .cluster_irq_o         (cluster_irq_o),
+      // ready timout signals
+      .rto_o                 (s_rto),
+      .start_rto_i           (s_start_rto),
+      .peripheral_rto_i      (s_peripheral_rto)
   );
 
   apb_adv_timer #(
