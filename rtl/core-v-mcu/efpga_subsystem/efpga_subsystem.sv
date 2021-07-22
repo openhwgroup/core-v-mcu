@@ -118,7 +118,7 @@ module efpga_subsystem #(
   logic        fcb2efpga_wl_sel_tb_int;
   logic        fcb2efpga_fb_iso_enb;
   logic        fcb2efpga_pwr_gate;
-  logic        fcb2efpga_set_por
+  logic        fcb2efpga_set_por;
   logic        efpga2fcb_pif_en;
   logic        efpga_por;
 
