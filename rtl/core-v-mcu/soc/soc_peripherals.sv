@@ -131,7 +131,6 @@ module soc_peripherals #(
   logic                                                      s_i2c_event;
   logic                                                      s_i2s_event;
   logic                                                      s_i2s_cam_event;
-  logic                                                      s_i2cs_event;
 
   logic [                    3:0]                            s_adv_timer_events;
   logic [                    1:0]                            s_fc_hp_events;
@@ -194,6 +193,10 @@ module soc_peripherals #(
   logic                  s_start_rto;
   logic [`NB_MASTER-1:0] s_peripheral_rto;
 
+  logic s_soft_reset, apb_reset;
+
+
+  assign apb_reset = rst_ni & !s_soft_reset;
 
 
   assign s_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0] = s_udma_events[UDMA_EVENTS-N_EFPGA_EVENTS-1:0]; // 111 - 0
@@ -290,7 +293,7 @@ module soc_peripherals #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) apb_fll_if_i (
       .HCLK   (clk_i),
-      .HRESETn(rst_ni),
+      .HRESETn(apb_reset),
 
       .PADDR  (s_fll_bus.paddr),
       .PWDATA (s_fll_bus.pwdata),
@@ -339,7 +342,7 @@ module soc_peripherals #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) i_apb_gpio (
       .HCLK   (clk_i),
-      .HRESETn(rst_ni),
+      .HRESETn(apb_reset),
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
@@ -397,7 +400,7 @@ module soc_peripherals #(
       .sys_clk_i   (clk_i),
       .periph_clk_i(periph_clk_i),
       .efpga_clk_i (periph_clk_i),  // FIXME if udma stays
-      .sys_resetn_i(rst_ni),
+      .sys_resetn_i(apb_reset),
 
       .udma_apb_paddr  (s_udma_bus.paddr),
       .udma_apb_pwdata (s_udma_bus.pwdata),
@@ -497,7 +500,8 @@ module soc_peripherals #(
       // ready timout signals
       .rto_o                 (s_rto),
       .start_rto_i           (s_start_rto),
-      .peripheral_rto_i      (s_peripheral_rto)
+      .peripheral_rto_i      (s_peripheral_rto),
+      .soft_reset_o          (s_soft_reset)
   );
 
   apb_adv_timer #(
@@ -505,7 +509,7 @@ module soc_peripherals #(
       .EXTSIG_NUM    (32)
   ) i_apb_adv_timer (
       .HCLK   (clk_i),
-      .HRESETn(rst_ni),
+      .HRESETn(apb_reset),
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
@@ -550,7 +554,7 @@ module soc_peripherals #(
       .FC_EVENT_POS  (7)
   ) u_evnt_gen (
       .HCLK   (clk_i),
-      .HRESETn(rst_ni),
+      .HRESETn(apb_reset),
 
       .PADDR  (s_soc_evnt_gen_bus.paddr),
       .PWDATA (s_soc_evnt_gen_bus.pwdata),
@@ -644,7 +648,7 @@ module soc_peripherals #(
       .enable_tcdm1_efpga_i (enable_tcdm1_efpga),
       .enable_tcdm0_efpga_i (enable_tcdm0_efpga),
 
-      .rst_n(rst_ni),
+      .rst_n(apb_reset),
 
 
       .l2_asic_tcdm_o(l2_efpga_tcdm_master),
@@ -676,7 +680,7 @@ module soc_peripherals #(
 
   apb_i2cs i_apb_i2cs (
       .apb_pclk_i   (clk_i),
-      .apb_presetn_i(rst_ni),
+      .apb_presetn_i(apb_reset),
 
       .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
@@ -685,14 +689,16 @@ module soc_peripherals #(
       .apb_penable_i(s_apb_i2cs_bus.penable),
       .apb_prdata_o (s_apb_i2cs_bus.prdata),
       .apb_pready_o (s_apb_i2cs_bus.pready),
-      .apb_interrupt_o(),
+      .apb_interrupt_o(s_i2cs_event),
       // .PSLVERR(s_apb_i2cs_bus.pslverr),
 
       .i2c_scl_i(apbio_in_i[`N_GPIO+16]),
       .i2c_sda_i(apbio_in_i[`N_GPIO+17]),
       .i2c_sda_o(apbio_out_o[`N_GPIO+17]),
       .i2c_sda_oe(apbio_oe_o[`N_GPIO+17]),
-      .i2c_interrupt_o(s_i2cs_event)
+      .i2c_interrupt_o(apbio_out_o[`N_GPIO+18])
   );
+  assign apbio_oe_o[`N_GPIO+18] = 1'b1;
+
 
 endmodule

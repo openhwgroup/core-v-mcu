@@ -118,7 +118,9 @@ module efpga_subsystem #(
   logic        fcb2efpga_wl_sel_tb_int;
   logic        fcb2efpga_fb_iso_enb;
   logic        fcb2efpga_pwr_gate;
+  logic        fcb2efpga_set_por
   logic        efpga2fcb_pif_en;
+  logic        efpga_por;
 
 
 
@@ -165,6 +167,7 @@ module efpga_subsystem #(
 
   logic reset_hi;
   assign reset_hi = ~rst_n;
+  assign efpga_por = reset_hi | fcb2efpga_set_por;
   assign qualified_valid_p3 = l2_asic_tcdm_o[3].r_valid & wen_p3;
   assign qualified_valid_p2 = l2_asic_tcdm_o[2].r_valid & wen_p2;
   assign qualified_valid_p1 = l2_asic_tcdm_o[1].r_valid & wen_p1;
@@ -409,7 +412,7 @@ module efpga_subsystem #(
       .fcb_clp_vlp(),
 
       .fcb_pwr_gate(fcb2efpga_pwr_gate),
-      .fcb_set_por(),  //done
+      .fcb_set_por(fcb2efpga_set_por),  //done
       .fcb_clp_set_por(),
       .fcb_spi_master_status(),  // done
       // Inputs
@@ -448,7 +451,7 @@ module efpga_subsystem #(
       .test_fb_spe_in(efpga_test_FB_SPE_IN_i),
       .MLATCH(efpga_test_MLATCH_i),
       .STM(efpga_STM_i),
-      .POR(~rst_n),
+      .POR(efpga_por),
       .M(efpga_test_M_i),
 
       .fcb_bl_din(fcb2efpga_bl_din),

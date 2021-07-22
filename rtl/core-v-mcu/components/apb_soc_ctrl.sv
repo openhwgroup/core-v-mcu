@@ -46,6 +46,8 @@
 `define EFPGA_CONTROL 12'hF0
 `define EFPGA_STATUS 12'hF4
 `define EFPGA_VERSION 12'hF8
+`define SOFT_RESET 12'hFC
+
 `define PAD_CFG_MUX 12'b0100????????  // 0x400 - 7FC for 256 PADMUX
 
 
@@ -123,7 +125,8 @@ module apb_soc_ctrl #(
     output logic                  cluster_irq_o,
     output logic                  rto_o,
     input  logic                  start_rto_i,
-    input  logic [`NB_MASTER-1:0] peripheral_rto_i
+    input  logic [`NB_MASTER-1:0] peripheral_rto_i,
+    output logic                  soft_reset_o
 
 );
   localparam IDX_WIDTH = `LOG2(`N_IO);
@@ -172,9 +175,9 @@ module apb_soc_ctrl #(
 
   logic        s_apb_write;
 
-  (* mark_debug = "true" *)logic [19:0] ready_timeout_count;
-  (* mark_debug = "true" *)logic [31:0] rto_count_reg;
-  (* mark_debug = "true" *)logic [31:0] periph_rto_reg;
+  logic [19:0] ready_timeout_count;
+  logic [31:0] rto_count_reg;
+  logic [31:0] periph_rto_reg;
 
   logic [ 1:0] APB_fsm;
   localparam FSM_IDLE = 0, FSM_READ = 1, FSM_WRITE = 2, FSM_WAIT = 3;
@@ -229,7 +232,6 @@ module apb_soc_ctrl #(
   always_ff @(posedge HCLK, negedge HRESETn) begin
     if (~HRESETn) begin
       APB_fsm                  <= FSM_IDLE;
-
       r_io_pad                 <= '0;
       r_padmux                 <= '0;
       r_corestatus             <= '0;
@@ -262,6 +264,7 @@ module apb_soc_ctrl #(
       rto_count_reg            <= {12'h0, 20'h000ff};
       periph_rto_reg           <= 32'h0;
       rto_o                    <= 1'b0;
+      soft_reset_o             <= 1'b0;
 
     end else begin
 
@@ -273,6 +276,8 @@ module apb_soc_ctrl #(
 
       r_jtag_regi_sync[1] <= soc_jtag_reg_i;
       r_jtag_regi_sync[0] <= r_jtag_regi_sync[1];
+
+      soft_reset_o <= 0;
 
       // allow fc fetch enable to be controlled through a signal
       if (fc_fetch_en_valid_i) r_fetchen <= fc_fetch_en_i;
@@ -316,6 +321,20 @@ module apb_soc_ctrl #(
             `RESET_TYPE1_EFPGA: r_reset_type1_efpga <= PWDATA[3:0];
             `ENABLE_IN_OUT_EFPGA: r_enable_inout_efpga <= PWDATA[5:0];
             `EFPGA_CONTROL: control_in <= PWDATA;
+            `SOFT_RESET: begin
+              soft_reset_o         <= 1;
+              r_io_pad             <= '0;
+              r_padmux             <= '0;
+              r_pad_fun0           <= '0;
+              r_pad_fun1           <= '0;
+              pad_cfg_o            <= '1;
+              r_clk_gating_dc_fifo <= 1'b1;
+              r_reset_type1_efpga  <= '0;
+              r_enable_inout_efpga <= '0;
+              control_in           <= '0;
+              rto_count_reg        <= {12'h0, 20'h000ff};
+              periph_rto_reg       <= 32'h0;
+            end
             12'h4??: begin
               if (PADDR[9:2] < `N_IO) begin
                 r_io_pad <= PADDR[9:2];
@@ -367,6 +386,8 @@ module apb_soc_ctrl #(
             `EFPGA_CONTROL: PRDATA <= control_in;
             `EFPGA_STATUS: PRDATA <= status_out;
             `EFPGA_VERSION: PRDATA[7:0] <= version;
+
+
             default: begin
               PSLVERR <= 1;
               PRDATA  <= 32'hDEADBEEF;

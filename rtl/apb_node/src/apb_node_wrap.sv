@@ -24,9 +24,9 @@ module apb_node_wrap #(
 )(
         input logic                                      clk_i,
         input logic                                      rst_ni,
-(* mark_debug = "true" *)  input logic rto_i,
-(* mark_debug = "true" *)  output logic start_rto_o,
-(* mark_debug = "true" *)  output logic [NB_MASTER-1:0] peripheral_rto_o,
+        input logic rto_i,
+        output logic start_rto_o,
+        output logic [NB_MASTER-1:0] peripheral_rto_o,
 
         // Slave Port
         APB_BUS.Slave                                    apb_slave,

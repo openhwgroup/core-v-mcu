@@ -86,6 +86,10 @@ module i2c_peripheral_interface (
   reg [2:0]                      scl_d, sda_d;
   reg                            scl_cs,scl_ls, sda_cs, sda_ls;
 
+  reg [4:0]                      sda_cnt;
+  reg [4:0]                      scl_cnt;
+
+
   always @(posedge rst or posedge clk) begin
     if (rst == 1) begin
       scl_d <= 3'b111;
@@ -94,10 +98,23 @@ module i2c_peripheral_interface (
       scl_ls <= 1;
       sda_cs <= 1;
       sda_ls <= 1;
+      sda_cnt <= 5'b0;
+      scl_cnt <= 5'b0;
     end
     else begin
-      scl_d <= {scl_d[1:0],i2c_scl_i};
-      sda_d <= {sda_d[1:0],i2c_sda_i};
+      if (sda_cnt == i2c_sda_delay_len_i[4:0])
+        sda_cnt <= 5'b0;
+      else
+        sda_cnt <= sda_cnt + 5'b00001;
+      if (scl_cnt == i2c_scl_delay_len_i[4:0])
+        scl_cnt <= 5'b0;
+      else
+        sda_cnt <= sda_cnt + 5'b00001;
+
+      if (scl_cnt == 5'b0)
+        scl_d <= {scl_d[1:0],i2c_scl_i};
+      if (sda_cnt == 5'b0)
+        sda_d <= {sda_d[1:0],i2c_sda_i};
       case (scl_d)
         3'b000: scl_cs <= 0;
         3'b111: scl_cs <= 1;

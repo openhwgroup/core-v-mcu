@@ -50,8 +50,18 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0x00C4,BOOTSEL,,,,,
 0x00C8,CLKSEL,,,,,
 0x00D8,CLK_DIV_CLU,,,,,
-0x00E0,SEL_CLK_DC_FIFO_EFPGA,,,,,
-0x00E4,CLK_GATING_DC_FIFO_EFPGA,,,,,
+0x00E0,RTO_PERIPHERAL_ERROR,,,,,Indicates which APB peripheral cause a ready timeout error
+,FCB_RTO,8,8,R/W,0x0 ,1 indicates that the FCB interface caused a ready timeout
+,TIMER_RTO,7,7,R/W,0x0 ,1 indicates that the TIMER interface caused a ready timeout
+,I2CS_RTO,6,6,R/W,0x0 ,1 indicates that the I2CS interface caused a ready timeout
+,EVENT_GEN_RTO,5,5,R/W,0x0 ,1 indicates that the EVENT GENERATOR interface caused a ready timeout
+,ADV_TIMER_RTO,4,4,R/W,0x0 ,1 indicates that the ADVANCED TIMER interface caused a ready timeout
+,SOC_CONTROL_RTO,3,3,R/W,0x0,1 indicates that the SOC CONTROL interface caused a ready timeout
+,UDMA_RTO,2,2,R/W,0x0,1 indicates that the UDMA CONTROL interface caused a ready timeout
+,GPIO_RTO,1,1,R/W,0x0 ,1 indicates that the GPIO interface caused a ready timeout
+,FLL_RTO,0,0,R/W,0x0 ,1 indicates that the FLL interface caused a ready timeout
+0x00E4,READY_TIMEOUT_COUNT,,,,,
+,COUNT,19,0,R/W,0xFF,Number of APB clocks before a ready timeout occurs
 0x00E8,RESET_TYPE1_EFPGA,,,,,
 ,RESET_LB,3,3,R/W,0x0 ,Reset eFPGA Left Bottom Quadrant
 ,RESET_RB,2,2,R/W,0x0 ,Reset eFPGA Right Bottom Quadrant
@@ -66,8 +76,8 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,ENABLE_TCDM_P0,0,0,R/W,3x0 ,Enable EFPGA access via TCDM port 0
 0x00F0,EFPGA_CONTROL_IN,31,0,RW,0x00,EFPGA control  bits use per eFPGA design 
 0x00F4,EFPGA_STATUS_OUT,31,0,R0,,Status from eFPGA 
-,EFPGA_VERSION,7,0,R0,,EFPGA version info
-,,,,,,
+0x00F8,EFPGA_VERSION,7,0,R0,,EFPGA version info
+0x00FC,SOFT_RESET,1,1,WO,NA,Write only strobe to reset all APB clients
 0x0400,IO_CTRL[`N_IO],,,,,
 ,CFG,+`NBIT_PADCFG,8,RW,0x00,Pad configuration (TBD)
 ,MUX,+`NBIT_PADMUX,0,RW,0x00,Mux select
