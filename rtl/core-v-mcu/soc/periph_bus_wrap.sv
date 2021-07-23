@@ -29,7 +29,8 @@ module periph_bus_wrap #(
     APB_BUS.Master timer_master,
     APB_BUS.Master hwpe_master,
     APB_BUS.Master fcb_master,
-    APB_BUS.Master stdout_master
+    APB_BUS.Master stdout_master,
+    APB_BUS.Master i2cs_master
 );
 
   localparam NB_MASTER = `NB_MASTER;
@@ -97,6 +98,9 @@ module periph_bus_wrap #(
   assign s_start_addr[11] = `EFPGA_CONFIG_START_ADDR;
   assign s_end_addr[11]   = `EFPGA_CONFIG_END_ADDR;
 
+  `APB_ASSIGN_MASTER(s_masters[12], i2cs_master);
+  assign s_start_addr[12] = `I2CS_START_ADDR;
+  assign s_end_addr[12]   = `I2CS_END_ADDR;
 
 
 

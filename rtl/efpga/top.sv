@@ -478,7 +478,7 @@ module top (
         0: begin
           p0_cnt <= '0;
           if (launch_p0 == 1) begin
-            launch_p0 <= 0;
+            //            launch_p0 <= 0;
             m0_oper0_raddr <= 0;
             m0_oper0_waddr <= 0;
             if (tcdm_wen_p0 == 0)  // write
@@ -530,7 +530,7 @@ module top (
         0: begin
           p1_cnt <= '0;
           if (launch_p1 == 1) begin
-            launch_p1 <= 0;
+            //          launch_p1 <= 0;
             m0_oper1_raddr <= 0;
             m0_oper1_waddr <= 0;
             if (tcdm_wen_p1 == 0)  // write
@@ -582,7 +582,7 @@ module top (
         0: begin
           p2_cnt <= '0;
           if (launch_p2 == 1) begin
-            launch_p2 <= 0;
+            //            launch_p2 <= 0;
             m1_oper0_raddr <= 0;
             m1_oper0_waddr <= 0;
             if (tcdm_wen_p2 == 0)  // write
@@ -634,7 +634,7 @@ module top (
         0: begin
           p3_cnt <= '0;
           if (launch_p3 == 1) begin
-            launch_p3 <= 0;
+            //            launch_p3 <= 0;
             m1_oper1_raddr <= 0;
             m1_oper1_waddr <= 0;
             if (tcdm_wen_p3 == 0)  // write

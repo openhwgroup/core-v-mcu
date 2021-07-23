@@ -24,6 +24,9 @@ from datetime import datetime
 #  Argument handling
 #
 parser = argparse.ArgumentParser()
+parameterArgs = parser.add_argument_group("parameters")
+parameterArgs.add_argument("--emulation-toplevel", help="top level module name to use in emulation wrapper")
+
 inputArgs = parser.add_argument_group("input files")
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
 inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
@@ -428,7 +431,7 @@ if args.soc_defines != None and args.cvmcu_h != None:
 if args.soc_defines != None and args.pin_table != None:
     N_IO = int(soc_defines['N_IO'])
     N_PERIO = perio_index
-    N_GPIO = int(soc_defines['N_GPIO'])
+    N_GPIO = int(soc_defines['N_APBIO'])
     N_FPGAIO = int(soc_defines['N_FPGAIO'])
     NBIT_PADMUX = int(soc_defines['NBIT_PADMUX'])
     N_PADSEL = 2**NBIT_PADMUX
@@ -438,7 +441,7 @@ if args.soc_defines != None and args.pin_table != None:
     io_out_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
     io_oe_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
     perio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_PERIO)]
-    gpio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
+    apbio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
     fpgaio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_FPGAIO)]
     xilinx_names = ['' for i in range(N_IO)]
     with open(args.pin_table, 'r') as f_pin_table:
@@ -476,11 +479,11 @@ if args.soc_defines != None and args.pin_table != None:
                         print("ERROR: found sysio '%s' as a sel option for IO_%d" % (entry, io_num))
                         error_count = error_count + 1
                     else:
-                        if entry[0:4] == 'gpio':    # gpio
-                            gpio_num = int(entry[5:])
-                            io_out_mux[io_num][sel] = "gpio_out_i[" + str(gpio_num) + "]"
-                            io_oe_mux[io_num][sel] = "gpio_oe_i[" + str(gpio_num) + "]"
-                            gpio_in_mux[gpio_num][sel] = "io_in_i[" + str(io_num) + "]"
+                        if entry[0:5] == 'apbio':    # apbio
+                            apbio_num = int(entry[6:])
+                            io_out_mux[io_num][sel] = "apbio_out_i[" + str(apbio_num) + "]"
+                            io_oe_mux[io_num][sel] = "apbio_oe_i[" + str(apbio_num) + "]"
+                            apbio_in_mux[apbio_num][sel] = "io_in_i[" + str(io_num) + "]"
                         elif entry[0:6] == 'fpgaio':    # fpgaio
                             fpgaio_num = int(entry[7:])
                             io_out_mux[io_num][sel] = "fpgaio_out_i[" + str(fpgaio_num) + "]"
@@ -545,10 +548,10 @@ if args.pad_control_sv != None:
         pad_control_sv.write("    output logic [`N_PERIO-1:0]     perio_in_o,\n")
         pad_control_sv.write("    input  logic [`N_PERIO-1:0]     perio_oe_i,\n")
         pad_control_sv.write("\n")
-        pad_control_sv.write("    // GPIOS\n")
-        pad_control_sv.write("    input  logic [`N_GPIO-1:0]      gpio_out_i,\n")
-        pad_control_sv.write("    output logic [`N_GPIO-1:0]      gpio_in_o,\n")
-        pad_control_sv.write("    input  logic [`N_GPIO-1:0]      gpio_oe_i,\n")
+        pad_control_sv.write("    // APBIOs\n")
+        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      apbio_out_i,\n")
+        pad_control_sv.write("    output logic [`N_APBIO-1:0]      apbio_in_o,\n")
+        pad_control_sv.write("    input  logic [`N_APBIO-1:0]      apbio_oe_i,\n")
         pad_control_sv.write("\n")
         pad_control_sv.write("    // FPGAIOS\n")
         pad_control_sv.write("    input  logic [`N_FPGAIO-1:0]    fpgaio_out_i,\n")
@@ -584,12 +587,12 @@ if args.pad_control_sv != None:
 
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
-        pad_control_sv.write("    // Assign signals to the gpio bus\n")
+        pad_control_sv.write("    // Assign signals to the apbio bus\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         index = -1
-        for row in gpio_in_mux:
+        for row in apbio_in_mux:
             index = index + 1
-            pad_control_sv.write("    assign gpio_in_o[%d] = " %index)
+            pad_control_sv.write("    assign apbio_in_o[%d] = " %index)
             nparen = 0
             for sel in range(len(row)):
                 if row[sel] != '':
@@ -735,7 +738,7 @@ if args.pad_frame_sv != None:
                     error_count = error_count + 1
                 pad_frame_sv.write("    `endif\n")
             else:
-                pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
+                pad_frame_sv.write("    pad_functional_pu i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
                     (ionum, ionum, ionum, ionum, ionum, ionum))
         pad_frame_sv.write("\n")
         pad_frame_sv.write("endmodule\n")
@@ -848,7 +851,7 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("`include \"pulp_soc_defines.sv\"\n")
         x_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         x_sv.write("\n")
-        x_sv.write("module xilinx_core_v_mcu\n")
+        x_sv.write("module %s\n" % (args.emulation_toplevel))
         x_sv.write("  (\n")
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
         x_sv.write("  );\n")
@@ -862,7 +865,8 @@ if args.xilinx_core_v_mcu_sv != None:
             if sysionames[ionum] != "ref_clk_o" and  sysionames[ionum] != "jtag_tck_o":
                 ionum_end = ionum
             else:                       # break in sequence
-                x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
+                if ionum_end >= 0:
+                    x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
                 ionum_start = ionum+1
                 ionum_end = -1
                 if sysionames[ionum] == "ref_clk_o":
@@ -886,7 +890,6 @@ if args.xilinx_core_v_mcu_sv != None:
             x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
 
         x_sv.write("  core_v_mcu #(\n")
-        x_sv.write("    .CORE_TYPE(`CORE_TYPE),\n")
         x_sv.write("    .USE_FPU(`USE_FPU),\n")
         x_sv.write("    .USE_HWPE(`USE_HWPE)\n")
         x_sv.write("  ) i_core_v_mcu (\n")

@@ -27,6 +27,7 @@
 `define REG_RDSTAT 12'h034
 `define REG_SETDIR 12'h038
 `define REG_SETINT 12'h03C
+`define REG_INTACK 12'H040
 
 
 `include "pulp_soc_defines.sv"
@@ -73,6 +74,8 @@ module apb_gpiov2 #(
   logic [`N_GPIO-1:0]      s_is_int_fall;
   logic [`N_GPIO-1:0]      s_is_int_low;
   logic [`N_GPIO-1:0]      s_is_int_hi;
+  logic [`N_GPIO-1:0]      s_block_int;
+
 
   genvar i;
 
@@ -85,10 +88,10 @@ module apb_gpiov2 #(
     for (int i = 0; i < `N_GPIO; i++) begin
       s_is_int_fall[i] = r_gpio_inttype[i][0] & r_gpio_fall[i];  // inttype[0] == 1 ->  fall
       s_is_int_rise[i] = r_gpio_inttype[i][1] & r_gpio_rise[i];  // inttype[1] == 1 ->  rise
-      s_is_int_low[i] =   (r_gpio_inttype[i] == 2'b00) & ~r_gpio_inttype[2] & ~r_gpio_in[i]; // active low int
-      s_is_int_hi[i] =   (r_gpio_inttype[i] == 2'b00) & r_gpio_inttype[2] & r_gpio_in[i];    // active hi int
-      interrupt[i] = r_gpio_inten[i] & (s_is_int_fall[i] | s_is_int_rise[i] |
-					   s_is_int_low[i] | s_is_int_hi[i]);
+      s_is_int_low[i] =   (r_gpio_inttype[i] == 3'b000) & ~r_gpio_in[i] & ~s_block_int[i] & r_gpio_inten[i]; // active low int
+      s_is_int_hi[i] =   (r_gpio_inttype[i] == 3'b100) & r_gpio_in[i] & ~s_block_int[i] & r_gpio_inten[i];    // active hi int
+      interrupt[i] = (r_gpio_inten[i] & (s_is_int_fall[i] | s_is_int_rise[i])) |
+					   s_is_int_low[i] | s_is_int_hi[i];
 
       gpio_out[i] = r_gpio_dir[i][0] & r_gpio_out[i];
       gpio_dir[i] = r_gpio_dir[i][1] ? ~r_gpio_out[i] : r_gpio_dir[i][0];  // Open Drain
@@ -101,8 +104,11 @@ module apb_gpiov2 #(
       r_gpio_dir <= '0;
       r_gpio_inttype <= '0;
       r_gpio_select <= '0;
+      r_gpio_inten <= '0;
       PREADY <= 0;
-    end else begin
+      s_block_int <= '0;
+                          end else begin
+                          s_block_int <= s_is_int_low | s_is_int_hi | s_block_int;
       PREADY <= 0;
       if (PSEL && PENABLE) begin  //APB WRITE
         if (PWRITE) begin
@@ -146,6 +152,10 @@ module apb_gpiov2 #(
               `REG_OUT3: begin
                 if (`N_GPIO > 96) r_gpio_out[127 : 96] <= PWDATA[31 : 0];
               end
+              `REG_INTACK: begin
+                s_block_int[PWDATA[7:0]] <= 0;
+              end
+
             endcase  // case (PADDR[11:0])
           end
 
@@ -155,8 +165,9 @@ module apb_gpiov2 #(
             PRDATA <= 0;
             case (PADDR[11:0])
               `REG_RDSTAT: begin
-                PRDATA[26:24] <= r_gpio_dir[r_gpio_select];
-                PRDATA[19:16] <= r_gpio_inttype[r_gpio_select];
+                PRDATA[25:24] <= r_gpio_dir[r_gpio_select];
+                PRDATA[19:17] <= r_gpio_inttype[r_gpio_select];
+                PRDATA[16] <= r_gpio_inten[r_gpio_select];
                 PRDATA[12] <= r_gpio_in[r_gpio_select];
                 PRDATA[8] <= r_gpio_out[r_gpio_select];
                 PRDATA[NG_BITS:0] <= r_gpio_select;
@@ -201,8 +212,8 @@ module apb_gpiov2 #(
       r_gpio_sync0 <= gpio_in[`N_GPIO-1:0];
       r_gpio_sync1 <= r_gpio_sync0;
       r_gpio_in    <= r_gpio_sync1;
-      r_gpio_rise  <=  r_gpio_sync1 & ~r_gpio_in;
-      r_gpio_fall  <= ~r_gpio_sync1 &  r_gpio_in;
+      r_gpio_rise  <= ~r_gpio_in  & r_gpio_sync1;
+      r_gpio_fall  <= r_gpio_in &  ~r_gpio_sync1;
     end
   end  // always_ff @ (posedge HCLK or negedge HRESETn)
 

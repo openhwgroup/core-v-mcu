@@ -84,10 +84,10 @@ module core_v_mcu #(
   logic [    `N_PERIO-1:0]                   s_perio_out;
   logic [    `N_PERIO-1:0]                   s_perio_in;
   logic [    `N_PERIO-1:0]                   s_perio_oe;
-  //GPIO
-  logic [     `N_GPIO-1:0]                   s_gpio_out;
-  logic [     `N_GPIO-1:0]                   s_gpio_in;
-  logic [     `N_GPIO-1:0]                   s_gpio_oe;
+  //APBIO
+  logic [    `N_APBIO-1:0]                   s_apbio_out;
+  logic [    `N_APBIO-1:0]                   s_apbio_in;
+  logic [    `N_APBIO-1:0]                   s_apbio_oe;
   // FPGAIO
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_out;
   logic [   `N_FPGAIO-1:0]                   s_fpgaio_in;
@@ -173,10 +173,10 @@ module core_v_mcu #(
   logic [             7:0]                   s_cam_data;
   logic                                      s_cam_hsync;
   logic                                      s_cam_vsync;
-  logic [             3:0]                   s_timer0;
-  logic [             3:0]                   s_timer1;
-  logic [             3:0]                   s_timer2;
-  logic [             3:0]                   s_timer3;
+  //  logic [             3:0]                   s_timer0;
+  //  logic [             3:0]                   s_timer1;
+  //  logic [             3:0]                   s_timer2;
+  //  logic [             3:0]                   s_timer3;
 
   logic                                      s_jtag_shift_dr;
   logic                                      s_jtag_update_dr;
@@ -351,18 +351,18 @@ module core_v_mcu #(
       .perio_in_o     (s_perio_in),
       .perio_oe_i     (s_perio_oe),
       // GPIO signals
-      .gpio_out_i     (s_gpio_out),
-      .gpio_in_o      (s_gpio_in),
-      .gpio_oe_i      (s_gpio_oe),
+      .apbio_out_i    (s_apbio_out),
+      .apbio_in_o     (s_apbio_in),
+      .apbio_oe_i     (s_apbio_oe),
       // FPGAIO signals
       .fpgaio_out_i   (s_fpgaio_out),
       .fpgaio_in_o    (s_fpgaio_in),
       .fpgaio_oe_i    (s_fpgaio_oe),
       // Timer signals
-      .timer0_i       (s_timer0),
-      .timer1_i       (s_timer1),
-      .timer2_i       (s_timer2),
-      .timer3_i       (s_timer3),
+      //      .timer0_i       (s_timer0),
+      //      .timer1_i       (s_timer1),
+      //      .timer2_i       (s_timer2),
+      //      .timer3_i       (s_timer3),
       .debug0         (s_debug0),
       .debug1         (s_debug1)
   );
@@ -539,19 +539,19 @@ module core_v_mcu #(
       .perio_out_o (s_perio_out),
       .perio_oe_o  (s_perio_oe),
       // GPIO signals
-      .gpio_in_i   (s_gpio_in),
-      .gpio_out_o  (s_gpio_out),
-      .gpio_oe_o   (s_gpio_oe),
+      .apbio_in_i   (s_apbio_in),
+      .apbio_out_o  (s_apbio_out),
+      .apbio_oe_o   (s_apbio_oe),
       // FPGAIO signals
       .fpgaio_out_o(s_fpgaio_out),
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
       .fpga_clk_in({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
-      .timer_ch0_o(s_timer0),
-      .timer_ch1_o(s_timer1),
-      .timer_ch2_o(s_timer2),
-      .timer_ch3_o(s_timer3),
+      //      .timer_ch0_o(s_timer0),
+      //      .timer_ch1_o(s_timer1),
+      //      .timer_ch2_o(s_timer2),
+      //      .timer_ch3_o(s_timer3),
       .cluster_busy_i(s_cluster_busy),
 
       .cluster_events_wt_o(s_event_writetoken),

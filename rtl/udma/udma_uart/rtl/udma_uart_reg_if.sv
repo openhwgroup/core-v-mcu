@@ -119,6 +119,7 @@ module udma_uart_reg_if #(
     logic                      r_err_parity;
     logic                      r_err_overflow;
     logic                      r_uart_rx_clean_fifo;
+
     logic                      r_uart_rx_polling_en;
     logic                      r_uart_err_irq_en;
     logic                      r_uart_rx_irq_en;
@@ -161,13 +162,13 @@ module udma_uart_reg_if #(
             r_rx_startaddr     <=  'h0;
             r_rx_size          <=  'h0;
             r_rx_continuous    <=  'h0;
-            r_rx_en             =  'h0;
-            r_rx_clr            =  'h0;
+            r_rx_en            <=  'h0;
+            r_rx_clr           <=  'h0;
             r_tx_startaddr     <=  'h0;
             r_tx_size          <=  'h0;
             r_tx_continuous    <=  'h0;
-            r_tx_en             =  'h0;
-            r_tx_clr            =  'h0;
+            r_tx_en            <=  'h0;
+            r_tx_clr           <=  'h0;
             r_uart_div         <=  'h0;
             r_uart_stop_bits   <=  'h0;
             r_uart_bits        <=  'h0;
@@ -185,10 +186,11 @@ module udma_uart_reg_if #(
         end
         else
         begin
-            r_rx_en   =  'h0;
-            r_rx_clr  =  'h0;
-            r_tx_en   =  'h0;
-            r_tx_clr  =  'h0;
+            r_rx_en  <=  'h0;
+            r_rx_clr <=  'h0;
+            r_tx_en  <=  'h0;
+            r_tx_clr <=  'h0;
+            r_uart_rx_clean_fifo <= 'h0;
 
             if(err_overflow_i)
                 r_err_overflow <= 1'b1;
@@ -226,8 +228,8 @@ module udma_uart_reg_if #(
                     r_rx_size         <= cfg_data_i[TRANS_SIZE-1:0];
                 `UART_REG_RX_CFG:
                 begin
-                    r_rx_clr           = cfg_data_i[6];
-                    r_rx_en            = cfg_data_i[4];
+                    r_rx_clr           <= cfg_data_i[6];
+                    r_rx_en            <= cfg_data_i[4];
                     r_rx_continuous   <= cfg_data_i[0];
                 end
                 `UART_REG_TX_SADDR:
@@ -236,21 +238,28 @@ module udma_uart_reg_if #(
                     r_tx_size         <= cfg_data_i[TRANS_SIZE-1:0];
                 `UART_REG_TX_CFG:
                 begin
-                    r_tx_clr           = cfg_data_i[6];
-                    r_tx_en            = cfg_data_i[4];
+                    r_tx_clr           <= cfg_data_i[6];
+                    r_tx_en            <= cfg_data_i[4];
                     r_tx_continuous   <= cfg_data_i[0];
                 end
 
                 `UART_REG_UART_SETUP:
                 begin
-                    r_uart_div        <= cfg_data_i[31:16];
-                    r_uart_en_rx      <= cfg_data_i[9];
-                    r_uart_en_tx      <= cfg_data_i[8];
-                    r_uart_rx_clean_fifo <= cfg_data_i[5];
-                    r_uart_rx_polling_en <= cfg_data_i[4];
-                    r_uart_stop_bits  <= cfg_data_i[3];
-                    r_uart_bits       <= cfg_data_i[2:1];
-                    r_uart_parity_en  <= cfg_data_i[0];
+                  r_uart_div        <= cfg_data_i[5] ?
+                                       r_uart_div : cfg_data_i[31:16];
+                  r_uart_en_rx      <= cfg_data_i[5] ?
+                                       r_uart_en_rx : cfg_data_i[9];
+                  r_uart_en_tx      <= cfg_data_i[5] ?
+                                       r_uart_en_tx : cfg_data_i[8];
+                  r_uart_rx_clean_fifo <= cfg_data_i[5];
+                  r_uart_rx_polling_en <= cfg_data_i[5] ?
+                                          r_uart_rx_polling_en : cfg_data_i[4];
+                  r_uart_stop_bits  <= cfg_data_i[5] ?
+                                       r_uart_stop_bits : cfg_data_i[3];
+                  r_uart_bits       <= cfg_data_i[5] ?
+                                       r_uart_bits : cfg_data_i[2:1];
+                  r_uart_parity_en  <= cfg_data_i[5] ?
+                                       r_uart_parity_en : cfg_data_i[0];
                 end
                 `UART_REG_IRQ_EN:
                   begin

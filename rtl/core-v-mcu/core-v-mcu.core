@@ -4,7 +4,7 @@ CAPI=2:
 # Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-name: openhwgroup.org:systems:core-v-mcu
+name: openhwgroup.org:systems:core-v-mcu-orig
 description: CORE-V MCU Top.
 
 filesets:
@@ -19,6 +19,7 @@ filesets:
     - openhwgroup.org:ip:apb_adv_timer
     - openhwgroup.org:ip:apb_fll_if
     - openhwgroup.org:ip:apb_gpio
+    - openhwgroup.org:ip:apb_i2cs
     - openhwgroup.org:ip:apb_interrupt_cntrl
     - openhwgroup.org:ip:apb_node
     - openhwgroup.org:ip:apb2apbcomp
@@ -87,6 +88,55 @@ filesets:
     - components/freq_meter.sv
     file_type: systemVerilogSource
 
+  simulation-rtl:
+    files:
+    - tb/sim_clk_gen.sv
+    file_type: systemVerilogSource
+
+  tb-rtl:
+    files:
+    - tb/core_v_mcu_tb.sv
+    - tb/tb_clk_gen.sv
+    file_type: systemVerilogSource
+
+  emulation-rtl:
+    depend:
+    - pulp-platform.org::tech_cells_xilinx
+    files:
+    - ../../emulation/xilinx/rtl/cv32e40p_clock_gate.sv
+    - ../../emulation/xilinx/rtl/fpga_bootrom.sv
+    - ../../emulation/xilinx/rtl/fpga_clk_gen.sv
+    - ../../emulation/xilinx/rtl/fpga_interleaved_ram.sv
+    - ../../emulation/xilinx/rtl/fpga_private_ram.sv
+    - ../../emulation/xilinx/rtl/fpga_slow_clk_gen.sv
+    - ../../emulation/xilinx/rtl/pad_functional_xilinx.sv
+    - ../../emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    file_type: systemVerilogSource
+
+  xilinx-ips:
+    files:
+    - ../../emulation/xilinx/ips/xilinx_clk_mngr.tcl
+    - ../../emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    - ../../emulation/xilinx/ips/xilinx_interleaved_ram.tcl
+    - ../../emulation/xilinx/ips/xilinx_private_ram.tcl
+    file_type: tclSource
+
+  nexys-rtl:
+    files:
+    - ../../emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+    file_type: systemVerilogSource
+
+  nexys-xdc:
+    files:
+    - ../../emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+    file_type: xdc
+
+  nexys-cfg:
+    files:
+    - ../../emulation/core-v-mcu-nexys/tcl/common.tcl
+    - ../../emulation/core-v-mcu-nexys/tcl/flatten.tcl
+    file_type: tclSource
+
   # Scripts for hooks
   pre_build_scripts:
     files:
@@ -104,6 +154,14 @@ filesets:
     files:
     - top/core_v_mcu_wrapper.sv
     file_type: systemVerilogSource
+
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+
 
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
@@ -128,11 +186,19 @@ targets:
   sim:
     <<: *default_target
     default_tool: modelsim
+    filesets_append:
+    - simulation-rtl
+    - rtl-behavioral
+    - tb-rtl
+    toplevel:
+    - core_v_mcu_tb
     tools:
       modelsim:
         vlog_options:
         - -override_timescale 1ns/1ps
-    toplevel: [core_v_mcu]
+        - -suppress vlog-2583
+        vsim_options:
+        - -voptargs="-O1"
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
@@ -159,5 +225,21 @@ targets:
       verilator:
         mode: lint-only
         verilator_options:
-        - -Wno-UNOPTFLAT
-        - -Wall
+        - -Wno-fatal
+
+  nexys-a7-100t:
+    <<: *default_target
+    default_tool: vivado
+    description: Digilent Nexys-A7-100T Board
+    parameters:
+    - PULP_FPGA_EMUL=true
+    filesets_append:
+    - emulation-rtl
+    - xilinx-ips
+    - nexys-rtl
+    - nexys-cfg
+    - nexys-xdc
+    tools:
+      vivado:
+        part: xc7a100tcsg324-1
+    toplevel: core_v_mcu_nexys

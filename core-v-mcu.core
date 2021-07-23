@@ -1,0 +1,196 @@
+CAPI=2:
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:systems:core-v-mcu
+description: CORE-V MCU Top.
+
+filesets:
+  files_rtl_generic:
+    depend:
+    - pulp-platform.org::axi
+    - pulp-platform.org::common_cells
+    - pulp-platform.org::riscv_dbg
+    - pulp-platform.org::tech_cells_generic
+    - pulp-platform.org::fpnew
+    - pulp-platform.org::fpu_div_sqrt_mvp
+    - openhwgroup.org:ip:apb_adv_timer
+    - openhwgroup.org:ip:apb_fll_if
+    - openhwgroup.org:ip:apb_gpio
+    - openhwgroup.org:ip:apb_i2cs
+    - openhwgroup.org:ip:apb_interrupt_cntrl
+    - openhwgroup.org:ip:apb_node
+    - openhwgroup.org:ip:apb2apbcomp
+    - openhwgroup.org:ip:apb2per
+    - openhwgroup.org:ip:apb_timer_unit
+    - openhwgroup.org:ip:udma_uart
+    - openhwgroup.org:ip:udma_sdio
+    - openhwgroup.org:ip:udma_qspi
+    - openhwgroup.org:ip:udma_i2s
+    - openhwgroup.org:ip:udma_i2c
+    - openhwgroup.org:ip:udma_filter
+    - openhwgroup.org:ip:udma_external_per
+    - openhwgroup.org:ip:udma_core
+    - openhwgroup.org:ip:udma_camera
+    - openhwgroup.org:ip:logint_dc_fifo_xbar
+    - openhwgroup.org:ip:l2_tcdm_hybrid_interco
+    - quicklogic.com:ip:efpga
+    - openhwgroup.org:ip:generic_fll
+    - openhwgroup.org:ip:tcdm_interconnect
+    - openhwgroup.org:ip:cv32e40p
+    files:
+    - rtl/includes/periph_bus_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
+    - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: rtl/core-v-mcu/include/}
+    - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv
+    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
+    - rtl/core-v-mcu/soc/lint_2_axi_wrap.sv
+    - rtl/core-v-mcu/soc/contiguous_crossbar.sv
+    - rtl/core-v-mcu/soc/interleaved_crossbar.sv
+    - rtl/core-v-mcu/soc/tcdm_demux.sv
+    - rtl/core-v-mcu/soc/boot_rom.sv
+    - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
+    - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
+    - rtl/core-v-mcu/soc/periph_bus_wrap.sv
+    - rtl/core-v-mcu/soc/soc_clk_rst_gen.sv
+    - rtl/core-v-mcu/soc/soc_event_arbiter.sv
+    - rtl/core-v-mcu/soc/soc_event_generator.sv
+    - rtl/core-v-mcu/soc/soc_event_queue.sv
+    - rtl/core-v-mcu/soc/tcdm_error_slave.sv
+    - rtl/core-v-mcu/soc/soc_interconnect.sv
+    - rtl/core-v-mcu/soc/soc_interconnect_wrap.sv
+    - rtl/core-v-mcu/soc/soc_peripherals.sv
+    - rtl/core-v-mcu/udma_subsystem/udma_subsystem.sv
+    - rtl/core-v-mcu/fc/fc_demux.sv
+    - rtl/core-v-mcu/fc/fc_subsystem.sv
+    - rtl/core-v-mcu/fc/fc_hwpe.sv
+    - rtl/core-v-mcu/fc/cv32e40p_fp_wrapper.sv
+    - rtl/core-v-mcu/components/apb_soc_ctrl.sv
+    - rtl/core-v-mcu/components/pulp_interfaces.sv
+    - rtl/core-v-mcu/efpga_subsystem/efpga_subsystem.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ctl.sv
+    - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ram.sv
+    - rtl/core-v-mcu/efpga_subsystem/tcdm_interface.sv
+    - rtl/core-v-mcu/top/pad_control.sv
+    - rtl/core-v-mcu/top/pad_frame.sv
+    - rtl/core-v-mcu/top/safe_domain.sv
+    - rtl/core-v-mcu/top/soc_domain.sv
+    - rtl/core-v-mcu/top/core_v_mcu.sv
+    file_type: systemVerilogSource
+
+  rtl-behavioral:
+    files:
+    - rtl/core-v-mcu/components/freq_meter.sv
+    file_type: systemVerilogSource
+
+  simulation-rtl:
+    files:
+    - tb/sim_clk_gen.sv
+    file_type: systemVerilogSource
+
+  tb-rtl:
+    files:
+    - tb/core_v_mcu_tb.sv
+    - tb/tb_clk_gen.sv
+    file_type: systemVerilogSource
+
+  emulation-rtl:
+    depend:
+    - pulp-platform.org::tech_cells_xilinx
+    files:
+    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
+    - emulation/xilinx/rtl/fpga_bootrom.sv
+    - emulation/xilinx/rtl/fpga_clk_gen.sv
+    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
+    - emulation/xilinx/rtl/fpga_private_ram.sv
+    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
+    - emulation/xilinx/rtl/pad_functional_xilinx.sv
+    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    file_type: systemVerilogSource
+
+  xilinx-ips:
+    files:
+    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
+    - emulation/xilinx/ips/xilinx_private_ram.tcl
+    file_type: tclSource
+
+  nexys-rtl:
+    files:
+    - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+    file_type: systemVerilogSource
+
+  nexys-xdc:
+    files:
+    - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+    file_type: xdc
+
+  nexys-cfg:
+    files:
+    - emulation/core-v-mcu-nexys/tcl/common.tcl
+    - emulation/core-v-mcu-nexys/tcl/flatten.tcl
+    file_type: tclSource
+
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+targets:
+  default: &default_target
+    filesets:
+    - files_rtl_generic
+    - target_lint? (rtl-behavioral)
+    toplevel: [core_v_mcu]
+
+  sim:
+    <<: *default_target
+    default_tool: modelsim
+    filesets_append:
+    - simulation-rtl
+    - rtl-behavioral
+    - tb-rtl
+    toplevel:
+    - core_v_mcu_tb
+    tools:
+      modelsim:
+        vlog_options:
+        - -override_timescale 1ns/1ps
+        - -suppress vlog-2583
+        vsim_options:
+        - -voptargs="-O1"
+
+
+  lint:
+    <<: *default_target
+    default_tool: verilator
+    toplevel: [core_v_mcu]
+    tools:
+      verilator:
+        mode: lint-only
+        verilator_options:
+        - -Wno-fatal
+
+  nexys-a7-100t:
+    <<: *default_target
+    default_tool: vivado
+    description: Digilent Nexys-A7-100T Board
+    parameters:
+    - PULP_FPGA_EMUL=true
+    filesets_append:
+    - emulation-rtl
+    - xilinx-ips
+    - nexys-rtl
+    - nexys-cfg
+    - nexys-xdc
+    tools:
+      vivado:
+        part: xc7a100tcsg324-1
+    toplevel: core_v_mcu_nexys

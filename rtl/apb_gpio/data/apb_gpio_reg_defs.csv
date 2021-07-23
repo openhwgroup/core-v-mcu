@@ -74,3 +74,5 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,,,,,,0x5 to 0x7: no interrupt
 ,INTENABLE,16,16,WO,0x0,Enable interrupt on GPIO[GPIO_ADDDR]
 ,gpio_num,7,0,WO,0x0,Address of GPIO to set interrupt type and enable for
+,,,,,,
+0x40,INTACK,7,0,WO,-,Gpio num to clear level interrupts

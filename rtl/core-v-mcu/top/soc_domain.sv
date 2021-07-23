@@ -179,22 +179,22 @@ module soc_domain
     output logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
 
     // Signals to pad frame
-    input logic [ `N_PERIO-1:0] 		perio_in_i,
-    output logic [ `N_PERIO-1:0] 		perio_out_o,
-    output logic [ `N_PERIO-1:0] 		perio_oe_o,
+    input  logic [ `N_PERIO-1:0] perio_in_i,
+    output logic [ `N_PERIO-1:0] perio_out_o,
+    output logic [ `N_PERIO-1:0] perio_oe_o,
     // Signals to gpio controller
-    input logic [ `N_GPIO-1:0] 			gpio_in_i,
-    output logic [ `N_GPIO-1:0] 		gpio_out_o,
-    output logic [ `N_GPIO-1:0] 		gpio_oe_o,
+    input  logic [ `N_APBIO-1:0] apbio_in_i,
+    output logic [ `N_APBIO-1:0] apbio_out_o,
+    output logic [ `N_APBIO-1:0] apbio_oe_o,
     // IO signals to efpga
-    input logic [`N_FPGAIO-1:0] 		fpgaio_in_i,
-    output logic [`N_FPGAIO-1:0] 		fpgaio_out_o,
-    output logic [`N_FPGAIO-1:0] 		fpgaio_oe_o,
+    input  logic [`N_FPGAIO-1:0] fpgaio_in_i,
+    output logic [`N_FPGAIO-1:0] fpgaio_out_o,
+    output logic [`N_FPGAIO-1:0] fpgaio_oe_o,
     // Timers
-    output logic [ 3:0] 			timer_ch0_o,
-    output logic [ 3:0] 			timer_ch1_o,
-    output logic [ 3:0] 			timer_ch2_o,
-    output logic [ 3:0] 			timer_ch3_o,
+    //    output logic [ 3:0] 			timer_ch0_o,
+    //    output logic [ 3:0] 			timer_ch1_o,
+    //    output logic [ 3:0] 			timer_ch2_o,
+    //    output logic [ 3:0] 			timer_ch3_o,
 
     // output logic [191:0]                  gpio_cfg_o,
     // output logic                          uart_tx_o,
@@ -616,10 +616,10 @@ module soc_domain
       .perio_in_i  (perio_in_i),
       .perio_out_o (perio_out_o),
       .perio_oe_o  (perio_oe_o),
-      // GPIO signals
-      .gpio_in_i   (gpio_in_i),
-      .gpio_out_o  (gpio_out_o),
-      .gpio_oe_o   (gpio_oe_o),
+      // APBIO signals
+      .apbio_in_i   (apbio_in_i),
+      .apbio_out_o  (apbio_out_o),
+      .apbio_oe_o   (apbio_oe_o),
       // FPGAIO signals
       .fpgaio_out_o(fpgaio_out_o),
       .fpgaio_in_i (fpgaio_in_i),
@@ -723,10 +723,10 @@ module soc_domain
       .efpga_test_M_5_i            (efpga_test_M_5_i),
       .efpga_test_MLATCH_i         (efpga_test_MLATCH_i),
 
-      .timer_ch0_o(timer_ch0_o),
-      .timer_ch1_o(timer_ch1_o),
-      .timer_ch2_o(timer_ch2_o),
-      .timer_ch3_o(timer_ch3_o),
+      //      .timer_ch0_o(timer_ch0_o),
+      //      .timer_ch1_o(timer_ch1_o),
+      //      .timer_ch2_o(timer_ch2_o),
+      //      .timer_ch3_o(timer_ch3_o),
 
       .cl_event_data_o (s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),

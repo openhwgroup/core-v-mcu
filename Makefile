@@ -24,8 +24,6 @@ export INTERLEAVED_BANK_SIZE=28672
 #Must also change the localparam 'L2_BANK_SIZE_PRI' in pulp_soc.sv accordingly
 export PRIVATE_BANK_SIZE=8192
 
-all:	${IOSCRIPT_OUT} docs sw
-
 help:
 			@echo "all:            generate build scripts, custom build files, doc and sw header files"
 			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
@@ -33,6 +31,11 @@ help:
 			@echo "doc:            generate documentation"
 			@echo "sw:             generate C header files (in ./sw)"
 			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
+			@echo "buildsim:       build for Questa sim"
+			@echo "sim:            run Questa sim"
+			@echo "clean:          remove generated files"
+
+all:	${IOSCRIPT_OUT} docs sw
 
 clean:
 				(cd docs; make clean)
@@ -40,6 +43,13 @@ clean:
 
 lint:
 				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+
+.PHONY:sim
+sim:
+				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+.PHONY:buildsim
+buildsim:
+				fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"
@@ -53,7 +63,8 @@ nexys-emul:		${IOSCRIPT_OUT}
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
-					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
+					--emulation-toplevel core_v_mcu_nexys\
+					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 				@echo "*************************************"
@@ -69,8 +80,9 @@ nexys-emul:		${IOSCRIPT_OUT}
 					export FC_CLK_PERIOD_NS=100;\
 					export PER_CLK_PERIOD_NS=200;\
 					export SLOW_CLK_PERIOD_NS=30517;\
-					fusesoc --cores-root . run --target=nexys-a7-100t --setup --build openhwgroup.org:systems:core-v-mcu-emul\
+					fusesoc --cores-root . run --target=nexys-a7-100t --setup --build openhwgroup.org:systems:core-v-mcu\
 				) 2>&1 | tee lint.log
+				cp ./build/openhwgroup.org_systems_core-v-mcu_0/nexys-a7-100t-vivado/openhwgroup.org_systems_core-v-mcu_0.runs/impl_1/core_v_mcu_nexys.bit emulation/core_v_mcu_nexys.bit
 
 .PHONY:docs
 docs:
@@ -100,4 +112,4 @@ bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 
 download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
-              build/openhwgroup.org_systems_core-v-mcu-emul_0/nexys-a7-100t-vivado/openhwgroup.org_systems_core-v-mcu-emul_0.runs/impl_1/xilinx_core_v_mcu.bit
+             emulation/core_v_mcu_nexys.bit

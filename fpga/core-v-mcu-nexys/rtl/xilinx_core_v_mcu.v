@@ -20,36 +20,33 @@
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
 
-module xilinx_core_v_mcu
+module None
   (
     inout wire [`N_IO-1:0]  xilinx_io
   );
 
   wire [`N_IO-1:0]  s_io;
 
-  assign s_io[5:0] = xilinx_io[5:0];
+  //JTAG TCK clock buffer (dedicated route is false in constraints)
+  IBUF i_tck_iobuf (
+    .I(xilinx_io[0]),
+    .O(s_io[0])
+  );
+
+  assign s_io[4:1] = xilinx_io[4:1];
 
   // Input clock buffer
   IBUFG #(
     .IOSTANDARD("LVCMOS33"),
     .IBUF_LOW_PWR("FALSE")
   ) i_sysclk_iobuf (
-    .I(xilinx_io[6]),
-    .O(s_io[6])
+    .I(xilinx_io[5]),
+    .O(s_io[5])
   );
 
-  assign s_io[7:7] = xilinx_io[7:7];
-
-  //JTAG TCK clock buffer (dedicated route is false in constraints)
-  IBUF i_tck_iobuf (
-    .I(xilinx_io[8]),
-    .O(s_io[8])
-  );
-
-  assign s_io[47:9] = xilinx_io[47:9];
+  assign s_io[47:6] = xilinx_io[47:6];
 
   core_v_mcu #(
-    .CORE_TYPE(`CORE_TYPE),
     .USE_FPU(`USE_FPU),
     .USE_HWPE(`USE_HWPE)
   ) i_core_v_mcu (

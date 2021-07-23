@@ -248,6 +248,8 @@ module apb_soc_ctrl #(
       PRDATA                   <= '0;
       PREADY                   <= '0;
       PSLVERR                  <= '0;
+      control_in               <= '0;
+
     end else begin
       r_jtag_regi_sync[1] <= soc_jtag_reg_i;
       r_jtag_regi_sync[0] <= r_jtag_regi_sync[1];

@@ -97,6 +97,18 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,m1_oper0_wmode,3,2,RW,0x0,Math Unit 1 operand 1 RAM write mode
 ,m1_oper0_rmode,1,0,RW,0x0,Math Unit 1 operand 1 RAM read mode
 ,,,,,,
+0x30,M0_M0_CLKEN,,,,,
+,m0_m0_clken,0,0,WO,-,Math Unit 0 Multiplier 0 Clock enable
+,,,,,,
+0x34,M0_M1_CLKEN,,,,,
+,m0_m1_clken,0,0,WO,-,Math Unit 0 Multiplier 1 Clock enable
+,,,,,,
+0x38,M1_M0_CLKEN,,,,,
+,m1_m0_clken,0,0,WO,-,Math Unit 1 Multiplier 0 Clock enable
+,,,,,,
+0x3C,M1_M1_CLKEN,,,,,
+,m1_m1_clken,0,0,WO,-,Math Unit 1 Multiplier 1 Clock enable
+,,,,,,
 0x40,FPGAIO_OUT31_00,,,,,
 ,fpgaio_o_31,31,31,RW,0x0,Sets the fpgio output bit 31
 ,fpgaio_o_30,30,30,RW,0x0,Sets the fpgio output bit 30
@@ -269,7 +281,7 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,fpgaio_oe_65,1,1,RW,0x0,Sets the fpgio output enable for bit 65
 ,fpgaio_oe_64,0,0,RW,0x0,Sets the fpgio output enable for bit 64
 ,,,,,,
-0x60,FPGAIO_I31_00,,,,,
+0x60,FPGAIO_IN31_00,,,,,
 ,fpgaio_i_31,31,31,RW,0x0,Reads the fpgaio input value for bit 31
 ,fpgaio_i_30,30,30,RW,0x0,Reads the fpgaio input value for bit 30
 ,fpgaio_i_29,29,29,RW,0x0,Reads the fpgaio input value for bit 29
@@ -303,7 +315,7 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,fpgaio_i_1,1,1,RW,0x0,Reads the fpgaio input value for bit 1
 ,fpgaio_i_0,0,0,RW,0x0,Reads the fpgaio input value for bit 0
 ,,,,,,
-0x64,FPGAIO_I63_32,,,,,
+0x64,FPGAIO_IN63_32,,,,,
 ,fpgaio_i_63,31,31,RO,,Reads the fpgaio input value for bit 63
 ,fpgaio_i_62,30,30,RO,,Reads the fpgaio input value for bit 62
 ,fpgaio_i_61,29,29,RO,,Reads the fpgaio input value for bit 61
@@ -337,7 +349,7 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,fpgaio_i_33,1,1,RO,,Reads the fpgaio input value for bit 33
 ,fpgaio_i_32,0,0,RO,,Reads the fpgaio input value for bit 32
 ,,,,,,
-0x68,FPGAIO_I79_64,,,,,
+0x68,FPGAIO_IN79_64,,,,,
 ,fpgaio_i_79,15,15,RO,,Reads the fpgaio input value for bit 79
 ,fpgaio_i_78,14,14,RO,,Reads the fpgaio input value for bit 78
 ,fpgaio_i_77,13,13,RO,,Reads the fpgaio input value for bit 77
@@ -394,7 +406,7 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0x98,M0_M0_CDATA,,,,,
 ,cdata,31,0,RW,,Sets the coeficient data for math unit 0 multiplier 0
 ,,,,,,
-0x98,M0_M1_CDATA,,,,,
+0x9C,M0_M1_CDATA,,,,,
 ,cdata,31,0,RW,,Sets the coeficient data for math unit 0 multiplier 1
 ,,,,,,
 0xA0,M1_M0_ODATA,,,,,
@@ -406,17 +418,29 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0xA8,M1_M0_CDATA,,,,,
 ,cdata,31,0,RW,,Sets the coeficient data for math unit 1 multiplier 0
 ,,,,,,
-0xA8,M1_M1_CDATA,,,,,
+0xAC,M1_M1_CDATA,,,,,
 ,cdata,31,0,RW,,Sets the coeficient data for math unit 1 multiplier 1
 ,,,,,,
-0x3000,M0_OPER0[0x400],,,,,
+0x100,M0_M0_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 0 multiplier 0
 ,,,,,,
-0x4000,M0_OPER1[0x400],,,,,
+0x104,M0_M1_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 0 multiplier 1
 ,,,,,,
-0x5000,M0_COEF[0x400],,,,,
+0x108,M1_M0_MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 1 multiplier 0
 ,,,,,,
-0x6000,M1_OPER0[0x400],,,,,
+0x10C,M1_M01MULTOUT,,,,,
+,multout,31,0,RO,,Reads the output of math unit 1 multiplier 1
 ,,,,,,
-0x7000,M1_OPER1[0x400],,,,,
+0x1000,M0_OPER0[0x400],,,,,
 ,,,,,,
-0x8000,M1_COEF[0x400],,,,,
+0x2000,M0_OPER1[0x400],,,,,
+,,,,,,
+0x3000,M0_COEF[0x400],,,,,
+,,,,,,
+0x4000,M1_OPER0[0x400],,,,,
+,,,,,,
+0x5000,M1_OPER1[0x400],,,,,
+,,,,,,
+0x6000,M1_COEF[0x400],,,,,
