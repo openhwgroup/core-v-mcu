@@ -27,8 +27,9 @@ make with no argments will print a list of the current targets:
 $ make
 all:            generate build scripts, custom build files, doc and sw header files
 bitstream:      generate nexysA7-100T.bit file for emulation
+model-lib:      build a Verilator model library
 lint:           run Verilator lint check
-doc:            generate documentation
+docs:           generate documentation
 sw:             generate C header files (in ./sw)
 nexys-emul:     generate bitstream for Nexys-A7-100T emulation)
 buildsim:       build for Questa sim
@@ -113,6 +114,16 @@ fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:sy
 ## Contributing: Pre-commit checks
 
 If you are submitting a pull-request, it will be subject to pre-commit checks.  The two that most likely cause problems are the Verilator Lint check and the Verible format check.
+
+### Verilator model library
+
+The system will run
+```
+fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
+```
+If your changes introduce any Verilator errors, you either need to fix these, or, if appropriate, add a rule to ignore them to `rtl/core-v-mcu/verilator.waiver`.
+
+This will create the Verilator library `Vcore_v_mcu_wrapper__ALL.a` in `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/obj_dir`.
 
 ### Verilator lint check
 
