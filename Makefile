@@ -27,6 +27,7 @@ export PRIVATE_BANK_SIZE=8192
 help:
 			@echo "all:            generate build scripts, custom build files, doc and sw header files"
 			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
+			@echo "model-lib:      build a Verilator model library"
 			@echo "lint:           run Verilator lint check"
 			@echo "doc:            generate documentation"
 			@echo "sw:             generate C header files (in ./sw)"
@@ -40,6 +41,12 @@ all:	${IOSCRIPT_OUT} docs sw
 clean:
 				(cd docs; make clean)
 				(cd sw; make clean)
+
+.PHONY: model-lib
+model-lib:
+	fusesoc --cores-root . run --target=model-lib --setup \
+		--build openhwgroup.org:systems:core-v-mcu | tee model-lib.log
+
 
 lint:
 				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
