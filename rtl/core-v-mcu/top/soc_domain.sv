@@ -498,7 +498,6 @@ module soc_domain
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o),
-
       .cl_event_data_o (s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),
       .cl_event_ready_i(s_cl_event_ready)

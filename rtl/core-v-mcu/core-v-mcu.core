@@ -214,6 +214,7 @@ targets:
         verilator_options:
         - -Wno-fatal
         - --trace
+        - --CFLAGS -DVL_TIME_CONTEXT
 
   lint:
     <<: *default_target

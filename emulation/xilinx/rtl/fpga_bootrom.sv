@@ -2016,7 +2016,8 @@ module fpga_bootrom
   2000: value <= 32'h00000000;
   2001: value <= 32'h00000000;
   2002: value <= 32'h00000000;
+  2003: value <= 32'h00000000;
   default: value <= 0;
    endcase
   end
-endmodule    
+endmodule

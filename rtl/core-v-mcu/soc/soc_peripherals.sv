@@ -111,14 +111,13 @@ module soc_peripherals #(
   APB_BUS s_apb_i2cs_bus ();
 
   logic [            `N_GPIO-1:0]                            s_gpio_sync;
-  //  logic                                                      s_sel_hyper_axi;
-
   logic [            `N_GPIO-1:0]                            s_gpio_events;
   logic [                    1:0]                            s_spim_event;
   logic                                                      s_uart_event;
   logic                                                      s_i2c_event;
   logic                                                      s_i2s_event;
   logic                                                      s_i2s_cam_event;
+  logic                                                      s_i2cs_event;
 
   logic [                    3:0]                            s_adv_timer_events;
   logic [                    1:0]                            s_fc_hp_events;
@@ -182,7 +181,6 @@ module soc_peripherals #(
   logic [`NB_MASTER-1:0] s_peripheral_rto;
 
   logic s_soft_reset, apb_reset;
-
 
   assign apb_reset = rst_ni & !s_soft_reset;
 
@@ -643,7 +641,6 @@ module soc_peripherals #(
       .fpgaio_out_o(fpgaio_out_o),
 
       .efpga_event_o(s_efpga_events),
-
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o)
@@ -661,7 +658,6 @@ module soc_peripherals #(
   apb_i2cs i_apb_i2cs (
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(apb_reset),
-
       .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
       .apb_pwrite_i (s_apb_i2cs_bus.pwrite),
@@ -670,8 +666,6 @@ module soc_peripherals #(
       .apb_prdata_o (s_apb_i2cs_bus.prdata),
       .apb_pready_o (s_apb_i2cs_bus.pready),
       .apb_interrupt_o(s_i2cs_event),
-      // .PSLVERR(s_apb_i2cs_bus.pslverr),
-
       .i2c_scl_i(apbio_in_i[`N_GPIO+16]),
       .i2c_sda_i(apbio_in_i[`N_GPIO+17]),
       .i2c_sda_o(apbio_out_o[`N_GPIO+17]),
@@ -679,6 +673,5 @@ module soc_peripherals #(
       .i2c_interrupt_o(apbio_out_o[`N_GPIO+18])
   );
   assign apbio_oe_o[`N_GPIO+18] = 1'b1;
-
 
 endmodule

@@ -41,6 +41,7 @@ module apb_i2cs (
     i2c_interrupt_o
 );
 
+
   parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 0;
   parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 0;
   parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 0;
