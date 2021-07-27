@@ -240,5 +240,5 @@ targets:
     - nexys-xdc
     tools:
       vivado:
-      part: xc7a100tcsg324-1
+        part: xc7a100tcsg324-1
     toplevel: core_v_mcu_nexys

@@ -15,11 +15,7 @@
  */
 
 // SOC PERIPHERALS APB BUS PARAMETRES
-<<<<<<< HEAD
 `define NB_MASTER  11
-=======
-`define NB_MASTER  13
->>>>>>> 5b2a0161a43151830af4a17dbe8b811511c4fe89
 
 // MASTER PORT TO FLL
 `define FLL_START_ADDR           32'h1A10_0000
@@ -49,19 +45,8 @@
 `define I2CS_START_ADDR          32'h1A10_7000
 `define I2CS_END_ADDR            32'h1A10_7FFF
 
-<<<<<<< HEAD
-//`define EU_START_ADDR            32'h1A10_9000
-//`define EU_END_ADDR              32'h1A10_AFFF
-=======
-`define EU_START_ADDR            32'h1A10_9000
-`define EU_END_ADDR              32'h1A10_AFFF
->>>>>>> 5b2a0161a43151830af4a17dbe8b811511c4fe89
-
 `define TIMER_START_ADDR         32'h1A10_B000
 `define TIMER_END_ADDR           32'h1A10_BFFF
-
-//`define HWPE_START_ADDR          32'h1A10_C000
-//`define HWPE_END_ADDR            32'h1A10_CFFF
 
 `define STDOUT_START_ADDR        32'h1A10_F000
 `define STDOUT_END_ADDR          32'h1A10_FFFF
