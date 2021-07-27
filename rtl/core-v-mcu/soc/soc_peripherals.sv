@@ -23,7 +23,6 @@ module soc_peripherals #(
     input logic       periph_clk_i,
     input logic [5:0] fpga_clk_in,
     input logic       rst_ni,
-    //check the reset
     input logic       ref_clk_i,
     input logic       slow_clk_i,
 
@@ -35,12 +34,7 @@ module soc_peripherals #(
     input  logic          [ 7:0] soc_jtag_reg_i,
     output logic          [ 7:0] soc_jtag_reg_o,
     input  logic                 stoptimer_i,
-    input  logic                 boot_l2_i,
     input  logic                 bootsel_i,
-    // fc fetch enable can be controlled through this signal or through an APB
-    // write to the fc fetch enable register
-    input  logic                 fc_fetch_en_valid_i,
-    input  logic                 fc_fetch_en_i,
     input                 [ 4:0] core_irq_ack_id_i,
     input                        core_irq_ack_i,
     // SLAVE PORTS
@@ -49,38 +43,38 @@ module soc_peripherals #(
            APB_BUS.Master        apb_debug_master,
 
     // FABRIC CONTROLLER MASTER REFILL PORT
-           XBAR_TCDM_BUS.Master        l2_rx_master,
-           XBAR_TCDM_BUS.Master        l2_tx_master,
+    XBAR_TCDM_BUS.Master l2_rx_master,
+    XBAR_TCDM_BUS.Master l2_tx_master,
     // MASTER PORT TO SOC FLL
-           FLL_BUS.Master              soc_fll_master,
+    FLL_BUS.Master soc_fll_master,
     // MASTER PORT TO PER FLL
-           FLL_BUS.Master              per_fll_master,
+    FLL_BUS.Master per_fll_master,
     // MASTER PORT TO CLUSTER FLL
-           FLL_BUS.Master              cluster_fll_master,
+    FLL_BUS.Master cluster_fll_master,
     // MASTER PORT TO L2 from eFPGA
-           XBAR_TCDM_BUS.Master        l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
-           XBAR_TCDM_BUS.Slave         efpga_apbt1_slave,
-    input  logic                       dma_pe_evt_i,
-    input  logic                       dma_pe_irq_i,
-    input  logic                       pf_evt_i,
-    input  logic                [ 1:0] fc_hwpe_events_i,
-    output logic                [31:0] fc_events_o,
-
+    XBAR_TCDM_BUS.Master l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
+    XBAR_TCDM_BUS.Slave efpga_apbt1_slave,
+    input logic dma_pe_evt_i,
+    input logic dma_pe_irq_i,
+    input logic pf_evt_i,
+    input logic [1:0] fc_hwpe_events_i,
+    output logic [31:0] fc_events_o,
+    output logic wd_expired_o,
     // Pad control signals
-    output logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
-    output logic [    `N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
+    output logic [`N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
+    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
     // PERIO signals
-    input  logic [ `N_PERIO-1:0]                   perio_in_i,
-    output logic [ `N_PERIO-1:0]                   perio_out_o,
-    output logic [ `N_PERIO-1:0]                   perio_oe_o,
+    input logic [`N_PERIO-1:0] perio_in_i,
+    output logic [`N_PERIO-1:0] perio_out_o,
+    output logic [`N_PERIO-1:0] perio_oe_o,
     // GPIO signals
-    input  logic [ `N_APBIO-1:0]                   apbio_in_i,
-    output logic [ `N_APBIO-1:0]                   apbio_out_o,
-    output logic [ `N_APBIO-1:0]                   apbio_oe_o,
+    input logic [`N_APBIO-1:0] apbio_in_i,
+    output logic [`N_APBIO-1:0] apbio_out_o,
+    output logic [`N_APBIO-1:0] apbio_oe_o,
     // FPGAIO signals
-    input  logic [`N_FPGAIO-1:0]                   fpgaio_in_i,
-    output logic [`N_FPGAIO-1:0]                   fpgaio_out_o,
-    output logic [`N_FPGAIO-1:0]                   fpgaio_oe_o,
+    input logic [`N_FPGAIO-1:0] fpgaio_in_i,
+    output logic [`N_FPGAIO-1:0] fpgaio_out_o,
+    output logic [`N_FPGAIO-1:0] fpgaio_oe_o,
 
     //eFPGA TEST MODE
     input  [20:0] testio_i,
@@ -88,14 +82,8 @@ module soc_peripherals #(
 
     output logic [EVNT_WIDTH-1:0] cl_event_data_o,
     output logic                  cl_event_valid_o,
-    input  logic                  cl_event_ready_i,
+    input  logic                  cl_event_ready_i
 
-    output logic        cluster_pow_o,
-    output logic        cluster_byp_o,  // bypass cluster
-    output logic [63:0] cluster_boot_addr_o,
-    output logic        cluster_fetch_enable_o,
-    output logic        cluster_rstn_o,
-    output logic        cluster_irq_o
 );
 
 
@@ -123,7 +111,7 @@ module soc_peripherals #(
   APB_BUS s_apb_i2cs_bus ();
 
   logic [            `N_GPIO-1:0]                            s_gpio_sync;
-  logic                                                      s_sel_hyper_axi;
+  //  logic                                                      s_sel_hyper_axi;
 
   logic [            `N_GPIO-1:0]                            s_gpio_events;
   logic [                    1:0]                            s_spim_event;
@@ -460,14 +448,11 @@ module soc_peripherals #(
       .PREADY (s_soc_ctrl_bus.pready),
       .PSLVERR(s_soc_ctrl_bus.pslverr),
 
-      .sel_fll_clk_i      (sel_fll_clk_i),
-      .boot_l2_i          (boot_l2_i),
-      .bootsel_i          (bootsel_i),
-      .fc_fetch_en_valid_i(fc_fetch_en_valid_i),
-      .fc_fetch_en_i      (fc_fetch_en_i),
-      .status_out         (status_out),
-      .version            (version),
-      .control_in         (control_in),
+      .sel_fll_clk_i(sel_fll_clk_i),
+      .bootsel_i    (bootsel_i),
+      .status_out   (status_out),
+      .version      (version),
+      .control_in   (control_in),
 
       .pad_cfg_o(pad_cfg_o),
       .pad_mux_o(pad_mux_o),
@@ -489,19 +474,14 @@ module soc_peripherals #(
       .enable_tcdm1_efpga_o (enable_tcdm1_efpga),
       .enable_tcdm0_efpga_o (enable_tcdm0_efpga),
 
-      .fc_fetchen_o          (fc_fetchen_o),
-      .sel_hyper_axi_o       (s_sel_hyper_axi),
-      .cluster_pow_o         (cluster_pow_o),
-      .cluster_byp_o         (cluster_byp_o),
-      .cluster_boot_addr_o   (cluster_boot_addr_o),
-      .cluster_fetch_enable_o(cluster_fetch_enable_o),
-      .cluster_rstn_o        (cluster_rstn_o),
-      .cluster_irq_o         (cluster_irq_o),
-      // ready timout signals
-      .rto_o                 (s_rto),
-      .start_rto_i           (s_start_rto),
-      .peripheral_rto_i      (s_peripheral_rto),
-      .soft_reset_o          (s_soft_reset)
+      .fc_fetchen_o    (fc_fetchen_o),
+      .stoptimer_i     (stoptimer_i),
+      .ref_clk_i       (s_ref_rise_event),
+      .wd_expired_o    (wd_expired_o),
+      .rto_o           (s_rto),
+      .start_rto_i     (s_start_rto),
+      .peripheral_rto_i(s_peripheral_rto),
+      .soft_reset_o    (s_soft_reset)
   );
 
   apb_adv_timer #(

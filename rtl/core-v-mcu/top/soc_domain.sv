@@ -51,22 +51,10 @@ module soc_domain
     input logic test_clk_i,
     input logic rstn_glob_i,
 
-    input logic dft_test_mode_i,
-    input logic dft_cg_enable_i,
-    input logic mode_select_i,
-    input logic bootsel_i,
-
-    input logic fc_fetch_en_valid_i,
-    input logic fc_fetch_en_i,
-
-    output logic                         cluster_rtc_o,
-    output logic                         cluster_fetch_enable_o,
-    output logic [                 63:0] cluster_boot_addr_o,
-    output logic                         cluster_test_en_o,
-    output logic                         cluster_pow_o,
-    output logic                         cluster_byp_o,
-    output logic                         cluster_rstn_o,
-    output logic                         cluster_irq_o,
+    input  logic                         dft_test_mode_i,
+    input  logic                         dft_cg_enable_i,
+    input  logic                         mode_select_i,
+    input  logic                         bootsel_i,
     // AXI4 SLAVE
     input  logic [                  7:0] data_slave_aw_writetoken_i,
     input  logic [   AXI_ADDR_WIDTH-1:0] data_slave_aw_addr_i,
@@ -161,22 +149,17 @@ module soc_domain
     input  logic [    AXI_USER_WIDTH-1:0] data_master_b_user_i,
     output logic [                   7:0] data_master_b_readpointer_o,
 
-    output logic [BUFFER_WIDTH-1:0]                   cluster_events_wt_o,
-    input  logic [BUFFER_WIDTH-1:0]                   cluster_events_rp_i,
-    output logic [  EVNT_WIDTH-1:0]                   cluster_events_da_o,
-    output logic                                      cluster_clk_o,
-    input  logic                                      cluster_busy_i,
-    output logic                                      dma_pe_evt_ack_o,
-    input  logic                                      dma_pe_evt_valid_i,
-    output logic                                      dma_pe_irq_ack_o,
-    input  logic                                      dma_pe_irq_valid_i,
-    output logic                                      pf_evt_ack_o,
-    input  logic                                      pf_evt_valid_i,
+    output logic                               dma_pe_evt_ack_o,
+    input  logic                               dma_pe_evt_valid_i,
+    output logic                               dma_pe_irq_ack_o,
+    input  logic                               dma_pe_irq_valid_i,
+    output logic                               pf_evt_ack_o,
+    input  logic                               pf_evt_valid_i,
     ///////////////////////////////////////////////////
     //      To I/O Controller and padframe           //
     ///////////////////////////////////////////////////
-    output logic [       `N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
-    output logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
+    output logic [`N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_o,
+    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
 
     // Signals to pad frame
     input  logic [ `N_PERIO-1:0] perio_in_i,
@@ -206,19 +189,20 @@ module soc_domain
     //    output logic efpga_fcb_spis_miso_o,
 
 
+    output              wd_expired_o,
     //eFPGA TEST MODE
-    input        [        20:0] testio_i,
-    output       [        15:0] testio_o,
+    input        [20:0] testio_i,
+    output       [15:0] testio_o,
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
     // From JTAG Tap Controller to axi_dcb module    //
     ///////////////////////////////////////////////////
-    input  logic                jtag_tck_i,
-    input  logic                jtag_trst_ni,
-    input  logic                jtag_tms_i,
-    input  logic                jtag_tdi_i,
-    output logic                jtag_tdo_o,
-    output logic [NB_CORES-1:0] cluster_dbg_irq_valid_o
+    input  logic        jtag_tck_i,
+    input  logic        jtag_trst_ni,
+    input  logic        jtag_tms_i,
+    input  logic        jtag_tdi_i,
+    output logic        jtag_tdo_o
+    //    output logic [NB_CORES-1:0] cluster_dbg_irq_valid_o
     ///////////////////////////////////////////////////
 );
 
@@ -318,9 +302,6 @@ module soc_domain
   logic                                               s_periph_rstn;
   logic                                               s_soc_clk;
   logic                                               s_soc_rstn;
-  logic                                               s_cluster_clk;
-  logic                                               s_cluster_rstn;
-  logic                                               s_cluster_rstn_soc_ctrl;
   logic                                               s_sel_fll_clk;
 
   logic                                               s_dma_pe_evt;
@@ -359,8 +340,6 @@ module soc_domain
 
   logic spi_master0_csn3, spi_master0_csn2;
 
-  //  APB_BUS s_apb_eu_bus ();
-  //  APB_BUS s_apb_hwpe_bus ();
   APB_BUS s_apb_debug_bus ();
 
   AXI_BUS #(
@@ -378,7 +357,6 @@ module soc_domain
       .AXI_USER_WIDTH(AXI_USER_WIDTH)
   ) s_data_out_bus ();
 
-  //assign s_data_out_bus.aw_atop = 6'b0;
 
   FLL_BUS #(
       .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
@@ -413,21 +391,6 @@ module soc_domain
   XBAR_TCDM_BUS s_lint_efpga_bus[`N_EFPGA_TCDM_PORTS-1:0] ();
   XBAR_TCDM_BUS s_lint_efpga_apbt1_bus ();
 
-
-  logic s_cluster_isolate_dc;
-  logic s_rstn_cluster_sync_soc;
-
-
-  assign cluster_clk_o           = s_cluster_clk;
-  assign cluster_rstn_o          = s_cluster_rstn && s_cluster_rstn_soc_ctrl;
-  assign s_rstn_cluster_sync_soc = s_cluster_rstn && s_cluster_rstn_soc_ctrl;
-
-  assign cluster_rtc_o           = ref_clk_i;
-  assign cluster_test_en_o       = dft_test_mode_i;
-  // isolate dc if the cluster is down
-  assign s_cluster_isolate_dc    = ISOLATE_CLUSTER_CDC;
-  //cluster_byp_o;
-  // If you want to connect a real PULP cluster you also need a cluster_busy_i signal
 
   //********************************************************
   //********************* SOC L2 RAM ***********************
@@ -472,31 +435,23 @@ module soc_domain
       .EVNT_WIDTH    (EVNT_WIDTH)
   ) soc_peripherals_i (
 
-      .clk_i        (s_soc_clk),
-      .periph_clk_i (s_periph_clk),
-      .rst_ni       (s_soc_rstn),
-      .sel_fll_clk_i(s_sel_fll_clk),
-      .ref_clk_i    (ref_clk_i),
-      .slow_clk_i   (slow_clk_i),
-
+      .clk_i          (s_soc_clk),
+      .periph_clk_i   (s_periph_clk),
+      .rst_ni         (s_soc_rstn),
+      .sel_fll_clk_i  (s_sel_fll_clk),
+      .ref_clk_i      (ref_clk_i),
+      .slow_clk_i     (slow_clk_i),
+      .wd_expired_o   (wd_expired_o),
       .dft_test_mode_i(dft_test_mode_i),
       .dft_cg_enable_i(1'b0),
 
       .stoptimer_i(s_stoptimer),
-      .boot_l2_i  (1'b0),
-      .bootsel_i  (bootsel_i),
-
-      .fc_fetch_en_valid_i(fc_fetch_en_valid_i),
-      .fc_fetch_en_i      (fc_fetch_en_i),
-
+      .bootsel_i(bootsel_i),
       .fc_bootaddr_o(s_fc_bootaddr),
-      .fc_fetchen_o (s_fc_fetchen),
+      .fc_fetchen_o(s_fc_fetchen),
 
       .apb_slave(s_apb_periph_bus),
-
-      //      .apb_eu_master   (s_apb_eu_bus),
       .apb_debug_master(s_apb_debug_bus),
-      //      .apb_hwpe_master (s_apb_hwpe_bus),
 
       .l2_rx_master(s_lint_udma_rx_bus),
       .l2_tx_master(s_lint_udma_tx_bus),
@@ -546,48 +501,10 @@ module soc_domain
 
       .cl_event_data_o (s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),
-      .cl_event_ready_i(s_cl_event_ready),
+      .cl_event_ready_i(s_cl_event_ready)
 
-      .cluster_pow_o         (cluster_pow_o),
-      .cluster_byp_o         (cluster_byp_o),
-      .cluster_boot_addr_o   (cluster_boot_addr_o),
-      .cluster_fetch_enable_o(cluster_fetch_enable_o),
-      .cluster_rstn_o        (s_cluster_rstn_soc_ctrl),
-      .cluster_irq_o         (cluster_irq_o)
   );
 
-
-
-  dc_token_ring_fifo_din #(
-      .DATA_WIDTH  (EVNT_WIDTH),
-      .BUFFER_DEPTH(BUFFER_WIDTH)
-  ) u_event_dc (
-      .clk         (s_soc_clk),
-      .rstn        (s_rstn_cluster_sync_soc),
-      .data        (s_cl_event_data),
-      .valid       (s_cl_event_valid),
-      .ready       (s_cl_event_ready),
-      .write_token (cluster_events_wt_o),
-      .read_pointer(cluster_events_rp_i),
-      .data_async  (cluster_events_da_o)
-  );
-
-
-  edge_propagator_rx ep_dma_pe_evt_i (
-      .clk_i  (s_soc_clk),
-      .rstn_i (s_rstn_cluster_sync_soc),
-      .valid_o(s_dma_pe_evt),
-      .ack_o  (dma_pe_evt_ack_o),
-      .valid_i(dma_pe_evt_valid_i)
-  );
-
-  edge_propagator_rx ep_dma_pe_irq_i (
-      .clk_i  (s_soc_clk),
-      .rstn_i (s_rstn_cluster_sync_soc),
-      .valid_o(s_dma_pe_irq),
-      .ack_o  (dma_pe_irq_ack_o),
-      .valid_i(dma_pe_irq_valid_i)
-  );
 `ifndef PULP_FPGA_EMUL
   edge_propagator_rx ep_pf_evt_i (
       .clk_i  (s_soc_clk),
@@ -724,12 +641,12 @@ module soc_domain
       hartinfo[hartid] = RI5CY_HARTINFO;
     end
   end
-
+  /*
   // redirect debug request from dm to correct cluster core
   for (genvar dbg_var = 0; dbg_var < NB_CORES; dbg_var = dbg_var + 1) begin : gen_debug_valid
     assign cluster_dbg_irq_valid_o[dbg_var] = dm_debug_req[cluster_core_id[dbg_var]];
   end
-
+*/
   dm_top #(
       .NrHarts        (NrHarts),
       .BusWidth       (32),

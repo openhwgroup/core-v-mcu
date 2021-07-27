@@ -41,14 +41,17 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,N_SDIO,7,0,RO,`N_SDIO,Number of SDIO controllers
 ,,,,,,
 0x0074,JTAGREG,,,,,JTAG register
-0x00A0,CORESTATUS,,,,,
-,EOC,31,31,RW,,EOC condition
-,STATUS,30,0,RW,,Status bits
-0x00C0,CS_RO,,,,,Read Only mirror
-,EOC,31,31,RO,,EOC condition
-,STATUS,30,0,RO,,Status bits
-0x00C4,BOOTSEL,,,,,
+0x00C4,BOOTSEL,,,,,Bootsel Pin sampled at rising edge of RESET
+,BootDev,0,0,,,"Selects Boot device 1=SPI, 0=Host mode via I2Cs"
 0x00C8,CLKSEL,,,,,
+0x00D0,WD_COUNT,,,,,Watch Dog Count register (number of Ref clocks before Watchdog expires)
+,COUNT,30,0,R/W,0x8000,Only writable before Watchdog is enabled
+0x00D4,WD_CONTROL,,,,,Watchdog Control
+,ENABLE_STATUS,31,31,R0,,"1=Watchdog Enabled, 0=Watchdog not enabled"
+,WD_VALUE,15,0,WO,NA,"Set to 0x6699 to reset watchdog when enabled, read current WD value"
+,ENABLE_WD,0,0,WO,,"Enabled Watch dog,, once enable, cannot be disabled"
+0x00D8,RESET_REASON,,,,,Reset for most reset reset
+,REASON,1,0,R/W,,"2'b01= reset pin, 2'b11=Watchdog expired"
 0x00D8,CLK_DIV_CLU,,,,,
 0x00E0,RTO_PERIPHERAL_ERROR,,,,,Indicates which APB peripheral cause a ready timeout error
 ,FCB_RTO,8,8,R/W,0x0 ,1 indicates that the FCB interface caused a ready timeout

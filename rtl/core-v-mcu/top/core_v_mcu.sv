@@ -50,6 +50,7 @@ module core_v_mcu #(
 
   logic                                      s_ref_clk;
   logic                                      s_rstn;
+  logic                                      s_pad_rstn;
 
   logic                                      s_jtag_tck;
   logic                                      s_jtag_tdi;
@@ -186,8 +187,6 @@ module core_v_mcu #(
   logic [             7:0]                   s_soc_jtag_rego;
 
   logic                                      s_rstn_por;
-  logic                                      s_cluster_pow;
-  logic                                      s_cluster_byp;
 
   logic                                      s_dma_pe_irq_ack;
   logic                                      s_dma_pe_irq_valid;
@@ -239,16 +238,14 @@ module core_v_mcu #(
   logic [BUFFER_WIDTH-1:0]                   s_event_writetoken;
   logic [BUFFER_WIDTH-1:0]                   s_event_readpointer;
   logic [ EVENT_WIDTH-1:0]                   s_event_dataasync;
-  logic                                      s_cluster_irq;
+  logic                                      s_wd_wxpired;
+
 
 
   //
   // OTHER PAD FRAME SIGNALS
   //
   logic                                      s_bootsel;
-  logic                                      s_fc_fetch_en_valid;
-  logic                                      s_fc_fetch_en;
-
   logic                                      debug1;
   logic                                      debug0;
 
@@ -269,12 +266,14 @@ module core_v_mcu #(
   //
   // PAD FRAME
   //
+  assign s_rstn = ~(~s_pad_rstn | s_wd_expired);
+
   pad_frame i_pad_frame (
       .pad_cfg_i(s_pad_cfg),
       .bootsel_o(s_bootsel),
 
       .ref_clk_o  (s_ref_clk),
-      .rstn_o     (s_rstn),
+      .rstn_o     (s_pad_rstn),
       .jtag_tdo_i (s_jtag_tdo),
       .jtag_tck_o (s_jtag_tck),
       .jtag_tdi_o (s_jtag_tdi),
@@ -359,19 +358,6 @@ module core_v_mcu #(
       .dft_cg_enable_i(s_dft_cg_enable),
       .mode_select_i(s_mode_select),
       .bootsel_i(s_bootsel),
-
-      // we immediately start booting in the default setup
-      .fc_fetch_en_valid_i(1'b1),
-      .fc_fetch_en_i      (1'b1),
-
-      .cluster_rtc_o(),
-      .cluster_fetch_enable_o(),
-      .cluster_boot_addr_o(),
-      .cluster_test_en_o(),
-      .cluster_pow_o(s_cluster_pow),
-      .cluster_byp_o(s_cluster_byp),
-      .cluster_rstn_o(),
-      .cluster_irq_o(s_cluster_irq),
 
       .data_slave_aw_writetoken_i('0),
       .data_slave_aw_addr_i('0),
@@ -470,6 +456,7 @@ module core_v_mcu #(
       .jtag_tms_i  (s_jtag_tms),
       .jtag_tdi_i  (s_jtag_tdi),
       .jtag_tdo_o  (s_jtag_tdo),
+      .wd_expired_o(s_wd_expired),
       // Pad control signals
       .pad_cfg_o   (s_pad_cfg_soc),
       .pad_mux_o   (s_pad_mux_soc),
@@ -486,23 +473,14 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-      .fpga_clk_in({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
-
-      .cluster_busy_i(s_cluster_busy),
-      .cluster_events_wt_o(s_event_writetoken),
-      .cluster_events_rp_i(s_event_readpointer),
-      .cluster_events_da_o(s_event_dataasync),
-
-
-      .cluster_clk_o          (),
-      .selected_mode_i        ('0),
-      .cluster_dbg_irq_valid_o(),
-      .dma_pe_evt_ack_o       (s_dma_pe_evt_ack),
-      .dma_pe_evt_valid_i     (s_dma_pe_evt_valid),
-      .dma_pe_irq_ack_o       (s_dma_pe_irq_ack),
-      .dma_pe_irq_valid_i     (s_dma_pe_irq_valid),
-      .pf_evt_ack_o           (s_pf_evt_ack),
-      .pf_evt_valid_i         (s_pf_evt_valid),
+      .fpga_clk_in       ({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
+      .selected_mode_i   ('0),
+      .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
+      .dma_pe_evt_valid_i(s_dma_pe_evt_valid),
+      .dma_pe_irq_ack_o  (s_dma_pe_irq_ack),
+      .dma_pe_irq_valid_i(s_dma_pe_irq_valid),
+      .pf_evt_ack_o      (s_pf_evt_ack),
+      .pf_evt_valid_i    (s_pf_evt_valid),
 
 
       //eFPGA TEST MODE
