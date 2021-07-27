@@ -482,7 +482,6 @@ module core_v_mcu #(
       .pf_evt_ack_o      (s_pf_evt_ack),
       .pf_evt_valid_i    (s_pf_evt_valid),
 
-
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o)

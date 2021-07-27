@@ -25,7 +25,11 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,APB_TO_I2C_STATUS,0,0,RW,0x00,
 0x080,I2CS_FIFO_I2C_APB_WRITE_DATA_PORT,,,,,This is the write data port for the I2CtoAPB FIFO.
 ,I2C_APB_WRITE_DATA_PORT,31,0,RW,,
+<<<<<<< HEAD
 0x084,I2CS_FIFO_I2C_APB_READ_DATA_PORT,,,,,This is the read data port for the I2CtoAPB FIFO.
+=======
+0x084,I2CS_FIFO_I2C_APB_WRITE_DATA_PORT,,,,,This is the read data port for the I2CtoAPB FIFO.
+>>>>>>> 5b2a0161a43151830af4a17dbe8b811511c4fe89
 ,I2C_APB_READ_DATA_PORT,31,0,RW,,
 0x088,I2CS_FIFO_I2C_APB_FLUSH,,,,,
 ,RESERVED,7,1,RW,,"Reserved"
@@ -38,7 +42,11 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,FLAGS,2,0,RW,,
 0x0C0,I2CS_FIFO_APB_I2C_WRITE_DATA_PORT,,,,,This is the write data port for the APBtoI2C FIFO.
 ,I2C_APB_WRITE_DATA_PORT,31,0,RW,,
+<<<<<<< HEAD
 0x0C4,I2CS_FIFO_APB_I2C_READ_DATA_PORT,,,,,This is the read data port for the APBtoI2C FIFO.
+=======
+0x0C4,I2CS_FIFO_APB_I2C_WRITE_DATA_PORT,,,,,This is the read data port for the APBtoI2C FIFO.
+>>>>>>> 5b2a0161a43151830af4a17dbe8b811511c4fe89
 ,I2C_APB_READ_DATA_PORT,31,0,RW,,
 0x0C8,I2CS_FIFO_APB_I2C_FLUSH,,,,,
 ,RESERVED,7,1,RW,,"Reserved"

@@ -12,6 +12,7 @@ rtl/tb/run-sim.log
 gmon.out
 modelsim.ini
 vivado.log
+model-lib.log
 lint.log
 nexys-emul.log
 sw/inc/
