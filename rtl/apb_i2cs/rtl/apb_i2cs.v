@@ -41,9 +41,10 @@ module apb_i2cs (
     i2c_interrupt_o
 );
 
-  parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 20;
-  parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 20;
-  parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 8;
+
+  parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 0;
+  parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 0;
+  parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 0;
 
   // APB interface
   input apb_pclk_i;
@@ -119,7 +120,7 @@ module apb_i2cs (
 
   assign i2c_scl_in = i2c_scl_i;
   assign i2c_sda_in = i2c_sda_i;
-  assign I2c_sda_o  = 1'b0;
+  assign i2c_sda_o  = 1'b0;
   assign i2c_sda_oe = ~i2c_sda_out; // oe is active high
 
 

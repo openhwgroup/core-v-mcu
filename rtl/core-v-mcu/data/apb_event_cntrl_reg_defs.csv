@@ -1,0 +1,56 @@
+Module,APB_EVENT_CNTRL,,,,,
+,Memory address: SOC_EVENT_GEN_START_ADDR(`SOC_EVENT_START_ADDR),,,,,
+,,,,,,
+,This APB peripheral device collects all the events which presented,,,,,
+,to the CPU as IRQ11 (Machine interrupt).,,,,,
+,Each event is individually maskable by the appropriate bit in the,,,,,
+,EVENT_MASKx register.,,,,,
+,When an enabled event (unmasked) is received it is placed in a event FIFO,,,,,
+,and the IRQ11 signal is presented to the CPU which can then read,,,,,
+,the EVENT FIFO to determine which event cause the interrupt.,,,,,
+,each event has a queue of depth four to collect events if the ,,,,,
+,queue for any event overflows an error is logged into the appropriate,,,,,
+,EVENT_ERR register  and IRQ31 is presented to the CPU. ,,,,,
+Register,Offset/Field,MSB,LSB,Type,Default,Description
+0x000,APB_EVENTS,,,RW,,
+,apb_event,15,0,,,16-bits of software generated events
+0x004,EVENT_MASK0,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 0 - 31 1=mask event
+0x008,EVENT_MASK1,,,RW,,
+,event_enable,31,30,,,individual masks for events 32 - 63 1=mask event
+0x00C,EVENT_MASK2,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 64 - 95 1=mask event
+0x010,EVENT_MASK3,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 96 - 127 1=mask event
+0x014,EVENT_MASK4,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 128 - 159 1=mask event
+0x018,EVENT_MASK5,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 160 - 191 1=mask event
+0x01C,EVENT_MASK6,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 192 - 223 1=mask event
+0x020,EVENT_MASK7,,,RW,,
+,event_enable,31,30,0xFFFFFFFF,,individual masks for events 224 - 255 1=mask event
+,,,,,,
+0x064,EVENT_ERR0,,,RW,,
+,event_err,31,30,0x0,,individual error bits to indicate event queue overflow for events 0 - 31
+0x068,EVENT_ERR1,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 32 - 63
+0x06C,EVENT_ERR2,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 64 - 95
+0x070,EVENT_ERR3,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 96 - 127
+0x074,EVENT_ERR4,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 128 - 159
+0x078,EVENT_ERR5,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 160 - 191
+0x07C,EVENT_ERR6,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 192 - 223
+0x080,EVENT_ERR7,,,RW,,
+,event_enable,31,30,0x0,,individual error bits to indicate event queue overflow for events 224 - 255
+,,,,,,
+0x0084,TIMER_LO_EVENT,,,RW,,
+,event,7,0,,specifies which event should be routed to the lo timer,
+0x0088,TIMER_HI_EVENT,,,RW,,
+,event,7,0,,specifies which event should be routed to the hi timer,
+0x090,EVENT_FIFO,,,,,
+,EVENT_ID,7,0,RO,,ID of triggering event to be read by interrupt handler

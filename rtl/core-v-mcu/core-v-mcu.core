@@ -162,7 +162,6 @@ parameters:
     default: true
 
 
-
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
 scripts:

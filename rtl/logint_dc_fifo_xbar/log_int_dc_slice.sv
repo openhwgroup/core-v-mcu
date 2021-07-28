@@ -238,7 +238,7 @@ generate
    dc_resp_out_fifo
    (
       .clk            ( push_clk               ),
-      .rst_n          ( push_rst_              ),
+      .rst_n          ( push_rst_n             ),
       .data_i         ( data_resp_pop_ch_sync  ),
       .valid_i        ( valid_resp_pop_ch_sync ),
       .grant_o        ( ready_resp_pop_ch_sync ),

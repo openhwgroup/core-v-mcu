@@ -64,9 +64,8 @@ module apb_slave_interface (
   wire [11:0] apb_reg_raddr_o;
   wire [31:0] apb_reg_rdata_i;
   wire        apb_reg_rd_byte_complete_o;
-
-
   wire        clk;
+  wire        rst;
   assign clk = apb_pclk_i;
   assign rst = apb_preset_i;
 

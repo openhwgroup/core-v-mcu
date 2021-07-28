@@ -9,14 +9,14 @@ IOSCRIPT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT+=rtl/includes/periph_bus_defines.sv
 IOSCRIPT+=pin-table.csv
 IOSCRIPT+=perdef.json
-IOSCRIPT+=fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v
-IOSCRIPT+=fpga/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
+#IOSCRIPT+=emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+IOSCRIPT+=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
 IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
 IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
-IOSCRIPT_OUT+=fpga/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+IOSCRIPT_OUT+=emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
 #Must also change the localparam 'L2_BANK_SIZE' in pulp_soc.sv accordingly
@@ -26,6 +26,7 @@ export PRIVATE_BANK_SIZE=8192
 
 help:
 			@echo "all:            generate build scripts, custom build files, doc and sw header files"
+			@echo "src:            set up all generated source files"
 			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
 			@echo "model-lib:      build a Verilator model library"
 			@echo "lint:           run Verilator lint check"
@@ -36,7 +37,9 @@ help:
 			@echo "sim:            run Questa sim"
 			@echo "clean:          remove generated files"
 
-all:	${IOSCRIPT_OUT} docs sw
+all:		${IOSCRIPT_OUT} docs sw
+
+src:		${IOSCRIPT_OUT}
 
 clean:
 				(cd docs; make clean)
@@ -108,7 +111,7 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
 					--pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
-					--xilinx-core-v-mcu-sv fpga/core-v-mcu-nexys/rtl/xilinx_core_v_mcu.v\
+					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 
@@ -117,6 +120,9 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 				(cd fpga; make nexys rev=nexysA7-100T) 2>&1 | tee vivado.log
 
-download:
+download0:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
+             emulation/core_v_mcu_nexys.bit
+download:
+	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit

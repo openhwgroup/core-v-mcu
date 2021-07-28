@@ -88,9 +88,6 @@ module i2c_peripheral_registers (
   wire [ 7:0] i2c_debounce_len_o;
   wire [ 7:0] i2c_scl_delay_len_o;
   wire [ 7:0] i2c_sda_delay_len_o;
-  wire [ 7:0] i2c_reg_addr_i;
-  wire [ 7:0] i2c_reg_wdata_i;
-  wire        i2c_reg_wrenable_i;
   wire [ 7:0] i2c_reg_rddata_o;
   wire        i2c_reg_rd_byte_complete_i;
 

@@ -54,16 +54,8 @@ module safe_domain #(
     // FPGAIOS
     input  logic [`N_FPGAIO-1:0] fpgaio_out_i,
     output logic [`N_FPGAIO-1:0] fpgaio_in_o,
-    input  logic [`N_FPGAIO-1:0] fpgaio_oe_i,
+    input  logic [`N_FPGAIO-1:0] fpgaio_oe_i
 
-
-    // TIMER
-    //    input logic [3:0] timer0_i,
-    //    input logic [3:0] timer1_i,
-    //    input logic [3:0] timer2_i,
-    //    input logic [3:0] timer3_i,
-    input logic debug0,
-    input logic debug1
 );
 
   logic                    s_test_clk;
@@ -146,19 +138,5 @@ module safe_domain #(
   assign dft_cg_enable_o = 1'b0;
   assign test_mode_o     = 1'b0;
   assign mode_select_o   = 1'b0;
-
-  // //********************************************************
-  // //*** PAD AND GPIO CONFIGURATION SIGNALS PACK ************
-  // //********************************************************
-
-  // generate
-  // for (i=0; i<32; i++)
-  // begin : GEN_GPIO_CFG_I
-  // for (j=0; j<6; j++)
-  // begin : GEN_GPIO_CFG_J
-  // assign s_gpio_cfg[i][j] = gpio_cfg_i[j+6*i];
-  // end
-  // end
-  // endgenerate
 
 endmodule  // safe_domain
