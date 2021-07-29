@@ -34,8 +34,6 @@ module core_v_mcu_tb;
 
     // Design Under Test
     core_v_mcu #(
-        .USE_FPU    ( 1 ),
-        .USE_HWPE   ( 1 )
     )
     core_v_mcu_i (
     .io (io_t)
