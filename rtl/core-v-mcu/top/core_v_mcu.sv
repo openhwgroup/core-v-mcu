@@ -238,7 +238,7 @@ module core_v_mcu #(
   logic [BUFFER_WIDTH-1:0]                   s_event_writetoken;
   logic [BUFFER_WIDTH-1:0]                   s_event_readpointer;
   logic [ EVENT_WIDTH-1:0]                   s_event_dataasync;
-  logic                                      s_wd_wexpired;
+  logic                                      s_wd_expired;
 
 
 
