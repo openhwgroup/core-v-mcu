@@ -109,7 +109,7 @@ The goals of the whole product tests are to:
 |        | Write char              ||
 |        | Read N char             ||
 |        | Write N char            ||
-|        | Read through '\n'       ||
+|        | Read through '\\n'       ||
 |        | Rx empty                ||
 |        | Tx empty                ||
 |        | Wait for idle           ||
@@ -117,6 +117,7 @@ The goals of the whole product tests are to:
 
 ### I2Cmaster
 Pmod used for regression testing: PmodRTCC (has small SRAM)
+
 | Type       | Mode                           | Notes   |
 | :------------  | :---------------------     | :-------  |
 | Blocking  |                                 ||
@@ -150,6 +151,7 @@ Note: APIs are on host, so used for purposes of describing tested functionality
 
 ### QSPImaster
 Pmod used for regression testing: PmodSF3 (serial NOR flash memory)
+
 | Type       | Mode                           | Notes   |
 | :------------  | :---------------------     | :-------  |
 | Blocking     |                              ||

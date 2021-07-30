@@ -1,3 +1,5 @@
+// July30 -- uart reset fixed
+
 module fpga_bootrom
  #(
  parameter ADDR_WIDTH=32,
@@ -2044,4 +2046,4 @@ module fpga_bootrom
   default: value <= 0;
    endcase
   end
-endmodule    
+endmodule

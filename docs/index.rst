@@ -24,7 +24,7 @@ CORE-V-MCU User Manual
     :maxdepth: 2
     :glob:
 
-    auto-docs/pin-table
+    auto-docs/pin-table.md
 
 ..  toctree::
     :caption: Core Controllers
@@ -32,20 +32,21 @@ CORE-V-MCU User Manual
     :glob:
 
 
-    auto-docs/apb_soc_ctrl_reg_defs
-    auto-docs/apb_interrupt_cntrl_reg_defs
-    auto-docs/apb_timer_unit_reg_defs
-    auto-docs/apb_gpio_reg_defs
-    auto-docs/efpga_template_reg_defs
-    auto-docs/udma_ctrl_reg_defs
+    auto-docs/apb_soc_ctrl_reg_defs.md
+    auto-docs/apb_event_cntrl_reg_defs.md
+    auto-docs/apb_timer_unit_reg_defs.md
+    auto-docs/apb_gpio_reg_defs.md
+    auto-docs/apb_i2cs_reg_defs.md
+    auto-docs/efpga_template_reg_defs.md
+    auto-docs/udma_ctrl_reg_defs.md
 
 ..  toctree::
     :caption: Peripheral Controllers
     :maxdepth: 1
     :glob:
 
-    auto-docs/udma_uart_reg_defs
-    auto-docs/udma_i2cm_reg_defs
-    auto-docs/udma_qspi_reg_defs
-    auto-docs/udma_sdio_reg_defs
-    auto-docs/udma_camera_reg_defs
+    auto-docs/udma_uart_reg_defs.md
+    auto-docs/udma_i2cm_reg_defs.md
+    auto-docs/udma_qspi_reg_defs.md
+    auto-docs/udma_sdio_reg_defs.md
+    auto-docs/udma_camera_reg_defs.md
