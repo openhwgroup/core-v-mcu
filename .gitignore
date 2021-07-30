@@ -19,7 +19,4 @@ sw/inc/
 sw/csv-mirror/
 emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 emulation/core-v-mcu-nexys/rtl/*.v
-rtl/core-v-mcu/top/pad_frame.sv
-rtl/core-v-mcu/top/pad_control.sv
-rtl/includes/pulp_peripheral_defines.svh
 vivado*
