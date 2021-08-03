@@ -21,6 +21,25 @@ Supports 7-bit I2C addressing.
 ---------------------------------------------------------------------------- */
 
 module apb_i2cs (
+  input apb_pclk_i,
+  input apb_presetn_i,
+  input [11:0] apb_paddr_i,
+  input apb_psel_i,
+  input apb_penable_i,
+  input apb_pwrite_i,
+  input [31:0] apb_pwdata_i,
+  output wire apb_pready_o,
+  output wire [31:0] apb_prdata_o,
+  output wire apb_interrupt_o,
+
+  // I2C pins
+  input i2c_scl_i,
+  input i2c_sda_i,
+  output wire i2c_sda_o,
+  output wire i2c_sda_oe,
+  output wire i2c_interrupt_o
+
+/*
     // APB interface
     apb_pclk_i,
     apb_presetn_i,
@@ -39,13 +58,14 @@ module apb_i2cs (
     i2c_sda_o,
     i2c_sda_oe,
     i2c_interrupt_o
+ */
 );
 
 
   parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 0;
   parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 0;
   parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 0;
-
+/*
   // APB interface
   input apb_pclk_i;
   input apb_presetn_i;
@@ -84,7 +104,7 @@ module apb_i2cs (
   wire        i2c_sda_oe;
   wire        i2c_interrupt_o;
 
-
+*/
   // internal versions of the I2C signals
   wire        i2c_scl_in;
   wire        i2c_sda_in;

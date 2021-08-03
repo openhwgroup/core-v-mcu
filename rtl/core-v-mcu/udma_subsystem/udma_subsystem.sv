@@ -285,8 +285,8 @@ module udma_subsystem #(
       .PREADY (udma_apb_pready),
       .PSLVERR(udma_apb_pslverr),
 
-      .periph_per_clk_o(s_clk_periphs_per),
-      .periph_sys_clk_o(s_clk_periphs_core),
+      .periph_per_clk_o  (s_clk_periphs_per),
+      .periph_sys_clk_o  (s_clk_periphs_core),
       .periph_rst_value_o(s_rst_periphs),
 
       .event_valid_i(event_valid_i),
@@ -721,14 +721,14 @@ module udma_subsystem #(
   // I2S
   generate
     for (genvar g_i2s = 0; g_i2s < `N_I2S; g_i2s++) begin : i_i2s_gen
-      assign s_events[4*(PER_ID_I2S + g_i2s)+0]    = s_rx_ch_events[CH_ID_RX_I2S + g_i2s];
-      assign s_events[4*(PER_ID_I2S + g_i2s)+1]  = s_tx_ch_events[CH_ID_TX_I2S + g_i2s];
-      assign s_events[4*(PER_ID_I2S + g_i2s)+2]  = 1'b0;
-      assign s_events[4*(PER_ID_I2S + g_i2s)+3]  = 1'b0;
-      assign s_rx_cfg_stream[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_rx_cfg_stream_id[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_rx_ch_destination[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_tx_ch_destination[CH_ID_TX_I2S + g_i2s] = 'h0;
+      assign s_events[4*(PER_ID_I2S+g_i2s)+0] = s_rx_ch_events[CH_ID_RX_I2S+g_i2s];
+      assign s_events[4*(PER_ID_I2S+g_i2s)+1] = s_tx_ch_events[CH_ID_TX_I2S+g_i2s];
+      assign s_events[4*(PER_ID_I2S+g_i2s)+2] = 1'b0;
+      assign s_events[4*(PER_ID_I2S+g_i2s)+3] = 1'b0;
+      assign s_rx_cfg_stream[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_rx_cfg_stream_id[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_rx_ch_destination[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_tx_ch_destination[CH_ID_TX_I2S+g_i2s] = 'h0;
 
       assign s_per_rst[PER_ID_I2S+g_i2s] = sys_resetn_i & !s_rst_periphs[PER_ID_I2S+g_i2s];
       udma_i2s_top #(
@@ -866,18 +866,18 @@ module udma_subsystem #(
   // FILTER
   generate
     for (genvar g_filter = 0; g_filter < `N_FILTER; g_filter++) begin : i_filter_gen
-      assign s_events[4*(PER_ID_FILTER+g_filter)+0]               = s_filter_eot_evt;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+1]               = s_filter_act_evt;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+2]               = 1'b0;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+3]               = 1'b0;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+0] = s_filter_eot_evt;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+1] = s_filter_act_evt;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+2] = 1'b0;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+3] = 1'b0;
 
-      assign s_rx_ext_destination[CH_ID_EXT_RX_FILTER+g_filter]   = 'h0;
-      assign s_rx_ext_stream[CH_ID_EXT_RX_FILTER+g_filter]        = 'h0;
-      assign s_rx_ext_stream_id[CH_ID_EXT_RX_FILTER+g_filter]     = 'h0;
-      assign s_rx_ext_sot[CH_ID_EXT_RX_FILTER+g_filter]           = 'h0;
-      assign s_rx_ext_eot[CH_ID_EXT_RX_FILTER+g_filter]           = 'h0;
+      assign s_rx_ext_destination[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_stream[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_stream_id[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_sot[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_eot[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
 
-      assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter]   = 'h0;
+      assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter] = 'h0;
       assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter+1] = 'h0;
 
       assign s_per_rst[PER_ID_FILTER+g_filter] = sys_resetn_i & !s_rst_periphs[PER_ID_FILTER+g_filter];

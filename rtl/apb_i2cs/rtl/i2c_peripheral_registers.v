@@ -9,6 +9,34 @@
 // specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_registers (
+  input clk_i,
+  input rst_i,
+
+  // APB reg interface
+  input [11:0] apb_reg_waddr_i,
+  input [31:0] apb_reg_wdata_i,
+  input apb_reg_wrenable_i,
+  input [11:0] apb_reg_raddr_i,
+  output [31:0] apb_reg_rdata_o,
+  input apb_reg_rd_byte_complete_i,
+
+  // i2c interfae
+  output [6:0] i2c_dev_addr_o,
+  output i2c_enabled_o,
+  output [7:0] i2c_debounce_len_o,
+  output [7:0] i2c_scl_delay_len_o,
+  output [7:0] i2c_sda_delay_len_o,
+  input [7:0] i2c_reg_addr_i,
+  input [7:0] i2c_reg_wdata_i,
+  input i2c_reg_wrenable_i,
+  output [7:0] i2c_reg_rddata_o,
+  input i2c_reg_rd_byte_complete_i,
+
+  // interrupts
+  output i2c_interrupt_o,
+  output apb_interrupt_o
+                                 /*
+
     clk_i,
     rst_i,
 
@@ -34,9 +62,9 @@ module i2c_peripheral_registers (
 
     // interrupt outputs
     i2c_interrupt_o,
-    apb_interrupt_o
+    apb_interrupt_o */
 );
-
+/*
   input clk_i;
   input rst_i;
 
@@ -63,24 +91,24 @@ module i2c_peripheral_registers (
   // interrupts
   output i2c_interrupt_o;
   output apb_interrupt_o;
-
+*/
 
   parameter [6:0] I2C_DEFAULT_ADDR = 7'h6F;  // default I2C device address
   parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 20;
   parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 20;
   parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 8;
 
-
+/*
   wire        clk_i;
   wire        rst_i;
 
   // APB reg interface
-  wire [11:0] apb_reg_waddr_i;
-  wire [31:0] apb_reg_wdata_i;
-  wire        apb_reg_wrenable_i;
-  wire [11:0] apb_reg_raddr_i;
+//  wire [11:0] apb_reg_waddr_i;
+//  wire [31:0] apb_reg_wdata_i;
+//  wire        apb_reg_wrenable_i;
+//  wire [11:0] apb_reg_raddr_i;
   wire [31:0] apb_reg_rdata_o;
-  wire        apb_reg_rd_byte_complete_i;
+//  wire        apb_reg_rd_byte_complete_i;
 
   // i2c interfae
   wire [ 6:0] i2c_dev_addr_o;
@@ -89,12 +117,12 @@ module i2c_peripheral_registers (
   wire [ 7:0] i2c_scl_delay_len_o;
   wire [ 7:0] i2c_sda_delay_len_o;
   wire [ 7:0] i2c_reg_rddata_o;
-  wire        i2c_reg_rd_byte_complete_i;
+//  wire        i2c_reg_rd_byte_complete_i;
 
   // interrupts
   wire        i2c_interrupt_o;
   wire        apb_interrupt_o;
-
+*/
 
   wire        clk;
   wire        rst;
@@ -191,43 +219,37 @@ module i2c_peripheral_registers (
       reg_0x53 <= 0;
       fifo_i2c_to_apb_push <= 1'b0;
     end else begin
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h00) reg_0x00 <= apb_reg_wdata_i[6:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h00)
+        reg_0x00 <= apb_reg_wdata_i[6:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h01) reg_0x01 <= apb_reg_wdata_i[0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h01)
+        reg_0x01 <= apb_reg_wdata_i[0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h02) reg_0x02 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h02)
+        reg_0x02 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h03) reg_0x03 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h03)
+        reg_0x03 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h04) reg_0x04 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h04)
+        reg_0x04 <= apb_reg_wdata_i[7:0];
 
-      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10) reg_0x10 <= i2c_reg_wdata_i;
+      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10)
+        reg_0x10 <= i2c_reg_wdata_i;
 
-      case (reg_0x11)
-        // set when reg_0x10 is written, clear when it's been read
-        1'b0:
-        if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h10) reg_0x11 <= 1'b1;
-        else reg_0x11 <= 1'b0;
-        1'b1:
-        if (apb_reg_rd_byte_complete_i && apb_reg_raddr_i[11:10]==2'b0 &&
-            apb_reg_raddr_i[9:2]==8'h10 && apb_reg_raddr_i[1:0]==2'b0)
-          reg_0x11 <= 1'b0;
-        else reg_0x11 <= 1'b1;
-        default: reg_0x11 <= 1'bx;
-      endcase
+      if (i2c_reg_wrenable_i && (i2c_reg_addr_i == 8'h10))
+        reg_0x11 <= 1'b1;
+      else if (apb_reg_rd_byte_complete_i && (apb_reg_raddr_i[11:0]==12'h40))
+        reg_0x11 <= 1'b0;
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h12) reg_0x12 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h12)
+        reg_0x12 <= apb_reg_wdata_i[7:0];
 
-      case (reg_0x13)
-        // set when reg_0x12 is written, clear when it's been read
-        1'b0:
-        if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h12) reg_0x13 <= 1'b1;
-        else reg_0x13 <= 1'b0;
-        1'b1:
-        if (i2c_reg_rd_byte_complete_i && i2c_reg_addr_i == 8'h12) reg_0x13 <= 1'b0;
-        else reg_0x13 <= 1'b1;
-        default: reg_0x13 <= 1'bx;
-      endcase
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h44)
+        reg_0x13 <= 1'b1;
+      else if (i2c_reg_rd_byte_complete_i && i2c_reg_addr_i == 8'h12)
+        reg_0x13 <= 1'b0;
+
 
       if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h20) begin
         reg_0x20 <= i2c_reg_wdata_i;
@@ -238,32 +260,38 @@ module i2c_peripheral_registers (
       end
 
       // reg_0x21 - fifo read port
-      if (apb_reg_waddr_i[11:10]==2'h0 && apb_reg_waddr_i[9:2]==8'h21 &&
-                    apb_reg_waddr_i[1:0]==2'b0 && apb_reg_rd_byte_complete_i)
+      if ((apb_reg_raddr_i[11:0]==12'h84) && apb_reg_rd_byte_complete_i)
         fifo_i2c_to_apb_pop <= 1'b1;
       else fifo_i2c_to_apb_pop <= 1'b0;
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h22) reg_0x22 <= apb_reg_wdata_i[0];
-      else if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h22) reg_0x22 <= i2c_reg_wdata_i[0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h88)
+        reg_0x22 <= apb_reg_wdata_i[0];
+      else if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h22)
+        reg_0x22 <= i2c_reg_wdata_i[0];
 
       reg_0x23 <= fifo_i2c_to_apb_wrflags;
 
       reg_0x24 <= fifo_i2c_to_apb_rdflags;
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h30) begin
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'hc0) begin
         reg_0x30 <= apb_reg_wdata_i[7:0];
         fifo_apb_to_i2c_push <= 1'b1;
-      end else begin
+      end
+      else begin
         reg_0x30 <= reg_0x30;
         fifo_apb_to_i2c_push <= 1'b0;
       end
 
       // reg_0x31 - fifo read port
-      if (i2c_reg_addr_i == 8'h31 && i2c_reg_rd_byte_complete_i) fifo_apb_to_i2c_pop <= 1'b1;
-      else fifo_apb_to_i2c_pop <= 1'b0;
+      if (i2c_reg_addr_i == 8'h31 && i2c_reg_rd_byte_complete_i)
+        fifo_apb_to_i2c_pop <= 1'b1;
+      else
+        fifo_apb_to_i2c_pop <= 1'b0;
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h32) reg_0x32 <= apb_reg_wdata_i[0];
-      else if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h32) reg_0x32 <= i2c_reg_wdata_i[0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'hC8)
+        reg_0x32 <= apb_reg_wdata_i[0];
+      else if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h32)
+        reg_0x32 <= i2c_reg_wdata_i[0];
 
       reg_0x33 <= fifo_apb_to_i2c_wrflags;
 
@@ -271,19 +299,25 @@ module i2c_peripheral_registers (
 
       //reg_0x40 has more complicated logic and is implemented elsewhere
 
-      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h41) reg_0x41 <= i2c_reg_wdata_i[2:0];
+      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h41)
+        reg_0x41 <= i2c_reg_wdata_i[2:0];
 
-      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h42) reg_0x42 <= i2c_reg_wdata_i[7:0];
+      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h42)
+        reg_0x42 <= i2c_reg_wdata_i[7:0];
 
-      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h43) reg_0x43 <= i2c_reg_wdata_i[7:0];
+      if (i2c_reg_wrenable_i && i2c_reg_addr_i == 8'h43)
+        reg_0x43 <= i2c_reg_wdata_i[7:0];
 
       //reg_0x50 has more complicated logic and is implemented elsewhere
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h51) reg_0x51 <= apb_reg_wdata_i[2:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h144)
+        reg_0x51 <= apb_reg_wdata_i[2:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h52) reg_0x52 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h148)
+        reg_0x52 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h53) reg_0x53 <= apb_reg_wdata_i[7:0];
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h14C)
+        reg_0x53 <= apb_reg_wdata_i[7:0];
 
     end
 
@@ -380,7 +414,9 @@ module i2c_peripheral_registers (
         8'h02:   apb_reg_rdata_muxed <= {reg_0x02[7:0]};
         8'h03:   apb_reg_rdata_muxed <= {reg_0x03[7:0]};
         8'h04:   apb_reg_rdata_muxed <= {reg_0x04[7:0]};
-        8'h10:   apb_reg_rdata_muxed <= {reg_0x10[7:0]};
+        8'h10:   begin
+          apb_reg_rdata_muxed <= {reg_0x10[7:0]};
+        end
         8'h11:   apb_reg_rdata_muxed <= {7'b0, reg_0x11};
         8'h12:   apb_reg_rdata_muxed <= {reg_0x12[7:0]};
         8'h13:   apb_reg_rdata_muxed <= {7'b0, reg_0x13};
@@ -455,9 +491,11 @@ module i2c_peripheral_registers (
 
   // I2C to APB FIFO
   assign fifo_i2c_to_apb_wrdata = reg_0x20;
+  wire      i2c2apb_flush;
+  assign i2c2apb_flush = rst | reg_0x22;
 
   FIFO_sync_256x8 FIFO_sync_256x8_i2c_to_apb (
-      .rst_i     (rst),
+      .rst_i     (i2c2apb_flush),
       .clk_i     (clk),
       .push_i    (fifo_i2c_to_apb_push),
       .wr_data_i (fifo_i2c_to_apb_wrdata),
@@ -471,9 +509,11 @@ module i2c_peripheral_registers (
 
   // APB to I2C FIFO
   assign fifo_apb_to_i2c_wrdata = reg_0x30;
+  wire      apb2i2c_flush;
+  assign apb2i2c_flush = rst | reg_0x32;
 
   FIFO_sync_256x8 FIFO_sync_256x8_apb_to_i2c (
-      .rst_i     (rst),
+      .rst_i     (apb2i2c_flush),
       .clk_i     (clk),
       .push_i    (fifo_apb_to_i2c_push),
       .wr_data_i (fifo_apb_to_i2c_wrdata),

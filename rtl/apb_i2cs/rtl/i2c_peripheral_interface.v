@@ -9,6 +9,26 @@
 // specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_interface (
+  input clk_i,
+  input rst_i,
+
+  // i2c pins
+ input i2c_scl_i,
+ input i2c_sda_i,
+ output i2c_sda_o,
+
+  // interface to registers
+  input [6:0] i2c_dev_addr_i,
+  input i2c_enabled_i,
+  input [7:0] i2c_debounce_len_i,
+  input [7:0] i2c_scl_delay_len_i,
+  input [7:0] i2c_sda_delay_len_i,
+  output [7:0] i2c_reg_addr_o,
+  output [7:0] i2c_reg_wdata_o,
+  output i2c_reg_wrenable_o,
+  input [7:0] i2c_reg_rddata_i,
+  output i2c_reg_rd_byte_complete_o
+                                 /*
     clk_i,
     rst_i,
 
@@ -27,10 +47,10 @@ module i2c_peripheral_interface (
     i2c_reg_wdata_o,
     i2c_reg_wrenable_o,
     i2c_reg_rddata_i,
-    i2c_reg_rd_byte_complete_o
+    i2c_reg_rd_byte_complete_o */
 );
 
-
+/*
   input clk_i;
   input rst_i;
 
@@ -68,7 +88,7 @@ module i2c_peripheral_interface (
   wire       i2c_reg_wrenable_o;
   wire [7:0] i2c_reg_rddata_i;
   wire       i2c_reg_rd_byte_complete_o;
-
+*/
   reg        sda_out;
   reg        i2c_reg_wrenable;
 

@@ -9,6 +9,24 @@
 // specific language governing permissions and limitations under the License.
 
 module apb_slave_interface (
+  input apb_pclk_i,
+  input apb_preset_i,
+  input [11:0] apb_paddr_i,
+  input apb_psel_i,
+  input apb_penable_i,
+  input apb_pwrite_i,
+  input [31:0] apb_pwdata_i,
+  output apb_pready_o,
+  output [31:0] apb_prdata_o,
+
+  // interface to register module
+  output [11:0] apb_reg_waddr_o,
+  output [31:0] apb_reg_wdata_o,
+  output apb_reg_wrenable_o,
+  output [11:0] apb_reg_raddr_o,
+  input [31:0] apb_reg_rdata_i,
+  output apb_reg_rd_byte_complete_o
+/*
     apb_pclk_i,
     apb_preset_i,
     apb_paddr_i,
@@ -26,27 +44,10 @@ module apb_slave_interface (
     apb_reg_raddr_o,
     apb_reg_rdata_i,
     apb_reg_rd_byte_complete_o
+ */
 );
 
-  input apb_pclk_i;
-  input apb_preset_i;
-  input [11:0] apb_paddr_i;
-  input apb_psel_i;
-  input apb_penable_i;
-  input apb_pwrite_i;
-  input [31:0] apb_pwdata_i;
-  output apb_pready_o;
-  output [31:0] apb_prdata_o;
-
-  // interface to register module
-  output [11:0] apb_reg_waddr_o;
-  output [31:0] apb_reg_wdata_o;
-  output apb_reg_wrenable_o;
-  output [11:0] apb_reg_raddr_o;
-  input [31:0] apb_reg_rdata_i;
-  output apb_reg_rd_byte_complete_o;
-
-
+/*
   wire        apb_pclk_i;
   wire        apb_preset_i;
   wire [11:0] apb_paddr_i;
@@ -64,6 +65,7 @@ module apb_slave_interface (
   wire [11:0] apb_reg_raddr_o;
   wire [31:0] apb_reg_rdata_i;
   wire        apb_reg_rd_byte_complete_o;
+  */
   wire        clk;
   wire        rst;
   assign clk = apb_pclk_i;
@@ -77,7 +79,7 @@ module apb_slave_interface (
   wire [11:0] apb_reg_raddr;
   reg         apb_reg_rd_byte_complete;
 
-
+/*
   // APB handshake
   always @(posedge rst or posedge clk)
     if (rst) begin
@@ -95,10 +97,10 @@ module apb_slave_interface (
         default: pready_reg <= 1'b0;
       endcase
     end
-
+*/
 
   // interface to the register module
-  always @(posedge rst or posedge clk)
+  always @(posedge rst or posedge clk) begin
     if (rst) begin
       apb_reg_waddr <= 0;
       apb_reg_wdata <= 0;
@@ -107,13 +109,18 @@ module apb_slave_interface (
     end else begin
       apb_reg_waddr <= apb_paddr_i;
       apb_reg_wdata <= apb_pwdata_i;
-      if (apb_psel_i && apb_pwrite_i && apb_penable_i && pready_reg) apb_reg_wrenable <= 1'b1;
-      else apb_reg_wrenable <= 1'b0;
-      if (apb_psel_i && !apb_pwrite_i && apb_penable_i && pready_reg)
-        apb_reg_rd_byte_complete <= 1'b1;
-      else apb_reg_rd_byte_complete <= 1'b0;
+      apb_reg_wrenable <= apb_psel_i & apb_penable_i & apb_pwrite_i;
+      pready_reg <= apb_psel_i & apb_penable_i;
+      apb_reg_rd_byte_complete <= apb_psel_i & apb_penable_i & !apb_pwrite_i;
+      /*
+       if (apb_psel_i && apb_pwrite_i && apb_penable_i && pready_reg) apb_reg_wrenable <= 1'b1;
+       else apb_reg_wrenable <= 1'b0;
+       if (apb_psel_i && !apb_pwrite_i && apb_penable_i && pready_reg)
+       apb_reg_rd_byte_complete <= 1'b1;
+       else apb_reg_rd_byte_complete <= 1'b0;
+       */
     end
-
+  end
 
   // output assignments
   assign apb_pready_o               = pready_reg;
