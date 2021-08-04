@@ -164,8 +164,7 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
-        - -voptargs="-O1"
-
+        - -voptargs="-O1 +acc"
 
   lint:
     <<: *default_target
