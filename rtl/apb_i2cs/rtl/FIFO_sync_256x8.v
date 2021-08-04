@@ -43,40 +43,18 @@ full  wr_flags:
 ---------------------------------------------------------------------------- */
 
 module FIFO_sync_256x8 (
-    rst_i,
-    clk_i,
-    push_i,
-    wr_data_i,
-    full_o,
-    wr_flags_o,
-    pop_i,
-    rd_data_o,
-    empty_o,
-    rd_flags_o
+  input rst_i,
+  input clk_i,
+  input push_i,
+  input [7:0] wr_data_i,
+  output full_o,
+  output [2:0] wr_flags_o,
+  input pop_i,
+  output [7:0] rd_data_o,
+  output empty_o,
+  output [2:0] rd_flags_o
+
 );
-
-
-  input rst_i;
-  input clk_i;
-  input push_i;
-  input [7:0] wr_data_i;
-  output full_o;
-  output [2:0] wr_flags_o;
-  input pop_i;
-  output [7:0] rd_data_o;
-  output empty_o;
-  output [2:0] rd_flags_o;
-
-  wire       rst_i;
-  wire       clk_i;
-  wire       push_i;
-  wire [7:0] wr_data_i;
-  wire       full_o;
-  wire [2:0] wr_flags_o;
-  wire       pop_i;
-  wire [7:0] rd_data_o;
-  wire       empty_o;
-  wire [2:0] rd_flags_o;
 
 
   // internal signals

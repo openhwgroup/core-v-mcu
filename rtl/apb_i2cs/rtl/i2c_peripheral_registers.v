@@ -35,100 +35,16 @@ module i2c_peripheral_registers (
   // interrupts
   output i2c_interrupt_o,
   output apb_interrupt_o
-                                 /*
-
-    clk_i,
-    rst_i,
-
-    // APB reg interface
-    apb_reg_waddr_i,
-    apb_reg_wdata_i,
-    apb_reg_wrenable_i,
-    apb_reg_raddr_i,
-    apb_reg_rdata_o,
-    apb_reg_rd_byte_complete_i,
-
-    // i2c reg interfae
-    i2c_dev_addr_o,
-    i2c_enabled_o,
-    i2c_debounce_len_o,
-    i2c_scl_delay_len_o,
-    i2c_sda_delay_len_o,
-    i2c_reg_addr_i,
-    i2c_reg_wdata_i,
-    i2c_reg_wrenable_i,
-    i2c_reg_rddata_o,
-    i2c_reg_rd_byte_complete_i,
-
-    // interrupt outputs
-    i2c_interrupt_o,
-    apb_interrupt_o */
 );
-/*
-  input clk_i;
-  input rst_i;
-
-  // APB reg interface
-  input [11:0] apb_reg_waddr_i;
-  input [31:0] apb_reg_wdata_i;
-  input apb_reg_wrenable_i;
-  input [11:0] apb_reg_raddr_i;
-  output [31:0] apb_reg_rdata_o;
-  input apb_reg_rd_byte_complete_i;
-
-  // i2c interfae
-  output [6:0] i2c_dev_addr_o;
-  output i2c_enabled_o;
-  output [7:0] i2c_debounce_len_o;
-  output [7:0] i2c_scl_delay_len_o;
-  output [7:0] i2c_sda_delay_len_o;
-  input [7:0] i2c_reg_addr_i;
-  input [7:0] i2c_reg_wdata_i;
-  input i2c_reg_wrenable_i;
-  output [7:0] i2c_reg_rddata_o;
-  input i2c_reg_rd_byte_complete_i;
-
-  // interrupts
-  output i2c_interrupt_o;
-  output apb_interrupt_o;
-*/
 
   parameter [6:0] I2C_DEFAULT_ADDR = 7'h6F;  // default I2C device address
   parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 20;
   parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 20;
   parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 8;
 
-/*
-  wire        clk_i;
-  wire        rst_i;
-
-  // APB reg interface
-//  wire [11:0] apb_reg_waddr_i;
-//  wire [31:0] apb_reg_wdata_i;
-//  wire        apb_reg_wrenable_i;
-//  wire [11:0] apb_reg_raddr_i;
-  wire [31:0] apb_reg_rdata_o;
-//  wire        apb_reg_rd_byte_complete_i;
-
-  // i2c interfae
-  wire [ 6:0] i2c_dev_addr_o;
-  wire        i2c_enabled_o;
-  wire [ 7:0] i2c_debounce_len_o;
-  wire [ 7:0] i2c_scl_delay_len_o;
-  wire [ 7:0] i2c_sda_delay_len_o;
-  wire [ 7:0] i2c_reg_rddata_o;
-//  wire        i2c_reg_rd_byte_complete_i;
-
-  // interrupts
-  wire        i2c_interrupt_o;
-  wire        apb_interrupt_o;
-*/
-
   wire        clk;
   wire        rst;
 
-  assign clk = clk_i;
-  assign rst = rst_i;
 
 
   reg        fifo_i2c_to_apb_push;
@@ -149,6 +65,8 @@ module i2c_peripheral_registers (
   wire [2:0] fifo_apb_to_i2c_rdflags;
   wire       fifo_apb_to_i2c_empty;
 
+  assign clk = clk_i;
+  assign rst = rst_i;
 
 
   // registers
@@ -245,7 +163,7 @@ module i2c_peripheral_registers (
       if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h12)
         reg_0x12 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h44)
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h48)
         reg_0x13 <= 1'b1;
       else if (i2c_reg_rd_byte_complete_i && i2c_reg_addr_i == 8'h12)
         reg_0x13 <= 1'b0;
