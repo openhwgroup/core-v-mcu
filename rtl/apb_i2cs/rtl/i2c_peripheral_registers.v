@@ -234,7 +234,7 @@ module i2c_peripheral_registers (
       if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h148)
         reg_0x52 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h14C)
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h14C)
         reg_0x53 <= apb_reg_wdata_i[7:0];
 
     end
