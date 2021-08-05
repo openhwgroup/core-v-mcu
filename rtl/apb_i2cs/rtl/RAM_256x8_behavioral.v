@@ -23,24 +23,15 @@ edge of the read clock, and read data is available after that clock edge.
 ---------------------------------------------------------------------------- */
 
 module RAM_256x8_behavioral (
-    wr_clk,
-    wr_addr,
-    wr_enable,
-    wr_data,
-    rd_clk,
-    rd_addr,
-    rd_data
+  input wr_clk,
+  input [7:0] wr_addr,
+  input wr_enable,
+  input [7:0] wr_data,
+  input rd_clk,
+  input [7:0] rd_addr,
+  output wire [7:0] rd_data
 );
 
-  input wr_clk;
-  input [7:0] wr_addr;
-  input wr_enable;
-  input [7:0] wr_data;
-  input rd_clk;
-  input [7:0] rd_addr;
-  output [7:0] rd_data;
-
-  wire [7:0] rd_data;
 
   reg  [7:0] ram          [255:0];
 

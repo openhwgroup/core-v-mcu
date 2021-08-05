@@ -13,14 +13,14 @@ module MAC_32BIT (
   MAC_ACC_RND,
   MAC_ACC_CLEAR,
   MAC_ACC_SAT,
-  MAC_OUT_SEL,  
+  MAC_OUT_SEL,
   MAC_TC,
   acc_ff_rstn
 );
-
+  parameter USE_BW = 0;
   parameter MULTI_WIDTH   = 32;
   parameter TC            = 1'b0;
-  
+
   parameter PAD_ZERO      = MULTI_WIDTH / 4 ;
   parameter DATAIN_WIDTH  = MULTI_WIDTH+PAD_ZERO ;
   parameter ACC_WIDTH     = 2*(MULTI_WIDTH+PAD_ZERO) ;
@@ -36,21 +36,21 @@ input  [31:0] MAC_COEF_DATA;
 input         MAC_ACC_RND;
 input         MAC_ACC_CLEAR;
 input         MAC_ACC_SAT;
-input  [5:0]  MAC_OUT_SEL;  
+input  [5:0]  MAC_OUT_SEL;
 input         MAC_TC;
 input         acc_ff_rstn;
 
 /*------------------------------*/
 /*       Delclaration           */
 /*------------------------------*/
-reg  [ 5:0] fMAC_OUT_SEL; 
-reg  [79:0] mux_acc_idata; 
+reg  [ 5:0] fMAC_OUT_SEL;
+reg  [79:0] mux_acc_idata;
 reg  [79:0] fmux_acc_idata;
 reg  [31:0] MAC_OUT;
-reg  [79:0] is_rounded_value; 
-reg  [79:0] feedback_acc_data;  
+reg  [79:0] is_rounded_value;
+reg  [79:0] feedback_acc_data;
 reg         is_not_saturation;
-reg  [31:0] acc_data_out_sel; 
+reg  [31:0] acc_data_out_sel;
 
 wire [79:0] DWMAC_out;
 wire        acc_ff_rstn;
@@ -62,7 +62,7 @@ wire        acc_ff_rstn;
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : DELAY_OF_MAC_OUT_SEL
   if (~acc_ff_rstn)
     fMAC_OUT_SEL <= #0.2 'h0;
-  else  
+  else
     fMAC_OUT_SEL <= #0.2 MAC_OUT_SEL;
 end //DELAY_OF_MAC_OUT_SEL
 
@@ -71,22 +71,37 @@ end //DELAY_OF_MAC_OUT_SEL
 /*------------------------------*/
    wire [7:0] oper_sign, coef_sign;
    assign oper_sign = MAC_TC ? {8{MAC_OPER_DATA[31]}} : 8'b00000000;
-   assign coef_sign = MAC_TC ? {8{MAC_COEF_DATA[31]}} : 8'b00000000;   
-
-DW02_mac #( 
-.A_width (40),
-.B_width (40)
-)	
-U_DW02_mac (   
-//vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}), 
-//vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}), 
-.A  ({oper_sign,MAC_OPER_DATA[31:0]}), 
-.B  ({coef_sign,MAC_COEF_DATA[31:0]}), 
-.C  (feedback_acc_data[79:0]), 
-.TC (MAC_TC), 
-.MAC(DWMAC_out[79:0])
-);
-
+   assign coef_sign = MAC_TC ? {8{MAC_COEF_DATA[31]}} : 8'b00000000;
+  generate
+    if (USE_BW == 1)
+      bw_mac #(
+               .A_width (40),
+               .B_width (40)
+               )
+    U_DW02_mac (
+                //vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}),
+                //vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}),
+                .A  ({oper_sign,MAC_OPER_DATA[31:0]}),
+                .B  ({coef_sign,MAC_COEF_DATA[31:0]}),
+                .C  (feedback_acc_data[79:0]),
+                .TC (MAC_TC),
+                .MAC(DWMAC_out[79:0])
+                );
+    else
+      DW02_mac #(
+               .A_width (40),
+               .B_width (40)
+               )
+    U_DW02_mac (
+                //vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}),
+                //vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}),
+                .A  ({oper_sign,MAC_OPER_DATA[31:0]}),
+                .B  ({coef_sign,MAC_COEF_DATA[31:0]}),
+                .C  (feedback_acc_data[79:0]),
+                .TC (MAC_TC),
+                .MAC(DWMAC_out[79:0])
+                );
+  endgenerate
 /*------------------------------*/
 /*        LOAD of ACC           */
 /*------------------------------*/
@@ -102,12 +117,12 @@ end //MUX_OF_IDATA_ACC
 /*        ACCUMULATOR           */
 /*------------------------------*/
 //vincent@20181029always@(posedge MAC_ACC_CLK) begin : FF_OF_ACCUMULATOR
-//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;   
+//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;
 
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : FF_OF_ACCUMULATOR
   if (~acc_ff_rstn)
     fmux_acc_idata <= #0.2 80'h0;
-  else  
+  else
     fmux_acc_idata <= #0.2 mux_acc_idata;
 end //FF_OF_ACCUMULATOR
 
@@ -166,7 +181,7 @@ always@(*) begin : ACC_ROUNDED
     6'd48 : is_rounded_value = 80'b0000_0000_0000_0000_0000_0000_0000_0000_1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
     default: is_rounded_value = 80'h0;
   endcase
-end                             
+end
 
 /*------------------------------*/
 /*         CLR_AND_RND          */
@@ -177,7 +192,7 @@ always@(*) begin: CLR_AND_RND
   else if (MAC_ACC_RND == 1'b1)
     feedback_acc_data = is_rounded_value;
   else
-    feedback_acc_data = fmux_acc_idata;  
+    feedback_acc_data = fmux_acc_idata;
 end //CLR_AND_RND
 
 /*------------------------------*/
@@ -233,7 +248,7 @@ always@(*) begin : ACC_DATA_OUT_SEL
     6'd45 : acc_data_out_sel = fmux_acc_idata[76:45];
     6'd46 : acc_data_out_sel = fmux_acc_idata[77:46];
     6'd47 : acc_data_out_sel = fmux_acc_idata[78:47];
-    6'd48 : acc_data_out_sel = fmux_acc_idata[79:48]; 
+    6'd48 : acc_data_out_sel = fmux_acc_idata[79:48];
     default : acc_data_out_sel = fmux_acc_idata[31:0];
   endcase
 end
@@ -243,8 +258,8 @@ end
 /*------------------------------*/
 //vincent@20181031always@(*) begin : CHECK_SAT_CONDITION
 //vincent@20181031  case(fMAC_OUT_SEL[5:0])
-//vincent@20181031    6'd0  : is_not_saturation = &fmux_acc_idata[79:32] || !(|fmux_acc_idata[79:32]) ; 
-//vincent@20181031    6'd1  : is_not_saturation = &fmux_acc_idata[79:33] || !(|fmux_acc_idata[79:33]) ; 
+//vincent@20181031    6'd0  : is_not_saturation = &fmux_acc_idata[79:32] || !(|fmux_acc_idata[79:32]) ;
+//vincent@20181031    6'd1  : is_not_saturation = &fmux_acc_idata[79:33] || !(|fmux_acc_idata[79:33]) ;
 //vincent@20181031    6'd2  : is_not_saturation = &fmux_acc_idata[79:34] || !(|fmux_acc_idata[79:34]) ;
 //vincent@20181031    6'd3  : is_not_saturation = &fmux_acc_idata[79:35] || !(|fmux_acc_idata[79:35]) ;
 //vincent@20181031    6'd4  : is_not_saturation = &fmux_acc_idata[79:36] || !(|fmux_acc_idata[79:36]) ;
@@ -350,20 +365,19 @@ end
 
 always@(*) begin : ACC_SAT_DATA_OUT
   if (MAC_ACC_SAT)
-    if ( is_not_saturation ) 
+    if ( is_not_saturation )
       MAC_OUT = acc_data_out_sel;
     else begin
       if (MAC_TC == 0)
         MAC_OUT = 32'hffffffff;
       else if (fmux_acc_idata[79] == 1'b1)
         MAC_OUT = {1'b1,31'h0};
-      else 
+      else
         MAC_OUT = {1'b0,31'h7fff_ffff};
     end
-  else 
-     MAC_OUT = acc_data_out_sel;	  
+  else
+     MAC_OUT = acc_data_out_sel;
 end
 
 
 endmodule
-

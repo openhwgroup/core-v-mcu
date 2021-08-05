@@ -2,7 +2,8 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-module MATH_BLOCK(
+module MATH_BLOCK
+ (
 //input
 		  reset, // active high
   //OUTPUT
@@ -33,7 +34,9 @@ module MATH_BLOCK(
 
   EFPGA_MATHB_DATAOUT_SEL
 );
-
+                     parameter MU = 0;
+                     parameter BLOCK = 0;
+                     parameter USE_BW = 0;
 input reset;
 output [31:0] FMATHB_EFPGA_MAC_OUT;
 
@@ -167,7 +170,8 @@ assign MAC_TC        = EFPGA_MATHB_TC_defPin;
 /*------------------------------*/
    assign acc_ff_rstn = ~reset ; // (EFPGA_MATHB_DATAOUT_SEL == 2'b11);
 
-MAC_ARRAY U_MAC_ARRAY (
+MAC_ARRAY # (.MU(MU), .BLOCK(BLOCK), .USE_BW(USE_BW))
+  U_MAC_ARRAY (
   //OUTPUT
   .MAC0_OUT(MAC0_OUT[31:0]),
   .MAC1_OUT(MAC1_OUT[15:0]),

@@ -58,7 +58,7 @@ module udma_core
 
     output logic        [N_PERIPHS-1:0] periph_per_clk_o,
     output logic        [N_PERIPHS-1:0] periph_sys_clk_o,
-
+    output logic        [N_PERIPHS-1:0] periph_rst_value_o,
     output logic                 [31:0] periph_data_to_o,
     output logic                  [4:0] periph_addr_o,
     output logic                        periph_rwn_o,
@@ -88,7 +88,7 @@ module udma_core
     input  logic [N_RX_LIN_CHANNELS-1:0]                         rx_lin_valid_i,
     input  logic [N_RX_LIN_CHANNELS-1:0]      [DATA_WIDTH-1 : 0] rx_lin_data_i,
     input  logic [N_RX_LIN_CHANNELS-1:0]                 [1 : 0] rx_lin_datasize_i,
-    input  logic [N_RX_LIN_CHANNELS-1:0]       [DEST_SIZE-1 : 0] rx_lin_destination_i,      
+    input  logic [N_RX_LIN_CHANNELS-1:0]       [DEST_SIZE-1 : 0] rx_lin_destination_i,
     output logic [N_RX_LIN_CHANNELS-1:0]                         rx_lin_ready_o,
     output logic [N_RX_LIN_CHANNELS-1:0]                         rx_lin_events_o,
     output logic [N_RX_LIN_CHANNELS-1:0]                         rx_lin_en_o,
@@ -131,7 +131,7 @@ module udma_core
     input  logic [N_TX_LIN_CHANNELS-1:0]                        tx_lin_cfg_continuous_i,
     input  logic [N_TX_LIN_CHANNELS-1:0]                        tx_lin_cfg_en_i,
     input  logic [N_TX_LIN_CHANNELS-1:0]                        tx_lin_cfg_clr_i,
-    
+
     input  logic [N_TX_EXT_CHANNELS-1:0]                        tx_ext_req_i,
     input  logic [N_TX_EXT_CHANNELS-1:0]                [1 : 0] tx_ext_datasize_i,
     input  logic [N_TX_EXT_CHANNELS-1:0]                [1 : 0] tx_ext_destination_i,
@@ -140,7 +140,7 @@ module udma_core
     output logic [N_TX_EXT_CHANNELS-1:0]                        tx_ext_valid_o,
     output logic [N_TX_EXT_CHANNELS-1:0]     [DATA_WIDTH-1 : 0] tx_ext_data_o,
     input  logic [N_TX_EXT_CHANNELS-1:0]                        tx_ext_ready_i
-    
+
     );
 
     localparam N_REAL_TX_EXT_CHANNELS = N_TX_EXT_CHANNELS + N_STREAMS;
@@ -180,6 +180,7 @@ module udma_core
     logic          [31:0] s_periph_data_from_cgunit;
     logic [N_PERIPHS-1:0] s_cg_value;
 
+
     logic               s_clk_core;
     logic               s_clk_core_en;
 
@@ -191,7 +192,7 @@ module udma_core
     assign s_periph_data_from[0]                  = s_periph_data_from_cgunit;
     assign s_periph_ready[N_REAL_PERIPHS-1:1]     = periph_ready_i;
     assign s_periph_data_from[N_REAL_PERIPHS-1:1] = periph_data_from_i;
-   
+
 
     always_comb
     begin
@@ -230,13 +231,13 @@ module udma_core
     ) u_tx_channels (
       .clk_i                ( s_clk_core          ),
       .rstn_i               ( HRESETn             ),
-    
+
       .l2_req_o             ( tx_l2_req_o         ),
       .l2_gnt_i             ( tx_l2_gnt_i         ),
       .l2_addr_o            ( tx_l2_addr_o        ),
       .l2_rdata_i           ( tx_l2_rdata_i       ),
       .l2_rvalid_i          ( tx_l2_rvalid_i      ),
-      
+
       .lin_req_i            ( tx_lin_req_i            ),
       .lin_gnt_o            ( tx_lin_gnt_o            ),
       .lin_valid_o          ( tx_lin_valid_o          ),
@@ -254,7 +255,7 @@ module udma_core
       .lin_cfg_continuous_i ( tx_lin_cfg_continuous_i ),
       .lin_cfg_en_i         ( tx_lin_cfg_en_i         ),
       .lin_cfg_clr_i        ( tx_lin_cfg_clr_i        ),
-    
+
       .ext_req_i            ( s_tx_ext_req            ),
       .ext_datasize_i       ( s_tx_ext_datasize       ),
       .ext_destination_i    ( s_tx_ext_dest           ),
@@ -278,12 +279,12 @@ module udma_core
     ) u_rx_channels (
       .clk_i               ( s_clk_core              ),
       .rstn_i              ( HRESETn                 ),
-    
+
       .l2_req_o            ( rx_l2_req_o             ),
       .l2_addr_o           ( rx_l2_addr_o            ),
       .l2_be_o             ( rx_l2_be_o              ),
       .l2_wdata_o          ( rx_l2_wdata_o           ),
-      .l2_gnt_i            ( rx_l2_gnt_i             ), 
+      .l2_gnt_i            ( rx_l2_gnt_i             ),
 
       .stream_data_o       ( stream_data_o           ),
       .stream_datasize_o   ( stream_datasize_o       ),
@@ -317,7 +318,7 @@ module udma_core
       .lin_ch_cfg_stream_i     ( rx_lin_cfg_stream_i     ),
       .lin_ch_cfg_stream_id_i  ( rx_lin_cfg_stream_id_i  ),
       .lin_ch_cfg_clr_i        ( rx_lin_cfg_clr_i        ),
-      
+
       .ext_ch_addr_i           ( rx_ext_addr_i           ),
       .ext_ch_datasize_i       ( rx_ext_datasize_i       ),
       .ext_ch_destination_i    ( rx_ext_destination_i    ),
@@ -370,7 +371,7 @@ module udma_core
         .cg_value_o(s_cg_value),
         .cg_core_o(s_clk_core_en),
 
-        .rst_value_o(), //TODO 
+        .rst_value_o(periph_rst_value_o), //TODO gam@ql 7/30/2021
 
         .event_valid_i(event_valid_i),
         .event_data_i (event_data_i),
@@ -400,7 +401,7 @@ module udma_core
             .test_en_i(dft_cg_enable_i),
             .clk_o(periph_per_clk_o[i])
         );
-    
+
         pulp_clock_gating i_clk_gate_sys
         (
             .clk_i(s_clk_core),

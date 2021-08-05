@@ -20,13 +20,20 @@ all:    doc
 
 clean:
 				rm -rf ${AUTO_MD_DIR}
+				rm index.pdf
+				rm doc-src/all.md
 
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
 
 doc:    ${MD_FILES}
+				rm -f doc-src/all.md
 				make -f make-sphinx.mk html
 
+pdf:    ${MD_FILES}
+				rm -f doc-src/all.md
+				for f in `egrep doc-src\|auto-docs index.rst`; do cat "$$f" >> doc-src/all.md; echo "\n\n" >> doc-src/all.md;done
+				(cd doc-src; pandoc -t latex -o ../index.pdf all.md)
 
 ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 			@mkdir -p ${AUTO_MD_DIR}
@@ -35,7 +42,7 @@ ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
 				--reg-def-csv $<\
 				--reg-def-md $@
-				
+
 ${AUTO_MD_DIR}/pin-table.md: ../pin-table.csv
 			@mkdir -p ${AUTO_MD_DIR}
 			@python3 ../util/ioscript.py\

@@ -77,44 +77,6 @@ module udma_subsystem #(
     input  logic [`N_PERIO-1:0] perio_in_i,
     output logic [`N_PERIO-1:0] perio_out_o,
     output logic [`N_PERIO-1:0] perio_oe_o
-
-    // output logic     [`N_SPI-1:0]       spi_clk,
-    // output logic     [`N_SPI-1:0] [3:0] spi_csn,
-    // output logic     [`N_SPI-1:0] [3:0] spi_oen,
-    // output logic     [`N_SPI-1:0] [3:0] spi_sdo,
-    // input  logic     [`N_SPI-1:0] [3:0] spi_sdi,
-
-    // input  logic           [`N_I2C-1:0] i2c_scl_i,
-    // output logic           [`N_I2C-1:0] i2c_scl_o,
-    // output logic           [`N_I2C-1:0] i2c_scl_oe,
-    // input  logic           [`N_I2C-1:0] i2c_sda_i,
-    // output logic           [`N_I2C-1:0] i2c_sda_o,
-    // output logic           [`N_I2C-1:0] i2c_sda_oe,
-
-    // input  logic                       cam_clk_i,
-    // input  logic  [CAM_DATA_WIDTH-1:0] cam_data_i,
-    // input  logic                       cam_hsync_i,
-    // input  logic                       cam_vsync_i,
-
-    // input  logic          [`N_UART-1:0] uart_rx_i,
-    // output logic          [`N_UART-1:0] uart_tx_o,
-
-    // output logic                       sdio_clk_o,
-    // output logic                       sdio_cmd_o,
-    // input  logic                       sdio_cmd_i,
-    // output logic                       sdio_cmd_oen_o,
-    // output logic                 [3:0] sdio_data_o,
-    // input  logic                 [3:0] sdio_data_i,
-    // output logic                 [3:0] sdio_data_oen_o,
-
-    // input  logic                       i2s_slave_sd0_i,
-    // input  logic                       i2s_slave_sd1_i,
-    // input  logic                       i2s_slave_ws_i,
-    // output logic                       i2s_slave_ws_o,
-    // output logic                       i2s_slave_ws_oe,
-    // input  logic                       i2s_slave_sck_i,
-    // output logic                       i2s_slave_sck_o,
-    // output logic                       i2s_slave_sck_oe
 );
 
   localparam DEST_SIZE = 2;
@@ -254,6 +216,8 @@ module udma_subsystem #(
 
   logic   [        N_PERIPHS-1:0]                        s_clk_periphs_core;
   logic   [        N_PERIPHS-1:0]                        s_clk_periphs_per;
+  logic   [        N_PERIPHS-1:0]                        s_rst_periphs;
+  logic   [        N_PERIPHS-1:0]                        s_per_rst;
 
   logic   [                 31:0]                        s_periph_data_to;
   logic   [                  4:0]                        s_periph_addr;
@@ -321,8 +285,9 @@ module udma_subsystem #(
       .PREADY (udma_apb_pready),
       .PSLVERR(udma_apb_pslverr),
 
-      .periph_per_clk_o(s_clk_periphs_per),
-      .periph_sys_clk_o(s_clk_periphs_core),
+      .periph_per_clk_o  (s_clk_periphs_per),
+      .periph_sys_clk_o  (s_clk_periphs_core),
+      .periph_rst_value_o(s_rst_periphs),
 
       .event_valid_i(event_valid_i),
       .event_data_i (event_data_i),
@@ -428,16 +393,15 @@ module udma_subsystem #(
       assign s_rx_ch_destination[CH_ID_RX_UART+g_uart] = 'h0;
       assign s_tx_ch_destination[CH_ID_TX_UART+g_uart] = 'h0;
 
+      assign s_per_rst[PER_ID_UART+g_uart] = sys_resetn_i & !s_rst_periphs[PER_ID_UART+g_uart];
+
       udma_uart_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE)
       ) i_uart (
           .sys_clk_i   (s_clk_periphs_core[PER_ID_UART+g_uart]),
           .periph_clk_i(s_clk_periphs_per[PER_ID_UART+g_uart]),
-          .rstn_i      (sys_resetn_i),
-
-          // .uart_tx_o           ( uart_tx_o[g_uart]                       ),
-          // .uart_rx_i           ( uart_rx_i[g_uart]                       ),
+          .rstn_i      (s_per_rst[PER_ID_UART+g_uart]),
 
           // Signals to pads
           .uart_tx_o(perio_out_o[`PERIO_UART0_TX+`PERIO_UART_NPORTS*g_uart]),
@@ -503,35 +467,18 @@ module udma_subsystem #(
       assign s_rx_ch_destination[CH_ID_RX_SPIM+g_spi] = 'h0;
       assign s_tx_ch_destination[CH_ID_TX_SPIM+g_spi] = 'h0;
       assign s_tx_ch_destination[CH_ID_CMD_SPIM+g_spi] = 'h0;
+      assign s_per_rst[PER_ID_SPIM+g_spi] = sys_resetn_i & !s_rst_periphs[PER_ID_SPIM+g_spi];
       udma_spim_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE    (TRANS_SIZE)
       ) i_spim (
           .sys_clk_i      (s_clk_periphs_core[PER_ID_SPIM+g_spi]),
           .periph_clk_i   (s_clk_periphs_per[PER_ID_SPIM+g_spi]),
-          .rstn_i         (sys_resetn_i),
+          .rstn_i         (s_per_rst[PER_ID_SPIM+g_spi]),
           .dft_test_mode_i(dft_test_mode_i),
           .dft_cg_enable_i(dft_cg_enable_i),
           .spi_eot_o      (s_spi_eot[g_spi]),
           .spi_event_i    (s_trigger_events),
-
-          // .spi_clk_o           ( spi_clk[g_spi]                           ),
-          // .spi_csn0_o          ( spi_csn[g_spi][0]                        ),
-          // .spi_csn1_o          ( spi_csn[g_spi][1]                        ),
-          // .spi_csn2_o          ( spi_csn[g_spi][2]                        ),
-          // .spi_csn3_o          ( spi_csn[g_spi][3]                        ),
-          // .spi_oen0_o          ( spi_oen[g_spi][0]                        ),
-          // .spi_oen1_o          ( spi_oen[g_spi][1]                        ),
-          // .spi_oen2_o          ( spi_oen[g_spi][2]                        ),
-          // .spi_oen3_o          ( spi_oen[g_spi][3]                        ),
-          // .spi_sdo0_o          ( spi_sdo[g_spi][0]                        ),
-          // .spi_sdo1_o          ( spi_sdo[g_spi][1]                        ),
-          // .spi_sdo2_o          ( spi_sdo[g_spi][2]                        ),
-          // .spi_sdo3_o          ( spi_sdo[g_spi][3]                        ),
-          // .spi_sdi0_i          ( spi_sdi[g_spi][0]                        ),
-          // .spi_sdi1_i          ( spi_sdi[g_spi][1]                        ),
-          // .spi_sdi2_i          ( spi_sdi[g_spi][2]                        ),
-          // .spi_sdi3_i          ( spi_sdi[g_spi][3]                        ),
 
           // Signals to pads
           .spi_clk_o (perio_out_o[`PERIO_QSPIM0_CLK+`PERIO_QSPIM_NPORTS*g_spi]),
@@ -623,7 +570,7 @@ module udma_subsystem #(
       assign s_rx_cfg_stream_id[CH_ID_RX_I2C+g_i2c] = 'h0;
       assign s_rx_ch_destination[CH_ID_RX_I2C+g_i2c] = 'h0;
       assign s_tx_ch_destination[CH_ID_TX_I2C+g_i2c] = 'h0;
-
+      assign s_per_rst[PER_ID_I2C+g_i2c] = sys_resetn_i & !s_rst_periphs[PER_ID_I2C+g_i2c];
       udma_i2c_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE)
@@ -633,7 +580,7 @@ module udma_subsystem #(
           //
           .sys_clk_i   (s_clk_periphs_core[PER_ID_I2C+g_i2c]),
           .periph_clk_i(s_clk_periphs_per[PER_ID_I2C+g_i2c]),
-          .rstn_i      (sys_resetn_i),
+          .rstn_i      (s_per_rst[PER_ID_I2C+g_i2c]),
 
           .cfg_data_i (s_periph_data_to),
           .cfg_addr_i (s_periph_addr),
@@ -677,13 +624,6 @@ module udma_subsystem #(
 
           .err_o(s_i2c_evt[g_i2c]),
 
-          // .scl_i               ( i2c_scl_i[g_i2c]                      ),
-          // .scl_o               ( i2c_scl_o[g_i2c]                      ),
-          // .scl_oe              ( i2c_scl_oe[g_i2c]                     ),
-          // .sda_i               ( i2c_sda_i[g_i2c]                      ),
-          // .sda_o               ( i2c_sda_o[g_i2c]                      ),
-          // .sda_oe              ( i2c_sda_oe[g_i2c]                     ),
-
           // Signals to pads
           .scl_i (perio_in_i[`PERIO_I2CM0_SCL+`PERIO_I2CM_NPORTS*g_i2c]),
           .scl_o (perio_out_o[`PERIO_I2CM0_SCL+`PERIO_I2CM_NPORTS*g_i2c]),
@@ -715,14 +655,14 @@ module udma_subsystem #(
       assign s_tx_ch_destination[CH_ID_TX_SDIO+g_sdio] = 'h0;
 
       assign perio_oe_o[`PERIO_SDIO_NPORTS * g_sdio + `PERIO_SDIO0_DATA3 : `PERIO_SDIO_NPORTS * g_sdio + `PERIO_SDIO0_DATA0] = ~s_sddata_oen;
-
+      assign s_per_rst[PER_ID_SDIO+g_sdio] = sys_resetn_i & !s_rst_periphs[PER_ID_SDIO+g_sdio];
       udma_sdio_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE    (TRANS_SIZE)
       ) i_sdio (
           .sys_clk_i   (s_clk_periphs_core[(PER_ID_SDIO+g_sdio)]),
           .periph_clk_i(s_clk_periphs_per[(PER_ID_SDIO+g_sdio)]),
-          .rstn_i      (sys_resetn_i),
+          .rstn_i      (s_per_rst[PER_ID_SDIO+g_sdio]),
 
           .err_o(s_sdio_err),
           .eot_o(s_sdio_eot),
@@ -781,33 +721,27 @@ module udma_subsystem #(
   // I2S
   generate
     for (genvar g_i2s = 0; g_i2s < `N_I2S; g_i2s++) begin : i_i2s_gen
-      assign s_events[4*(PER_ID_I2S + g_i2s)+0]    = s_rx_ch_events[CH_ID_RX_I2S + g_i2s];
-      assign s_events[4*(PER_ID_I2S + g_i2s)+1]  = s_tx_ch_events[CH_ID_TX_I2S + g_i2s];
-      assign s_events[4*(PER_ID_I2S + g_i2s)+2]  = 1'b0;
-      assign s_events[4*(PER_ID_I2S + g_i2s)+3]  = 1'b0;
-      assign s_rx_cfg_stream[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_rx_cfg_stream_id[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_rx_ch_destination[CH_ID_RX_I2S + g_i2s] = 'h0;
-      assign s_tx_ch_destination[CH_ID_TX_I2S + g_i2s] = 'h0;
+      assign s_events[4*(PER_ID_I2S+g_i2s)+0] = s_rx_ch_events[CH_ID_RX_I2S+g_i2s];
+      assign s_events[4*(PER_ID_I2S+g_i2s)+1] = s_tx_ch_events[CH_ID_TX_I2S+g_i2s];
+      assign s_events[4*(PER_ID_I2S+g_i2s)+2] = 1'b0;
+      assign s_events[4*(PER_ID_I2S+g_i2s)+3] = 1'b0;
+      assign s_rx_cfg_stream[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_rx_cfg_stream_id[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_rx_ch_destination[CH_ID_RX_I2S+g_i2s] = 'h0;
+      assign s_tx_ch_destination[CH_ID_TX_I2S+g_i2s] = 'h0;
+
+      assign s_per_rst[PER_ID_I2S+g_i2s] = sys_resetn_i & !s_rst_periphs[PER_ID_I2S+g_i2s];
       udma_i2s_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE)
       ) i_i2s_udma (
           .sys_clk_i   (s_clk_periphs_core[PER_ID_I2S+g_i2s]),
           .periph_clk_i(s_clk_periphs_per[PER_ID_I2S+g_i2s]),
-          .rstn_i      (sys_resetn_i),
+          .rstn_i      (s_per_rst[PER_ID_I2S+g_i2s]),
 
           .dft_test_mode_i(dft_test_mode_i),
           .dft_cg_enable_i(dft_cg_enable_i),
 
-          // .pad_slave_sd0_i     ( i2s_slave_sd0_i                 ),
-          // .pad_slave_sd1_i     ( i2s_slave_sd1_i                 ),
-          // .pad_slave_sck_i     ( i2s_slave_sck_i                 ),
-          // .pad_slave_sck_o     ( i2s_slave_sck_o                 ),
-          // .pad_slave_sck_oe    ( i2s_slave_sck_oe                ),
-          // .pad_slave_ws_i      ( i2s_slave_ws_i                  ),
-          // .pad_slave_ws_o      ( i2s_slave_ws_o                  ),
-          // .pad_slave_ws_oe     ( i2s_slave_ws_oe                 ),
           // Pad signals
           .pad_slave_sd0_i (perio_in_i[`PERIO_I2SC0_SD0+`PERIO_I2SC_NPORTS*g_i2s]),
           .pad_slave_sd1_i (perio_in_i[`PERIO_I2SC0_SD1+`PERIO_I2SC_NPORTS*g_i2s]),
@@ -881,13 +815,16 @@ module udma_subsystem #(
       assign s_rx_cfg_stream[CH_ID_RX_CAM+g_cam] = 'h0;
       assign s_rx_cfg_stream_id[CH_ID_RX_CAM+g_cam] = 'h0;
       assign s_rx_ch_destination[CH_ID_RX_CAM+g_cam] = 'h0;
+
+      assign s_per_rst[PER_ID_CAM+g_cam] = sys_resetn_i & !s_rst_periphs[PER_ID_CAM+g_cam];
+
       camera_if #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE),
           .DATA_WIDTH(8)
       ) i_camera_if (
           .clk_i (s_clk_periphs_core[PER_ID_CAM+g_cam]),
-          .rstn_i(sys_resetn_i),
+          .rstn_i(s_per_rst[PER_ID_CAM+g_cam]),
 
           .dft_test_mode_i(dft_test_mode_i),
           .dft_cg_enable_i(dft_cg_enable_i),
@@ -915,10 +852,6 @@ module udma_subsystem #(
           .data_rx_ready_i   (s_rx_ch_ready[CH_ID_RX_CAM+g_cam]),
 
           // Pad signals
-          // .cam_clk_i           ( cam_clk_i                       ),
-          // .cam_data_i          ( cam_data_i                      ),
-          // .cam_hsync_i         ( cam_hsync_i                     ),
-          // .cam_vsync_i         ( cam_vsync_i                     )
 
           .cam_clk_i(perio_in_i[`PERIO_CAM0_CLK+`PERIO_CAM_NPORTS*g_cam]),
           .cam_data_i          ( perio_in_i[`PERIO_CAM0_DATA7 + `PERIO_CAM_NPORTS * g_cam : `PERIO_CAM0_DATA0 + `PERIO_CAM_NPORTS * g_cam]),
@@ -933,26 +866,28 @@ module udma_subsystem #(
   // FILTER
   generate
     for (genvar g_filter = 0; g_filter < `N_FILTER; g_filter++) begin : i_filter_gen
-      assign s_events[4*(PER_ID_FILTER+g_filter)+0]               = s_filter_eot_evt;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+1]               = s_filter_act_evt;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+2]               = 1'b0;
-      assign s_events[4*(PER_ID_FILTER+g_filter)+3]               = 1'b0;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+0] = s_filter_eot_evt;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+1] = s_filter_act_evt;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+2] = 1'b0;
+      assign s_events[4*(PER_ID_FILTER+g_filter)+3] = 1'b0;
 
-      assign s_rx_ext_destination[CH_ID_EXT_RX_FILTER+g_filter]   = 'h0;
-      assign s_rx_ext_stream[CH_ID_EXT_RX_FILTER+g_filter]        = 'h0;
-      assign s_rx_ext_stream_id[CH_ID_EXT_RX_FILTER+g_filter]     = 'h0;
-      assign s_rx_ext_sot[CH_ID_EXT_RX_FILTER+g_filter]           = 'h0;
-      assign s_rx_ext_eot[CH_ID_EXT_RX_FILTER+g_filter]           = 'h0;
+      assign s_rx_ext_destination[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_stream[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_stream_id[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_sot[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
+      assign s_rx_ext_eot[CH_ID_EXT_RX_FILTER+g_filter] = 'h0;
 
-      assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter]   = 'h0;
+      assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter] = 'h0;
       assign s_tx_ext_destination[CH_ID_EXT_TX_FILTER+g_filter+1] = 'h0;
+
+      assign s_per_rst[PER_ID_FILTER+g_filter] = sys_resetn_i & !s_rst_periphs[PER_ID_FILTER+g_filter];
 
       udma_filter #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE)
       ) i_filter (
           .clk_i(s_clk_periphs_core[PER_ID_FILTER+g_filter]),
-          .resetn_i(sys_resetn_i),
+          .resetn_i(s_per_rst[PER_ID_FILTER+g_filter]),
 
           .cfg_data_i (s_periph_data_to),
           .cfg_addr_i (s_periph_addr),
@@ -1012,13 +947,15 @@ module udma_subsystem #(
       assign s_rx_ch_destination[CH_ID_RX_FPGA+g_fpga] = 'h0;
       assign s_tx_ch_destination[CH_ID_TX_FPGA+g_fpga] = 'h0;
 
+      assign s_per_rst[PER_ID_FPGA+g_fpga] = sys_resetn_i & !s_rst_periphs[PER_ID_FPGA+g_fpga];
+
       udma_external_per_top #(
           .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
           .TRANS_SIZE(TRANS_SIZE)
       ) i_efpga (
           .sys_clk_i   (s_clk_periphs_core[PER_ID_FPGA+g_fpga]),
           .periph_clk_i(efpga_clk_i),
-          .rstn_i      (sys_resetn_i),
+          .rstn_i      (s_per_rst[PER_ID_FPGA+g_fpga]),
 
           .cfg_data_i (s_periph_data_to),
           .cfg_addr_i (s_periph_addr),
@@ -1074,77 +1011,4 @@ module udma_subsystem #(
       );
     end
   endgenerate
-
-  //fills remaining events with 0s
-  //generate
-  //    for (genvar g_evt=N_PERIPHS;g_evt<32;g_evt++)
-  //    begin: i_evt_assign
-  //        assign s_events[4*g_evt]   = 1'b0;
-  //        assign s_events[4*g_evt+1] = 1'b0;
-  //        assign s_events[4*g_evt+2] = 1'b0;
-  //        assign s_events[4*g_evt+3] = 1'b0;
-  //   end
-  //endgenerate
-
-`ifdef PULP_TRAINING
-  //PER_ID 8
-  assign s_events[4*PER_ID_EXT_PER]            = s_rx_ch_events[CH_ID_RX_EXT_PER];
-  assign s_events[4*PER_ID_EXT_PER+1]          = s_tx_ch_events[CH_ID_TX_EXT_PER];
-  assign s_events[4*PER_ID_EXT_PER+2]          = 1'b0;
-  assign s_events[4*PER_ID_EXT_PER+3]          = 1'b0;
-
-  assign s_rx_cfg_stream[CH_ID_RX_EXT_PER]     = 'h0;
-  assign s_rx_cfg_stream_id[CH_ID_RX_EXT_PER]  = 'h0;
-  assign s_rx_ch_destination[CH_ID_RX_EXT_PER] = 'h0;
-  assign s_tx_ch_destination[CH_ID_TX_EXT_PER] = 'h0;
-
-  udma_external_per_wrapper #(
-      .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
-      .TRANS_SIZE(TRANS_SIZE)
-  ) i_external_per (
-      .sys_clk_i   (s_clk_periphs_core[PER_ID_EXT_PER]),
-      .periph_clk_i(s_clk_periphs_per[PER_ID_EXT_PER]),
-      .rstn_i      (sys_resetn_i),
-
-      .cfg_data_i (s_periph_data_to),
-      .cfg_addr_i (s_periph_addr),
-      .cfg_valid_i(s_periph_valid[PER_ID_EXT_PER]),
-      .cfg_rwn_i  (s_periph_rwn),
-      .cfg_ready_o(s_periph_ready[PER_ID_EXT_PER]),
-      .cfg_data_o (s_periph_data_from[PER_ID_EXT_PER]),
-
-      .cfg_rx_startaddr_o (s_rx_cfg_startaddr[CH_ID_RX_EXT_PER]),
-      .cfg_rx_size_o      (s_rx_cfg_size[CH_ID_RX_EXT_PER]),
-      .cfg_rx_continuous_o(s_rx_cfg_continuous[CH_ID_RX_EXT_PER]),
-      .cfg_rx_en_o        (s_rx_cfg_en[CH_ID_RX_EXT_PER]),
-      .cfg_rx_clr_o       (s_rx_cfg_clr[CH_ID_RX_EXT_PER]),
-      .cfg_rx_en_i        (s_rx_ch_en[CH_ID_RX_EXT_PER]),
-      .cfg_rx_pending_i   (s_rx_ch_pending[CH_ID_RX_EXT_PER]),
-      .cfg_rx_curr_addr_i (s_rx_ch_curr_addr[CH_ID_RX_EXT_PER]),
-      .cfg_rx_bytes_left_i(s_rx_ch_bytes_left[CH_ID_RX_EXT_PER]),
-
-      .cfg_tx_startaddr_o (s_tx_cfg_startaddr[CH_ID_TX_EXT_PER]),
-      .cfg_tx_size_o      (s_tx_cfg_size[CH_ID_TX_EXT_PER]),
-      .cfg_tx_continuous_o(s_tx_cfg_continuous[CH_ID_TX_EXT_PER]),
-      .cfg_tx_en_o        (s_tx_cfg_en[CH_ID_TX_EXT_PER]),
-      .cfg_tx_clr_o       (s_tx_cfg_clr[CH_ID_TX_EXT_PER]),
-      .cfg_tx_en_i        (s_tx_ch_en[CH_ID_TX_EXT_PER]),
-      .cfg_tx_pending_i   (s_tx_ch_pending[CH_ID_TX_EXT_PER]),
-      .cfg_tx_curr_addr_i (s_tx_ch_curr_addr[CH_ID_TX_EXT_PER]),
-      .cfg_tx_bytes_left_i(s_tx_ch_bytes_left[CH_ID_TX_EXT_PER]),
-
-      .data_tx_req_o     (s_tx_ch_req[CH_ID_TX_EXT_PER]),
-      .data_tx_gnt_i     (s_tx_ch_gnt[CH_ID_TX_EXT_PER]),
-      .data_tx_datasize_o(s_tx_ch_datasize[CH_ID_TX_EXT_PER]),
-      .data_tx_i         (s_tx_ch_data[CH_ID_TX_EXT_PER]),
-      .data_tx_valid_i   (s_tx_ch_valid[CH_ID_TX_EXT_PER]),
-      .data_tx_ready_o   (s_tx_ch_ready[CH_ID_TX_EXT_PER]),
-
-      .data_rx_datasize_o(s_rx_ch_datasize[CH_ID_RX_EXT_PER]),
-      .data_rx_o         (s_rx_ch_data[CH_ID_RX_EXT_PER]),
-      .data_rx_valid_o   (s_rx_ch_valid[CH_ID_RX_EXT_PER]),
-      .data_rx_ready_i   (s_rx_ch_ready[CH_ID_RX_EXT_PER])
-
-  );
-`endif
 endmodule

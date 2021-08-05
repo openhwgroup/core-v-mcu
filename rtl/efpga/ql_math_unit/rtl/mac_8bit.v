@@ -1,7 +1,7 @@
 // Copyright 2021 QuickLogic
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-module MAC_8BIT (
+module MAC_8BIT  (
   //OUTPUT
   MAC_OUT,
   //INPUT
@@ -12,14 +12,14 @@ module MAC_8BIT (
   MAC_ACC_RND,
   MAC_ACC_CLEAR,
   MAC_ACC_SAT,
-  MAC_OUT_SEL,  
+  MAC_OUT_SEL,
   MAC_TC,
   acc_ff_rstn
 );
-
+  parameter USE_BW = 0;
   parameter MULTI_WIDTH   = 8;
   parameter TC            = 1'b0;
-  
+
   parameter PAD_ZERO      = MULTI_WIDTH / 4 ;
   parameter DATAIN_WIDTH  = MULTI_WIDTH+PAD_ZERO ;
   parameter ACC_WIDTH     = 2*(MULTI_WIDTH+PAD_ZERO) ;
@@ -35,7 +35,7 @@ input  [7:0] MAC_COEF_DATA;
 input        MAC_ACC_RND;
 input        MAC_ACC_CLEAR;
 input        MAC_ACC_SAT;
-input  [5:0] MAC_OUT_SEL;  
+input  [5:0] MAC_OUT_SEL;
 input        MAC_TC;
 input        acc_ff_rstn;
 
@@ -43,14 +43,14 @@ input        acc_ff_rstn;
 /*------------------------------*/
 /*                              */
 /*------------------------------*/
-reg  [ 5:0] fMAC_OUT_SEL; 
-reg  [23:0] mux_acc_idata; 
+reg  [ 5:0] fMAC_OUT_SEL;
+reg  [23:0] mux_acc_idata;
 reg  [23:0] fmux_acc_idata;
 reg  [7: 0] MAC_OUT;
-reg  [23:0] is_rounded_value; 
-reg  [23:0] feedback_acc_data;  
+reg  [23:0] is_rounded_value;
+reg  [23:0] feedback_acc_data;
 reg         is_not_saturation;
-reg  [7: 0] acc_data_out_sel; 
+reg  [7: 0] acc_data_out_sel;
 
 wire [23:0] DWMAC_OUT;
 
@@ -61,7 +61,7 @@ wire [23:0] DWMAC_OUT;
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : DELAY_OF_MAC_OUT_SEL
   if (~acc_ff_rstn)
     fMAC_OUT_SEL <= #0.2 'h0;
-  else  
+  else
     fMAC_OUT_SEL <= #0.2 MAC_OUT_SEL;
 end //DELAY_OF_MAC_OUT_SEL
 
@@ -70,20 +70,37 @@ end //DELAY_OF_MAC_OUT_SEL
 /*------------------------------*/
    wire [3:0] oper_sign, coef_sign;
    assign oper_sign = MAC_TC ? {4{MAC_OPER_DATA[7]}} : 4'b0000;
-   assign coef_sign = MAC_TC ? {4{MAC_COEF_DATA[7]}} : 4'b0000;   
-DW02_mac #( 
-.A_width (12),
-.B_width (12)
-)	
-U_DW02_mac (   
-//vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}), 
-//vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}), 
-.A  ({oper_sign,MAC_OPER_DATA[7:0]}), 
-.B  ({coef_sign,MAC_COEF_DATA[7:0]}), 
-.C  (feedback_acc_data[23:0]), 
-.TC (MAC_TC), 
-.MAC(DWMAC_OUT[23:0])
-);
+   assign coef_sign = MAC_TC ? {4{MAC_COEF_DATA[7]}} : 4'b0000;
+  generate
+    if (USE_BW == 1)
+      bw_mac #(
+               .A_width (12),
+               .B_width (12)
+               )
+    U_DW02_mac (
+                //vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
+                //vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
+                .A  ({oper_sign,MAC_OPER_DATA[7:0]}),
+                .B  ({coef_sign,MAC_COEF_DATA[7:0]}),
+                .C  (feedback_acc_data[23:0]),
+                .TC (MAC_TC),
+                .MAC(DWMAC_OUT[23:0])
+                );
+    else
+      DW02_mac #(
+               .A_width (12),
+               .B_width (12)
+               )
+    U_DW02_mac (
+                //vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
+                //vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
+                .A  ({oper_sign,MAC_OPER_DATA[7:0]}),
+                .B  ({coef_sign,MAC_COEF_DATA[7:0]}),
+                .C  (feedback_acc_data[23:0]),
+                .TC (MAC_TC),
+                .MAC(DWMAC_OUT[23:0])
+                );
+  endgenerate
 
 /*------------------------------*/
 /*        LOAD of ACC           */
@@ -100,12 +117,12 @@ end //MUX_OF_IDATA_ACC
 /*        ACCUMULATOR           */
 /*------------------------------*/
 //vicnent@20181029always@(posedge MAC_ACC_CLK) begin : FF_OF_ACCUMULATOR
-//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;   
+//vincent@20181031assign acc_rstn = ~MAC_ACC_CLEAR;
 
 always@(posedge MAC_ACC_CLK or negedge acc_ff_rstn) begin : FF_OF_ACCUMULATOR
   if (~acc_ff_rstn)
     fmux_acc_idata <= #0.2 24'h0;
-  else  
+  else
     fmux_acc_idata <= #0.2 mux_acc_idata;
 end //FF_OF_ACCUMULATOR
 
@@ -136,7 +153,7 @@ always@(*) begin : ACC_ROUNDED
     6'd20 : is_rounded_value = 24'b0000_1000_0000_0000_0000_0000;
   default: is_rounded_value = 24'h0;
   endcase
-end                             
+end
 
 /*------------------------------*/
 /*         CLR_AND_RND          */
@@ -147,7 +164,7 @@ always@(*) begin: CLR_AND_RND
   else if (MAC_ACC_RND == 1'b1)
     feedback_acc_data = is_rounded_value;
   else
-    feedback_acc_data = fmux_acc_idata;  
+    feedback_acc_data = fmux_acc_idata;
 end //CLR_AND_RND
 
 /*------------------------------*/
@@ -227,13 +244,12 @@ always@(*) begin : ACC_SAT_DATA_OUT
         MAC_OUT = 8'hff;
       else if (fmux_acc_idata[23] == 1'b1)
         MAC_OUT = {1'b1,7'h0};
-      else 
+      else
         MAC_OUT = {1'b0,7'h7f};
     end
-  else 
-     MAC_OUT = acc_data_out_sel;	  
+  else
+     MAC_OUT = acc_data_out_sel;
 end
 
 
 endmodule
-

@@ -9,66 +9,26 @@
 // specific language governing permissions and limitations under the License.
 
 module i2c_peripheral_interface (
-    clk_i,
-    rst_i,
+  input clk_i,
+  input rst_i,
 
-    // i2c pins
-    i2c_scl_i,
-    i2c_sda_i,
-    i2c_sda_o,
+  // i2c pins
+ input i2c_scl_i,
+ input i2c_sda_i,
+ output i2c_sda_o,
 
-    // interface to registers
-    i2c_dev_addr_i,  // the I2C address for this device (comes from reg block)
-    i2c_enabled_i,  // when low, ignore all I2C transactions
-    i2c_debounce_len_i,
-    i2c_scl_delay_len_i,
-    i2c_sda_delay_len_i,
-    i2c_reg_addr_o,
-    i2c_reg_wdata_o,
-    i2c_reg_wrenable_o,
-    i2c_reg_rddata_i,
-    i2c_reg_rd_byte_complete_o
+  // interface to registers
+  input [6:0] i2c_dev_addr_i,
+  input i2c_enabled_i,
+  input [7:0] i2c_debounce_len_i,
+  input [7:0] i2c_scl_delay_len_i,
+  input [7:0] i2c_sda_delay_len_i,
+  output [7:0] i2c_reg_addr_o,
+  output [7:0] i2c_reg_wdata_o,
+  output i2c_reg_wrenable_o,
+  input [7:0] i2c_reg_rddata_i,
+  output i2c_reg_rd_byte_complete_o
 );
-
-
-  input clk_i;
-  input rst_i;
-
-  // i2c pins
- input i2c_scl_i;
- input i2c_sda_i;
- output i2c_sda_o;
-
-  // interface to registers
-  input [6:0] i2c_dev_addr_i;
-  input i2c_enabled_i;
-  input [7:0] i2c_debounce_len_i;
-  input [7:0] i2c_scl_delay_len_i;
-  input [7:0] i2c_sda_delay_len_i;
-  output [7:0] i2c_reg_addr_o;
-  output [7:0] i2c_reg_wdata_o;
-  output i2c_reg_wrenable_o;
-  input [7:0] i2c_reg_rddata_i;
-  output i2c_reg_rd_byte_complete_o;
-
-
-  wire       clk_i;
-  wire       rst_i;
-
-  // i2c pins
-  wire       i2c_scl_i;
-  wire       i2c_sda_i;
-  wire       i2c_sda_o;
-
-  // interface to registers
-  wire [6:0] i2c_dev_addr_i;
-  wire       i2c_enabled_i;
-  wire [7:0] i2c_reg_addr_o;
-  wire [7:0] i2c_reg_wdata_o;
-  wire       i2c_reg_wrenable_o;
-  wire [7:0] i2c_reg_rddata_i;
-  wire       i2c_reg_rd_byte_complete_o;
-
   reg        sda_out;
   reg        i2c_reg_wrenable;
 

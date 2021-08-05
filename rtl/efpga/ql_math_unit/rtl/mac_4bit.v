@@ -1,7 +1,7 @@
 // Copyright 2021 QuickLogic
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-module MAC_4BIT (
+module MAC_4BIT  (
   //OUTPUT
   MAC_OUT,
   //INPUT
@@ -16,7 +16,7 @@ module MAC_4BIT (
   MAC_TC,
   acc_ff_rstn
 );
-
+  parameter USE_BW = 0;
   parameter MULTI_WIDTH   = 4;
   parameter TC            = 1'b0;
   parameter PAD_ZERO      = 4;
@@ -70,20 +70,36 @@ end //DELAY_OF_MAC_OUT_SEL
    wire [5:0] oper_sign, coef_sign;
    assign oper_sign = MAC_TC ? {6{MAC_OPER_DATA[3]}} : 6'b000000;
    assign coef_sign = MAC_TC ? {6{MAC_COEF_DATA[3]}} : 6'b000000;
-DW02_mac #(
-.A_width (10),
-.B_width (10)
-)
-U_DW02_mac (
-//vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
-//vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
-.A  ({oper_sign,MAC_OPER_DATA[3:0]}),
-.B  ({coef_sign,MAC_COEF_DATA[3:0]}),
-.C  (feedback_acc_data[19:0]),
-.TC (MAC_TC),
-.MAC(DWMAC_out[19:0])
-);
-
+   generate
+     if (USE_BW == 1)
+         bw_mac #(
+                  .A_width (10),
+                  .B_width (10)
+                  )
+         U_DW02_mac (
+                     //vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
+                     //vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
+                     .A  ({oper_sign,MAC_OPER_DATA[3:0]}),
+                     .B  ({coef_sign,MAC_COEF_DATA[3:0]}),
+                     .C  (feedback_acc_data[19:0]),
+                     .TC (MAC_TC),
+                     .MAC(DWMAC_out[19:0])
+                     );
+     else
+       DW02_mac #(
+                .A_width (10),
+                .B_width (10)
+                )
+     U_DW02_mac (
+                 //vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
+                 //vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
+                 .A  ({oper_sign,MAC_OPER_DATA[3:0]}),
+                 .B  ({coef_sign,MAC_COEF_DATA[3:0]}),
+                 .C  (feedback_acc_data[19:0]),
+                 .TC (MAC_TC),
+                 .MAC(DWMAC_out[19:0])
+                 );
+   endgenerate
 /*------------------------------*/
 /*        LOAD of ACC           */
 /*------------------------------*/
