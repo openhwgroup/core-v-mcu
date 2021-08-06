@@ -47,7 +47,6 @@ module soc_domain
 
 
     input logic ref_clk_i,
-    input logic slow_clk_i,
     input logic test_clk_i,
     input logic rstn_glob_i,
 
@@ -440,7 +439,6 @@ module soc_domain
       .rst_ni         (s_soc_rstn),
       .sel_fll_clk_i  (s_sel_fll_clk),
       .ref_clk_i      (ref_clk_i),
-      .slow_clk_i     (slow_clk_i),
       .wd_expired_o   (wd_expired_o),
       .dft_test_mode_i(dft_test_mode_i),
       .dft_cg_enable_i(1'b0),
