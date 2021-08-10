@@ -17,8 +17,6 @@
 module pad_control(
     // PAD CONTROL REGISTER
     input  logic [`N_IO-1:0][`NBIT_PADMUX-1:0]    pad_mux_i,
-    input  logic [`N_IO-1:0][`NBIT_PADCFG-1:0]    pad_cfg_i,
-    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0]    pad_cfg_o,
 
     // IOS
     output logic [`N_IO-1:0]        io_out_o,
@@ -40,11 +38,6 @@ module pad_control(
     output logic [`N_FPGAIO-1:0]    fpgaio_in_o,
     input  logic [`N_FPGAIO-1:0]    fpgaio_oe_i
     );
-
-    ///////////////////////////////////////////////////
-    // Assign signals to the pad_cfg_o bus
-    ///////////////////////////////////////////////////
-    assign pad_cfg_o = pad_cfg_i;
 
     ///////////////////////////////////////////////////
     // Assign signals to the perio bus
@@ -196,34 +189,12 @@ module pad_control(
     ///////////////////////////////////////////////////
     // Assign signals to the io_out bus
     ///////////////////////////////////////////////////
-    assign io_out_o[0] = ((pad_mux_i[0] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[1] = ((pad_mux_i[1] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[2] = ((pad_mux_i[2] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[3] = ((pad_mux_i[3] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[4] = ((pad_mux_i[4] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[5] = ((pad_mux_i[5] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_out_o[6] = ((pad_mux_i[6] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd3) ? 1'b0 : 1'b0))));
+    assign io_out_o[0] = 1'b0;
+    assign io_out_o[1] = 1'b0;
+    assign io_out_o[3] = 1'b0;
+    assign io_out_o[4] = 1'b0;
+    assign io_out_o[5] = 1'b0;
+    assign io_out_o[6] = 1'b0;
     assign io_out_o[7] = ((pad_mux_i[7] == 2'd0) ? 1'b0 :
                          ((pad_mux_i[7] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[7] == 2'd2) ? apbio_out_i[0] :
@@ -376,10 +347,7 @@ module pad_control(
                          ((pad_mux_i[44] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[44] == 2'd2) ? apbio_out_i[47] :
                          ((pad_mux_i[44] == 2'd3) ? fpgaio_out_i[37] : 1'b0))));
-    assign io_out_o[45] = ((pad_mux_i[45] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd3) ? fpgaio_out_i[38] : 1'b0))));
+    assign io_out_o[45] = 1'b0;
     assign io_out_o[46] = ((pad_mux_i[46] == 2'd0) ? perio_out_i[`PERIO_I2CM1_SCL] :
                          ((pad_mux_i[46] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[46] == 2'd2) ? 1'b0 :
@@ -392,34 +360,13 @@ module pad_control(
     ///////////////////////////////////////////////////
     // Assign signals to the io_oe bus
     ///////////////////////////////////////////////////
-    assign io_oe_o[0] = ((pad_mux_i[0] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[0] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[1] = ((pad_mux_i[1] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[1] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[2] = ((pad_mux_i[2] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[2] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[3] = ((pad_mux_i[3] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[3] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[4] = ((pad_mux_i[4] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[4] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[5] = ((pad_mux_i[5] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[5] == 2'd3) ? 1'b0 : 1'b0))));
-    assign io_oe_o[6] = ((pad_mux_i[6] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[6] == 2'd3) ? 1'b0 : 1'b0))));
+    assign io_oe_o[0] = 1'b0;
+    assign io_oe_o[1] = 1'b0;
+    assign io_oe_o[2] = 1'b1;
+    assign io_oe_o[3] = 1'b0;
+    assign io_oe_o[4] = 1'b0;
+    assign io_oe_o[5] = 1'b0;
+    assign io_oe_o[6] = 1'b0;
     assign io_oe_o[7] = ((pad_mux_i[7] == 2'd0) ? 1'b0 :
                          ((pad_mux_i[7] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[7] == 2'd2) ? apbio_oe_i[0] :
@@ -572,10 +519,7 @@ module pad_control(
                          ((pad_mux_i[44] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[44] == 2'd2) ? apbio_oe_i[47] :
                          ((pad_mux_i[44] == 2'd3) ? fpgaio_oe_i[37] : 1'b0))));
-    assign io_oe_o[45] = ((pad_mux_i[45] == 2'd0) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd1) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd2) ? 1'b0 :
-                         ((pad_mux_i[45] == 2'd3) ? fpgaio_oe_i[38] : 1'b0))));
+    assign io_oe_o[45] = 1'b0;
     assign io_oe_o[46] = ((pad_mux_i[46] == 2'd0) ? perio_oe_i[`PERIO_I2CM1_SCL] :
                          ((pad_mux_i[46] == 2'd1) ? 1'b0 :
                          ((pad_mux_i[46] == 2'd2) ? 1'b0 :

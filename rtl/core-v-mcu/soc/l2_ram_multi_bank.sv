@@ -71,7 +71,7 @@ module l2_ram_multi_bank #(
     );
 
 `else  // !`ifndef PULP_FPGA_EMUL
-    fpga_interleaved_ram #(
+    core_v_mcu_interleaved_ram #(
         .ADDR_WIDTH(INTL_MEM_ADDR_WIDTH)
     ) bank_i (
         .clk_i,
@@ -120,7 +120,7 @@ module l2_ram_multi_bank #(
       .Q    (mem_pri_slave[0].r_rdata)
   );
 `else  // !`ifndef PULP_FPGA_EMUL
-  fpga_private_ram #(
+  core_v_mcu_private_ram #(
       .ADDR_WIDTH(PRI0_MEM_ADDR_WIDTH)
   ) bank_sram_pri0_i (
       .clk_i,
@@ -164,7 +164,7 @@ module l2_ram_multi_bank #(
       .Q    (mem_pri_slave[1].r_rdata)
   );
 `else  // !`ifndef PULP_FPGA_EMUL
-  fpga_private_ram #(
+  core_v_mcu_private_ram #(
       .ADDR_WIDTH(PRI1_MEM_ADDR_WIDTH)
   ) bank_sram_pri1_i (
       .clk_i,
