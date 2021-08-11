@@ -25,34 +25,36 @@ export INTERLEAVED_BANK_SIZE=28672
 export PRIVATE_BANK_SIZE=8192
 
 help:
-			@echo "all:            generate build scripts, custom build files, doc and sw header files"
-			@echo "src:            set up all generated source files"
-			@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
-			@echo "lint:           run Verilator lint check"
-			@echo "doc:            generate documentation"
-			@echo "sw:             generate C header files (in ./sw)"
-			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
-			@echo "buildsim:       build for Questa sim"
-			@echo "sim:            run Questa sim"
-			@echo "clean:          remove generated files"
+	@echo "all:            generate build scripts, custom build files, doc and sw header files"
+	@echo "src:            set up all generated source files"
+	@echo "bitstream:      generate nexysA7-100T.bit file for emulation"
+	@echo "lint:           run Verilator lint check"
+	@echo "doc:            generate documentation"
+	@echo "sw:             generate C header files (in ./sw)"
+	@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
+	@echo "buildsim:       build for Questa sim"
+	@echo "sim:            run Questa sim"
+	@echo "clean:          remove generated files"
 
-all:		${IOSCRIPT_OUT} docs sw
+all:	${IOSCRIPT_OUT} docs sw
 
-src:		${IOSCRIPT_OUT}
+src:	${IOSCRIPT_OUT}
 
 clean:
-				(cd docs; make clean)
-				(cd sw; make clean)
+	(cd docs; make clean)
+	(cd sw; make clean)
 
 lint:
-				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+	fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 
 .PHONY:sim
 sim:
-				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run-gui) 2>&1 | tee sim.log
+
 .PHONY:buildsim
 buildsim:
-				fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+	fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
 
 

@@ -52,6 +52,7 @@ filesets:
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
+    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
@@ -90,6 +91,8 @@ filesets:
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
+    - tb/uartdpi/uartdpi.sv
+    - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
   tb-rtl:
@@ -164,7 +167,7 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
-        - -voptargs="-O1 +acc"
+        - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
 
   lint:
     <<: *default_target

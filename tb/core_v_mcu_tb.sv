@@ -11,10 +11,18 @@
 `include "../includes/pulp_soc_defines.sv"
 
 module core_v_mcu_tb;
-    localparam IO_REF_CLK = 6;
-    localparam IO_RESETN = 7;
-     
-    localparam  REF_CLK_PERIOD = 10ns;        // period of the external reference clock (100MHz)
+   localparam IO_REF_CLK = 5;
+   localparam IO_RESETN = 6;
+   localparam IO_BOOTSEL = 45;
+   localparam IO_UART0_RX = 8;
+   localparam IO_UART0_TX = 7;
+   localparam IO_UART1_RX = 9;
+   localparam IO_UART1_TX = 10;
+   
+   localparam  REF_CLK_PERIOD = 30517ns; // external reference clock (32KHz)
+   localparam  BAUD_CLK_FREQ = 12500000;
+   localparam  BAUD_CLK_PERIOD = 2ns;
+   
     
     initial begin
       $display("***********************************");
@@ -29,9 +37,43 @@ module core_v_mcu_tb;
 
     // Local variables
     reg resetn;
+    reg 	bootsel;
+   reg 		uart_clk;
+   
+   assign io_t[IO_BOOTSEL] = bootsel;   
+   assign io_t[IO_RESETN] = resetn;
+   
+   initial uart_clk = 0;
+   initial forever #(BAUD_CLK_PERIOD/2) uart_clk=~uart_clk;
 
-    assign io_t[IO_RESETN] = resetn;
-
+   GD25Q128B # (.initfile("../../../tb/cli.txt")) qspi (.sclk(io_t[16]),
+	     .si(io_t[14]),
+	     .cs(io_t[13]),
+	     .wp(io_t[39]),
+	     .hold(io_t[40]),
+	     .so(io_t[15]));
+   
+   uartdpi #(.BAUD(115200), 
+	     .FREQ(BAUD_CLK_FREQ),
+	     .NAME("uart0"))
+   uart_0 (
+	   .clk(uart_clk),
+	   .rst (~resetn),
+	   .tx(io_t[IO_UART0_TX]),
+	   .rx(io_t[IO_UART0_RX])
+	   );
+   uartdpi #(.BAUD(115200), 
+	     .FREQ(BAUD_CLK_FREQ),
+     	     .NAME("uart1"))
+   uart_1 (
+	   .clk(uart_clk),
+	   .rst (~resetn),
+	   .tx(io_t[IO_UART1_TX]),
+	   .rx(io_t[IO_UART1_RX])
+	   );
+   
+	     
+   
     // Design Under Test
     core_v_mcu #(
     )
@@ -47,8 +89,11 @@ module core_v_mcu_tb;
 
     initial begin:  sys_reset
         $display("asserting reset");
+        bootsel = 1'b1;
         resetn = 1'b0;
-        resetn = #(4*REF_CLK_PERIOD) 1'b1;
+        resetn = #(4*BAUD_CLK_PERIOD) 1'b1;
+       #(5*BAUD_CLK_PERIOD) bootsel = 1'b0;
+       
         $display("releasing reset");
     end
 

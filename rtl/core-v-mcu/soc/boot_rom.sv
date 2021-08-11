@@ -34,7 +34,7 @@ module boot_rom #(
   //Remove address offset
   logic [31:0] address;
   assign address = mem_slave.add - `SOC_MEM_MAP_BOOT_ROM_START_ADDR;
-
+/*
 `ifndef PULP_FPGA_EMUL
 
   generic_rom #(
@@ -49,8 +49,8 @@ module boot_rom #(
   );
 
 `else  // !`ifndef PULP_FPGA_EMUL
-
-  fpga_bootrom #(
+*/
+  a2_bootrom #(
       .ADDR_WIDTH(ROM_ADDR_WIDTH-2), //The ROM uses 32-bit word addressing while the bus addresses bytes
       .DATA_WIDTH(32)
   ) rom_mem_i (
@@ -61,6 +61,6 @@ module boot_rom #(
       .Q  (mem_slave.r_rdata)
   );
 
-`endif
+//`endif
 
 endmodule

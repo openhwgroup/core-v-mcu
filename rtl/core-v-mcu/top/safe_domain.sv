@@ -102,6 +102,7 @@ module safe_domain #(
 
 
 `ifndef PULP_FPGA_EMUL
+  assign slow_clk_o = ref_clk_i;
   rstgen i_rstgen (
       .clk_i      (ref_clk_i),
       .rst_ni     (s_rstn),

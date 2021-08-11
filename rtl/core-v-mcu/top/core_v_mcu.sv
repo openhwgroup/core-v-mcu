@@ -49,6 +49,7 @@ module core_v_mcu #(
   //
 
   logic                                      s_ref_clk;
+  logic                                      s_clk_in;  // clock in from pad
   logic                                      s_rstn;
   logic                                      s_pad_rstn;
 
@@ -252,7 +253,7 @@ module core_v_mcu #(
 `ifdef VERILATOR
   logic [`N_IO-1:0] io_pos;
 
-  assign s_ref_clk = io[6];
+  assign s_clk_in = io[6];
   assign s_rstn = (io[6] == 1) ? io[7] : io_pos[7];
   assign s_jtag_tck = (io[6] == 1) ? io[8] : io_pos[8];
   assign s_jtag_tdi = (io[6] == 1) ? io[9] : io_pos[9];
@@ -272,7 +273,7 @@ module core_v_mcu #(
       .pad_cfg_i(s_pad_cfg),
       .bootsel_o(s_bootsel),
 
-      .ref_clk_o  (s_ref_clk),
+      .ref_clk_o  (s_clk_in),
       .rstn_o     (s_pad_rstn),
       .jtag_tdo_i (s_jtag_tdo),
       .jtag_tck_o (s_jtag_tck),
@@ -298,8 +299,8 @@ module core_v_mcu #(
       .FLL_ADDR_WIDTH(2)
   ) i_safe_domain (
 
-      .ref_clk_i  (s_ref_clk),
-      .slow_clk_o (s_slow_clk),
+      .ref_clk_i  (s_clk_in),
+      .slow_clk_o (s_ref_clk),
       .efpga_clk_o(s_efpga_clk),
       .bootsel_i  (s_bootsel),
       .rst_ni     (s_rstn),
@@ -350,7 +351,6 @@ module core_v_mcu #(
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
       .ref_clk_i  (s_ref_clk),
-      .slow_clk_i (s_slow_clk),
       .test_clk_i (s_test_clk),
       .rstn_glob_i(s_rstn_por),
 

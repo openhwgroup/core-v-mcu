@@ -16,6 +16,7 @@
 #==========================================================
 
 import json
+from collections import OrderedDict
 import argparse
 import csv
 from datetime import datetime
@@ -182,8 +183,7 @@ if args.periph_bus_defines != None:
 ####################################################################################
 if args.perdef_json != None:
   with open(args.perdef_json) as f:
-    perdefs = json.load(f)
-
+    perdefs = json.load(f,object_pairs_hook=OrderedDict)
 ######################################################################
 #
 # Generate pulp_peripheral_defines.svh
@@ -721,9 +721,9 @@ if args.pad_frame_sv != None:
             if sysionames[ionum] != -1:
                 pad_frame_sv.write("    `ifndef PULP_FPGA_EMUL\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I(%s), .O(void1), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O(void1), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 else:
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(1'b0), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I(1'b0), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
                 pad_frame_sv.write("    `else\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
                     pad_frame_sv.write("      assign io[%d] = %s;\n" %(ionum, sysionames[ionum]))
