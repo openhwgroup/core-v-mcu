@@ -35,29 +35,27 @@ help:
 			@echo "sim:            run Questa sim"
 			@echo "clean:          remove generated files"
 
-all:		${IOSCRIPT_OUT} docs sw
+all:	${IOSCRIPT_OUT} docs sw
 
-src:		${IOSCRIPT_OUT}
+src:	${IOSCRIPT_OUT}
 
 clean:
-				(cd docs; make clean)
-				(cd sw; make clean)
-
-.PHONY: model-lib
-model-lib:
-	fusesoc --cores-root . run --target=model-lib --setup \
-		--build openhwgroup.org:systems:core-v-mcu | tee model-lib.log
-
+	(cd docs; make clean)
+	(cd sw; make clean)
 
 lint:
-				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+	fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 
 .PHONY:sim
 sim:
-				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run-gui) 2>&1 | tee sim.log
+
 .PHONY:buildsim
 buildsim:
-				fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+	fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+
+
 
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"
@@ -120,6 +118,9 @@ bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 download0:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
+
 download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
+				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+

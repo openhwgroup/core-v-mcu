@@ -10,6 +10,7 @@
 
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
+`include "periph_bus_defines.svh"
 
 module soc_peripherals #(
     parameter MEM_ADDR_WIDTH = 13,
