@@ -32,9 +32,9 @@ module safe_domain #(
     //**********************************************************
 
     // PAD CONTROL REGISTER
-    input  logic [`N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_i,
-//    input  logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,
-//    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
+    input logic [`N_IO-1:0][`NBIT_PADMUX-1:0] pad_mux_i,
+    //    input  logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,
+    //    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
 
     // IOS
     output logic [`N_IO-1:0] io_out_o,

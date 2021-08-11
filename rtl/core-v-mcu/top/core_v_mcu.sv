@@ -15,18 +15,18 @@ module core_v_mcu #(
     parameter USE_FPU  = 1,
     parameter USE_HWPE = 1
 ) (
-   input              jtag_tck_i,
-   input              jtag_tdi_i,
-   output             jtag_tdo_o,
-   input              jtag_tms_i,
-   input              jtag_trst_i,
-   input              ref_clk_i,
-   input              rstn_i,
-   input              bootsel_i,
-   input [`N_IO-1:0]  io_in_i,
-   output [`N_IO-1:0] io_out_o,
-   output [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
-   output [`N_IO-1:0] io_oe_o
+    input                                jtag_tck_i,
+    input                                jtag_tdi_i,
+    output                               jtag_tdo_o,
+    input                                jtag_tms_i,
+    input                                jtag_trst_i,
+    input                                ref_clk_i,
+    input                                rstn_i,
+    input                                bootsel_i,
+    input  [`N_IO-1:0]                   io_in_i,
+    output [`N_IO-1:0]                   io_out_o,
+    output [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
+    output [`N_IO-1:0]                   io_oe_o
 );
 
   localparam AXI_ADDR_WIDTH = 32;
@@ -48,11 +48,11 @@ module core_v_mcu #(
   // PAD FRAME TO PAD CONTROL SIGNALS
   //
 
-//  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;
+  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;
 
-//  logic [       `N_IO-1:0]                   s_io_out;
-//  logic [       `N_IO-1:0]                   s_io_oe;
-//  logic [       `N_IO-1:0]                   s_io_in;
+  //  logic [       `N_IO-1:0]                   s_io_out;
+  //  logic [       `N_IO-1:0]                   s_io_oe;
+  //  logic [       `N_IO-1:0]                   s_io_in;
 
 
   //
@@ -204,7 +204,7 @@ module core_v_mcu #(
   logic                                      s_dma_pe_irq_valid;
 
   logic [       `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
-//  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
+  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
   logic [             1:0]                   s_selected_pad_mode;
 
   logic [             5:0]                   efpga_test_M;
@@ -260,7 +260,7 @@ module core_v_mcu #(
   logic                                      s_bootsel;
   logic                                      debug1;
   logic                                      debug0;
-/*
+  /*
 `ifdef VERILATOR
   logic [`N_IO-1:0] io_pos;
 
@@ -322,8 +322,8 @@ module core_v_mcu #(
       .mode_select_o  (s_mode_select),
       .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
-//      .pad_cfg_o      (s_pad_cfg),
-//      .pad_cfg_i      (s_pad_cfg_soc),
+      //      .pad_cfg_o      (s_pad_cfg),
+      //      .pad_cfg_i      (s_pad_cfg_soc),
       .pad_mux_i      (s_pad_mux_soc),
       // IO signals
       .io_out_o       (io_out_o),
@@ -361,9 +361,9 @@ module core_v_mcu #(
       .BUFFER_WIDTH      (BUFFER_WIDTH),
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
-      .ref_clk_i  (s_ref_clk),
-                  .sclk_in(ref_clk_i),
-      .test_clk_i (s_test_clk),
+      .ref_clk_i(s_ref_clk),
+      .sclk_in(ref_clk_i),
+      .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
       .dft_test_mode_i(s_test_mode),

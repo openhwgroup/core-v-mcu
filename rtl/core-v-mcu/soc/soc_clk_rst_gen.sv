@@ -12,43 +12,43 @@
 `include "pulp_soc_defines.sv"
 
 module soc_clk_rst_gen (
-    input logic         ref_clk_i,
-                        input sclk_in,
-    input logic         test_clk_i,
-    input logic         rstn_glob_i,
-    input logic         test_mode_i,
-    input logic         sel_fll_clk_i,
-    input logic         shift_enable_i,
-    input logic         soc_fll_slave_req_i,
-    input logic         soc_fll_slave_wrn_i,
-    input logic [ 1:0]  soc_fll_slave_add_i,
-    input logic [31:0]  soc_fll_slave_data_i,
+    input  logic        ref_clk_i,
+    input               sclk_in,
+    input  logic        test_clk_i,
+    input  logic        rstn_glob_i,
+    input  logic        test_mode_i,
+    input  logic        sel_fll_clk_i,
+    input  logic        shift_enable_i,
+    input  logic        soc_fll_slave_req_i,
+    input  logic        soc_fll_slave_wrn_i,
+    input  logic [ 1:0] soc_fll_slave_add_i,
+    input  logic [31:0] soc_fll_slave_data_i,
     output logic        soc_fll_slave_ack_o,
     output logic [31:0] soc_fll_slave_r_data_o,
     output logic        soc_fll_slave_lock_o,
 
-    input logic         per_fll_slave_req_i,
-    input logic         per_fll_slave_wrn_i,
-    input logic [ 1:0]  per_fll_slave_add_i,
-    input logic [31:0]  per_fll_slave_data_i,
+    input  logic        per_fll_slave_req_i,
+    input  logic        per_fll_slave_wrn_i,
+    input  logic [ 1:0] per_fll_slave_add_i,
+    input  logic [31:0] per_fll_slave_data_i,
     output logic        per_fll_slave_ack_o,
     output logic [31:0] per_fll_slave_r_data_o,
     output logic        per_fll_slave_lock_o,
 
-    input logic         cluster_fll_slave_req_i,
-    input logic         cluster_fll_slave_wrn_i,
-    input logic [ 1:0]  cluster_fll_slave_add_i,
-    input logic [31:0]  cluster_fll_slave_data_i,
+    input  logic        cluster_fll_slave_req_i,
+    input  logic        cluster_fll_slave_wrn_i,
+    input  logic [ 1:0] cluster_fll_slave_add_i,
+    input  logic [31:0] cluster_fll_slave_data_i,
     output logic        cluster_fll_slave_ack_o,
     output logic [31:0] cluster_fll_slave_r_data_o,
     output logic        cluster_fll_slave_lock_o,
 
-    output logic        rstn_soc_sync_o,
-    output logic        rstn_cluster_sync_o,
+    output logic rstn_soc_sync_o,
+    output logic rstn_cluster_sync_o,
 
-    output logic        clk_soc_o,
-    output logic        clk_per_o,
-    output logic        clk_cluster_o
+    output logic clk_soc_o,
+    output logic clk_per_o,
+    output logic clk_cluster_o
 );
 
   logic s_clk_soc;

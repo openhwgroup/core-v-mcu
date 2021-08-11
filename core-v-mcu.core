@@ -52,6 +52,7 @@ filesets:
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
+    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
@@ -102,7 +103,6 @@ filesets:
     - pulp-platform.org::tech_cells_xilinx
     files:
     - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - emulation/xilinx/rtl/fpga_bootrom.sv
     - emulation/xilinx/rtl/fpga_clk_gen.sv
     - emulation/xilinx/rtl/fpga_interleaved_ram.sv
     - emulation/xilinx/rtl/fpga_private_ram.sv
