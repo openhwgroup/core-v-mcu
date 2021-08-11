@@ -363,6 +363,7 @@ module core_v_mcu #(
   ) i_soc_domain (
       .ref_clk_i(s_ref_clk),
       .sclk_in(ref_clk_i),
+      .emul_clk(s_efpga_clk),
       .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
@@ -485,7 +486,6 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-      .fpga_clk_in       ({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
       .selected_mode_i   ('0),
       .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
       .dma_pe_evt_valid_i(s_dma_pe_evt_valid),

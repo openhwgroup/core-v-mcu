@@ -49,6 +49,7 @@ module soc_domain
     input logic ref_clk_i,
     input logic sclk_in,
     input logic test_clk_i,
+    input logic emul_clk,
     input logic rstn_glob_i,
 
     input  logic                         dft_test_mode_i,
@@ -177,7 +178,7 @@ module soc_domain
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
     input  logic [          1:0] selected_mode_i,
-    input  logic [          5:0] fpga_clk_in,
+
 
     //eFPGA SPIS
     //    input  logic efpga_fcb_spis_rst_n_i,
@@ -491,7 +492,7 @@ module soc_domain
       .fpgaio_oe_o (fpgaio_oe_o),
 
       // other FPGA signals
-      .fpga_clk_in(fpga_clk_in),
+      .fpga_clk_in(s_cluster_clk),
 
 
       //eFPGA TEST MODE
@@ -535,6 +536,7 @@ module soc_domain
   soc_clk_rst_gen i_clk_rst_gen (
       .ref_clk_i    (ref_clk_in),
       .sclk_in      (sclk_in),
+      .emul_clk     (emul_clk),
       .test_clk_i   (test_clk_i),
       .sel_fll_clk_i(s_sel_fll_clk),
 

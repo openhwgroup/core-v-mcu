@@ -14,6 +14,7 @@
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,
     input               sclk_in,
+    input               emul_clk,
     input  logic        test_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
@@ -263,7 +264,7 @@ module soc_clk_rst_gen (
   );
 
   assign s_clk_soc     = s_clk_fll_soc;
-  assign s_clk_cluster = s_clk_fll_cluster;
+  assign s_clk_cluster = emul_clk;
   assign s_clk_per     = s_clk_fll_per;
 
 `endif
