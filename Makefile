@@ -13,7 +13,7 @@ IOSCRIPT+=perdef.json
 IOSCRIPT+=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
-IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
+#IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
 IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
 IOSCRIPT_OUT+=emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
@@ -108,7 +108,6 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
-					--pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc

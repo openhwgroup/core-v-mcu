@@ -19,11 +19,11 @@ module soc_peripherals #(
     parameter NB_CLUSTERS    = 0,
     parameter EVNT_WIDTH     = 8
 ) (
-    input logic       clk_i,
-    input logic       periph_clk_i,
-    input logic [5:0] fpga_clk_in,
-    input logic       rst_ni,
-    input logic       ref_clk_i,
+    input logic clk_i,
+    input logic periph_clk_i,
+    input logic fpga_clk_in,
+    input logic rst_ni,
+    input logic ref_clk_i,
 
     input  logic                 sel_fll_clk_i,
     input  logic                 dft_test_mode_i,
@@ -606,12 +606,12 @@ module soc_peripherals #(
       .APB_FPGA_ADDR_WIDTH(APB_EFPGA_HWCE_ADDR_WIDTH)
   ) i_efpga_subsystem (
       .asic_clk_i (clk_i),
-      .fpga_clk0_i(fpga_clk_in[0]),
-      .fpga_clk1_i(fpga_clk_in[1]),
-      .fpga_clk2_i(fpga_clk_in[2]),
-      .fpga_clk3_i(fpga_clk_in[3]),
-      .fpga_clk4_i(fpga_clk_in[4]),
-      .fpga_clk5_i(fpga_clk_in[5]),
+      .fpga_clk0_i(fpga_clk_in),
+      .fpga_clk1_i(ref_clk_i),
+      .fpga_clk2_i(periph_clk_i),
+      .fpga_clk3_i(fpgaio_in_i[9]),  // qspi clk
+      .fpga_clk4_i(fpgaio_in_i[18]),  //cam_clk
+      .fpga_clk5_i(fpgaio_in_i[30]),  // sdio_clk
 
 
 
