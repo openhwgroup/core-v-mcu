@@ -90,6 +90,8 @@ filesets:
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
+    - tb/uartdpi/uartdpi.sv
+    - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
   tb-rtl:
@@ -135,45 +137,17 @@ filesets:
     - emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
-  # Scripts for hooks
-  pre_build_scripts:
-    files:
-    - rtl/core-v-mcu/scripts/vedit.sh
-    file_type: user
-
-  # Waiver file, without which the model lib will not build.
-  verilator-waiver:
-    files:
-    - rtl/core-v-mcu/verilator.waiver
-    file_type: vlt
-
-  # Verilator wrapper
-  verilator_wrapper:
-    files:
-    - rtl/core-v-mcu/top/core_v_mcu_wrapper.sv
-    file_type: systemVerilogSource
-
 parameters:
   PULP_FPGA_EMUL:
     datatype: bool
     paramtype: vlogdefine
     default: true
 
-# A script to modify Verilator pre-build to generate a library, not an
-# executable.
-scripts:
-  pre_build_scripts:
-    cmd:
-    - sh
-    - ../src/openhwgroup.org_systems_core-v-mcu_0/rtl/core-v-mcu/scripts/vedit.sh
-    - openhwgroup.org_systems_core-v-mcu_0.vc
-
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
     - target_lint? (rtl-behavioral)
-    - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -191,29 +165,7 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
-        - -voptargs="-O1"
-
-
-  # A target for a Verilator model as a library.  Note that we do not disable
-  # UNOPTFLAT warnings, since these will affect performance, so we want to see
-  # them.
-  model-lib:
-    <<: *default_target
-    default_tool: verilator
-    filesets_append:
-    - pre_build_scripts
-    - verilator_wrapper
-    - verilator-waiver
-    toplevel: [core_v_mcu_wrapper]
-    hooks:
-      pre_build: [pre_build_scripts]
-    tools:
-      verilator:
-        mode: cc
-        verilator_options:
-        - -Wno-fatal
-        - --trace
-        - --CFLAGS -DVL_TIME_CONTEXT
+        - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
 
   lint:
     <<: *default_target

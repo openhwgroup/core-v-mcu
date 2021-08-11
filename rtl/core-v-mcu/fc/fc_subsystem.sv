@@ -7,7 +7,7 @@
 // this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-
+`include "pulp_soc_defines.sv"
 
 module fc_subsystem #(
     parameter USE_FPU             = 1,
@@ -126,12 +126,22 @@ module fc_subsystem #(
   // OpenHW Group CV32E40P
   assign boot_addr             = boot_addr_i;
 
+   logic [31:0] 		     event_a, event_b, event_r;
+   assign event_r = ~event_b & event_a;
+   
   always_ff @(posedge clk_i, negedge rst_ni) begin
-    if (~rst_ni) r_int <= 0;
+    if (~rst_ni) begin
+       r_int <= 0;
+       event_a <= 0;
+       event_b <= 0;
+    end
     else begin
+       event_a <= events_i;
+       event_b <= event_a;
+       
       for (int i = 0; i < 32; i++) begin
         if (core_irq_ack_o && (core_irq_ack_id_o == i)) r_int[i] <= 0;
-        else r_int[i] <= events_i[i] | r_int[i];
+        else r_int[i] <= event_r[i] | r_int[i];
       end
     end
   end  // always_ff @ (posedge clk_i, negedge rst_ni)

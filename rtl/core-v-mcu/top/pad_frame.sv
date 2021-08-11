@@ -14,7 +14,7 @@
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
 
-module pad_frame (
+module pad_frame(
 
     input logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,
 
@@ -30,8 +30,8 @@ module pad_frame (
 
     // internal io signals
     input  logic [`N_IO-1:0] io_out_i,  // data going to pads
-    input  logic [`N_IO-1:0] io_oe_i,  // enable going to pads
-    output logic [`N_IO-1:0] io_in_o,  // data coming from pads
+    input  logic [`N_IO-1:0] io_oe_i,   // enable going to pads
+    output logic [`N_IO-1:0] io_in_o,   // data coming from pads
 
     // pad signals
     inout wire [`N_IO-1:0] io

@@ -53,6 +53,7 @@ filesets:
     - soc/interleaved_crossbar.sv
     - soc/tcdm_demux.sv
     - soc/boot_rom.sv
+    - soc/a2_bootrom.sv
     - soc/l2_ram_multi_bank.sv
     - soc/lint_jtag_wrap.sv
     - soc/periph_bus_wrap.sv
