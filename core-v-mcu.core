@@ -147,12 +147,6 @@ filesets:
     - rtl/core-v-mcu/verilator.waiver
     file_type: vlt
 
-  # Verilator wrapper
-  verilator_wrapper:
-    files:
-    - rtl/core-v-mcu/top/core_v_mcu_wrapper.sv
-    file_type: systemVerilogSource
-
 parameters:
   PULP_FPGA_EMUL:
     datatype: bool
@@ -202,9 +196,8 @@ targets:
     default_tool: verilator
     filesets_append:
     - pre_build_scripts
-    - verilator_wrapper
     - verilator-waiver
-    toplevel: [core_v_mcu_wrapper]
+    toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
     tools:
