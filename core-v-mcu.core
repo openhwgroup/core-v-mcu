@@ -40,7 +40,7 @@ filesets:
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
-    - rtl/includes/periph_bus_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
