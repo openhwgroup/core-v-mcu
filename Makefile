@@ -6,7 +6,7 @@ YML=$(shell find . -name '*.yml' -print)
 
 IOSCRIPT=rtl/includes/pulp_soc_defines.sv
 IOSCRIPT+=rtl/includes/pulp_peripheral_defines.svh
-IOSCRIPT+=rtl/includes/periph_bus_defines.sv
+IOSCRIPT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT+=pin-table.csv
 IOSCRIPT+=perdef.json
 #IOSCRIPT+=emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
@@ -15,7 +15,7 @@ IOSCRIPT+=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
 #IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
 IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
-IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
+IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT_OUT+=emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
@@ -110,7 +110,7 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.sv\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
-					--periph-bus-defines rtl/includes/periph_bus_defines.sv\
+					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
