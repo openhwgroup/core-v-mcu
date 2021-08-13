@@ -76,6 +76,7 @@ filesets:
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ctl.sv
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ram.sv
     - rtl/core-v-mcu/efpga_subsystem/tcdm_interface.sv
+    - rtl/core-v-mcu/efpga_subsystem/apbt1_interface.sv
     - rtl/core-v-mcu/top/pad_control.sv
     - rtl/core-v-mcu/top/safe_domain.sv
     - rtl/core-v-mcu/top/soc_domain.sv

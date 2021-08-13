@@ -34,24 +34,41 @@ module core_v_mcu_tb;
 
     // Ports on the core
     wire [`N_IO-1:0]   io_t;
-
-    // Local variables
-    reg resetn;
-    reg 	bootsel;
-   reg 		uart_clk;
+   wire 	       jtag_tck_i;
+   wire 	       jtag_tdi_i;
+   wire 	       jtag_tdo_o;
+   wire 	       jtag_tms_i;
+   wire 	       jtag_trst_i;
+   wire 	       ref_clk_i;
+   wire 	       rstn_i;
+   wire 	       bootsel_i;
+   wire [`N_IO-1:0]    io_in_i;
+   wire [`N_IO-1:0]    io_out_o;
+   wire [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o;
+   wire [`N_IO-1:0] io_oe_o;
+   // Local variables
+   reg 		    resetn;
+   reg 		    bootsel;
+   reg 		    uart_clk;
+   wire 	    pup,pdown ;
    
-   assign io_t[IO_BOOTSEL] = bootsel;   
-   assign io_t[IO_RESETN] = resetn;
+   assign pup = 1'b1;
+      assign pdown = 1'b0;
+   
+   assign bootsel_i = bootsel;   
+   assign rstn_i = resetn;
    
    initial uart_clk = 0;
    initial forever #(BAUD_CLK_PERIOD/2) uart_clk=~uart_clk;
 
-   GD25Q128B # (.initfile("../../../tb/cli.txt")) qspi (.sclk(io_t[16]),
-	     .si(io_t[14]),
-	     .cs(io_t[13]),
-	     .wp(io_t[39]),
-	     .hold(io_t[40]),
-	     .so(io_t[15]));
+   GD25Q128B # (.initfile("cli_sim.txt")) 
+   qspi (
+	 .sclk(io_out_o[16]),
+	 .si(io_out_o[14]),
+	 .cs(io_out_o[13]),
+	 .wp(pup),
+	 .hold(pup),
+	 .so(io_in_i[15]));
    
    uartdpi #(.BAUD(115200), 
 	     .FREQ(BAUD_CLK_FREQ),
@@ -59,8 +76,8 @@ module core_v_mcu_tb;
    uart_0 (
 	   .clk(uart_clk),
 	   .rst (~resetn),
-	   .tx(io_t[IO_UART0_TX]),
-	   .rx(io_t[IO_UART0_RX])
+	   .tx(io_in_i[IO_UART0_TX]),
+	   .rx(io_out_o[IO_UART0_RX])
 	   );
    uartdpi #(.BAUD(115200), 
 	     .FREQ(BAUD_CLK_FREQ),
@@ -68,8 +85,8 @@ module core_v_mcu_tb;
    uart_1 (
 	   .clk(uart_clk),
 	   .rst (~resetn),
-	   .tx(io_t[IO_UART1_TX]),
-	   .rx(io_t[IO_UART1_RX])
+	   .tx(io_in_i[IO_UART1_TX]),
+	   .rx(io_out_o[IO_UART1_RX])
 	   );
    
 	     
@@ -78,10 +95,21 @@ module core_v_mcu_tb;
     core_v_mcu #(
     )
     core_v_mcu_i (
-    .io (io_t)
+		  .jtag_tck_i(jtag_tck_i),
+		  .jtag_tdi_i(jtag_tdi_i),
+		  .jtag_tdo_o(jtag_tdo_o),
+		  .jtag_tms_i(jtag_tms_i),
+		  .jtag_trst_i(jtag_trst_i),
+		  .ref_clk_i(ref_clk_i),
+		  .rstn_i(rstn_i),
+		  .bootsel_i(bootsel_i),
+		  .io_in_i(io_in_i),
+		  .io_out_o(io_out_o),
+		  .pad_cfg_o(pad_cfg_o),
+		  .io_oe_o(io_oe_o)
     );
 
-    tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(io_t[IO_REF_CLK]) );
+    tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(ref_clk_i) );
 
     initial begin: finish
         #(2000000ns) $finish();
