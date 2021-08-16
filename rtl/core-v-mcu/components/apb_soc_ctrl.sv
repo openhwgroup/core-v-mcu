@@ -10,7 +10,7 @@
 
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
-`include "periph_bus_defines.sv"
+`include "periph_bus_defines.svh"
 
 `define REG_INFO 12'h00  //BASEADDR+0x00 Cores [31:16] and Clusters [15:0]
 `define REG_FCBOOT 12'h04 //BASEADDR+0x04 not used at the moment
