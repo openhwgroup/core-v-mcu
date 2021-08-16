@@ -3,7 +3,7 @@
 
 # CORE-V MCU
 
-> CORE-V MCU originated from PULPissimo and is currently in change to become a
+> CORE-V MCU originated from PULPissimo and is now a
 > stand-alone project within OpenHW Group independent from PULPIssimo.
 >
 > In case you should be interested to join the project please feel free to open
@@ -57,7 +57,7 @@ The swap size can be increased by searching for "increase swapfile in ubuntu" an
 ```
 $ make docs
 ```
-The resulting documents are accessed using file ./docs/_build/html/index.html
+The resulting documents are accessed using file ./docs/\_build/html/index.html
 
 ### Documentation of the Debug Unit
 
