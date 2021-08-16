@@ -19,9 +19,11 @@ module core_v_mcu_tb;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
    
-   localparam  REF_CLK_PERIOD = 30517ns; // external reference clock (32KHz)
+   localparam  REF_CLK_PERIOD =  763ns; // external reference clock (32KHz)
    localparam  BAUD_CLK_FREQ = 12500000;
    localparam  BAUD_CLK_PERIOD = 2ns;
+
+   
    
     
     initial begin
@@ -50,10 +52,10 @@ module core_v_mcu_tb;
    reg 		    resetn;
    reg 		    bootsel;
    reg 		    uart_clk;
-   wire 	    pup,pdown ;
-   
-   assign pup = 1'b1;
-      assign pdown = 1'b0;
+   wire 	    pup_qspi,pdown_qspi ;
+      wire [`N_IO-1:0]	    pup;
+   assign pup_qspi = 1'b1;
+      assign pdown_qspi = 1'b0;
    
    assign bootsel_i = bootsel;   
    assign rstn_i = resetn;
@@ -66,8 +68,8 @@ module core_v_mcu_tb;
 	 .sclk(io_out_o[16]),
 	 .si(io_out_o[14]),
 	 .cs(io_out_o[13]),
-	 .wp(pup),
-	 .hold(pup),
+	 .wp(pup_qspi),
+	 .hold(pup_qspi),
 	 .so(io_in_i[15]));
    
    uartdpi #(.BAUD(115200), 
@@ -88,6 +90,10 @@ module core_v_mcu_tb;
 	   .tx(io_in_i[IO_UART1_TX]),
 	   .rx(io_out_o[IO_UART1_RX])
 	   );
+
+   pullup(pup[46]);
+   
+   assign io_in_i[46] = io_oe_o[46] ? io_out_o[46] : pup[46];
    
 	     
    
@@ -111,9 +117,9 @@ module core_v_mcu_tb;
 
     tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(ref_clk_i) );
 
-    initial begin: finish
-        #(2000000ns) $finish();
-    end
+//    initial begin: finish
+//        #(2000000ns) $finish();
+//    end
 
     initial begin:  sys_reset
         $display("asserting reset");
