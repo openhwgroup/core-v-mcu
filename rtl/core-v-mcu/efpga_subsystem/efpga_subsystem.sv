@@ -257,35 +257,29 @@ module efpga_subsystem #(
   endgenerate
 
 
-      apbt1_interface apbt1_interface (
-          .lint_rst(reset_hi),
-          .lint_clk(asic_clk_i),
-          .lint_req(s_lint_REQ),
-          .lint_gnt(s_lint_GNT),  //(tcdm_gnt_fpga[g_tcdm]),
-          .lint_fmo(),
-          .lint_valid(s_lint_VALID),  //(tcdm_valid_fpga[g_tcdm]),
-          .lint_req_data({
-            apbt1_i.wen,
-            apbt1_i.add[APB_FPGA_ADDR_WIDTH-1:0],
-            apbt1_i.be,
-            apbt1_i.wdata
-          }),
-          .efpga_req_data({
-            apbt1_int.wen,
-            apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0],
-            apbt1_int.be,
-            apbt1_int.wdata
-          }),
-          .lint_rdata(apbt1_i.r_rdata),  //(tcdm_rdata_fpga[g_tcdm]),
-          .efpga_rdata(apbt1_int.r_rdata),
-          .efpga_rst(reset_hi),
-          .efpga_clk(s_efpga_clk),
-          .efpga_req(apbt1_int.req),
-          .efpga_gnt(apbt1_int.gnt),
-          .efpga_valid(apbt1_int.r_valid)
-      );
+  apbt1_interface apbt1_interface (
+      .lint_rst(reset_hi),
+      .lint_clk(asic_clk_i),
+      .lint_req(s_lint_REQ),
+      .lint_gnt(s_lint_GNT),  //(tcdm_gnt_fpga[g_tcdm]),
+      .lint_fmo(),
+      .lint_valid(s_lint_VALID),  //(tcdm_valid_fpga[g_tcdm]),
+      .lint_req_data({
+        apbt1_i.wen, apbt1_i.add[APB_FPGA_ADDR_WIDTH-1:0], apbt1_i.be, apbt1_i.wdata
+      }),
+      .efpga_req_data({
+        apbt1_int.wen, apbt1_int.add[APB_FPGA_ADDR_WIDTH-1:0], apbt1_int.be, apbt1_int.wdata
+      }),
+      .lint_rdata(apbt1_i.r_rdata),  //(tcdm_rdata_fpga[g_tcdm]),
+      .efpga_rdata(apbt1_int.r_rdata),
+      .efpga_rst(reset_hi),
+      .efpga_clk(s_efpga_clk),
+      .efpga_req(apbt1_int.req),
+      .efpga_gnt(apbt1_int.gnt),
+      .efpga_valid(apbt1_int.r_valid)
+  );
 
-/*
+  /*
    
   log_int_dc_slice #(
       .ADDR_WIDTH(20)

@@ -689,9 +689,22 @@ if args.pad_control_sv != None:
         for row in io_out_mux:
             index = index + 1
             if sysionames[index] != -1:
-                if sysio[sysionames[index][:-2]] != 'output':
+                if (sysio[sysionames[index][:-2]] == 'input') :
                     pad_control_sv.write("    assign io_out_o[%d] = " %index)
                     pad_control_sv.write("1'b0;\n")
+                elif (sysio[sysionames[index][:-2]] == 'snoop'):
+                    pad_control_sv.write("    assign io_out_o[%d] = " %index)
+                    nparen = 0
+                    for sel in range(len(row)):
+                        if row[sel] != '':
+                            if nparen != 0:
+                                pad_control_sv.write("\n                         ")
+                            pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                            nparen = nparen + 1
+                    pad_control_sv.write(" 1'b0")
+                    for i in range(nparen):
+                        pad_control_sv.write(")")
+                    pad_control_sv.write(";\n")
             else:
                 pad_control_sv.write("    assign io_out_o[%d] = " %index)
                 nparen = 0
@@ -717,6 +730,17 @@ if args.pad_control_sv != None:
             if sysionames[index] != -1:
                 if sysio[sysionames[index][:-2]] == 'output':
                     pad_control_sv.write("1'b1")
+                elif sysio[sysionames[index][:-2]] == 'snoop':
+                    nparen = 0
+                    for sel in range(len(row)):
+                        if row[sel] != '':
+                            if nparen != 0:
+                                pad_control_sv.write("\n                         ")
+                            pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                            nparen = nparen + 1
+                    pad_control_sv.write(" 1'b0")
+                    for i in range(nparen):
+                        pad_control_sv.write(")")
                 else:
                     pad_control_sv.write("1'b0")
             else:

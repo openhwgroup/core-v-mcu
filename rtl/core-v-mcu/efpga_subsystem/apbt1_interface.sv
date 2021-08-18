@@ -26,16 +26,14 @@ module apbt1_interface (
   logic req_empty;
   logic req_full;
   logic resp_empty;
-   
-   always @(posedge lint_clk or posedge lint_rst) begin
-      if (lint_rst == 1'b1)
-	lint_valid <= 0;
-      else
-	lint_valid <= lint_gnt;
-   end
 
-  assign req_push = lint_req & !req_full;
-   assign lint_gnt = !resp_empty; // !req_full;
+  always @(posedge lint_clk or posedge lint_rst) begin
+    if (lint_rst == 1'b1) lint_valid <= 0;
+    else lint_valid <= lint_gnt;
+  end
+
+  assign req_push  = lint_req & !req_full;
+  assign lint_gnt  = !resp_empty;  // !req_full;
 
   assign efpga_req = !req_empty;
   //assign lint_valid = !resp_empty;
