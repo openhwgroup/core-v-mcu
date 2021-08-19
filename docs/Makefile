@@ -16,7 +16,7 @@ $(info ${MD_FILES})
 
 INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
 
-all:    doc pdf
+all:    doc
 
 clean:
 				rm -rf ${AUTO_MD_DIR}
@@ -39,7 +39,7 @@ ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 			@mkdir -p ${AUTO_MD_DIR}
 			@python3 ../util/ioscript.py\
 				--soc-defines ../rtl/includes/pulp_soc_defines.sv\
-				--periph-bus-defines ../rtl/includes/periph_bus_defines.svh\
+				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
 				--reg-def-csv $<\
 				--reg-def-md $@
 
@@ -47,7 +47,7 @@ ${AUTO_MD_DIR}/pin-table.md: ../pin-table.csv
 			@mkdir -p ${AUTO_MD_DIR}
 			@python3 ../util/ioscript.py\
 				--soc-defines ../rtl/includes/pulp_soc_defines.sv\
-				--periph-bus-defines ../rtl/includes/periph_bus_defines.svh\
+				--periph-bus-defines ../rtl/includes/periph_bus_defines.sv\
 				--peripheral-defines peripheral-defines.svh\
 				--perdef-json ../perdef.json\
 				--pin-table $<\
