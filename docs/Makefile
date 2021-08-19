@@ -16,7 +16,7 @@ $(info ${MD_FILES})
 
 INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
 
-all:    doc
+all:    doc pdf
 
 clean:
 				rm -rf ${AUTO_MD_DIR}
