@@ -1,0 +1,37 @@
+From 2ed8a0cc4cda83e94c748c7dafbb591afd828420 Mon Sep 17 00:00:00 2001
+From: Greg Martin <gmartin@quicklogic.com>
+Date: Wed, 18 Aug 2021 14:52:48 -0500
+Subject: [PATCH 2/3] Make generic memory pre-loadable
+
+Signed-off-by: Greg Martin <gmartin@quicklogic.com>
+---
+ src/deprecated/generic_memory.sv | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/deprecated/generic_memory.sv b/src/deprecated/generic_memory.sv
+index 8a1a390..071a9ee 100644
+--- a/src/deprecated/generic_memory.sv
++++ b/src/deprecated/generic_memory.sv
+@@ -32,6 +32,13 @@ module generic_memory
+    logic [DATA_WIDTH-1:0]                   MEM [NUM_WORDS-1:0];
+    logic [DATA_WIDTH-1:0]                   M;
+    genvar                         i,j;
++   string                        s;
++
++   initial begin
++      $display("%m");
++      $sformatf(s, "%m");
++      $readmemh(s, MEM);
++   end
+
+    generate
+       for (i=0; i<BE_WIDTH; i++)
+@@ -69,4 +76,4 @@ module generic_memory
+         end
+    endgenerate
+
+-endmodule
+\ No newline at end of file
++endmodule
+2.24.3 (Apple Git-128)
+
