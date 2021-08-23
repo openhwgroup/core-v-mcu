@@ -308,7 +308,7 @@ module apb_soc_ctrl #(
             `REG_INFO: PRDATA <= {n_cores, n_clusters};
             `REG_BUILD_DATE: PRDATA <= `BUILD_DATE;
             `REG_BUILD_TIME: PRDATA <= `BUILD_TIME;
-            `REG_BOOTSEL: PRDATA <= {dmactive_1, bootsel_i, 28'h0, r_bootsel};
+            `REG_BOOTSEL: PRDATA <= {dmactive_i, bootsel_i, 28'h0, r_bootsel};
             `REG_CLKSEL: PRDATA <= {31'h0, sel_fll_clk_i};
             `REG_JTAGREG: PRDATA <= {16'h0, r_jtag_regi_sync[0], r_jtag_rego};
             `REG_WD_COUNT: PRDATA <= {1'b0, wd_count};
