@@ -36,7 +36,7 @@ module generic_memory
 
    initial begin
       $display("%m");
-      $sformatf(s, "%m");
+      s = $sformatf("%m");
       $readmemh(s, MEM);
    end
 
