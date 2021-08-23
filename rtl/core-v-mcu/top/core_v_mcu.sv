@@ -250,7 +250,7 @@ module core_v_mcu #(
   logic [BUFFER_WIDTH-1:0]                   s_event_writetoken;
   logic [BUFFER_WIDTH-1:0]                   s_event_readpointer;
   logic [ EVENT_WIDTH-1:0]                   s_event_dataasync;
-  logic                                      s_wd_expired;
+
 
 
 
@@ -469,7 +469,6 @@ module core_v_mcu #(
       .jtag_tms_i  (jtag_tms_i),
       .jtag_tdi_i  (jtag_tdi_i),
       .jtag_tdo_o  (jtag_tdo_o),
-      .wd_expired_o(s_wd_expired),
       // Pad control signals
       .pad_cfg_o   (pad_cfg_o),
       .pad_mux_o   (s_pad_mux_soc),

@@ -20,12 +20,12 @@ module soc_peripherals #(
     parameter NB_CLUSTERS    = 0,
     parameter EVNT_WIDTH     = 8
 ) (
-    input logic clk_i,
-    input logic periph_clk_i,
-    input logic fpga_clk_in,
-    input logic rst_ni,
-    input logic ref_clk_i,
-
+    input  logic                 clk_i,
+    input  logic                 periph_clk_i,
+    input  logic                 fpga_clk_in,
+    input  logic                 rst_ni,
+    input  logic                 ref_clk_i,
+    input  logic                 dmactive_i,
     input  logic                 sel_fll_clk_i,
     input  logic                 dft_test_mode_i,
     input  logic                 dft_cg_enable_i,
@@ -448,6 +448,7 @@ module soc_peripherals #(
 
       .sel_fll_clk_i(sel_fll_clk_i),
       .bootsel_i    (bootsel_i),
+      .dmactive_i   (dmactive_i),
       .status_out   (status_out),
       .version      (version),
       .control_in   (control_in),
