@@ -138,6 +138,18 @@ filesets:
     - emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
 
+  # Scripts for hooks
+  pre_build_scripts:
+    files:
+    - rtl/core-v-mcu/scripts/vedit.sh
+    file_type: user
+
+  # Waiver file, without which the model lib will not build.
+  verilator-waiver:
+    files:
+    - rtl/core-v-mcu/verilator.waiver
+    file_type: vlt
+
 parameters:
   PULP_FPGA_EMUL:
     datatype: bool
@@ -167,6 +179,26 @@ targets:
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
+
+  # A target for a Verilator model as a library.  Note that we do not disable
+  # UNOPTFLAT warnings, since these will affect performance, so we want to see
+  # them.
+  model-lib:
+    <<: *default_target
+    default_tool: verilator
+    filesets_append:
+    - pre_build_scripts
+    - verilator-waiver
+    toplevel: [core_v_mcu]
+    hooks:
+      pre_build: [pre_build_scripts]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+        - -Wno-fatal
+        - --trace
+        - --CFLAGS -DVL_TIME_CONTEXT
 
   lint:
     <<: *default_target
