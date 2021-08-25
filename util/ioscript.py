@@ -16,6 +16,7 @@
 #==========================================================
 
 import json
+from collections import OrderedDict
 import argparse
 import csv
 from datetime import datetime
@@ -688,9 +689,22 @@ if args.pad_control_sv != None:
         for row in io_out_mux:
             index = index + 1
             if sysionames[index] != -1:
-                if sysio[sysionames[index][:-2]] != 'output':
+                if (sysio[sysionames[index][:-2]] == 'input') :
                     pad_control_sv.write("    assign io_out_o[%d] = " %index)
                     pad_control_sv.write("1'b0;\n")
+                elif (sysio[sysionames[index][:-2]] == 'snoop'):
+                    pad_control_sv.write("    assign io_out_o[%d] = " %index)
+                    nparen = 0
+                    for sel in range(len(row)):
+                        if row[sel] != '':
+                            if nparen != 0:
+                                pad_control_sv.write("\n                         ")
+                            pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                            nparen = nparen + 1
+                    pad_control_sv.write(" 1'b0")
+                    for i in range(nparen):
+                        pad_control_sv.write(")")
+                    pad_control_sv.write(";\n")
             else:
                 pad_control_sv.write("    assign io_out_o[%d] = " %index)
                 nparen = 0
@@ -716,6 +730,17 @@ if args.pad_control_sv != None:
             if sysionames[index] != -1:
                 if sysio[sysionames[index][:-2]] == 'output':
                     pad_control_sv.write("1'b1")
+                elif sysio[sysionames[index][:-2]] == 'snoop':
+                    nparen = 0
+                    for sel in range(len(row)):
+                        if row[sel] != '':
+                            if nparen != 0:
+                                pad_control_sv.write("\n                         ")
+                            pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                            nparen = nparen + 1
+                    pad_control_sv.write(" 1'b0")
+                    for i in range(nparen):
+                        pad_control_sv.write(")")
                 else:
                     pad_control_sv.write("1'b0")
             else:
@@ -914,8 +939,12 @@ if args.xilinx_core_v_mcu_sv != None:
         ionum_end = -1
         for ionum in range(N_IO):
             if sysionames[ionum] != "ref_clk_i" and  sysionames[ionum] != "jtag_tck_i" and sysionames[ionum] != "jtag_tdo_o" :
-                x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
-                    (ionum, ionum, ionum, ionum, ionum, ionum))
+                if sysionames[ionum] == "bootsel_i" :
+                    x_sv.write("  pad_functional_pd i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
+                        (ionum, ionum, ionum, ionum, ionum, ionum))
+                else :
+                    x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
+                        (ionum, ionum, ionum, ionum, ionum, ionum))
             else:                       # break in sequence
                 if sysionames[ionum] == "jtag_tdo_o" :
                     x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_jtag_tdo), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\

@@ -40,7 +40,7 @@ filesets:
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
-    - rtl/includes/periph_bus_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
@@ -76,6 +76,7 @@ filesets:
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ctl.sv
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ram.sv
     - rtl/core-v-mcu/efpga_subsystem/tcdm_interface.sv
+    - rtl/core-v-mcu/efpga_subsystem/apbt1_interface.sv
     - rtl/core-v-mcu/top/pad_control.sv
     - rtl/core-v-mcu/top/safe_domain.sv
     - rtl/core-v-mcu/top/soc_domain.sv
@@ -90,6 +91,8 @@ filesets:
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
+    - tb/uartdpi/uartdpi.sv
+    - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
   tb-rtl:
@@ -153,21 +156,11 @@ parameters:
     paramtype: vlogdefine
     default: true
 
-# A script to modify Verilator pre-build to generate a library, not an
-# executable.
-scripts:
-  pre_build_scripts:
-    cmd:
-    - sh
-    - ../src/openhwgroup.org_systems_core-v-mcu_0/rtl/core-v-mcu/scripts/vedit.sh
-    - openhwgroup.org_systems_core-v-mcu_0.vc
-
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
     - target_lint? (rtl-behavioral)
-    - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -185,8 +178,7 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
-        - -voptargs="-O1"
-
+        - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
