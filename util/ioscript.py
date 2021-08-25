@@ -31,18 +31,19 @@ inputArgs = parser.add_argument_group("input files")
 inputArgs.add_argument("--soc-defines", help="file with pulp_soc_defines")
 inputArgs.add_argument("--periph-bus-defines", help="file with peripheral bus define (memory map)")
 inputArgs.add_argument("--perdef-json", help="peripheral definition json file")
-inputArgs.add_argument("--pin-table", help="csv filecontaining pin-table")
+inputArgs.add_argument("--pin-table", help="csv file containing pin-table")
 inputArgs.add_argument("--input-xdc", help="xdc that defines board")
 inputArgs.add_argument("--reg-def-csv", help="register definition file (csv)")
 
 outputArgs = parser.add_argument_group("output files")
-outputArgs.add_argument("--peripheral-defines", help="file to put  pulp_peripheral_defines")
-outputArgs.add_argument("--pad-control-sv", help="file to put  pad_control.sv")
-outputArgs.add_argument("--pad-frame-sv", help="file to put  pad_frame.sv")
-outputArgs.add_argument("--pad-frame-gf22-sv", help="file to put  pad_frame_gf22.sv")
+outputArgs.add_argument("--peripheral-defines", help="file to put pulp_peripheral_defines")
+outputArgs.add_argument("--pad-control-sv", help="file to put pad_control.sv")
+outputArgs.add_argument("--pad-frame-sv", help="file to put pad_frame.sv")
+outputArgs.add_argument("--core-v-mcu-gf22fdx-sv", help="file to put top level for core_v_mcu_gf22.sv")
 outputArgs.add_argument("--xilinx-core-v-mcu-sv", help="file for xilinx_core_v_mcu.sv")
 outputArgs.add_argument("--output-xdc", help="output xdc for use in Vivado")
 outputArgs.add_argument("--cvmcu-h", help="cvmcu.h file for compiles")
+outputArgs.add_argument("--core-v-mcu-iodef-h", help=".h file for indices into IO array")
 outputArgs.add_argument("--reg-def-h", help="register definition C header file (h)")
 outputArgs.add_argument("--reg-def-svh", help="register definition Verilog header file (svh)")
 outputArgs.add_argument("--reg-def-md", help="register definition markdown file (md)")
@@ -180,9 +181,117 @@ if args.periph_bus_defines != None:
 # Grab peripheral definitions from perdef.json
 #
 ####################################################################################
+sysio = {"":""}                                                 # row for each sysio = ['name', 'direction']
+perio_defines = {"":""}
+perio_dir = {"":""}
+perio_index = 0
 if args.perdef_json != None:
   with open(args.perdef_json) as f:
     perdefs = json.load(f)
+
+    for perdef in perdefs:
+            if perdef['type'] == 'sysio':
+                sysio[perdef['name']] = perdef['direction']
+            else:
+                pername = perdef['name']
+                perports = perdef['ports']
+                define = "N_"+pername.upper()
+                ninst = int(soc_defines[define])
+
+                if ninst > 0 and not perdef['usable']:
+                    print("Error: trying to use %s when it is not usable" % pername)
+                def_name = "PERIO_" + pername.upper()+"_NPORTS"
+                perio_defines[def_name] = len(perports)
+                for inst in range(ninst if ninst > 0 else 1):   # Even if not used, need defines for the generate
+                    for perport in perports:
+                        def_name = "PERIO_" + pername.upper()+str(inst)+"_"+perport.upper()
+                        perio_defines[def_name] = perio_index
+                        perio_index = perio_index + 1
+                        perio_dir[def_name] = perports[perport]
+
+################################################
+#
+# Read pin-table and populate data structures
+#
+################################################
+if args.soc_defines != None and args.pin_table != None:
+    sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysiso = [ionum, 'name']
+    N_IO = int(soc_defines['N_IO'])
+    N_PERIO = perio_index
+    N_GPIO = int(soc_defines['N_APBIO'])
+    N_FPGAIO = int(soc_defines['N_FPGAIO'])
+    NBIT_PADMUX = int(soc_defines['NBIT_PADMUX'])
+    N_PADSEL = 2**NBIT_PADMUX
+
+    selcol = 4  # Index of column that has sel=0 (xilinx, IOname, IOnum, sysio, sel=0, sel=1, ...
+
+    io_out_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
+    io_oe_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
+    perio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_PERIO)]
+    apbio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
+    fpgaio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_FPGAIO)]
+    xilinx_names = ['' for i in range(N_IO)]
+    with open(args.pin_table, 'r') as f_pin_table:
+        pin_table = csv.reader(f_pin_table)
+        pin_num = -2
+        for pin in pin_table:
+            pin_num = pin_num + 1
+            if pin_num >= 0:
+                # Work to do
+                io_num = int(pin[2])
+                if pin[0] in xilinx_names:
+                    print("ERROR: multiple assignment to xilinx_pin '%s' (IO_%d)" % (pin[0], io_num))
+                    error_count = error_count + 1
+                xilinx_names[pin_num] = pin[0]
+                #
+                # Check for sysio name
+                #
+                sysio_only = False
+                if pin[3] != '':
+                    if pin[3] in sysio:
+                        sysionames[io_num] = pin[3] + ("_i" if (sysio[pin[3]] == 'input' or sysio[pin[3]] == 'snoop') else "_o")
+                        if sysio[pin[3]] != 'snoop':
+                            sysio_only = True
+                    else:
+                        print("ERROR: found '%s' in sysio column, but not defined as sysio in perdef.json (IO_%d)" % (pin[3], io_num))
+                        error_count = error_count + 1
+                for index in range(selcol,len(pin)):
+                    sel = index - selcol
+                    entry = pin[index]
+                    if sysio_only and entry != '':
+                        print("ERROR: found '%s' as a sel option for IO_%d which is a sysio" % (entry, io_num))
+                    if entry == '':
+                        entry = 'z'
+                    if entry != '' and entry in sysio:
+                        print("ERROR: found sysio '%s' as a sel option for IO_%d" % (entry, io_num))
+                        error_count = error_count + 1
+                    else:
+                        if entry[0:5] == 'apbio':    # apbio
+                            apbio_num = int(entry[6:])
+                            io_out_mux[io_num][sel] = "apbio_out_i[" + str(apbio_num) + "]"
+                            io_oe_mux[io_num][sel] = "apbio_oe_i[" + str(apbio_num) + "]"
+                            apbio_in_mux[apbio_num][sel] = "io_in_i[" + str(io_num) + "]"
+                        elif entry[0:6] == 'fpgaio':    # fpgaio
+                            fpgaio_num = int(entry[7:])
+                            io_out_mux[io_num][sel] = "fpgaio_out_i[" + str(fpgaio_num) + "]"
+                            io_oe_mux[io_num][sel] = "fpgaio_oe_i[" + str(fpgaio_num) + "]"
+                            fpgaio_in_mux[fpgaio_num][sel] = "io_in_i[" + str(io_num) + "]"
+                        elif entry == '' or entry[0] == '1' or entry[0] == '0' or entry[0] == 'z' or entry[0] == 'Z':
+                            io_out_mux[io_num][sel] = "1'b1" if entry[0] == '1' else "1'b0"
+                            io_oe_mux[io_num][sel] = "1'b1" if entry[0] == '1' or entry[0] == '0' else "1'b0"
+                        else:
+                            perio_index = "PERIO_" + entry.upper()
+                            index = perio_defines[perio_index]
+                            direction = perio_dir[perio_index]
+                            io_out_mux[io_num][sel] = "perio_out_i[`" + perio_index + "]" if direction == 'output' or direction == 'bidir' else "1'b0"
+                            if direction == "bidir":
+                                io_oe_mux[io_num][sel] = "perio_oe_i[`" + perio_index + "]"
+                            elif direction == "output":
+                                io_oe_mux[io_num][sel] = "1'b1"
+                            else:
+                                io_oe_mux[io_num][sel] = "1'b0"
+                            perio_in_mux[index][sel] = "io_in_i[" + str(io_num) + "]"
+    f_pin_table.close()
 
 ######################################################################
 #
@@ -191,7 +300,7 @@ if args.perdef_json != None:
 ######################################################################
 if args.soc_defines != None and args.peripheral_defines != None and args.perdef_json != None:
     sysio = {"":""}                                                 # row for each sysio = ['name', 'direction']
-    sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysio = [ionum, 'name']
+    #sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysio = [ionum, 'name']
     with open(args.peripheral_defines, 'w') as peripheral_defines_svh:
         write_license_header(peripheral_defines_svh,"")
         peripheral_defines_svh.write("\n")
@@ -265,6 +374,12 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
         peripheral_defines_svh.write("`define N_RX_CHANNELS  %d\n" %(udma_rx_ch))
 
         peripheral_defines_svh.write("\n")
+
+        peripheral_defines_svh.write("//  Define indices for sysio in IO bus\n")
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                peripheral_defines_svh.write("`define IOINDEX_%-20s  %d\n" % (sysionames[ionum].upper(), ionum))
+
         peripheral_defines_svh.write("//  Width of perio bus\n")
         peripheral_defines_svh.write("`define N_PERIO  %d\n" %(perio_index))
 
@@ -282,7 +397,7 @@ if args.soc_defines != None and args.peripheral_defines != None and args.perdef_
 ######################################################################
 if args.soc_defines != None and args.cvmcu_h != None:
     sysio = {"":""}                                                 # row for each sysiso = ['name', 'direction']
-    sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysiso = [ionum, 'name']
+    #sysionames = [-1 for row in range(int(soc_defines['N_IO']))]    # row for each sysiso = [ionum, 'name']
     with open(args.cvmcu_h, 'w') as cvmcu_h:
         print("Writing '%s'" % args.cvmcu_h)
         # Start with SOC options (from pulp_soc_defines.svh
@@ -398,9 +513,9 @@ if args.soc_defines != None and args.cvmcu_h != None:
         ###########
         # Add EU information
         ###########
-        #cvmcu_h.write("\n")
-        #cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
-        #cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
+        cvmcu_h.write("\n")
+        cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
+        cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
 
         ###########
         # Add Timer information
@@ -425,86 +540,31 @@ if args.soc_defines != None and args.cvmcu_h != None:
 
 ################################################
 #
-# Read pin-table and populate data structures
+# Generate core-v-mcu-iodef.h
 #
 ################################################
-if args.soc_defines != None and args.pin_table != None:
-    N_IO = int(soc_defines['N_IO'])
-    N_PERIO = perio_index
-    N_GPIO = int(soc_defines['N_APBIO'])
-    N_FPGAIO = int(soc_defines['N_FPGAIO'])
-    NBIT_PADMUX = int(soc_defines['NBIT_PADMUX'])
-    N_PADSEL = 2**NBIT_PADMUX
+if args.soc_defines != None and args.core_v_mcu_iodef_h != None:
+    with open(args.core_v_mcu_iodef_h, 'w') as core_v_mcu_iodef_h:
+        print("*******************************************")
+        print("Writing '%s'" % args.core_v_mcu_iodef_h)
+        print("*******************************************")
+        write_license_header(core_v_mcu_iodef_h, "__CORE_V_MCU_IODEF_H_")
+        core_v_mcu_iodef_h.write("\n#ifdef __cplusplus\n")
+        core_v_mcu_iodef_h.write("namespace core_v_mcu {\n")
+        core_v_mcu_iodef_h.write("#endif\n\n")
+        core_v_mcu_iodef_h.write("  enum class iodef {")
+        separator = ''
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                core_v_mcu_iodef_h.write("%s\n    IOINDEX_%-20s = %d" % (separator, sysionames[ionum].upper(), ionum))
+                separator = ','
+        core_v_mcu_iodef_h.write("\n  };\n")
+        core_v_mcu_iodef_h.write("\n#ifdef __cplusplus\n")
+        core_v_mcu_iodef_h.write("}\n")
+        core_v_mcu_iodef_h.write("#endif\n\n")
+        core_v_mcu_iodef_h.write("#endif  // __CORE_V_MCU_IODEF_H_\n")
 
-    selcol = 4  # Index of column that has sel=0 (xilinx, IOname, IOnum, sysio, sel=0, sel=1, ...
-
-    io_out_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
-    io_oe_mux = [['' for j in range(N_PADSEL)] for i in range(N_IO)]
-    perio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_PERIO)]
-    apbio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_GPIO)]
-    fpgaio_in_mux = [['' for j in range(N_PADSEL)] for i in range(N_FPGAIO)]
-    xilinx_names = ['' for i in range(N_IO)]
-    with open(args.pin_table, 'r') as f_pin_table:
-        pin_table = csv.reader(f_pin_table)
-        pin_num = -2
-        for pin in pin_table:
-            pin_num = pin_num + 1
-            if pin_num >= 0:
-                # Work to do
-                io_num = int(pin[2])
-                if pin[0] in xilinx_names:
-                    print("ERROR: multiple assignment to xilinx_pin '%s' (IO_%d)" % (pin[0], io_num))
-                    error_count = error_count + 1
-                xilinx_names[pin_num] = pin[0]
-                #
-                # Check for sysio name
-                #
-                sysio_only = False
-                if pin[3] != '':
-                    if pin[3] in sysio:
-                        sysionames[io_num] = pin[3] + ("_o" if (sysio[pin[3]] == 'input' or sysio[pin[3]] == 'snoop') else "_i")
-                        if sysio[pin[3]] != 'snoop':
-                            sysio_only = True
-                    else:
-                        print("ERROR: found '%s' in sysio column, but not defined as sysio in perdef.json (IO_%d)" % (pin[3], io_num))
-                        error_count = error_count + 1
-                for index in range(selcol,len(pin)):
-                    sel = index - selcol
-                    entry = pin[index]
-                    if sysio_only and entry != '':
-                        print("ERROR: found '%s' as a sel option for IO_%d which is a sysio" % (entry, io_num))
-                    if entry == '':
-                        entry = 'z'
-                    if entry != '' and entry in sysio:
-                        print("ERROR: found sysio '%s' as a sel option for IO_%d" % (entry, io_num))
-                        error_count = error_count + 1
-                    else:
-                        if entry[0:5] == 'apbio':    # apbio
-                            apbio_num = int(entry[6:])
-                            io_out_mux[io_num][sel] = "apbio_out_i[" + str(apbio_num) + "]"
-                            io_oe_mux[io_num][sel] = "apbio_oe_i[" + str(apbio_num) + "]"
-                            apbio_in_mux[apbio_num][sel] = "io_in_i[" + str(io_num) + "]"
-                        elif entry[0:6] == 'fpgaio':    # fpgaio
-                            fpgaio_num = int(entry[7:])
-                            io_out_mux[io_num][sel] = "fpgaio_out_i[" + str(fpgaio_num) + "]"
-                            io_oe_mux[io_num][sel] = "fpgaio_oe_i[" + str(fpgaio_num) + "]"
-                            fpgaio_in_mux[fpgaio_num][sel] = "io_in_i[" + str(io_num) + "]"
-                        elif entry == '' or entry[0] == '1' or entry[0] == '0' or entry[0] == 'z' or entry[0] == 'Z':
-                            io_out_mux[io_num][sel] = "1'b1" if entry[0] == '1' else "1'b0"
-                            io_oe_mux[io_num][sel] = "1'b1" if entry[0] == '1' or entry[0] == '0' else "1'b0"
-                        else:
-                            perio_index = "PERIO_" + entry.upper()
-                            index = perio_defines[perio_index]
-                            direction = perio_dir[perio_index]
-                            io_out_mux[io_num][sel] = "perio_out_i[`" + perio_index + "]" if direction == 'output' or direction == 'bidir' else "1'b0"
-                            if direction == "bidir":
-                                io_oe_mux[io_num][sel] = "perio_oe_i[`" + perio_index + "]"
-                            elif direction == "output":
-                                io_oe_mux[io_num][sel] = "1'b1"
-                            else:
-                                io_oe_mux[io_num][sel] = "1'b0"
-                            perio_in_mux[index][sel] = "io_in_i[" + str(io_num) + "]"
-    f_pin_table.close()
+        core_v_mcu_iodef_h.close()
 
 ################################################
 #
@@ -535,8 +595,6 @@ if args.pad_control_sv != None:
         pad_control_sv.write("module pad_control(\n")
         pad_control_sv.write("    // PAD CONTROL REGISTER\n")
         pad_control_sv.write("    input  logic [`N_IO-1:0][`NBIT_PADMUX-1:0]    pad_mux_i,\n")
-        pad_control_sv.write("    input  logic [`N_IO-1:0][`NBIT_PADCFG-1:0]    pad_cfg_i,\n")
-        pad_control_sv.write("    output logic [`N_IO-1:0][`NBIT_PADCFG-1:0]    pad_cfg_o,\n")
         pad_control_sv.write("\n")
         pad_control_sv.write("    // IOS\n")
         pad_control_sv.write("    output logic [`N_IO-1:0]        io_out_o,\n")
@@ -558,12 +616,6 @@ if args.pad_control_sv != None:
         pad_control_sv.write("    output logic [`N_FPGAIO-1:0]    fpgaio_in_o,\n")
         pad_control_sv.write("    input  logic [`N_FPGAIO-1:0]    fpgaio_oe_i\n")
         pad_control_sv.write("    );\n")
-
-        pad_control_sv.write("\n")
-        pad_control_sv.write("    ///////////////////////////////////////////////////\n")
-        pad_control_sv.write("    // Assign signals to the pad_cfg_o bus\n")
-        pad_control_sv.write("    ///////////////////////////////////////////////////\n")
-        pad_control_sv.write("    assign pad_cfg_o = pad_cfg_i;\n")
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
         pad_control_sv.write("    // Assign signals to the perio bus\n")
@@ -635,18 +687,23 @@ if args.pad_control_sv != None:
         index = -1
         for row in io_out_mux:
             index = index + 1
-            pad_control_sv.write("    assign io_out_o[%d] = " %index)
-            nparen = 0
-            for sel in range(len(row)):
-                if row[sel] != '':
-                    if nparen != 0:
-                        pad_control_sv.write("\n                         ")
-                    pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
-                    nparen = nparen + 1
-            pad_control_sv.write(" 1'b0")
-            for i in range(nparen):
-                pad_control_sv.write(")")
-            pad_control_sv.write(";\n")
+            if sysionames[index] != -1:
+                if sysio[sysionames[index][:-2]] != 'output':
+                    pad_control_sv.write("    assign io_out_o[%d] = " %index)
+                    pad_control_sv.write("1'b0;\n")
+            else:
+                pad_control_sv.write("    assign io_out_o[%d] = " %index)
+                nparen = 0
+                for sel in range(len(row)):
+                    if row[sel] != '':
+                        if nparen != 0:
+                            pad_control_sv.write("\n                         ")
+                        pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                        nparen = nparen + 1
+                pad_control_sv.write(" 1'b0")
+                for i in range(nparen):
+                    pad_control_sv.write(")")
+                pad_control_sv.write(";\n")
 
         pad_control_sv.write("\n")
         pad_control_sv.write("    ///////////////////////////////////////////////////\n")
@@ -656,16 +713,22 @@ if args.pad_control_sv != None:
         for row in io_oe_mux:
             index = index + 1
             pad_control_sv.write("    assign io_oe_o[%d] = " %index)
-            nparen = 0
-            for sel in range(len(row)):
-                if row[sel] != '':
-                    if nparen != 0:
-                        pad_control_sv.write("\n                         ")
-                    pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
-                    nparen = nparen + 1
-            pad_control_sv.write(" 1'b0")
-            for i in range(nparen):
-                pad_control_sv.write(")")
+            if sysionames[index] != -1:
+                if sysio[sysionames[index][:-2]] == 'output':
+                    pad_control_sv.write("1'b1")
+                else:
+                    pad_control_sv.write("1'b0")
+            else:
+                nparen = 0
+                for sel in range(len(row)):
+                    if row[sel] != '':
+                        if nparen != 0:
+                            pad_control_sv.write("\n                         ")
+                        pad_control_sv.write("((pad_mux_i[%s] == %d'd%d) ? %s :" %(index, NBIT_PADMUX, sel, row[sel]))
+                        nparen = nparen + 1
+                pad_control_sv.write(" 1'b0")
+                for i in range(nparen):
+                    pad_control_sv.write(")")
             pad_control_sv.write(";\n")
         pad_control_sv.write("endmodule\n")
         pad_control_sv.close()
@@ -719,27 +782,14 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("    // connect io\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
-                pad_frame_sv.write("    `ifndef PULP_FPGA_EMUL\n")
                 if sysio[sysionames[ionum][:-2]] == 'output':
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I(%s), .O(void1), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                else:
-                    pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(1'b0), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                pad_frame_sv.write("    `else\n")
-                if sysio[sysionames[ionum][:-2]] == 'output':
-                    pad_frame_sv.write("      assign io[%d] = %s;\n" %(ionum, sysionames[ionum]))
+                    pad_frame_sv.write("      assign io_out_i[%d] = %s;\n" %(ionum, sysionames[ionum]))
                 elif sysio[sysionames[ionum][:-2]] == 'input':
-                    pad_frame_sv.write("      assign %s = io[%d];\n" % (sysionames[ionum], ionum))
-                elif sysio[sysionames[ionum][:-2]] == 'snoop':
-                    pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
-                        (ionum, ionum, ionum, ionum, ionum, ionum))
                     pad_frame_sv.write("      assign %s = io_in_o[%d];\n" % (sysionames[ionum], ionum))
-                else:
-                    print("ERROR: unknown sysio type '%s'" % sysio[sysionames[ionum][:-2]])
-                    error_count = error_count + 1
-                pad_frame_sv.write("    `endif\n")
-            else:
-                pad_frame_sv.write("    pad_functional_pu i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
-                    (ionum, ionum, ionum, ionum, ionum, ionum))
+                elif sysio[sysionames[ionum][:-2]] == 'snoop':
+                    pad_frame_sv.write("      assign %s = io_in_o[%d];\n" % (sysionames[ionum], ionum))
+            pad_frame_sv.write("    pad_functional_pd i_pad_%d   (.OEN(~io_oe_i[%d]), .I(io_out_i[%d]), .O(io_in_o[%d]), .PAD(io[%d]), .PEN(~pad_cfg_i[%d][0]));\n" %\
+            (ionum, ionum, ionum, ionum, ionum, ionum))
         pad_frame_sv.write("\n")
         pad_frame_sv.write("endmodule\n")
 
@@ -763,64 +813,59 @@ if args.pad_frame_sv != None:
 #           0x1 enable? pullup
 #
 ################################################
-if args.pad_frame_gf22_sv != None:
-    with open(args.pad_frame_gf22_sv, 'w') as pad_frame_sv:
+if args.core_v_mcu_gf22fdx_sv != None:
+    with open(args.core_v_mcu_gf22fdx_sv, 'w') as gf22fdx_sv:
         #
         # Write Apache license and header
         #
-        pad_frame_sv.write("//-----------------------------------------------------\n")
-        pad_frame_sv.write("// This is a generated file\n")
-        pad_frame_sv.write("//-----------------------------------------------------\n")
-        pad_frame_sv.write("// Copyright 2018 ETH Zurich and University of bologna.\n")
-        pad_frame_sv.write("// Copyright and related rights are licensed under the Solderpad Hardware\n")
-        pad_frame_sv.write("// License, Version 0.51 (the \"License\"); you may not use this file except in\n")
-        pad_frame_sv.write("// compliance with the License.  You may obtain a copy of the License at\n")
-        pad_frame_sv.write("// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law\n")
-        pad_frame_sv.write("// or agreed to in writing, software, hardware and materials distributed under\n")
-        pad_frame_sv.write("// this License is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR\n")
-        pad_frame_sv.write("// CONDITIONS OF ANY KIND, either express or implied. See the License for the\n")
-        pad_frame_sv.write("// specific language governing permissions and limitations under the License.\n")
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("`define DRV_SIG   .NDIN(1'b0), .NDOUT(), .DRV(2'b10), .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
-        pad_frame_sv.write("`define DRV_SIG_I .NDIN(1'b0), .NDOUT(),              .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("`include \"pulp_soc_defines.sv\"\n")
-        pad_frame_sv.write("\n")
+        gf22fdx_sv.write("//-----------------------------------------------------\n")
+        gf22fdx_sv.write("// This is a generated file\n")
+        gf22fdx_sv.write("//-----------------------------------------------------\n")
+        gf22fdx_sv.write("// Copyright 2021QuickLogic.\n")
+        gf22fdx_sv.write("// Copyright 2021 QuickLogic\n")
+        gf22fdx_sv.write("// Solderpad Hardware License, Version 2.1, see LICENSE.md for details.")
+        gf22fdx_sv.write("// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1")
+        gf22fdx_sv.write("\n")
+        gf22fdx_sv.write("`define DRV_SIG   .NDIN(1'b0), .NDOUT(), .DRV(2'b10), .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
+        gf22fdx_sv.write("`define DRV_SIG_I .NDIN(1'b0), .NDOUT(),              .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
+        gf22fdx_sv.write("\n")
+        gf22fdx_sv.write("`include \"pulp_soc_defines.sv\"\n")
+        gf22fdx_sv.write("\n")
 
-        pad_frame_sv.write("module pad_frame_gf22(\n")
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("    input logic [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_i,\n")
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("    // sysio signals\n")
-        for ioname in sysio:
-            if ioname != '':
-                pad_frame_sv.write("    %s logic %s_%s,\n" %('output' if (sysio[ioname] == 'input' or sysio[ioname] == 'snoop') else 'input ', ioname, "o" if (sysio[ioname] == 'input' or sysio[ioname] == 'snoop') else "i"))
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("    // internal io signals\n")
-        pad_frame_sv.write("    input  logic [`N_IO-1:0] io_out_i,  // data going to pads\n")
-        pad_frame_sv.write("    input  logic [`N_IO-1:0] io_oe_i,   // enable going to pads\n")
-        pad_frame_sv.write("    output logic [`N_IO-1:0] io_in_o,   // data coming from pads\n")
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("    // pad signals\n")
-        pad_frame_sv.write("    inout  wire [`N_IO-1:0] io\n")
-        pad_frame_sv.write("    );\n")
+        gf22fdx_sv.write("module core_v_mcu_gf22fdx(\n")
+        gf22fdx_sv.write("\n")
+        gf22fdx_sv.write("  // pad signals\n")
+        gf22fdx_sv.write("  inout  wire [`N_IO-1:0] io\n")
+        gf22fdx_sv.write("  );\n")
 
-        pad_frame_sv.write("    // connect io\n")
+        gf22fdx_sv.write("  // define signals\n")
+        gf22fdx_sv.write("  wire [`N_IO-1:0] s_io_out;\n")
+        gf22fdx_sv.write("  wire [`N_IO-1:0] s_io_oe;\n")
+        gf22fdx_sv.write("  wire [`N_IO-1:0] s_io_in;\n")
+        gf22fdx_sv.write("  wire [`N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;\n")
+
+        gf22fdx_sv.write("  // connect io\n")
         for ionum in range(N_IO):
-            if sysionames[ionum] != -1:
-                if sysio[sysionames[ionum][:-2]] == 'output':
-                    # pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I( ), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                    pad_frame_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b0), .DATA(%s), .RXEN(1'b0), .Y(), .PAD(io[%d]), .PDEN(~pad_cfg_i[%d][0]), .PUEN(~pad_cfg_i[%d][1]), `DRV_SIG );;\n" %\
-                        ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
-                else:
-                    # pad_frame_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O( ), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                    pad_frame_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b1), .DATA(), .RXEN(1'b1), .Y(%s), .PAD(io[%d]), .PDEN(~pad_cfg_i[%d][0]), .PUEN(~pad_cfg_i[%d][1]), `DRV_SIG );;\n" %\
-                        ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
-            else:
-                pad_frame_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~io_oe_i[%d]), .DATA(io_out_i[%d]), .RXEN(~io_out_i[%d]), .Y(io_in_o[%d]), .PAD(io[%d]), .PDEN(~pad_cfg_i[%d][0]), .PUEN(~pad_cfg_i[%d][1]), `DRV_SIG );;\n" %\
-                    ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
-        pad_frame_sv.write("\n")
-        pad_frame_sv.write("endmodule\n")
+            # if sysionames[ionum] != -1:
+                # if sysio[sysionames[ionum][:-2]] == 'output':
+                    # # gf22fdx_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I( ), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    # gf22fdx_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b0), .DATA(%s), .RXEN(1'b0), .Y(), .PAD(io[%d]), .PDEN(~pad_cfg_o[%d][0]), .PUEN(~pad_cfg_o[%d][1]), `DRV_SIG );;\n" %\
+                        # ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
+                # else:
+                    # # gf22fdx_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O( ), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
+                    # gf22fdx_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b1), .DATA(), .RXEN(1'b1), .Y(%s), .PAD(io[%d]), .PDEN(~pad_cfg_o[%d][0]), .PUEN(~pad_cfg_o[%d][1]), `DRV_SIG );;\n" %\
+                        # ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
+            # else:
+            gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d]), .DATA(s_io_out[%d]), .RXEN(~s_io_out[%d]), .Y(s_io_in[%d]), .PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" %\
+                ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
+        gf22fdx_sv.write("\n")
+        gf22fdx_sv.write("  core_v_mcu i_core_v_mcu (\n")
+        gf22fdx_sv.write("    .io_out_o(s_io_out),\n")
+        gf22fdx_sv.write("    .io_oe_o(s_io_oe),\n")
+        gf22fdx_sv.write("    .io_in_i(s_io_in),\n")
+        gf22fdx_sv.write("    .pad_cfg_o(s_pad_cfg)\n")
+        gf22fdx_sv.write("  );\n")
+        gf22fdx_sv.write("endmodule\n")
 
 ################################################
 #
@@ -856,44 +901,55 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
         x_sv.write("  );\n")
         x_sv.write("\n")
-        x_sv.write("  wire [`N_IO-1:0]  s_io;\n")
+        x_sv.write("  wire [`N_IO-1:0]  s_io_out;\n")
+        x_sv.write("  wire [`N_IO-1:0]  s_io_oe;\n")
+        x_sv.write("  wire [`N_IO-1:0]  s_io_in;\n")
+        x_sv.write("  wire [`N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;\n")
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                 x_sv.write("  wire s_%s;\n" %(sysionames[ionum][:-2]))
         x_sv.write("\n")
 
         ionum_start = 0
         ionum_end = -1
         for ionum in range(N_IO):
-            if sysionames[ionum] != "ref_clk_o" and  sysionames[ionum] != "jtag_tck_o":
-                ionum_end = ionum
+            if sysionames[ionum] != "ref_clk_i" and  sysionames[ionum] != "jtag_tck_i" and sysionames[ionum] != "jtag_tdo_o" :
+                x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
+                    (ionum, ionum, ionum, ionum, ionum, ionum))
             else:                       # break in sequence
-                if ionum_end >= 0:
-                    x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
-                ionum_start = ionum+1
-                ionum_end = -1
-                if sysionames[ionum] == "ref_clk_o":
+                if sysionames[ionum] == "jtag_tdo_o" :
+                    x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_jtag_tdo), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
+                    (ionum, ionum, ionum, ionum, ionum))
+                if sysionames[ionum] == "ref_clk_i":
                     x_sv.write("  // Input clock buffer\n")
                     x_sv.write("  IBUFG #(\n")
                     x_sv.write("    .IOSTANDARD(\"LVCMOS33\"),\n")
                     x_sv.write("    .IBUF_LOW_PWR(\"FALSE\")\n")
                     x_sv.write("  ) i_sysclk_iobuf (\n")
-                    x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("ref_clk_o"))
-                    x_sv.write("    .O(s_io[%d])\n" % sysionames.index("ref_clk_o"))
+                    x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("ref_clk_i"))
+                    x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("ref_clk_i"))
                     x_sv.write("  );\n\n")
-                if sysionames[ionum] == "jtag_tck_o":
+                if sysionames[ionum] == "jtag_tck_i":
                     x_sv.write("  //JTAG TCK clock buffer (dedicated route is false in constraints)\n")
                     x_sv.write("  IBUF i_tck_iobuf (\n")
-                    x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("jtag_tck_o"))
-                    x_sv.write("    .O(s_io[%d])\n" % sysionames.index("jtag_tck_o"))
+                    x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("jtag_tck_i"))
+                    x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("jtag_tck_i"))
                     x_sv.write("  );\n\n")
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                if sysio[sysionames[ionum][:-2]] == 'input':
+                    x_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
+                elif sysio[sysionames[ionum][:-2]] == 'snoop':
+                    x_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
+        x_sv.write("  core_v_mcu i_core_v_mcu (\n")
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                 x_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
 
-        # print remaining connections, if any
-        if ionum_end != -1:
-            x_sv.write("  assign s_io[%d:%d] = xilinx_io[%d:%d];\n\n" % (ionum_end, ionum_start, ionum_end, ionum_start))
-
-        x_sv.write("  core_v_mcu #(\n")
-        x_sv.write("    .USE_FPU(`USE_FPU),\n")
-        x_sv.write("    .USE_HWPE(`USE_HWPE)\n")
-        x_sv.write("  ) i_core_v_mcu (\n")
-        x_sv.write("    .io(s_io)\n")
+        x_sv.write("    .io_out_o(s_io_out),\n")
+        x_sv.write("    .io_oe_o(s_io_oe),\n")
+        x_sv.write("    .io_in_i(s_io_in),\n")
+        x_sv.write("    .pad_cfg_o(s_pad_cfg)\n")
         x_sv.write("  );\n")
         x_sv.write("endmodule\n")
 

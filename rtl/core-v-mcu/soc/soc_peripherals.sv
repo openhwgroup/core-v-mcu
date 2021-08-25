@@ -24,7 +24,6 @@ module soc_peripherals #(
     input logic [5:0] fpga_clk_in,
     input logic       rst_ni,
     input logic       ref_clk_i,
-    input logic       slow_clk_i,
 
     input  logic                 sel_fll_clk_i,
     input  logic                 dft_test_mode_i,
@@ -218,7 +217,7 @@ module soc_peripherals #(
       .clk_i   (clk_i),
       .rstn_i  (rst_ni),
       .en_i    (1'b1),
-      .serial_i(slow_clk_i),
+      .serial_i(ref_clk_i),
       .r_edge_o(s_ref_rise_event),
       .f_edge_o(s_ref_fall_event),
       .serial_o()
@@ -500,7 +499,7 @@ module soc_peripherals #(
       .PREADY (s_adv_timer_bus.pready),
       .PSLVERR(s_adv_timer_bus.pslverr),
 
-      .low_speed_clk_i(slow_clk_i),
+      .low_speed_clk_i(ref_clk_i),
       .ext_sig_i      (s_gpio_sync),
 
       .events_o(s_adv_timer_events),
@@ -543,7 +542,7 @@ module soc_peripherals #(
       .PREADY (s_soc_evnt_gen_bus.pready),
       .PSLVERR(s_soc_evnt_gen_bus.pslverr),
 
-      .low_speed_clk_i   (slow_clk_i),
+      .low_speed_clk_i   (ref_clk_i),
       .timer_event_lo_o  (s_timer_in_lo_event),
       .timer_event_hi_o  (s_timer_in_hi_event),
       .per_events_i      (s_events),
@@ -582,7 +581,7 @@ module soc_peripherals #(
       .PRDATA     (s_apb_timer_bus.prdata),
       .PREADY     (s_apb_timer_bus.pready),
       .PSLVERR    (s_apb_timer_bus.pslverr),
-      .ref_clk_i  (slow_clk_i),
+      .ref_clk_i  (ref_clk_i),
       .event_lo_i (s_timer_in_lo_event),
       .event_hi_i (s_timer_in_hi_event),
       .irq_lo_o   (s_timer_lo_event),

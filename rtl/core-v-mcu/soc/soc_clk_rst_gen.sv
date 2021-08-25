@@ -13,6 +13,7 @@
 
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,
+    input               sclk_in,
     input  logic        test_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
@@ -231,7 +232,7 @@ module soc_clk_rst_gen (
   // (e.g. 200MHz for genesys2 board).
 
   fpga_clk_gen i_fpga_clk_gen (
-      .ref_clk_i,
+      .ref_clk_i(sclk_in),
       .rstn_glob_i,
       .test_mode_i,
       .shift_enable_i,
