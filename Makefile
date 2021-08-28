@@ -53,13 +53,6 @@ lint:
 
 .PHONY:sim
 sim:
-	ln -f  tb/mem_init_files/col0.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i
-	ln -f  tb/mem_init_files/col1.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i
-	ln -f  tb/mem_init_files/col2.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i
-	ln -f  tb/mem_init_files/col3.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i
-	ln -f  tb/mem_init_files/privateBank0.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i
-	ln -f  tb/mem_init_files/privateBank1.mem build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i
-	ln -f  tb/mem_init_files/cli_sim.txt build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/cli_sim.txt
 	ln -f  tb/wave.do build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/wave.do
 	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run-gui) 2>&1 | tee sim.log
 

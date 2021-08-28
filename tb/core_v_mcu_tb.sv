@@ -63,7 +63,7 @@ module core_v_mcu_tb;
    initial uart_clk = 0;
    initial forever #(BAUD_CLK_PERIOD/2) uart_clk=~uart_clk;
 
-   GD25Q128B # (.initfile("cli_sim.txt")) 
+   GD25Q128B # (.initfile("mem_init/cli.txt")) 
    qspi (
 	 .sclk(io_out_o[16]),
 	 .si(io_out_o[14]),
