@@ -538,7 +538,7 @@ module soc_domain
   assign s_soc_rstn = !(!s_rstn_glob | s_wd_expired | s_periph_rst);
 
   soc_clk_rst_gen i_clk_rst_gen (
-      .ref_clk_i    (ref_clk_in),
+      .ref_clk_i    (ref_clk_i),
       .sclk_in      (sclk_in),
       .emul_clk     (emul_clk),
       .test_clk_i   (test_clk_i),

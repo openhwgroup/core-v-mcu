@@ -95,6 +95,22 @@ filesets:
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
+  rom_init:
+    files:
+    - tb/mem_init_files/boot.mem : {copyto : mem_init/boot.mem}
+    file_type : mem
+
+  mem_init:
+    files:
+ #   - tb/mem_init_files/cli.txt : {copyto : mem_init/cli.txt}
+ #   - tb/mem_init_files/col0.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.mem }
+ #   - tb/mem_init_files/col1.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.mem }
+ #   - tb/mem_init_files/col2.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.mem }
+ #   - tb/mem_init_files/col3.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.mem }
+ #   - tb/mem_init_files/privateBank0.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.mem }
+ #   - tb/mem_init_files/privateBank1.mem : {copyto : mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.mem }
+    file_type: mem
+
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
@@ -155,12 +171,26 @@ parameters:
     datatype: bool
     paramtype: vlogdefine
     default: true
+  VERILATOR:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+# A script to modify Verilator pre-build to generate a library, not an
+# executable.
+scripts:
+  pre_build_scripts:
+    cmd:
+    - sh
+    - ../src/openhwgroup.org_systems_core-v-mcu_0/rtl/core-v-mcu/scripts/vedit.sh
+    - openhwgroup.org_systems_core-v-mcu_0.vc
 
 targets:
   default: &default_target
     filesets:
     - files_rtl_generic
     - target_lint? (rtl-behavioral)
+    - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -168,6 +198,7 @@ targets:
     default_tool: modelsim
     filesets_append:
     - simulation-rtl
+    - mem_init
     - rtl-behavioral
     - tb-rtl
     toplevel:
@@ -186,9 +217,12 @@ targets:
   model-lib:
     <<: *default_target
     default_tool: verilator
+    parameters:
+    - VERILATOR=true
     filesets_append:
     - pre_build_scripts
     - verilator-waiver
+    - mem_init
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
@@ -222,6 +256,7 @@ targets:
     - nexys-rtl
     - nexys-cfg
     - nexys-xdc
+    - rom_init
     tools:
       vivado:
         part: xc7a100tcsg324-1

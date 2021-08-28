@@ -43,6 +43,11 @@ clean:
 	(cd docs; make clean)
 	(cd sw; make clean)
 
+.PHONY: model-lib
+model-lib:
+	fusesoc --cores-root . run --target=model-lib --setup \
+		--build openhwgroup.org:systems:core-v-mcu | tee model-lib.log
+
 lint:
 	fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 
