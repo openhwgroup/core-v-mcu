@@ -10,6 +10,7 @@
 
 `include "pulp_soc_defines.sv"
 `include "pulp_peripheral_defines.svh"
+`include "periph_bus_defines.svh"
 
 `define REG_INFO 12'h00  //BASEADDR+0x00 Cores [31:16] and Clusters [15:0]
 `define REG_FCBOOT 12'h04 //BASEADDR+0x04 not used at the moment
@@ -77,6 +78,7 @@ module apb_soc_ctrl #(
     input        [ 7:0] version,
     input               ref_clk_i,
     input               stoptimer_i,
+    input               dmactive_i,
     output logic        wd_expired_o,
     output logic [31:0] control_in,
 
@@ -306,7 +308,7 @@ module apb_soc_ctrl #(
             `REG_INFO: PRDATA <= {n_cores, n_clusters};
             `REG_BUILD_DATE: PRDATA <= `BUILD_DATE;
             `REG_BUILD_TIME: PRDATA <= `BUILD_TIME;
-            `REG_BOOTSEL: PRDATA <= {bootsel_i, 29'h0, r_bootsel};
+            `REG_BOOTSEL: PRDATA <= {dmactive_i, bootsel_i, 28'h0, r_bootsel};
             `REG_CLKSEL: PRDATA <= {31'h0, sel_fll_clk_i};
             `REG_JTAGREG: PRDATA <= {16'h0, r_jtag_regi_sync[0], r_jtag_rego};
             `REG_WD_COUNT: PRDATA <= {1'b0, wd_count};
@@ -340,7 +342,7 @@ module apb_soc_ctrl #(
 
   always_ff @(posedge HCLK, negedge HRESETn) begin
     if (~HRESETn) begin
-      r_bootsel <= {1'b0, bootsel_i};
+      r_bootsel <= {dmactive_i, bootsel_i};
     end else begin
       r_bootsel <= r_bootsel;
     end

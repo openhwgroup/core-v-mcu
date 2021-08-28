@@ -14,6 +14,7 @@
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,
     input               sclk_in,
+    input               emul_clk,
     input  logic        test_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
@@ -125,8 +126,13 @@ module soc_clk_rst_gen (
   assign s_clk_cluster = s_clk_fll_cluster;
   assign s_clk_per     = s_clk_fll_per;
 `else
+`ifdef VERILATOR
+  assign s_clk_fll_soc = ref_clk_i;
+  assign s_clk_fll_per = ref_clk_i;
+  assign s_clk_fll_cluster = ref_clk_i;
+`else
   gf22_FLL i_fll_soc (
-      .FLLCLK(s_clk_fll_soc),
+      xxx.FLLCLK (s_clk_fll_soc),
       .FLLOE (1'b1),
       .REFCLK(ref_clk_i),
       .LOCK  (soc_fll_slave_lock_o),
@@ -190,7 +196,7 @@ module soc_clk_rst_gen (
       .JTD   (1'b0),  //TO FIX DFT
       .JTQ   ()  //TO FIX DFT
   );
-
+`endif
   pulp_clock_mux2 clk_mux_fll_soc_i (
 `ifdef TEST_FLL
       .clk0_i   (1'bz),
@@ -263,7 +269,7 @@ module soc_clk_rst_gen (
   );
 
   assign s_clk_soc     = s_clk_fll_soc;
-  assign s_clk_cluster = s_clk_fll_cluster;
+  assign s_clk_cluster = emul_clk;
   assign s_clk_per     = s_clk_fll_per;
 
 `endif

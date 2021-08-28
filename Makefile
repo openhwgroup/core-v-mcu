@@ -6,16 +6,16 @@ YML=$(shell find . -name '*.yml' -print)
 
 IOSCRIPT=rtl/includes/pulp_soc_defines.sv
 IOSCRIPT+=rtl/includes/pulp_peripheral_defines.svh
-IOSCRIPT+=rtl/includes/periph_bus_defines.sv
+IOSCRIPT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT+=pin-table.csv
 IOSCRIPT+=perdef.json
 #IOSCRIPT+=emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
 IOSCRIPT+=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
-IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
+#IOSCRIPT_OUT+=rtl/core-v-mcu/top/pad_frame.sv
 IOSCRIPT_OUT+=rtl/includes/pulp_peripheral_defines.svh
-IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.sv
+IOSCRIPT_OUT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT_OUT+=emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 IOSCRIPT_OUT+=core-v-mcu-config.h
 
@@ -35,29 +35,33 @@ help:
 			@echo "sim:            run Questa sim"
 			@echo "clean:          remove generated files"
 
-all:		${IOSCRIPT_OUT} docs sw
+all:	${IOSCRIPT_OUT} docs sw
 
-src:		${IOSCRIPT_OUT}
+src:	${IOSCRIPT_OUT}
 
 clean:
-				(cd docs; make clean)
-				(cd sw; make clean)
+	(cd docs; make clean)
+	(cd sw; make clean)
 
 .PHONY: model-lib
 model-lib:
 	fusesoc --cores-root . run --target=model-lib --setup \
 		--build openhwgroup.org:systems:core-v-mcu | tee model-lib.log
 
-
 lint:
-				fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+	fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
 
 .PHONY:sim
 sim:
-				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+	ln -f  tb/wave.do build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim/wave.do
+	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run-gui) 2>&1 | tee sim.log
+
 .PHONY:buildsim
 buildsim:
-				fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+	fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+
+
 
 nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*************************************"
@@ -104,11 +108,10 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.sv\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
-					--periph-bus-defines rtl/includes/periph_bus_defines.sv\
+					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
-					--pad-frame-sv rtl/core-v-mcu/top/pad_frame.sv\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
@@ -121,6 +124,9 @@ bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 download0:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
+
 download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
+				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
+

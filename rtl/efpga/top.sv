@@ -303,7 +303,7 @@ module top (
   assign m1_m0_sat = m1_m0_control[18];
   assign m1_m0_reset = m1_m0_control[31];
 
-  assign m1_m1_outsel = m0_m0_control[5:0];
+  assign m1_m1_outsel = m1_m1_control[5:0];
   assign m1_m1_tc = m1_m1_control[6];
   assign m1_m1_mode = m1_m1_control[13:12];
   assign m1_m1_osel = m1_m1_control[14];
