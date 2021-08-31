@@ -125,6 +125,9 @@ If your changes introduce any Verilator errors, you either need to fix these, or
 
 This will create the Verilator library `Vcore_v_mcu_wrapper__ALL.a` in `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/obj_dir`.
 
+Note that when you use this library to build an application you will need to
+ensure that the directory `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/mem_init` is either symbolically linked or copied to the directory where the application will run. The model will load ROM images from this directory.
+
 ### Verilator lint check
 
 The system will run
