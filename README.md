@@ -54,6 +54,7 @@ Extra note for building on ubuntu - Vivado tools from Xilinx may require a large
 The swap size can be increased by searching for "increase swapfile in ubuntu" and add your release.
 
 ## Building documentation
+
 ```
 $ make docs
 ```
@@ -72,14 +73,15 @@ CORE-V MCU are documented in the [PULP Platform Debug
 Unit](https://github.com/pulp-platform/riscv-dbg).
 
 ## Building C header files
+
 ```
 $ make sw
 ```
 The resulting header files are located in ./sw
 
 ## Running Modelsim/Questasim
-```
 
+```
 $ make buildsim sim
 ```
 The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and then 'make sim' runs the simulation.
