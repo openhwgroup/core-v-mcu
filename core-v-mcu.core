@@ -40,7 +40,7 @@ filesets:
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
-    - rtl/includes/periph_bus_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
@@ -52,6 +52,7 @@ filesets:
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
+    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
@@ -75,8 +76,8 @@ filesets:
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ctl.sv
     - rtl/core-v-mcu/efpga_subsystem/A2_fifo_ram.sv
     - rtl/core-v-mcu/efpga_subsystem/tcdm_interface.sv
+    - rtl/core-v-mcu/efpga_subsystem/apbt1_interface.sv
     - rtl/core-v-mcu/top/pad_control.sv
-    - rtl/core-v-mcu/top/pad_frame.sv
     - rtl/core-v-mcu/top/safe_domain.sv
     - rtl/core-v-mcu/top/soc_domain.sv
     - rtl/core-v-mcu/top/core_v_mcu.sv
@@ -90,7 +91,40 @@ filesets:
   simulation-rtl:
     files:
     - tb/sim_clk_gen.sv
+    - tb/uartdpi/uartdpi.sv
+    - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
+
+  rom_init:
+    files:
+    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    file_type: mem
+
+
+  mem_init_modelsim:
+    files:
+    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.mem}
+    file_type: user
+
+  mem_init_verilator:
+    files:
+    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.mem}
+    file_type: user
+
 
   tb-rtl:
     files:
@@ -103,7 +137,6 @@ filesets:
     - pulp-platform.org::tech_cells_xilinx
     files:
     - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - emulation/xilinx/rtl/fpga_bootrom.sv
     - emulation/xilinx/rtl/fpga_clk_gen.sv
     - emulation/xilinx/rtl/fpga_interleaved_ram.sv
     - emulation/xilinx/rtl/fpga_private_ram.sv
@@ -148,14 +181,12 @@ filesets:
     - rtl/core-v-mcu/verilator.waiver
     file_type: vlt
 
-  # Verilator wrapper
-  verilator_wrapper:
-    files:
-    - rtl/core-v-mcu/top/core_v_mcu_wrapper.sv
-    file_type: systemVerilogSource
-
 parameters:
   PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+  VERILATOR:
     datatype: bool
     paramtype: vlogdefine
     default: true
@@ -182,6 +213,7 @@ targets:
     default_tool: modelsim
     filesets_append:
     - simulation-rtl
+    - mem_init_modelsim
     - rtl-behavioral
     - tb-rtl
     toplevel:
@@ -192,8 +224,7 @@ targets:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
-        - -voptargs="-O1"
-
+        - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
@@ -201,11 +232,13 @@ targets:
   model-lib:
     <<: *default_target
     default_tool: verilator
+    parameters:
+    - VERILATOR=true
     filesets_append:
     - pre_build_scripts
-    - verilator_wrapper
     - verilator-waiver
-    toplevel: [core_v_mcu_wrapper]
+    - mem_init_verilator
+    toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
     tools:
@@ -238,6 +271,7 @@ targets:
     - nexys-rtl
     - nexys-cfg
     - nexys-xdc
+    - rom_init
     tools:
       vivado:
         part: xc7a100tcsg324-1

@@ -20,7 +20,7 @@
 // language governing permissions and limitations under the License.
 // -----------------------------------------------------------------------------
 
-module fpga_interleaved_ram
+module core_v_mcu_interleaved_ram
   #(
     parameter ADDR_WIDTH=12
     ) (
@@ -54,4 +54,4 @@ module fpga_interleaved_ram
      .douta(rdata_o)
      );
 
-endmodule : fpga_interleaved_ram
+endmodule : core_v_mcu_interleaved_ram

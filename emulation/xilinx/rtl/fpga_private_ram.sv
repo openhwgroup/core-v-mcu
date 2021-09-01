@@ -20,7 +20,7 @@
 // language governing permissions and limitations under the License.
 // -----------------------------------------------------------------------------
 
-module fpga_private_ram
+module core_v_mcu_private_ram
   #(
     parameter ADDR_WIDTH=12
     ) (
@@ -54,4 +54,4 @@ module fpga_private_ram
      .douta(rdata_o)
      );
 
-endmodule : fpga_private_ram
+endmodule : core_v_mcu_private_ram

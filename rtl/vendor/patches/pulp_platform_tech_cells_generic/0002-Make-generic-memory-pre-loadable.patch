@@ -20,7 +20,7 @@ index 8a1a390..071a9ee 100644
 +
 +   initial begin
 +      $display("%m");
-+      $sformatf(s, "%m");
++      s = $sformatf("mem_init/%m.mem");
 +      $readmemh(s, MEM);
 +   end
 

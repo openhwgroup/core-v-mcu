@@ -15,7 +15,18 @@ module core_v_mcu #(
     parameter USE_FPU  = 1,
     parameter USE_HWPE = 1
 ) (
-    inout wire [`N_IO-1:0] io
+    input                                jtag_tck_i,
+    input                                jtag_tdi_i,
+    output                               jtag_tdo_o,
+    input                                jtag_tms_i,
+    input                                jtag_trst_i,
+    input                                ref_clk_i,
+    input                                rstn_i,
+    input                                bootsel_i,
+    input  [`N_IO-1:0]                   io_in_i,
+    output [`N_IO-1:0]                   io_out_o,
+    output [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
+    output [`N_IO-1:0]                   io_oe_o
 );
 
   localparam AXI_ADDR_WIDTH = 32;
@@ -37,11 +48,11 @@ module core_v_mcu #(
   // PAD FRAME TO PAD CONTROL SIGNALS
   //
 
-  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;
+  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;
 
-  logic [       `N_IO-1:0]                   s_io_out;
-  logic [       `N_IO-1:0]                   s_io_oe;
-  logic [       `N_IO-1:0]                   s_io_in;
+  //  logic [       `N_IO-1:0]                   s_io_out;
+  //  logic [       `N_IO-1:0]                   s_io_oe;
+  //  logic [       `N_IO-1:0]                   s_io_in;
 
 
   //
@@ -49,6 +60,7 @@ module core_v_mcu #(
   //
 
   logic                                      s_ref_clk;
+  logic                                      s_clk_in;  // clock in from pad
   logic                                      s_rstn;
   logic                                      s_pad_rstn;
 
@@ -192,7 +204,7 @@ module core_v_mcu #(
   logic                                      s_dma_pe_irq_valid;
 
   logic [       `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
-  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
+  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
   logic [             1:0]                   s_selected_pad_mode;
 
   logic [             5:0]                   efpga_test_M;
@@ -238,7 +250,7 @@ module core_v_mcu #(
   logic [BUFFER_WIDTH-1:0]                   s_event_writetoken;
   logic [BUFFER_WIDTH-1:0]                   s_event_readpointer;
   logic [ EVENT_WIDTH-1:0]                   s_event_dataasync;
-  logic                                      s_wd_expired;
+
 
 
 
@@ -248,11 +260,11 @@ module core_v_mcu #(
   logic                                      s_bootsel;
   logic                                      debug1;
   logic                                      debug0;
-
+  /*
 `ifdef VERILATOR
   logic [`N_IO-1:0] io_pos;
 
-  assign s_ref_clk = io[6];
+  assign s_clk_in = io[6];
   assign s_rstn = (io[6] == 1) ? io[7] : io_pos[7];
   assign s_jtag_tck = (io[6] == 1) ? io[8] : io_pos[8];
   assign s_jtag_tdi = (io[6] == 1) ? io[9] : io_pos[9];
@@ -272,7 +284,7 @@ module core_v_mcu #(
       .pad_cfg_i(s_pad_cfg),
       .bootsel_o(s_bootsel),
 
-      .ref_clk_o  (s_ref_clk),
+      .ref_clk_o  (s_clk_in),
       .rstn_o     (s_pad_rstn),
       .jtag_tdo_i (s_jtag_tdo),
       .jtag_tck_o (s_jtag_tck),
@@ -289,7 +301,7 @@ module core_v_mcu #(
       .io(io)  // pad wires
   );
 `endif
-
+*/
   //
   // SAFE DOMAIN
   //
@@ -298,11 +310,11 @@ module core_v_mcu #(
       .FLL_ADDR_WIDTH(2)
   ) i_safe_domain (
 
-      .ref_clk_i  (s_ref_clk),
-      .slow_clk_o (s_slow_clk),
+      .ref_clk_i  (ref_clk_i),
+      .slow_clk_o (s_ref_clk),
       .efpga_clk_o(s_efpga_clk),
-      .bootsel_i  (s_bootsel),
-      .rst_ni     (s_rstn),
+      .bootsel_i  (bootsel_i),
+      .rst_ni     (rstn_i),
       .rst_no     (s_rstn_por),
 
       .test_clk_o     (s_test_clk),
@@ -310,13 +322,13 @@ module core_v_mcu #(
       .mode_select_o  (s_mode_select),
       .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
-      .pad_cfg_o      (s_pad_cfg),
-      .pad_cfg_i      (s_pad_cfg_soc),
+      //      .pad_cfg_o      (s_pad_cfg),
+      //      .pad_cfg_i      (s_pad_cfg_soc),
       .pad_mux_i      (s_pad_mux_soc),
       // IO signals
-      .io_out_o       (s_io_out),
-      .io_in_i        (s_io_in),
-      .io_oe_o        (s_io_oe),
+      .io_out_o       (io_out_o),
+      .io_in_i        (io_in_i),
+      .io_oe_o        (io_oe_o),
       // PERIO signals
       .perio_out_i    (s_perio_out),
       .perio_in_o     (s_perio_in),
@@ -349,15 +361,16 @@ module core_v_mcu #(
       .BUFFER_WIDTH      (BUFFER_WIDTH),
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
-      .ref_clk_i  (s_ref_clk),
-      .slow_clk_i (s_slow_clk),
-      .test_clk_i (s_test_clk),
+      .ref_clk_i(s_ref_clk),
+      .sclk_in(ref_clk_i),
+      .emul_clk(s_efpga_clk),
+      .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
       .dft_test_mode_i(s_test_mode),
       .dft_cg_enable_i(s_dft_cg_enable),
       .mode_select_i(s_mode_select),
-      .bootsel_i(s_bootsel),
+      .bootsel_i(bootsel_i),
 
       .data_slave_aw_writetoken_i('0),
       .data_slave_aw_addr_i('0),
@@ -451,14 +464,13 @@ module core_v_mcu #(
       .data_master_b_readpointer_o(),
 
 
-      .jtag_tck_i  (s_jtag_tck),
-      .jtag_trst_ni(s_jtag_trst),
-      .jtag_tms_i  (s_jtag_tms),
-      .jtag_tdi_i  (s_jtag_tdi),
-      .jtag_tdo_o  (s_jtag_tdo),
-      .wd_expired_o(s_wd_expired),
+      .jtag_tck_i  (jtag_tck_i),
+      .jtag_trst_ni(jtag_trst_i),
+      .jtag_tms_i  (jtag_tms_i),
+      .jtag_tdi_i  (jtag_tdi_i),
+      .jtag_tdo_o  (jtag_tdo_o),
       // Pad control signals
-      .pad_cfg_o   (s_pad_cfg_soc),
+      .pad_cfg_o   (pad_cfg_o),
       .pad_mux_o   (s_pad_mux_soc),
       // PERIO signals
       .perio_in_i  (s_perio_in),
@@ -473,7 +485,6 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-      .fpga_clk_in       ({s_fpgaio_in[5:2], s_slow_clk, s_efpga_clk}),
       .selected_mode_i   ('0),
       .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
       .dma_pe_evt_valid_i(s_dma_pe_evt_valid),

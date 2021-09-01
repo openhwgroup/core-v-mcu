@@ -3,7 +3,7 @@
 
 # CORE-V MCU
 
-> CORE-V MCU originated from PULPissimo and is currently in change to become a
+> CORE-V MCU originated from PULPissimo and is now a
 > stand-alone project within OpenHW Group independent from PULPIssimo.
 >
 > In case you should be interested to join the project please feel free to open
@@ -58,7 +58,7 @@ The swap size can be increased by searching for "increase swapfile in ubuntu" an
 ```
 $ make docs
 ```
-The resulting documents are accessed using file ./docs/_build/html/index.html
+The resulting documents are accessed using file ./docs/\_build/html/index.html
 
 ### Documentation of the Debug Unit
 
@@ -126,6 +126,9 @@ fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:sy
 If your changes introduce any Verilator errors, you either need to fix these, or, if appropriate, add a rule to ignore them to `rtl/core-v-mcu/verilator.waiver`.
 
 This will create the Verilator library `Vcore_v_mcu_wrapper__ALL.a` in `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/obj_dir`.
+
+Note that when you use this library to build an application you will need to
+ensure that the directory `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/mem_init` is either symbolically linked or copied to the directory where the application will run. The model will load ROM images from this directory.
 
 ### Verilator lint check
 

@@ -47,8 +47,9 @@ module soc_domain
 
 
     input logic ref_clk_i,
-    input logic slow_clk_i,
+    input logic sclk_in,
     input logic test_clk_i,
+    input logic emul_clk,
     input logic rstn_glob_i,
 
     input  logic                         dft_test_mode_i,
@@ -177,7 +178,7 @@ module soc_domain
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
     input  logic [          1:0] selected_mode_i,
-    input  logic [          5:0] fpga_clk_in,
+
 
     //eFPGA SPIS
     //    input  logic efpga_fcb_spis_rst_n_i,
@@ -189,7 +190,6 @@ module soc_domain
     //    output logic efpga_fcb_spis_miso_o,
 
 
-    output              wd_expired_o,
     //eFPGA TEST MODE
     input        [20:0] testio_i,
     output       [15:0] testio_o,
@@ -277,8 +277,10 @@ module soc_domain
   //***************** SIGNALS DECLARATION ******************
   //********************************************************
 
-  logic                                               s_stoptimer;
+  logic                                               s_dmactive;
 
+  logic                                               s_stoptimer;
+  logic                                               s_wd_expired;
   logic            [           1:0]                   s_fc_hwpe_events;
   logic            [          31:0]                   s_fc_events;
 
@@ -299,9 +301,10 @@ module soc_domain
   logic            [          31:0]                   s_fc_bootaddr;
 
   logic                                               s_periph_clk;
-  logic                                               s_periph_rstn;
+  logic                                               s_periph_rst;
   logic                                               s_soc_clk;
   logic                                               s_soc_rstn;
+  logic                                               s_rstn_glob;
   logic                                               s_sel_fll_clk;
 
   logic                                               s_dma_pe_evt;
@@ -440,8 +443,8 @@ module soc_domain
       .rst_ni         (s_soc_rstn),
       .sel_fll_clk_i  (s_sel_fll_clk),
       .ref_clk_i      (ref_clk_i),
-      .slow_clk_i     (slow_clk_i),
-      .wd_expired_o   (wd_expired_o),
+      .dmactive_i     (s_dmactive),
+      .wd_expired_o   (s_wd_expired),
       .dft_test_mode_i(dft_test_mode_i),
       .dft_cg_enable_i(1'b0),
 
@@ -492,7 +495,7 @@ module soc_domain
       .fpgaio_oe_o (fpgaio_oe_o),
 
       // other FPGA signals
-      .fpga_clk_in(fpga_clk_in),
+      .fpga_clk_in(s_cluster_clk),
 
 
       //eFPGA TEST MODE
@@ -532,14 +535,17 @@ module soc_domain
 
       .supervisor_mode_o(s_supervisor_mode)
   );
+  assign s_soc_rstn = !(!s_rstn_glob | s_wd_expired | s_periph_rst);
 
   soc_clk_rst_gen i_clk_rst_gen (
       .ref_clk_i    (ref_clk_i),
+      .sclk_in      (sclk_in),
+      .emul_clk     (emul_clk),
       .test_clk_i   (test_clk_i),
       .sel_fll_clk_i(s_sel_fll_clk),
 
       .rstn_glob_i        (rstn_glob_i),
-      .rstn_soc_sync_o    (s_soc_rstn),
+      .rstn_soc_sync_o    (s_rstn_glob),  // (s_soc_rstn),
       .rstn_cluster_sync_o(s_cluster_rstn),
 
       .clk_cluster_o (s_cluster_clk),
@@ -617,7 +623,7 @@ module soc_domain
       .IdcodeValue(`DMI_JTAG_IDCODE)
   ) i_dmi_jtag (
       .clk_i           (s_soc_clk),
-      .rst_ni          (s_soc_rstn),
+      .rst_ni          (rstn_glob_i),  //(s_soc_rstn),
       .testmode_i      (1'b0),
       .dmi_req_o       (jtag_dmi_req),
       .dmi_req_valid_o (jtag_req_valid),
@@ -652,10 +658,10 @@ module soc_domain
       .SelectableHarts(SELECTABLE_HARTS)
   ) i_dm_top (
       .clk_i        (s_soc_clk),
-      .rst_ni       (s_soc_rstn),
+      .rst_ni       (rstn_glob_i),  //(s_soc_rstn),
       .testmode_i   (1'b0),
-      .ndmreset_o   (),
-      .dmactive_o   (),  // active debug session
+      .ndmreset_o   (s_periph_rst),
+      .dmactive_o   (s_dmactive),  // active debug session
       .debug_req_o  (dm_debug_req),
       .unavailable_i(~SELECTABLE_HARTS),
       .hartinfo_i   (hartinfo),
@@ -676,7 +682,7 @@ module soc_domain
       .master_r_valid_i(s_lint_riscv_jtag_bus.r_valid),
       .master_r_rdata_i(s_lint_riscv_jtag_bus.r_rdata),
 
-      .dmi_rst_ni      (s_soc_rstn),
+      .dmi_rst_ni      (rstn_glob_i),  //(s_soc_rstn),
       .dmi_req_valid_i (jtag_req_valid),
       .dmi_req_ready_o (debug_req_ready),
       .dmi_req_i       (jtag_dmi_req),
