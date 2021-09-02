@@ -28,6 +28,9 @@ endif
 -include ../makefile.defs
 
 # Add inputs and outputs from these tool invocations to the build variables 
+SECONDARY_FLASH += \
+A2_boot.srec \
+
 
 # All Target
 all: A2_boot.elf secondary-outputs
@@ -41,16 +44,22 @@ A2_boot.elf: $(OBJS) $(USER_OBJS)
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
 
+A2_boot.srec: A2_boot.elf
+	@echo 'Invoking: GNU RISC-V Cross Create Flash Image'
+	-O srec "A2_boot.elf"  "A2_boot.srec"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(ASM_DEPS)$(S_UPPER_DEPS)$(C_DEPS) A2_boot.elf
+	-$(RM) $(OBJS)$(SECONDARY_FLASH)$(ASM_DEPS)$(S_UPPER_DEPS)$(C_DEPS) A2_boot.elf
 	-@echo ' '
 
 post-build:
-	-riscv32-corev-elf-objcopy -O srec "A2_boot.elf"  "A2_boot.srec";python3 ../srec2verilog.py -i ./A2_boot.srec -o ./a2_bootrom.sv -m ./boot.mem
+	-riscv32-corev-elf-objcopy -O srec -j .text -j .data "A2_boot.elf"  "A2_boot.srec";python3 ../srec2verilog.py -i ./A2_boot.srec -o ./a2_bootrom.sv -m ./boot.mem
 	-@echo ' '
 
-secondary-outputs:
+secondary-outputs: $(SECONDARY_FLASH)
 
 .PHONY: all clean dependents post-build
 
