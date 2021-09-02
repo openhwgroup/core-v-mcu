@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : main.c
- Author      :
+ Author      : 
  Version     :
  Copyright   : Your copyright notice
  Description : Hello RISC-V World in C
@@ -25,11 +25,12 @@
 #include "flash.h"
 #include "dbg.h"
 #include "hal_apb_i2cs.h"
+#include "I2CProtocol.h"
+#include "crc.h"
 
 uint16_t udma_uart_open (uint8_t uart_id, uint32_t xbaudrate);
 uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer) ;
-
-
+extern uint8_t gStopUartMsgFlg;
 
 #define PLP_L2_DATA      __attribute__((section(".ram")))
 
@@ -62,11 +63,7 @@ static void load_section(boot_code_t *data, flash_v2_mem_area_t *area) {
 
 }
 
-static inline void __attribute__((noreturn)) jump_to_address(unsigned int address) {
-  void (*entry)() = (void (*)())((long)address);
-  entry();
-  while(1);
-}
+
 
 static inline void __attribute__((noreturn)) jump_to_entry(flash_v2_header_t *header) {
 
@@ -79,14 +76,16 @@ __attribute__((noreturn)) void changeStack(boot_code_t *data, unsigned int entry
 
 static void getMemAreas(boot_code_t *data)
 {
-  udma_flash_read(0, (unsigned int)(long)&data->header, sizeof(data->header));
-
+	udma_flash_read(0, (unsigned int)(long)&data->header, sizeof(data->header));
   int nbArea = data->header.nbAreas;
   if (nbArea >= MAX_NB_AREA) {
     nbArea = MAX_NB_AREA;
   }
 
-  if (nbArea) udma_flash_read(sizeof(flash_v2_header_t), (unsigned int)(long)data->memArea, nbArea*sizeof(flash_v2_mem_area_t));
+  if (nbArea)
+  {
+	  udma_flash_read(sizeof(flash_v2_header_t), (unsigned int)(long)data->memArea, nbArea*sizeof(flash_v2_mem_area_t));
+  }
 }
 
 static __attribute__((noreturn)) void loadBinaryAndStart(boot_code_t *data)
@@ -169,7 +168,7 @@ int main(void)
 			hal_set_apb_i2cs_slave_address(MY_I2C_SLAVE_ADDRESS);
 
 	udma_uart_open (id,115200);
-	dbg_str("\nA2 bootloader Bootsel=");
+	dbg_str("\nA2 Bootloader Bootsel=");
 
 	if (bootsel == 1) dbg_str("1");
 	else dbg_str("0");
@@ -188,10 +187,28 @@ int main(void)
 	tstring[1] = 0;
 	if ((bootsel == 1) && (flash_present == 1)) { //boot from SPI flash
 	 bootFromRom(0,0);
-	} else
-	while (1) {
-	 for (bootsel = 0; bootsel < 1000000; bootsel++);
-	 dbg_str(tstring);
 	}
-
+	else
+	{
+		/*
+		 * Compute the CRC of the test message, more efficiently.
+		 */
+		crcInit();
+		bootsel = 0;
+		//TODO: Send a single byte message indicating the reset type. POR / Button reset / WDT
+		psoc->jtagreg = 1;
+		while (1) {
+			if (psoc->jtagreg != 0x1)
+				dbg_hex32(psoc->jtagreg);
+			processI2CProtocolFrames();
+			bootsel++;
+			//for (bootsel = 0; bootsel < 1000000; bootsel++);
+			if( bootsel >= 500000 )
+			{
+				if( gStopUartMsgFlg == 0 )
+					dbg_str(tstring);
+				bootsel = 0;
+			}
+		}
+	}
 }

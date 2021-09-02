@@ -27,24 +27,13 @@ endif
 
 -include ../makefile.defs
 
-OPTIONAL_TOOL_DEPS := \
-$(wildcard ../makefile.defs) \
-$(wildcard ../makefile.init) \
-$(wildcard ../makefile.targets) \
-
-
-BUILD_ARTIFACT_NAME := A2_boot
-BUILD_ARTIFACT_EXTENSION := elf
-BUILD_ARTIFACT_PREFIX :=
-BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
-
-# Add inputs and outputs from these tool invocations to the build variables
+# Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
 all: A2_boot.elf secondary-outputs
 
 # Tool invocations
-A2_boot.elf: $(OBJS) $(USER_OBJS) makefile objects.mk $(OPTIONAL_TOOL_DEPS)
+A2_boot.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU RISC-V Cross C Linker'
 	riscv32-corev-elf-gcc -msmall-data-limit=8 -mno-save-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T ../target/core-v-mcu/core-v-mcu2-rom.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -Wl,-Map,"A2_boot.map" --specs=nosys.specs -o "A2_boot.elf" $(OBJS) $(USER_OBJS) $(LIBS)
@@ -60,8 +49,6 @@ clean:
 post-build:
 	-riscv32-corev-elf-objcopy -O srec "A2_boot.elf"  "A2_boot.srec";python3 ../srec2verilog.py -i ./A2_boot.srec -o ./a2_bootrom.sv -m ./boot.mem
 	-@echo ' '
-	-cp ./boot.mem ../../tb/mem_init_files/boot.mem
-
 
 secondary-outputs:
 
