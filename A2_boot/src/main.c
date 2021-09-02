@@ -147,8 +147,8 @@ static void bootFromRom(int hyperflash, int qpi)
   if (hyperflash) newData->blockSize = HYPER_FLASH_BLOCK_SIZE;
   else newData->blockSize = FLASH_BLOCK_SIZE;
 
-  loadBinaryAndStart_newStack(newData);
-
+  //loadBinaryAndStart_newStack(newData);
+loadBinaryAndStart(data);
 }
 
 

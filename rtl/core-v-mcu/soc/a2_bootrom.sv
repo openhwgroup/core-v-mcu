@@ -7,7 +7,7 @@ module a2_bootrom #(
     input  logic [ADDR_WIDTH-1:0] A,
     output logic [DATA_WIDTH-1:0] Q
 );
-  logic [31:0] value[511:0];
+  logic [31:0] value[1023:0];
 
   initial begin
     $readmemh("mem_init/boot.mem", value);
