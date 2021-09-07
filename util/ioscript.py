@@ -512,13 +512,6 @@ if args.soc_defines != None and args.cvmcu_h != None:
         cvmcu_h.write("#define SOC_CTRL_START_ADDR %s\n" % per_bus_defines["SOC_CTRL_START_ADDR"])
 
         ###########
-        # Add EU information
-        ###########
-        cvmcu_h.write("\n")
-        cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
-        cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
-
-        ###########
         # Add Timer information
         ###########
         cvmcu_h.write("\n")
