@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "Please cite core-v-mcu as below."
+authors:
+- family-names: "Schiavone"
+  given-names: "Pasquale Davide"
+- family-names: "Rossi"
+  given-names: "Davide"
+- family-names: "Pullini"
+  given-names: "Antonio"
+- family-names: "Di Mauro"
+  given-names: "Alfio"
+- family-names: "Conti"
+  given-names: "Francesco"
+- family-names: "Benini"
+  given-names: "Luca"
+title: "Quentin: an ultra-low-power pulpissimo soc in 22nm fdx"
+doi: 10.1109/S3S.2018.8640145
+date-released: 2019-02-14
+url: "https://ieeexplore.ieee.org/document/8640145"
+preferred-citation:
+authors:
+- family-names: "Schiavone"
+  given-names: "Pasquale Davide"
+- family-names: "Rossi"
+  given-names: "Davide"
+- family-names: "Di Mauro"
+  given-names: "Alfio"
+- family-names: "Gurkaynak"
+  given-names: "Frank"
+- family-names: "Saxe"
+  given-names: "Timothy"
+- family-names: "Wang"
+  given-names: "Mao"
+- family-names: "Yap"
+  given-names: "Ket Chong"
+- family-names: "Benini"
+  given-names: "Luca"
+journal: "IEEE Transactions on Very Large Scale Integration (VLSI) Systems" 
+title: "Arnold: An eFPGA-Augmented RISC-V SoC for Flexible and Low-Power IoT End Nodes"
+doi: 10.1109/TVLSI.2021.3058162
+date-released: 2021-03-04
+url: "https://ieeexplore.ieee.org/document/9369856"
