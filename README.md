@@ -3,7 +3,7 @@
 
 # CORE-V MCU
 
-> CORE-V MCU originated from PULPissimo and is now a
+> CORE-V MCU originated from PULPissimo \[[1](https://ieeexplore.ieee.org/abstract/document/8640145)\], \[[2](https://ieeexplore.ieee.org/document/9369856)\]. and is now a
 > stand-alone project within OpenHW Group independent from PULPIssimo.
 >
 > In case you should be interested to join the project please feel free to open
@@ -151,3 +151,9 @@ Two important things to note.
 1.  If you do not have Verible installed (which is likely), then `util/format-verible` will silently do nothing.
 
 2.  You must install the correct version of Verible, currently v0.0-1051-gd4cd328.  GitHub has [prebuilt versions](https://github.com/google/verible/releases/tag/v0.0-1051-gd4cd328).  The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
+
+## References
+
+1. [Schiavone, Pasquale Davide, et al. "Quentin: an ultra-low-power pulpissimo soc in 22nm fdx." 2018 IEEE SOI-3D-Subthreshold Microelectronics Technology Unified Conference (S3S). IEEE, 2018.](https://ieeexplore.ieee.org/abstract/document/8640145)
+
+2. [Schiavone, Pasquale Davide, et al. "Arnold: An eFPGA-Augmented RISC-V SoC for Flexible and Low-Power IoT End Nodes." IEEE Transactions on Very Large Scale Integration (VLSI) Systems 29.4 (2021): 677-690.](https://ieeexplore.ieee.org/document/9369856)
