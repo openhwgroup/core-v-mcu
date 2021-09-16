@@ -1,5 +1,5 @@
 module a2_bootrom #(
-    parameter ADDR_WIDTH = 32,
+    parameter ADDR_WIDTH = 11,
     parameter DATA_WIDTH = 32
 ) (
     input  logic                  CLK,

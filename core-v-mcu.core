@@ -190,6 +190,10 @@ parameters:
     datatype: bool
     paramtype: vlogdefine
     default: true
+  USE_BW:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
 
 # A script to modify Verilator pre-build to generate a library, not an
 # executable.
@@ -218,6 +222,8 @@ targets:
     - tb-rtl
     toplevel:
     - core_v_mcu_tb
+    parameters:
+    - USE_BW=true
     tools:
       modelsim:
         vlog_options:
@@ -234,6 +240,7 @@ targets:
     default_tool: verilator
     parameters:
     - VERILATOR=true
+    - USE_BW=true
     filesets_append:
     - pre_build_scripts
     - verilator-waiver
