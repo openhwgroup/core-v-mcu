@@ -19,7 +19,7 @@ module core_v_mcu_private_ram #(
       .CLK  (clk_i),
       .INITN(1'b1),
       .CEN  (csn_i),
-      .BEN  (be_i),
+      .BEN  (~be_i),
       .WEN  (wen_i),
       .A    (addr_i),  //Convert from byte to word addressing
       .D    (wdata_i),
@@ -48,7 +48,7 @@ module core_v_mcu_interleaved_ram #(
       .CLK  (clk_i),
       .INITN(1'b1),
       .CEN  (csn_i),
-      .BEN  (be_i),
+      .BEN  (~be_i),
       .WEN  (wen_i),
       .A    (addr_i),  //Convert from byte to word addressing
       .D    (wdata_i),
