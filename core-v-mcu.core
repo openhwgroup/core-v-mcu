@@ -262,6 +262,8 @@ targets:
     <<: *default_target
     default_tool: verilator
     toplevel: [core_v_mcu]
+    filesets_append:
+    - rtl-simulation
     tools:
       verilator:
         mode: lint-only
