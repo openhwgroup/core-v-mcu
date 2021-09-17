@@ -441,7 +441,11 @@ module eFPGA_wrapper (
   );
 
   A2_MATH_UNIT #(
+`ifdef USE_BW
+      .USE_BW(1),
+`else
       .USE_BW(0),
+`endif
       .MU(0)
   ) M0 (
       .m0_clk(m0_m0_clk),
@@ -512,7 +516,11 @@ module eFPGA_wrapper (
       .coef_pwrdn(m0_coef_powerdn)
   );
   A2_MATH_UNIT #(
+`ifdef USE_BW
+      .USE_BW(1),
+`else
       .USE_BW(0),
+`endif
       .MU(1)
   ) M1 (
       .m0_clk(m1_m0_clk),

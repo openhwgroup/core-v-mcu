@@ -52,7 +52,6 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 ,ENABLE_WD,0,0,WO,,"Enabled Watch dog,, once enable, cannot be disabled"
 0x00D8,RESET_REASON,,,,,Reset for most reset reset
 ,REASON,1,0,R/W,,"2'b01= reset pin, 2'b11=Watchdog expired"
-0x00D8,CLK_DIV_CLU,,,,,
 0x00E0,RTO_PERIPHERAL_ERROR,,,,,Indicates which APB peripheral cause a ready timeout error
 ,FCB_RTO,8,8,R/W,0x0 ,1 indicates that the FCB interface caused a ready timeout
 ,TIMER_RTO,7,7,R/W,0x0 ,1 indicates that the TIMER interface caused a ready timeout
