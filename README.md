@@ -3,7 +3,7 @@
 
 # CORE-V MCU
 
-> CORE-V MCU originated from PULPissimo and is now a
+> CORE-V MCU originated from PULPissimo \[[1](https://ieeexplore.ieee.org/abstract/document/8640145)\], \[[2](https://ieeexplore.ieee.org/document/9369856)\]. and is now a
 > stand-alone project within OpenHW Group independent from PULPIssimo.
 >
 > In case you should be interested to join the project please feel free to open
@@ -54,6 +54,7 @@ Extra note for building on ubuntu - Vivado tools from Xilinx may require a large
 The swap size can be increased by searching for "increase swapfile in ubuntu" and add your release.
 
 ## Building documentation
+
 ```
 $ make docs
 ```
@@ -72,14 +73,15 @@ CORE-V MCU are documented in the [PULP Platform Debug
 Unit](https://github.com/pulp-platform/riscv-dbg).
 
 ## Building C header files
+
 ```
 $ make sw
 ```
 The resulting header files are located in ./sw
 
 ## Running Modelsim/Questasim
-```
 
+```
 $ make buildsim sim
 ```
 The 'make buildsim' creates a work library in build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim, and then 'make sim' runs the simulation.
@@ -125,6 +127,9 @@ If your changes introduce any Verilator errors, you either need to fix these, or
 
 This will create the Verilator library `Vcore_v_mcu_wrapper__ALL.a` in `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/obj_dir`.
 
+Note that when you use this library to build an application you will need to
+ensure that the directory `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/mem_init` is either symbolically linked or copied to the directory where the application will run. The model will load ROM images from this directory.
+
 ### Verilator lint check
 
 The system will run
@@ -146,3 +151,9 @@ Two important things to note.
 1.  If you do not have Verible installed (which is likely), then `util/format-verible` will silently do nothing.
 
 2.  You must install the correct version of Verible, currently v0.0-1051-gd4cd328.  GitHub has [prebuilt versions](https://github.com/google/verible/releases/tag/v0.0-1051-gd4cd328).  The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
+
+## References
+
+1. [Schiavone, Pasquale Davide, et al. "Quentin: an ultra-low-power pulpissimo soc in 22nm fdx." 2018 IEEE SOI-3D-Subthreshold Microelectronics Technology Unified Conference (S3S). IEEE, 2018.](https://ieeexplore.ieee.org/abstract/document/8640145)
+
+2. [Schiavone, Pasquale Davide, et al. "Arnold: An eFPGA-Augmented RISC-V SoC for Flexible and Low-Power IoT End Nodes." IEEE Transactions on Very Large Scale Integration (VLSI) Systems 29.4 (2021): 677-690.](https://ieeexplore.ieee.org/document/9369856)

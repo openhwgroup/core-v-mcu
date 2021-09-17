@@ -34,7 +34,6 @@
 // JTAG
 `define DMI_JTAG_IDCODE 32'h10001c05
 
-
 // Hardware Accelerator selection
 `define HWCRYPT
 
