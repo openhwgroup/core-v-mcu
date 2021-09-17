@@ -19,6 +19,8 @@ pip3 install --user -r python-requirements.txt
 
 Install fusesoc: https://fusesoc.readthedocs.io/en/stable/user/installation.html#ug-installation
 
+Install Verilator v4.100: https://verilator.org/guide/latest/install.html
+
 ## Building
 
 The build system uses make to capture the required steps.
