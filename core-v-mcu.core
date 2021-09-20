@@ -91,6 +91,7 @@ filesets:
   rtl-simulation:
     files:
     - rtl/simulation/core_v_mcu_sim_ram.sv
+    - rtl/simulation/sram512x64.v
     file_type: systemVerilogSource
 
   rom_init:
@@ -131,6 +132,7 @@ filesets:
     - tb/uartdpi/uartdpi.sv
     - tb/qspi_model/GD25Q128B.v
     - tb/sim_clk_gen.sv
+    - rtl/simulation/sram512x64.v
     file_type: systemVerilogSource
 
   emulation-rtl:
@@ -144,6 +146,8 @@ filesets:
     - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
     - emulation/xilinx/rtl/pad_functional_xilinx.sv
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    - emulation/xilinx/rtl/sram512x64.v
+
     file_type: systemVerilogSource
 
   xilinx-ips:
