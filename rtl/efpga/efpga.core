@@ -12,8 +12,8 @@ filesets:
     files:
     - eFPGA_wrapper.sv
     - A2_design.sv
-    - top1_wrapper.sv
-    - top.sv
+#    - top1_wrapper.sv
+#    - top.sv
     - a2_math_unit.sv
     - ql_math_unit/rtl/DW02_mac.sv
     - ql_math_unit/rtl/bw_mac.sv

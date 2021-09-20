@@ -92,6 +92,8 @@ filesets:
     files:
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
     file_type: systemVerilogSource
 
   rom_init:
@@ -147,6 +149,8 @@ filesets:
     - emulation/xilinx/rtl/pad_functional_xilinx.sv
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     - emulation/xilinx/rtl/sram512x64.v
+    - emulation/xilinx/rtl/top.sv
+    - emulation/xilinx/rtl/top1_wrapper.sv
 
     file_type: systemVerilogSource
 
