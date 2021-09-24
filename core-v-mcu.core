@@ -88,6 +88,15 @@ filesets:
     - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
 
+  rtl-verilator:
+    files:
+    - rtl/simulation/clk_gen.sv
+    - rtl/simulation/core_v_mcu_sim_ram.sv
+    - rtl/simulation/sram512x64.v
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
+    file_type: systemVerilogSource
+
   rtl-simulation:
     files:
     - rtl/simulation/core_v_mcu_sim_ram.sv
@@ -116,7 +125,7 @@ filesets:
 
   mem_init_verilator:
     files:
-    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
     - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
     - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
@@ -130,7 +139,7 @@ filesets:
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
-    - tb/tb_clk_gen.sv
+    - rtl/simulation/clk_gen.sv
     - tb/uartdpi/uartdpi.sv
     - tb/qspi_model/GD25Q128B.v
     - tb/sim_clk_gen.sv
@@ -254,7 +263,7 @@ targets:
     - pre_build_scripts
     - verilator-waiver
     - mem_init_verilator
-    - rtl-simulation
+    - rtl-verilator
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
@@ -285,8 +294,8 @@ targets:
     parameters:
     - PULP_FPGA_EMUL=true
     filesets_append:
-    - emulation-rtl
     - xilinx-ips
+    - emulation-rtl
     - nexys-rtl
     - nexys-cfg
     - nexys-xdc

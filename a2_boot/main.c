@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : main.c
- Author      : 
+ Author      :
  Version     :
  Copyright   : Your copyright notice
  Description : Hello RISC-V World in C
@@ -24,6 +24,7 @@
 #include <string.h>
 #include "flash.h"
 #include "dbg.h"
+#include "spi.h"
 #include "hal_apb_i2cs.h"
 #include "I2CProtocol.h"
 #include "crc.h"

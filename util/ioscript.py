@@ -512,11 +512,11 @@ if args.soc_defines != None and args.cvmcu_h != None:
         cvmcu_h.write("#define SOC_CTRL_START_ADDR %s\n" % per_bus_defines["SOC_CTRL_START_ADDR"])
 
         ###########
-        # Add EU information
+        # Add I2CS information
         ###########
-        #cvmcu_h.write("\n")
-        #cvmcu_h.write("//  Event Unit (Interrupts) configuration information\n")
-        #cvmcu_h.write("#define EU_START_ADDR %s\n" % per_bus_defines["EU_START_ADDR"])
+        cvmcu_h.write("\n")
+        cvmcu_h.write("//  I2C slave configuration information\n")
+        cvmcu_h.write("#define I2CS_START_ADDR %s\n" % per_bus_defines["I2CS_START_ADDR"])
 
         ###########
         # Add Timer information
@@ -926,6 +926,7 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
         x_sv.write("  );\n")
         x_sv.write("\n")
+        x_sv.write("  wire private_net;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_out;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_oe;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_in;\n")
@@ -958,6 +959,12 @@ if args.xilinx_core_v_mcu_sv != None:
                     x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("ref_clk_i"))
                     x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("ref_clk_i"))
                     x_sv.write("  );\n\n")
+                    x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
+                    x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
+                    x_sv.write("    .ref_clk_i(s_io_in[%d]),\n" % sysionames.index("ref_clk_i"))
+                    x_sv.write("    .mhz4(),\n")
+                    x_sv.write("    .slow_clk_o(private_net)\n")
+                    x_sv.write("    );\n")
                 if sysionames[ionum] == "jtag_tck_i":
                     x_sv.write("  //JTAG TCK clock buffer (dedicated route is false in constraints)\n")
                     x_sv.write("  IBUF i_tck_iobuf (\n")
@@ -973,7 +980,10 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("  core_v_mcu i_core_v_mcu (\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
-                 x_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
+                if sysionames[ionum] == "ref_clk_i" :
+                    x_sv.write("    .%s(private_net),\n" % sysionames[ionum])
+                else :
+                    x_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
 
         x_sv.write("    .io_out_o(s_io_out),\n")
         x_sv.write("    .io_oe_o(s_io_oe),\n")
