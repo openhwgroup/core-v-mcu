@@ -299,42 +299,42 @@ module core_v_mcu #(
   logic [15:0] testio_o;  //
 
 
-  assign io_out_o[20:0] = io_in_i[44] ? 0 : s_io_out[20:0];
-  assign io_out_o[28:23] = io_in_i[44] ? 0 : s_io_out[28:23];
-  assign io_out_o[`N_IO-1:43] = io_in_i[44] ? 0 : s_io_out[`N_IO-1:43];
-  assign io_oe_o[20:0] = io_in_i[44] ? 0 : s_io_oe[20:0];
-  assign io_oe_o[28:23] = io_in_i[44] ? 0 : s_io_oe[28:23];
-  assign io_oe_o[`N_IO-1:43] = io_in_i[44] ? 0 : s_io_oe[`N_IO-1:43];
+  assign io_out_o[20:0] = stm_i ? 0 : s_io_out[20:0];
+  assign io_out_o[28:23] = stm_i ? 0 : s_io_out[28:23];
+  assign io_out_o[`N_IO-1:43] = stm_i ? 0 : s_io_out[`N_IO-1:43];
+  assign io_oe_o[20:0] = stm_i ? 0 : s_io_oe[20:0];
+  assign io_oe_o[28:22] = stm_i ? 0 : s_io_oe[28:22];
+  assign io_oe_o[38:37] = stm_i ? 0 : s_io_oe[38:37];
+  assign io_oe_o[`N_IO-1:43] = stm_i ? 0 : s_io_oe[`N_IO-1:43];
 
 
-  assign io_out_o[32:29] = io_in_i[44] ? testio_o[3:0] : s_io_out[32:29]; //  efpga_test_fcb_pif_do_l_o;
-  assign io_out_o[36:33] = io_in_i[44] ? testio_o[7:4] : s_io_out[36:33]; //  efpga_test_fcb_pif_do_h_o;
-  assign io_out_o[42:39] = io_in_i[44] ? testio_o[11:8] : s_io_out[42:39]; // efpga_test_FB_SPE_OUT_o;
-  assign io_out_o[37] = io_in_i[44] ? testio_o[12] : s_io_out[37];  // efpga_test_fcb_pif_do_l_en_o;
-  assign io_out_o[38] = io_in_i[44] ? testio_o[13] : s_io_out[38];  // efpga_test_fcb_pif_do_h_en_o;
-  assign io_out_o[21] = io_in_i[44] ? testio_o[14] : s_io_out[21];  // efpga_fcb_pif_vldo_o;
-  assign io_out_o[22] = io_in_i[44] ? testio_o[15] : s_io_out[22];  // efpga_fcb_pif_vldo_en_o;
+  assign io_out_o[32:29] = stm_i ? testio_o[3:0] : s_io_out[32:29];  //  efpga_test_fcb_pif_do_l_o;
+  assign io_out_o[36:33] = stm_i ? testio_o[7:4] : s_io_out[36:33];  //  efpga_test_fcb_pif_do_h_o;
+  assign io_out_o[42:39] = stm_i ? testio_o[11:8] : s_io_out[42:39];  // efpga_test_FB_SPE_OUT_o;
+  //assign io_out_o[37] = stm_i ? testio_o[12] : s_io_out[37]; // efpga_test_fcb_pif_do_l_en_o;
+  //assign io_out_o[38] = stm_i ? testio_o[13] : s_io_out[38]; // efpga_test_fcb_pif_do_h_en_o;
+  assign io_out_o[21] = stm_i ? testio_o[14] : s_io_out[21];  // efpga_fcb_pif_vldo_o;
+  //assign io_out_o[22] = stm_i ? testio_o[15] : s_io_out[22]; // efpga_fcb_pif_vldo_en_o;
 
-  assign io_oe_o[32:29] = io_in_i[44] ? 1 : s_io_oe[32:29];  //  efpga_test_fcb_pif_do_l_o;
-  assign io_oe_o[36:33] = io_in_i[44] ? 1 : s_io_oe[36:33];  //  efpga_test_fcb_pif_do_h_o;
-  assign io_oe_o[42:39] = io_in_i[44] ? 1 : s_io_oe[42:39];  // efpga_test_FB_SPE_OUT_o;
-  assign io_oe_o[37] = io_in_i[44] ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
-  assign io_oe_o[38] = io_in_i[44] ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
-  assign io_oe_o[21] = io_in_i[44] ? 1 : s_io_oe[21];  // efpga_fcb_pif_vldo_o;
-  assign io_oe_o[22] = io_in_i[44] ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
+  assign io_oe_o[32:29] = stm_i ? testio_o[12] : s_io_oe[32:29];  //  efpga_test_fcb_pif_do_l_o;
+  assign io_oe_o[36:33] = stm_i ? testio_o[13] : s_io_oe[36:33];  //  efpga_test_fcb_pif_do_h_o;
+  assign io_oe_o[42:39] = stm_i ? 1 : s_io_oe[42:39];  // efpga_test_FB_SPE_OUT_o;
+  assign io_oe_o[37] = stm_i ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
+  assign io_oe_o[38] = stm_i ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
+  assign io_oe_o[21] = stm_i ? testio_o[15] : s_io_oe[21];  // efpga_fcb_pif_vldo_o;
+  assign io_oe_o[22] = stm_i ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
 
-  assign s_io_in[`N_IO-1:0] = io_in_i[44] ? 0 : io_in_i[`N_IO-1:0];
+  assign s_io_in[`N_IO-1:0] = stm_i ? 0 : io_in_i[`N_IO-1:0];
 
-  assign testio_i[3:0] = io_in_i[44] ? io_in_i[16:13] : 4'b0;  // efpga_test_fcb_pif_di_l_i
-  assign testio_i[7:4] = io_in_i[44] ? io_in_i[20:17] : 4'b0;  // efpga_test_fcb_pif_di_h_i
-  assign testio_i[11:8] = io_in_i[44] ? io_in_i[28:25] : 4'b0;  //efpga_test_FB_SPE_IN_i =
-  assign testio_i[17:12] = io_in_i[44] ? io_in_i[12:7] : 6'b0;  // io_efpga_test_M_i =
-  assign testio_i[18] = io_in_i[44] ? io_in_i[23] : 0;  // efpga_test_MLATCH_i =
-  assign testio_i[19] = io_in_i[44] ? io_in_i[24] : 0;  //efpga_test_fcb_pif_vldi_i =
-  assign testio_i[20] = io_in_i[44];  //efpga_STM_i = testio_i[20];
+  assign testio_i[3:0] = stm_i ? io_in_i[32:29] : 4'b0;  // efpga_test_fcb_pif_di_l_i
+  assign testio_i[7:4] = stm_i ? io_in_i[36:33] : 4'b0;  // efpga_test_fcb_pif_di_h_i
+  assign testio_i[11:8] = stm_i ? io_in_i[28:25] : 4'b0;  //efpga_test_FB_SPE_IN_i =
+  assign testio_i[17:12] = stm_i ? io_in_i[12:7] : 6'b0;  // io_efpga_test_M_i =
+  assign testio_i[18] = stm_i ? io_in_i[23] : 0;  // efpga_test_MLATCH_i =
+  assign testio_i[19] = stm_i ? io_in_i[21] : 0;  //efpga_test_fcb_pif_vldi_i =
+  assign testio_i[20] = stm_i;  //efpga_STM_i = testio_i[20];
 
 
-  assign testio_i = '0;
   soc_domain #(
       .USE_FPU           (USE_FPU),
       .USE_HWPE          (USE_HWPE),
