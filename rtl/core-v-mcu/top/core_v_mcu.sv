@@ -319,10 +319,10 @@ module core_v_mcu #(
   assign io_oe_o[32:29] = stm_i ? testio_o[12] : s_io_oe[32:29];  //  efpga_test_fcb_pif_do_l_o;
   assign io_oe_o[36:33] = stm_i ? testio_o[13] : s_io_oe[36:33];  //  efpga_test_fcb_pif_do_h_o;
   assign io_oe_o[42:39] = stm_i ? 1 : s_io_oe[42:39];  // efpga_test_FB_SPE_OUT_o;
-  assign io_oe_o[37] = stm_i ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
-  assign io_oe_o[38] = stm_i ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
+  //assign io_oe_o[37] = stm_i ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
+  //assign io_oe_o[38] = stm_i ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
   assign io_oe_o[21] = stm_i ? testio_o[15] : s_io_oe[21];  // efpga_fcb_pif_vldo_o;
-  assign io_oe_o[22] = stm_i ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
+  //assign io_oe_o[22] = stm_i ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
 
   assign s_io_in[`N_IO-1:0] = stm_i ? 0 : io_in_i[`N_IO-1:0];
 

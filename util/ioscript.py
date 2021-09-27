@@ -871,20 +871,24 @@ if args.core_v_mcu_gf22fdx_sv != None:
 
         gf22fdx_sv.write("  // connect io\n")
         for ionum in range(N_IO):
-            # if sysionames[ionum] != -1:
-                # if sysio[sysionames[ionum][:-2]] == 'output':
-                    # # gf22fdx_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b1), .I( ), .O(%s), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                    # gf22fdx_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b0), .DATA(%s), .RXEN(1'b0), .Y(), .PAD(io[%d]), .PDEN(~pad_cfg_o[%d][0]), .PUEN(~pad_cfg_o[%d][1]), `DRV_SIG );;\n" %\
-                        # ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
-                # else:
-                    # # gf22fdx_sv.write("      pad_functional_pu i_pad_%d    (.OEN(1'b0), .I(%s), .O( ), .PAD(io[%d]), .PEN(1'b1));\n" % (ionum, sysionames[ionum], ionum))
-                    # gf22fdx_sv.write("    IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(1'b1), .DATA(), .RXEN(1'b1), .Y(%s), .PAD(io[%d]), .PDEN(~pad_cfg_o[%d][0]), .PUEN(~pad_cfg_o[%d][1]), `DRV_SIG );;\n" %\
-                        # ("H", ionum, sysionames[ionum], ionum, ionum, ionum))
-            # else:
             gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d]), .DATA(s_io_out[%d]), .RXEN(~s_io_out[%d]), .Y(s_io_in[%d]), .PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" %\
                 ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                gf22fdx_sv.write("       wire s_%s;\n" % sysionames[ionum][:-2])
+                if sysio[sysionames[ionum][:-2]] == 'input':
+                    gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
+                elif sysio[sysionames[ionum][:-2]] == 'snoop':
+                    gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
+
         gf22fdx_sv.write("\n")
         gf22fdx_sv.write("  core_v_mcu i_core_v_mcu (\n")
+        for ionum in range (N_IO) :
+            if sysionames[ionum] != -1:
+                if sysionames[ionum] == "ref_clk_i" :
+                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
+                else :
+                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
         gf22fdx_sv.write("    .io_out_o(s_io_out),\n")
         gf22fdx_sv.write("    .io_oe_o(s_io_oe),\n")
         gf22fdx_sv.write("    .io_in_i(s_io_in),\n")
