@@ -31,7 +31,7 @@ BOOTCODE = boot.mem
 all: $(BOOTCODE)
 
 $(BOOTCODE): A2_Boot.srec
-	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ./boot.mem
+	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ../tb/mem_init_files/boot.mem
 
 A2_Boot.srec: A2_boot.elf
 	$(OBJCOPY) -O srec -j .text -j .data A2_boot.elf A2_Boot.srec
@@ -40,10 +40,6 @@ A2_Boot.srec: A2_boot.elf
 A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o hal_apb_i2cs.o crt0.o
 	$(CC) $(LDFLAGS) crt0.o I2CProtocol.o crc.o dbg.o hal_apb_i2cs.o main.o spi.o uart.o  -lc -lm -lgcc
 
-
-boot_code.cde: $(BOOTCODE)
-	$(OBJCOPY) --srec-len 1 --output-target=srec $(BOOTCODE) $(BOOTCODE).s19
-	./s19toboot.py $(BOOTCODE).s19 boot_code.cde pulpissimo
 
 .PHONY: clean
 clean:
