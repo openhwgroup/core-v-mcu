@@ -1,9 +1,9 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/i_sim_clk_gen/ref_clk_i
-add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/i_sim_clk_gen/soc_clk_o
-add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/i_sim_clk_gen/per_clk_o
-add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/i_sim_clk_gen/cluster_clk_o
+add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/clk_soc_o
+add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/clk_per_o
+add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/clk_cluster_o
+add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/i_clk_rst_gen/ref_clk_i
 add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/s_lint_fc_instr_bus/add
 add wave -noupdate /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/s_lint_fc_instr_bus/r_rdata
 add wave -noupdate -group {load/store bus} /core_v_mcu_tb/core_v_mcu_i/i_soc_domain/s_lint_fc_data_bus/add

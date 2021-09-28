@@ -109,13 +109,14 @@ module core_v_mcu_tb;
 		  .ref_clk_i(ref_clk_i),
 		  .rstn_i(rstn_i),
 		  .bootsel_i(bootsel_i),
+      .stm_i(1'b0),
 		  .io_in_i(io_in_i),
 		  .io_out_o(io_out_o),
 		  .pad_cfg_o(pad_cfg_o),
 		  .io_oe_o(io_oe_o)
     );
 
-    tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(ref_clk_i) );
+
 
 //    initial begin: finish
 //        #(2000000ns) $finish();
