@@ -88,13 +88,6 @@ filesets:
     - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
 
-  rtl-verilator:
-    files:
-    - rtl/simulation/core_v_mcu_sim_ram.sv
-    - rtl/simulation/sram512x64.v
-    - rtl/simulation/top.sv
-    - rtl/simulation/top1_wrapper.sv
-    file_type: systemVerilogSource
 
   rtl-simulation:
     files:
@@ -261,7 +254,7 @@ targets:
     - pre_build_scripts
     - verilator-waiver
     - mem_init_verilator
-    - rtl-verilator
+    - rtl-simulation
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
