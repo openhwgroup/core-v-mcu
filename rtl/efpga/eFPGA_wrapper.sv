@@ -508,6 +508,7 @@ module eFPGA_wrapper (
       .coef_waddr(m0_coef_waddr),
       .coef_pwrdn(m0_coef_powerdn)
   );
+
   A2_MATH_UNIT M1 (
       .m0_clk(m1_m0_clk),
       .m0_clken(m1_m0_clken),
