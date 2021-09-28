@@ -158,6 +158,7 @@ filesets:
     - emulation/xilinx/rtl/pad_functional_xilinx.sv
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     - emulation/xilinx/rtl/sram512x64.v
+    - emulation/xilinx/rtl/DW02_mac.sv
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
 

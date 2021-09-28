@@ -15,7 +15,7 @@ filesets:
 #    - top1_wrapper.sv
 #    - top.sv
     - a2_math_unit.sv
-    - ql_math_unit/rtl/DW02_mac.sv
+#    - ql_math_unit/rtl/DW02_mac.sv
     - ql_math_unit/rtl/bw_mac.sv
     - ql_math_unit/rtl/bw_multiplier.sv
     - ql_math_unit/rtl/mac_16bit.v
