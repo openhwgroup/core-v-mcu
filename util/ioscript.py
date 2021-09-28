@@ -944,7 +944,7 @@ if args.xilinx_core_v_mcu_sv != None:
         ionum_end = -1
         for ionum in range(N_IO):
             if sysionames[ionum] != "ref_clk_i" and  sysionames[ionum] != "jtag_tck_i" and sysionames[ionum] != "jtag_tdo_o" :
-                if sysionames[ionum] == "bootsel_i" :
+                if sysionames[ionum] == "bootsel_i" or sysionames[ionum] == "stm_i" :
                     x_sv.write("  pad_functional_pd i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
                         (ionum, ionum, ionum, ionum, ionum, ionum))
                 else :
