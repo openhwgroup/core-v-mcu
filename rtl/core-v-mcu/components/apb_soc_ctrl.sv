@@ -76,7 +76,7 @@ module apb_soc_ctrl #(
     input  logic        bootsel_i,
     input        [31:0] status_out,
     input        [ 7:0] version,
-    input               ref_clk_i,
+    input               ref_clk_rising,
     input               stoptimer_i,
     input               dmactive_i,
     output logic        wd_expired_o,
@@ -201,13 +201,13 @@ module apb_soc_ctrl #(
 
     end else begin  // if (~HRESETn)
 
-
-      if (wd_enabled) begin
-        if (ref_clk_i) wd_current_count <= stoptimer_i ? wd_current_count : wd_current_count - 1;
-        if (wd_count == 0) begin
-          wd_expired_o <= 1;
-          reset_reason <= 2'b0;
-        end
+      wd_expired_o <= 1'b0;
+      if (wd_current_count == 0) begin
+        wd_expired_o <= 1'b1;
+        reset_reason <= 2'b0;
+      end
+      if ((wd_enabled == 1) && (stoptimer_i == 0)) begin
+        wd_current_count <= ref_clk_rising ? wd_current_count - 1 : wd_current_count;
       end
 
       if (start_rto_i == 1) ready_timeout_count <= ready_timeout_count - 1;
@@ -248,7 +248,7 @@ module apb_soc_ctrl #(
             `REG_JTAGREG: r_jtag_rego <= PWDATA[JTAG_REG_SIZE-1:0];
             `REG_WD_COUNT: wd_count <= wd_enabled ? wd_count : PWDATA[30:0];
             `REG_WD_CONTROL: begin
-              if (PWDATA[0] == 1) begin
+              if (PWDATA[31] == 1'b1) begin
                 wd_enabled <= 1;
                 wd_current_count <= wd_count;
               end
@@ -312,7 +312,7 @@ module apb_soc_ctrl #(
             `REG_CLKSEL: PRDATA <= {31'h0, sel_fll_clk_i};
             `REG_JTAGREG: PRDATA <= {16'h0, r_jtag_regi_sync[0], r_jtag_rego};
             `REG_WD_COUNT: PRDATA <= {1'b0, wd_count};
-            `REG_WD_CONTROL: PRDATA <= {wd_enabled, wd_count};
+            `REG_WD_CONTROL: PRDATA <= {wd_enabled, wd_current_count};
             `REG_RESET_REASON: PRDATA <= {30'b0, reset_reason};
             `RTO_PERIPHERAL: PRDATA <= periph_rto_reg;
             `RTO_COUNT: PRDATA <= rto_count_reg;

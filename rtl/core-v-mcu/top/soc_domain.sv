@@ -540,7 +540,7 @@ module soc_domain
   soc_clk_rst_gen i_clk_rst_gen (
       .ref_clk_i    (ref_clk_i),
       .sclk_in      (sclk_in),
-      .emul_clk     (emul_clk),
+      //      .emul_clk     (emul_clk),
       .test_clk_i   (test_clk_i),
       .sel_fll_clk_i(s_sel_fll_clk),
 

@@ -20,8 +20,9 @@
 // -----------------------------------------------------------------------------
 
 
-module fpga_clk_gen (
+module clk_gen (
                      input logic         ref_clk_i,
+                input logic emul_clk_i,
                      input logic         rstn_glob_i,
                      input logic         test_mode_i,
                      input logic         shift_enable_i,
@@ -56,9 +57,10 @@ module fpga_clk_gen (
   xilinx_clk_mngr i_clk_manager
     (
      .resetn(rstn_glob_i),
-     .clk_in1(ref_clk_i),
+     .clk_in1(emul_clk_i),
      .clk_out1(soc_clk_o),
      .clk_out2(per_clk_o),
+     .clk_out3(cluster_clk_o),
      .locked(s_locked)
      );
 
@@ -67,7 +69,7 @@ module fpga_clk_gen (
 
   // assign soc_cfg_ack_o = 1'b1; //Always acknowledge without doing anything for now
   // assign per_cfg_ack_o = 1'b1;
-  
+
   always_comb begin
     soc_cfg_ack_o       = 1'b0;
     per_cfg_ack_o       = 1'b0;
@@ -83,8 +85,29 @@ module fpga_clk_gen (
     end
   end
 
-  assign soc_cfg_r_data_o = (soc_cfg_add_i == 2'b00 ? 32'h00a10099 : (soc_cfg_add_i == 2'b01 ? 32'hbeef0003 : (soc_cfg_add_i == 2'b00 ? 32'hbeef0005 : 32'hbeef0007)));
-  assign per_cfg_r_data_o = 32'h00a10099;
-	assign cluster_cfg_r_data_o = 32'h00a10099;
+   always_comb begin
+    case (soc_cfg_add_i)
+      2'b00:soc_cfg_r_data_o = 32'h00010001;
+      2'b01:soc_cfg_r_data_o = 32'h00010002;
+      2'b10:soc_cfg_r_data_o = 32'h00010003;
+      2'b11:soc_cfg_r_data_o = 32'hfffefffc;
+    endcase // case (soc_cfg_i)
+  end
+  always_comb begin
+    case (per_cfg_add_i)
+      2'b00:per_cfg_r_data_o = 32'h00020001;
+      2'b01:per_cfg_r_data_o = 32'h00020002;
+      2'b10:per_cfg_r_data_o = 32'h00020003;
+      2'b11:per_cfg_r_data_o = 32'hfffdfffc;
+    endcase // case (soc_cfg_i)
+  end
+  always_comb begin
+    case (cluster_cfg_add_i)
+      2'b00:cluster_cfg_r_data_o = 32'h00030001;
+      2'b01:cluster_cfg_r_data_o = 32'h00030002;
+      2'b10:cluster_cfg_r_data_o = 32'h00030003;
+      2'b11:cluster_cfg_r_data_o = 32'hfffcfffc;
+    endcase // case (soc_cfg_i)
+  end
 
-endmodule : fpga_clk_gen
+endmodule : clk_gen

@@ -475,7 +475,7 @@ module soc_peripherals #(
 
       .fc_fetchen_o    (fc_fetchen_o),
       .stoptimer_i     (stoptimer_i),
-      .ref_clk_i       (s_ref_rise_event),
+      .ref_clk_rising  (s_ref_rise_event),
       .wd_expired_o    (wd_expired_o),
       .rto_o           (s_rto),
       .start_rto_i     (s_start_rto),

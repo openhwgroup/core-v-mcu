@@ -18,14 +18,14 @@ module core_v_mcu_tb;
    localparam IO_UART0_TX = 7;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
-   
+
    localparam  REF_CLK_PERIOD =  763ns; // external reference clock (32KHz)
    localparam  BAUD_CLK_FREQ = 12500000;
    localparam  BAUD_CLK_PERIOD = 2ns;
 
-   
-   
-    
+
+
+
     initial begin
       $display("***********************************");
     end
@@ -56,14 +56,14 @@ module core_v_mcu_tb;
       wire [`N_IO-1:0]	    pup;
    assign pup_qspi = 1'b1;
       assign pdown_qspi = 1'b0;
-   
-   assign bootsel_i = bootsel;   
+
+   assign bootsel_i = bootsel;
    assign rstn_i = resetn;
-   
+
    initial uart_clk = 0;
    initial forever #(BAUD_CLK_PERIOD/2) uart_clk=~uart_clk;
 
-   GD25Q128B # (.initfile("mem_init/cli.txt")) 
+   GD25Q128B # (.initfile("mem_init/cli.txt"))
    qspi (
 	 .sclk(io_out_o[16]),
 	 .si(io_out_o[14]),
@@ -71,8 +71,8 @@ module core_v_mcu_tb;
 	 .wp(pup_qspi),
 	 .hold(pup_qspi),
 	 .so(io_in_i[15]));
-   
-   uartdpi #(.BAUD(115200), 
+
+   uartdpi #(.BAUD(115200),
 	     .FREQ(BAUD_CLK_FREQ),
 	     .NAME("uart0"))
    uart_0 (
@@ -81,7 +81,7 @@ module core_v_mcu_tb;
 	   .tx(io_in_i[IO_UART0_TX]),
 	   .rx(io_out_o[IO_UART0_RX])
 	   );
-   uartdpi #(.BAUD(115200), 
+   uartdpi #(.BAUD(115200),
 	     .FREQ(BAUD_CLK_FREQ),
      	     .NAME("uart1"))
    uart_1 (
@@ -92,11 +92,11 @@ module core_v_mcu_tb;
 	   );
 
    pullup(pup[46]);
-   
+
    assign io_in_i[46] = io_oe_o[46] ? io_out_o[46] : pup[46];
-   
-	     
-   
+
+
+
     // Design Under Test
     core_v_mcu #(
     )
@@ -109,13 +109,14 @@ module core_v_mcu_tb;
 		  .ref_clk_i(ref_clk_i),
 		  .rstn_i(rstn_i),
 		  .bootsel_i(bootsel_i),
+      .stm_i(1'b0),
 		  .io_in_i(io_in_i),
 		  .io_out_o(io_out_o),
 		  .pad_cfg_o(pad_cfg_o),
 		  .io_oe_o(io_oe_o)
     );
 
-    tb_clk_gen #( .CLK_PERIOD(REF_CLK_PERIOD) ) ref_clk_gen_i (.clk_o(ref_clk_i) );
+
 
 //    initial begin: finish
 //        #(2000000ns) $finish();
@@ -127,7 +128,7 @@ module core_v_mcu_tb;
         resetn = 1'b0;
         resetn = #(4*BAUD_CLK_PERIOD) 1'b1;
        #(5*BAUD_CLK_PERIOD) bootsel = 1'b0;
-       
+
         $display("releasing reset");
     end
 
