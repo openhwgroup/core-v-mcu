@@ -440,14 +440,7 @@ module eFPGA_wrapper (
       .fcb_wl_sel_tb_int (fcb_wl_sel_tb_int)
   );
 
-  A2_MATH_UNIT #(
-`ifdef USE_BW
-      .USE_BW(1),
-`else
-      .USE_BW(0),
-`endif
-      .MU(0)
-  ) M0 (
+  A2_MATH_UNIT M0 (
       .m0_clk(m0_m0_clk),
       .m0_clken(m0_m0_clken),
       .m0_tc(m0_m0_tc),
@@ -515,14 +508,7 @@ module eFPGA_wrapper (
       .coef_waddr(m0_coef_waddr),
       .coef_pwrdn(m0_coef_powerdn)
   );
-  A2_MATH_UNIT #(
-`ifdef USE_BW
-      .USE_BW(1),
-`else
-      .USE_BW(0),
-`endif
-      .MU(1)
-  ) M1 (
+  A2_MATH_UNIT M1 (
       .m0_clk(m1_m0_clk),
       .m0_clken(m1_m0_clken),
       .m0_tc(m1_m0_tc),

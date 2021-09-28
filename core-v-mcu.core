@@ -90,7 +90,6 @@ filesets:
 
   rtl-verilator:
     files:
-    - rtl/simulation/clk_gen.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
@@ -99,6 +98,7 @@ filesets:
 
   rtl-simulation:
     files:
+    - rtl/simulation/clk_gen.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
@@ -139,11 +139,9 @@ filesets:
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
-    - rtl/simulation/clk_gen.sv
     - tb/uartdpi/uartdpi.sv
     - tb/qspi_model/GD25Q128B.v
-#    - tb/sim_clk_gen.sv
-    - rtl/simulation/sram512x64.v
+
     file_type: systemVerilogSource
 
   emulation-rtl:
@@ -193,7 +191,6 @@ filesets:
     files:
     - rtl/core-v-mcu/scripts/vedit.sh
     file_type: user
-
   # Waiver file, without which the model lib will not build.
   verilator-waiver:
     files:

@@ -32,10 +32,9 @@ module MAC_ARRAY
    MAC_TC,
    acc_ff_rstn
    );
-  parameter USE_BW = 0;
-  parameter BLOCK = 0;
-  parameter MU = 0;
-  localparam ONE_BW = (!BLOCK & !MU) | USE_BW;
+
+
+
 
   //OUTPUT
   output [31:0] MAC0_OUT;
@@ -69,7 +68,6 @@ module MAC_ARRAY
   /*        MAC_ARRAY             */
   /*------------------------------*/
   MAC_32BIT #(
-              .USE_BW(ONE_BW),
               .MULTI_WIDTH(32)
               ) U_MAC_32BIT ( //32-bit
                               //OUTPUT
@@ -88,7 +86,6 @@ module MAC_ARRAY
                               );
 
   MAC_16BIT #(
-              .USE_BW(ONE_BW),
               .MULTI_WIDTH(16)
               ) U0_MAC_16BIT ( //16-bit
                                //OUTPUT
@@ -107,7 +104,6 @@ module MAC_ARRAY
                                );
 
   MAC_16BIT #(
-              .USE_BW(USE_BW),
               .MULTI_WIDTH(16)
               ) U1_MAC_16BIT ( //16-bit
                                //OUTPUT
@@ -126,7 +122,6 @@ module MAC_ARRAY
                                );
 
   MAC_8BIT #(
-             .USE_BW(ONE_BW),
              .MULTI_WIDTH(8)
              ) U0_MAC_8BIT ( //8-bit
                              //OUTPUT
@@ -145,7 +140,6 @@ module MAC_ARRAY
                              );
 
   MAC_8BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(8)
              ) U1_MAC_8BIT ( //8-bit
                              //OUTPUT
@@ -164,7 +158,6 @@ module MAC_ARRAY
                              );
 
   MAC_8BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(8)
              ) U2_MAC_8BIT ( //8-bit
                              //OUTPUT
@@ -183,7 +176,6 @@ module MAC_ARRAY
                              );
 
   MAC_8BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(8)
              ) U3_MAC_8BIT ( //8-bit
                              //OUTPUT
@@ -202,7 +194,6 @@ module MAC_ARRAY
                              );
 
   MAC_4BIT #(
-             .USE_BW(ONE_BW),
              .MULTI_WIDTH(4)
              ) U0_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -220,7 +211,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U1_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -238,7 +228,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U2_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -256,7 +245,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U3_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -274,7 +262,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U4_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -292,7 +279,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U5_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -310,7 +296,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U6_MAC_4BIT ( //8-bit
                              //OUTPUT
@@ -328,7 +313,6 @@ module MAC_ARRAY
                              .acc_ff_rstn(acc_ff_rstn)
                              );
   MAC_4BIT #(
-             .USE_BW(USE_BW),
              .MULTI_WIDTH(4)
              ) U7_MAC_4BIT ( //8-bit
                              //OUTPUT
