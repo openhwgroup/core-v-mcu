@@ -869,26 +869,49 @@ if args.core_v_mcu_gf22fdx_sv != None:
         gf22fdx_sv.write("  wire [`N_IO-1:0] s_io_in;\n")
         gf22fdx_sv.write("  wire [`N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;\n")
 
-        gf22fdx_sv.write("  // connect io\n")
-        for ionum in range(N_IO):
-            gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d]), .DATA(s_io_out[%d]), .RXEN(~s_io_out[%d]), .Y(s_io_in[%d]), .PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" %\
-                ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
+        gf22fdx_sv.write("  wire PWROK_S, IOPWROK_S, BIAS_S, RETC_S;\n")
+        gf22fdx_sv.write("  assign PWROK_S = 1'b1;\n")
+        gf22fdx_sv.write("  assign IOPWROK_S = 1'b1;\n")
+        gf22fdx_sv.write("  assign BIAS_S = 1'b1;\n")
+        gf22fdx_sv.write("  assign RETC_S = 1'b1;\n")
+
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 gf22fdx_sv.write("       wire s_%s;\n" % sysionames[ionum][:-2])
+
+        gf22fdx_sv.write("  // connect io\n")
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
+                if sysio[sysionames[ionum][:-2]] == 'output':
+                    gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d])," % ("H", ionum, ionum))
+                    gf22fdx_sv.write(".DATA(s_%s)," % (sysionames[ionum][:-2]) )
+                    gf22fdx_sv.write(".RXEN(~s_io_out[%d]), .Y(s_io_in[%d])," % (ionum, ionum))
+                    gf22fdx_sv.write(".PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" % (ionum, ionum, ionum))
+                else:
+                    gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d])," % ("H", ionum, ionum))
+                    gf22fdx_sv.write(".DATA(s_io_out[%d])," % (ionum) )
+                    gf22fdx_sv.write(".RXEN(~s_io_out[%d]), .Y(s_io_in[%d])," % (ionum, ionum))
+                    gf22fdx_sv.write(".PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" % (ionum, ionum, ionum))
+            else:
+                gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d])," % ("H", ionum, ionum))
+                gf22fdx_sv.write(".DATA(s_io_out[%d])," % (ionum) )
+                gf22fdx_sv.write(".RXEN(~s_io_out[%d]), .Y(s_io_in[%d])," % (ionum, ionum))
+                gf22fdx_sv.write(".PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" % (ionum, ionum, ionum))
+
+#            gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d]), .DATA(s_io_out[%d]), .RXEN(~s_io_out[%d]), .Y(s_io_in[%d]), .PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" %\
+#                ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
                 if sysio[sysionames[ionum][:-2]] == 'input':
                     gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
                 elif sysio[sysionames[ionum][:-2]] == 'snoop':
                     gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
 
-        gf22fdx_sv.write("\n")
+        gf22fdx_sv.write("//duh?\n")
         gf22fdx_sv.write("  core_v_mcu i_core_v_mcu (\n")
         for ionum in range (N_IO) :
             if sysionames[ionum] != -1:
-                if sysionames[ionum] == "ref_clk_i" :
-                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
-                else :
-                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
+                gf22fdx_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
         gf22fdx_sv.write("    .io_out_o(s_io_out),\n")
         gf22fdx_sv.write("    .io_oe_o(s_io_oe),\n")
         gf22fdx_sv.write("    .io_in_i(s_io_in),\n")

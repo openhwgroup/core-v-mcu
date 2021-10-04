@@ -18,7 +18,7 @@ module safe_domain #(
     input  logic ref_clk_i,
     output logic slow_clk_o,
     output logic efpga_clk_o,
-    input  logic bootsel_i,
+//    input  logic bootsel_i,
     input  logic rst_ni,
     output logic rst_no,
 
