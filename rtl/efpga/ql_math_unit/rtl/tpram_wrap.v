@@ -87,11 +87,11 @@ module TPRAM_WRAP (
   assign tpram_w_cen  = ~EFPGA_TPRAM_WE;
   assign tpram_r_addr = EFPGA_TPRAM_R_ADDR[11:3];
   assign tpram_w_addr = EFPGA_TPRAM_W_ADDR[11:3];
-`ifdef PULP_FPGA_EMUL
-  psram512x64 U_TPRAM_512X64 (
-`else
+//`ifdef PULP_FPGA_EMUL
+//  psram512x64 U_TPRAM_512X64 (
+//`else
   sram512x64 U_TPRAM_512X64 (
-`endif
+//`endif
       .clkA     (EFPGA_TPRAM_R_CLK),
       .clkB     (EFPGA_TPRAM_W_CLK),
       .cenA     (tpram_r_cen),

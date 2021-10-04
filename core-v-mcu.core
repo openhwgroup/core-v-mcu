@@ -88,11 +88,13 @@ filesets:
     - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
 
-  simulation-rtl:
+  rtl-simulation:
     files:
-    - tb/sim_clk_gen.sv
-    - tb/uartdpi/uartdpi.sv
-    - tb/qspi_model/GD25Q128B.v
+    - rtl/simulation/clk_gen.sv
+    - rtl/simulation/core_v_mcu_sim_ram.sv
+    - rtl/simulation/sram512x64.v
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
     file_type: systemVerilogSource
 
   rom_init:
@@ -105,31 +107,32 @@ filesets:
     files:
     - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
-    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.mem'}
-    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.mem'}
-    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.mem'}
-    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.mem'}
-    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.mem}
-    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.mem}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
 
   mem_init_verilator:
     files:
-    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
-    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.mem'}
-    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.mem'}
-    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.mem'}
-    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.mem'}
-    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.mem}
-    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.mem}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
 
 
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
-    - tb/tb_clk_gen.sv
+    - tb/uartdpi/uartdpi.sv
+    - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
   emulation-rtl:
@@ -143,6 +146,11 @@ filesets:
     - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
     - emulation/xilinx/rtl/pad_functional_xilinx.sv
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    - emulation/xilinx/rtl/sram512x64.v
+    - emulation/xilinx/rtl/DW02_mac.sv
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
+
     file_type: systemVerilogSource
 
   xilinx-ips:
@@ -174,7 +182,6 @@ filesets:
     files:
     - rtl/core-v-mcu/scripts/vedit.sh
     file_type: user
-
   # Waiver file, without which the model lib will not build.
   verilator-waiver:
     files:
@@ -187,6 +194,10 @@ parameters:
     paramtype: vlogdefine
     default: true
   VERILATOR:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+  USE_BW:
     datatype: bool
     paramtype: vlogdefine
     default: true
@@ -212,12 +223,14 @@ targets:
     <<: *default_target
     default_tool: modelsim
     filesets_append:
-    - simulation-rtl
+    - rtl-simulation
     - mem_init_modelsim
     - rtl-behavioral
     - tb-rtl
     toplevel:
     - core_v_mcu_tb
+    parameters:
+    - USE_BW=true
     tools:
       modelsim:
         vlog_options:
@@ -234,10 +247,12 @@ targets:
     default_tool: verilator
     parameters:
     - VERILATOR=true
+    - USE_BW=true
     filesets_append:
     - pre_build_scripts
     - verilator-waiver
     - mem_init_verilator
+    - rtl-simulation
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
@@ -253,6 +268,8 @@ targets:
     <<: *default_target
     default_tool: verilator
     toplevel: [core_v_mcu]
+    filesets_append:
+    - rtl-simulation
     tools:
       verilator:
         mode: lint-only
@@ -266,8 +283,8 @@ targets:
     parameters:
     - PULP_FPGA_EMUL=true
     filesets_append:
-    - emulation-rtl
     - xilinx-ips
+    - emulation-rtl
     - nexys-rtl
     - nexys-cfg
     - nexys-xdc

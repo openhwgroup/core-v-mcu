@@ -16,7 +16,6 @@ module MAC_8BIT  (
   MAC_TC,
   acc_ff_rstn
 );
-  parameter USE_BW = 0;
   parameter MULTI_WIDTH   = 8;
   parameter TC            = 1'b0;
 
@@ -71,8 +70,6 @@ end //DELAY_OF_MAC_OUT_SEL
    wire [3:0] oper_sign, coef_sign;
    assign oper_sign = MAC_TC ? {4{MAC_OPER_DATA[7]}} : 4'b0000;
    assign coef_sign = MAC_TC ? {4{MAC_COEF_DATA[7]}} : 4'b0000;
-  generate
-    if (USE_BW == 1)
       bw_mac #(
                .A_width (12),
                .B_width (12)
@@ -86,21 +83,6 @@ end //DELAY_OF_MAC_OUT_SEL
                 .TC (MAC_TC),
                 .MAC(DWMAC_OUT[23:0])
                 );
-    else
-      DW02_mac #(
-               .A_width (12),
-               .B_width (12)
-               )
-    U_DW02_mac (
-                //vincent@20181101.A  ({2'h0,MAC_OPER_DATA[7:0]}),
-                //vincent@20181101.B  ({2'h0,MAC_COEF_DATA[7:0]}),
-                .A  ({oper_sign,MAC_OPER_DATA[7:0]}),
-                .B  ({coef_sign,MAC_COEF_DATA[7:0]}),
-                .C  (feedback_acc_data[23:0]),
-                .TC (MAC_TC),
-                .MAC(DWMAC_OUT[23:0])
-                );
-  endgenerate
 
 /*------------------------------*/
 /*        LOAD of ACC           */

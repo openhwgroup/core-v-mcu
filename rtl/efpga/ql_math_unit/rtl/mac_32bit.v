@@ -17,7 +17,6 @@ module MAC_32BIT (
   MAC_TC,
   acc_ff_rstn
 );
-  parameter USE_BW = 0;
   parameter MULTI_WIDTH   = 32;
   parameter TC            = 1'b0;
 
@@ -72,37 +71,20 @@ end //DELAY_OF_MAC_OUT_SEL
    wire [7:0] oper_sign, coef_sign;
    assign oper_sign = MAC_TC ? {8{MAC_OPER_DATA[31]}} : 8'b00000000;
    assign coef_sign = MAC_TC ? {8{MAC_COEF_DATA[31]}} : 8'b00000000;
-  generate
-    if (USE_BW == 1)
-      bw_mac #(
-               .A_width (40),
-               .B_width (40)
-               )
-    U_DW02_mac (
-                //vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}),
-                //vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}),
-                .A  ({oper_sign,MAC_OPER_DATA[31:0]}),
-                .B  ({coef_sign,MAC_COEF_DATA[31:0]}),
-                .C  (feedback_acc_data[79:0]),
-                .TC (MAC_TC),
-                .MAC(DWMAC_out[79:0])
-                );
-    else
-      DW02_mac #(
-               .A_width (40),
-               .B_width (40)
-               )
-    U_DW02_mac (
-                //vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}),
-                //vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}),
-                .A  ({oper_sign,MAC_OPER_DATA[31:0]}),
-                .B  ({coef_sign,MAC_COEF_DATA[31:0]}),
-                .C  (feedback_acc_data[79:0]),
-                .TC (MAC_TC),
-                .MAC(DWMAC_out[79:0])
-                );
-  endgenerate
-/*------------------------------*/
+  bw_mac #(
+           .A_width (40),
+           .B_width (40)
+           )
+  U_DW02_mac (
+              //vincent@20181101.A  ({8'h0,MAC_OPER_DATA[31:0]}),
+              //vincent@20181101.B  ({8'h0,MAC_COEF_DATA[31:0]}),
+              .A  ({oper_sign,MAC_OPER_DATA[31:0]}),
+              .B  ({coef_sign,MAC_COEF_DATA[31:0]}),
+              .C  (feedback_acc_data[79:0]),
+              .TC (MAC_TC),
+              .MAC(DWMAC_out[79:0])
+              );
+  /*------------------------------*/
 /*        LOAD of ACC           */
 /*------------------------------*/
 always@(*) begin: MUX_OF_IDATA_ACC

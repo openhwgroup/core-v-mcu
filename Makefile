@@ -91,6 +91,7 @@ nexys-emul:		${IOSCRIPT_OUT}
 					export XILINX_BOARD=digilentinc.com:nexys-a7-100t:1.0;\
 					export FC_CLK_PERIOD_NS=100;\
 					export PER_CLK_PERIOD_NS=200;\
+					export FPGA_CLK_PERIOD_NS=125;\
 					export SLOW_CLK_PERIOD_NS=30517;\
 					fusesoc --cores-root . run --target=nexys-a7-100t --setup --build openhwgroup.org:systems:core-v-mcu\
 				) 2>&1 | tee lint.log
@@ -129,4 +130,3 @@ download:
 	vivado -mode batch -source emulation/core-v-mcu-nexys/tcl/download_bitstream1.tcl -tclargs\
              emulation/core_v_mcu_nexys.bit
 				(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run) 2>&1 | tee sim.log
-
