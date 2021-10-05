@@ -300,7 +300,8 @@ module core_v_mcu #(
 
 
   assign io_out_o[20:0] = stm_i ? 0 : s_io_out[20:0];
-  assign io_out_o[28:23] = stm_i ? 0 : s_io_out[28:23];
+  assign io_out_o[28:22] = stm_i ? 0 : s_io_out[28:22];
+  assign io_out_o[38:37] = stm_i ? 0 : s_io_out[38:37];
   assign io_out_o[`N_IO-1:43] = stm_i ? 0 : s_io_out[`N_IO-1:43];
   assign io_oe_o[20:0] = stm_i ? 0 : s_io_oe[20:0];
   assign io_oe_o[28:22] = stm_i ? 0 : s_io_oe[28:22];
