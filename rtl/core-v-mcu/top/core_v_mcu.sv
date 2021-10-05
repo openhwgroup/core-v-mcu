@@ -261,7 +261,7 @@ module core_v_mcu #(
       .ref_clk_i  (ref_clk_i),
       .slow_clk_o (s_ref_clk),
       .efpga_clk_o(s_efpga_clk),
-//      .bootsel_i  (bootsel_i),
+      //      .bootsel_i  (bootsel_i),
       .rst_ni     (rstn_i),
       .rst_no     (s_rstn_por),
 
