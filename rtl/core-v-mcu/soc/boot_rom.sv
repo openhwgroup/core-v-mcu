@@ -34,9 +34,9 @@ module boot_rom #(
   //Remove address offset
   logic [31:0] address;
   assign address = mem_slave.add - `SOC_MEM_MAP_BOOT_ROM_START_ADDR;
-  a2_bootrom #(
-      .ADDR_WIDTH(ROM_ADDR_WIDTH - 2),
-      .DATA_WIDTH(32)
+  a2_bootrom // #(
+//      .ADDR_WIDTH(ROM_ADDR_WIDTH - 2),
+//      .DATA_WIDTH(32)
   ) rom_mem_i (
       .CLK(clk_i),
       .CEN(~mem_slave.req),

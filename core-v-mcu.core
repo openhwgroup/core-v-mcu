@@ -52,7 +52,6 @@ filesets:
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
-    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
@@ -95,6 +94,7 @@ filesets:
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
+    - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
 
   rom_init:
@@ -150,7 +150,7 @@ filesets:
     - emulation/xilinx/rtl/DW02_mac.sv
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
-
+    - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
 
   xilinx-ips:
