@@ -1,6 +1,6 @@
 Offset,Register,Field,MSB,LSB,Type,Default,Description,
 0x00,RX_SADDR,,,,,,,
-,,SADDR,11,0,RW,,Address of receive buffer on write, current address on read
+,,SADDR,11,0,RW,,Address of receive buffer on write; current address on read,
 0x04,RX_SIZE,,,,,,,
 ,,SIZE,15,0,RW,,Size of receive buffer on write, bytes left on read
 0x08,RX_CFG,,,,,,,

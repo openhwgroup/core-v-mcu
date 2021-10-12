@@ -44,23 +44,29 @@ TODO: step-by-step guide to getting a blinking LED test working.
 
 ## Peripherals
 <!--
+TODO: theory of operation of the peripherals
 -->
 
 ### Memory Map
 ### Peripheral Control and Status Registers
 #### UDMA
 <!--
+TODO: CSR table for UDMA goes here:
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### UART
 <!--
-Example CSR description below:
+This is the real CSR description description for the UART:
 -->
  | Offset |Register |Field |MSB |LSB |Type |Default |Description |
  |--- | --- | --- | --- | --- | --- | --- | --- |
  | 0x00 | RX_SADDR |  |  |  |  |  |  |
- |  |  | SADDR | 11 | 0 | RW |  | Address of receive buffer on write; current address on read | 
- | 0x04 | RX_SIZE |  |  |  |  |  |  | 
+ |  |  | SADDR | 11 | 0 | RW |  | Address of receive buffer on write; current address on read |
+ | 0x04 | RX_SIZE |  |  |  |  |  |  |
  |  |  | SIZE | 15 | 0 | RW |  | Size of receive buffer on write; bytes left on read | 
  | 0x08 | RX_CFG |  |  |  |  |  |  |
  |  |  | CLR | 6 | 6 | WO |  | Clear the receive channel |
@@ -108,34 +114,66 @@ Example CSR description below:
 #### I2Cm
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### I2Cs
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### SPIm
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### QSPIm
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### CAMI
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### GPIO
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### PWM
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 ### eFPGA
 <!--
 -->
+ | Offset |Register |Field |MSB |LSB |Type |Default |Description |
+ |--- | --- | --- | --- | --- | --- | --- | --- |
+ | 0x00 | EX_CSR |  |  |  |  |  |  |
+ |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
 
 #### Overview
 #### Programming the eFPGA
