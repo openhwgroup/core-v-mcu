@@ -1,8 +1,8 @@
 # CORE_V_MCU
 
 ## Purpose
-The purpose of the core-v-mcu is to showcase the cv32e40p, a fully verified RISC-V core available from the Open Hardware Group.
-The cv32e40p core is connected to a representative set of peripherals:
+The purpose of the core-v-mcu is to showcase the [CV32E40P](https://cv32e40p.readthedocs.io/en/latest/intro), a fully verified open-source RISC-V core supported by the Open Hardware Group.
+The CV32E40P core is connected to a representative set of peripherals:
 
 * 2xUART
 * 2xI2C master
