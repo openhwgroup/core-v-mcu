@@ -22,12 +22,12 @@ CORE-V-MCU supports 512KB of SRAM and 3 PLLs.
 ![Block Diagram](../images/core-v-mcu-block-diagram.png)
 
 
-## Hardware Evaluation Kits
+## Hardware Development Kits
 The CORE-V-MCU is delivered as either:
 
 * a Xilinx bitstream that runs on the Digilent Nexsy A7 board
 * a Xilinx bitstream that runs on the Digilent Genesys2 board
-* an SoC implemented with GLOBALFOUNDRIES 22nm fdx SOI technology that runs on the Open Hardware Group CORE-V-MCU EVK board
+* an SoC implemented with GLOBALFOUNDRIES 22nm fdx SOI technology that runs on the Open Hardware Group CORE-V-MCU HWDK board
 <!--
 TODO: add references to the documentation for the above boards.
 -->
