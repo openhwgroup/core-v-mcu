@@ -1,173 +1,62 @@
 # CORE_V_MCU
 
-## Purpose
-The purpose of the core-v-mcu is to showcase the [CV32E40P](https://cv32e40p.readthedocs.io/en/latest/intro), a fully verified open-source RISC-V core supported by the Open Hardware Group.
-The CV32E40P core is connected to a representative set of peripherals:
+## Feature Specification
+The core-v-mcu showcases the [CV32E40P](https://cv32e40p.readthedocs.io/en/latest/intro), a fully verified open-source RISC-V core supported by the Open Hardware Group in aa SoC design.
+In addition to the CV32E40P core the SoC provides 512 KBytes of SRAM, a set of standard Peripherals and an embedded FPGA.
+Three independent PLLs provide flexible clocking for the CPU, the peripherals and the eFPGA.
+An internal bootrom allows for booting from a SPI flash or under host control via an I2C slave interface along with a JTAG interface for debugging.
 
-* 2xUART
-* 2xI2C master
-* 1xI2C slave
-* 2xQSPI master
-* 1xCAMERA
-* 1xSDIO
-* 4xPWM
-* eFPGA with 4 math units
+The following peripherals are equipped:
 
-__Note:__ A set of registers in soc_ctrl defines which peripherals and how many were incorporated in the build.
-The soc_ctrl documenation reports the configuration when the documentation was generated, however that may not be in sync with the
-configuration when the RTL was built.
+* 2 UART
+* QSPI master
+* 2 I2C master
+* 1 Parallel CAMERA
+* 1 SDIO
+* 1 I2C slave
+* 32 GPIO
+* 4 advanced timer blocks with PWM
+* 1 eFPGA with 4 math units
+* Event Generator for Interrupt processing
+* Fast Interrupt capability
 
-The system supports 512KB of SRAM and 3 PLLs.
 
 ![Block Diagram](../images/core-v-mcu-block-diagram.png)
 
+### UART
+The uart equipped on the SoC are udma peripherals that allow efficient transfer of data.
 
-## Evaluation Kits
-The core-v-mcu is delivered as either:
+### QSPI master
+The QSPI master utilized the udma supsystem to efficiently transfer datato/from memory. It can operate in x1, x2 or x4 mode and can be used by the bootrom to load memory and transfer control. When booting from SPI the interface runs in x1 mode.
 
-* a Xilinx bitstream that runs on the Digilent Nexsy A7 board
-* a Xilinx bitstream that runs on the Digilent Genesys2 board
-* an SOC implemented with GLOBAFOUNDRIES 22nm fdx SOI technology that runs on an Open Hardware Group EVK board
+### I2C master
+Two I2C master interfaces are provided.  They utilize the udma subsystem for transfer to and from memory.
 
-All boards have multiple PMOD connectors that suport various PMOD modules which are used to connect debug and various peripherals.
+### Parallel Camera
+An 11-bit camera interface with 3 control inputs (CLK, HSYNC, VSYNC) and 8 data inputs is provided with a udma interface to transfer frames to memory.
+The interface is compatible with the HiMax HM01B0 low power image sensor.
 
-## Software Support
-The Open Hardware Group's Software Task Group supports the software ecosystem.
+### SDIO
+SDIO interface may be included -- TBD
 
-## Software Validation System
-The core-v-mcu project has a FreeRTOS/Eclipse based project that runs software on the emulation system to verify the correct operation of the system.  The software validation system is in the core-v-mcu-cli-test repo.  There are two components:
-
-* a FreeRTOS/Eclipse app called cli-test that uses a Command Line Interface to exercise features
-* a Python script that automates using the cli-test to validate correct system operation
-
-### Goals of the System Validation Tests
-The goals of the whole product tests are to:
-
-  * Confirm that the entire address space is accessible by the core
-    * All of the TCDM
-    * All of the peripheral registers
-    * All special registers
-  * Confirm that gdb can:
-    * halt and resume the core
-    * can single step the core
-    * access entire addressable memory space
-      - memories
-      - peripherals
-      - CSRS
-    * NOTE: for performance reasons, may use gdb for sampling test and another mechanism for exhaustive testing
-  * Confirm that the interrupts work as expected:
-    * All sources
-    * Masking
-  * Confirm that the timers work as expected:
-    * TBD
-  * Confirm that the clock trees & divisors work as expected:
-    * Can set FLL to desired frequency
-    * Clock tree enables work
-    * Clock tree divisors work
-  * uDMA
-    * Covered by peripheral tests
-  * Peripherals (details later in document)
-    * UART
-    * I2Cm
-    * I2Cs
-    * SPIm
-    * QSPIm
-    * CAMI
-    * GPIO
-    * PWM
-  * EFPGA
-    * TCMD
-    * APB
-    * Math blocks
-    * IO
-    * Configuration
-    * Test mode
-  * Confirm I/O control works as expected:
-    * Peripherals can access I/O
-    * GPIO can access all I/O
-    * EFPGA can access all I/O
-    * Mux select works properly
-    * All IO configurations can be set properly
-  * Test modes
-    * Confirm JTAG can be set in scan mode
-    * Confirm JTAG can be set in mem BIST mode
-    * Confirm JTAG can be set in EFPGA test mode
-  * Significant application
-    * TfLu person detection application reading from HiMax camera and using eFPGA acceleration
-
- ### Peripheral tests
- Peripheral tests use the specified peripherals (typically PMOD) to confirm correct system operation.
-
- ### UART tests
- Pmod used for regression testing: PmodUSBUART
-
-| Type          | Mode                            | Notes      |
-| :------------  | :---------------------------    | :-------  |
-| Blocking    |                    ||
-|        | Set config              |baud, stop, bits, parity  |
-|        | Read char               ||
-|        | Write char              ||
-|        | Read N char             ||
-|        | Write N char            ||
-|        | Read through '\\n'       ||
-|        | Rx empty                ||
-|        | Tx empty                ||
-|        | Wait for idle           ||
-| Non-blocking  |                  ||
-
-### I2Cmaster
-Pmod used for regression testing: PmodRTCC (has small SRAM)
-
-| Type       | Mode                           | Notes   |
-| :------------  | :---------------------     | :-------  |
-| Blocking  |                                 ||
-|           | Set clock frequency             ||
-|           | Wait for idle                   ||
-|           | Read register                   ||
-|           | Read non-existant register      | Test NAK handling |
-|           | Write register                  ||
-|           | Write non-existant register     | Test NAK handling |
-|           | Read N of M registers, M >= N   ||
-|           | Read N of M registers, M < N    | Test NAK handling |
-|           | Write N of M registers, M >= N  ||
-|           | Write N of M registers, M < N   | Test NAK handling |
-| Not tested  |                               ||
-|           | Clock stretching                ||
-
-### I2Cslave
-
-Note: APIs are on host, so used for purposes of describing tested functionality
-
-| Type       | Mode                | Notes   |
-| :------------  | :---------------------------    | :-------  |
-|         | Read register            |
-|        | Read non-existant register     | Test NAK handling |
-|        | Write register           |
-|        | Write non-existant register    | Test NAK handling |
-|        | Read N of M registers, M >= N    |
-|        | Read N of M registers, M < N    | Test NAK handling |
-|        | Write N of M registers, M >= N  |
-|        | Write N of M registers, M < N    | Test NAK handling |
-
-### QSPImaster
-Pmod used for regression testing: PmodSF3 (serial NOR flash memory)
-
-| Type       | Mode                           | Notes   |
-| :------------  | :---------------------     | :-------  |
-| Blocking     |                              ||
-|        | Set configuration                  | clock rate, cpol, cpha, endianness, cs# |
-|        | Wait for idle                      ||
-| Non-blocking  |                             ||
-|        | Write N bytes in single bit mode   ||
-|        | Write N bytes in dual bit mode     ||
-|        | Write N bytes in quad bit mode     ||
-|        | Read N bytes in single bit mode    ||
-|        | Read N bytes in dual bit mode      ||
-|        | Read N bytes in quad bit mode      ||
-|        | Write/Read N bytes in single mode  ||
-
-### CAMI
+### I2C Slave
+An I2C slave interface is provided for host communication to the SoC. It is directly controlled as an APB peripheral with 2 256-Byte Fifos for reciept and transmission of data.
 
 ### GPIO
+The Soc provides 32 GPIO pins that can multiplexed  from the internal gpio registers to the IO of the device.
+Each GPIO is independent and supports Open collector output, loopback from the PAD, programmable pullup/pulldown and several drive strengths. Additionally, interrupts via the event generator can be enabled for level or edge sensitive triggers.
 
-### PWM
+### Advanced Timer
+An advanced timer block with four independent timers each with 4 output channels can be programmebe to generate PWM outputs.
+
+### EFPGA
+A Quicklogic ArcticPro 2 eFPGA with four math Blocks is equipped. The EFPGA contains approximately 1000 SLC each with 4 lut/ff elements. 2 Math units are provided, each math unit contains 3 4kx32 bit Dual port RAMs and 2 Multiplier units.
+the RAMS cna be configures to be 8/16/or 32 bit width independently on the read and write ports.  The mulitpliers can be configured to be a 32x32, 2 -16x16, 4 8x8, or 8 4x4 multipliers.
+The EFPGA has a primary APB sytle interface to the SoC and can be addressed as a stadard peripheral.  In addition the CPU controlled APB interface the EFPGA has access to 4 TCDM (Tightly Coupled Distributed Memory) interfaces that allow the EFPGA to independently read and write the System Memory.
+The EFPGA had 16 dedicated interrupt output signals to the SoC Event Generator along with 40 FPGAIO that can send and recieve data from the device PADs.
+
+### EVENT Generator
+The event Generator collects events (interrupts) from all the udma peripherals (each udma channel has 4 interrupts allocated), the GPIO and the EFPGA for presentation to the CPU via set of FIFOs which presnt the interrupts in a round robin fashion
+
+### Fast Interrupts
+The CV32E40P core provides for Fast interrupts that allow quick response. The interrupts are directly vectored from the MTVEC.
