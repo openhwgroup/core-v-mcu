@@ -91,10 +91,10 @@ TODO: step-by-step guide to getting a blinking LED test working.
 <!--
 TODO: CSR table for UDMA goes here:
 -->
- | Offset |Register |Field |MSB |LSB |Type |Default |Description |
- |--- | --- | --- | --- | --- | --- | --- | --- |
- | 0x00 | EX_CSR |  |  |  |  |  |  |
- |  |  | EX_FIELD | 31 | 0 | RW |  | Example Control/Status Register |
+ | Offset | Register | Field     | MSB | LSB | Type | PoR     | Description                                                   |
+ |------- | -------- | --------- | --- | --- | ---- | ------- | ------------------------------------------------------------- |
+ | 0x00   | EX_CSR0  | EX_FIELD0 | 31  | 16  | RW   | 0x05    | Example single line Control/Status Register Field description |
+ |        |          | EX_FIELD1 | 15  |  0  | RW   | 0x50    | Example multi-line Control/Status Register description<br> for more complex fields |
 
 #### UART
 <!--
