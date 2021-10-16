@@ -91,60 +91,60 @@ TODO: step-by-step guide to getting a blinking LED test working.
 <!--
 TODO: CSR table for UDMA goes here:
 -->
- | Offset | Register | Field       | MSB | LSB | Access | PoR         | Description                                                                                        |
- |------- | -------- | ----------- | ---:| ---:| ------:| -----------:| -------------------------------------------------------------------------------------------------- |
- | 0x00   | EX_CSR0  |             |     |     |        |             | Example single line REGISTER description for CSR ``EX_CSR0``                                       |
- |        |          | EX_FIELD0.0 | 31  | 0   | RW     | 0x12340005  | Example single line FIELD description for ``EX_FIELD0.0 ``                                         |
- | 0x04   | EX_CSR1  |             |     |     | RW     |             | Another example REGISTER description for CSR ``EX_CSR1``                                           |
- |        |          | EX_FIELD1.0 | 31  | 16  | RW     | 0x0005      | Another FIELD description for ``EX_FIELD1.0``                                                      |
- |        |          | EX_FIELD1.1 | 15  | 0   | RW     | 0x5550      | Example multi-line FIELD description<br> for more complex field ``EX_FIELD1.1``                    |
+ | Offset | Register | Field       | MSB | LSB | Access | PoR        | Description                                                                                        |
+ |------- | -------- | ----------- | ---:| ---:| ------:|:---------- | -------------------------------------------------------------------------------------------------- |
+ | 0x00   | EX_CSR0  |             |     |     |        |            | Example single line REGISTER description for CSR ``EX_CSR0``                                       |
+ |        |          | EX_FIELD0.0 | 31  | 0   | RW     | 0x12340005 | Example single line FIELD description for ``EX_FIELD0.0 ``                                         |
+ | 0x04   | EX_CSR1  |             |     |     | RW     |            | Another example REGISTER description for CSR ``EX_CSR1``                                           |
+ |        |          | EX_FIELD1.0 | 31  | 16  | RW     | 0x0005     | Another FIELD description for ``EX_FIELD1.0``                                                      |
+ |        |          | EX_FIELD1.1 | 15  | 0   | RW     | 0x5550     | Example multi-line FIELD description<br> for more complex field ``EX_FIELD1.1``                    |
 
 #### UART
 <!--
 This is the real CSR description description for the UART:
 -->
- | Offset | Register   | Field         | MSB | LSB | Access | PoR        | Description                                                                                                                                 |
- |------- | ---------- | ------------- | ---:| ---:| ------:| ----------:| ------------------------------------------------------------------------------------------------------------------------------------------- |
- | 0x00   | RX_SADDR   |               |     |     |        |            |                                                                                                                                             |
- |        |            | SADDR         | 11  | 0   | RW     |            | Address of receive buffer on write<br> current address on read                                                                              |
- | 0x04   | RX_SIZE    |               |     |     |        |            |                                                                                                                                             |
- |        |            | SIZE          | 15  | 0   | RW     |            | Size of receive buffer on write; bytes left on read                                                                                         |
- | 0x08   | RX_CFG     |               |     |     |        |            |                                                                                                                                             |
- |        |            | CLR           | 6   | 6   | WO     |            | Clear the receive channel                                                                                                                   |
- |        |            | PENDING       | 5   | 5   | RO     |            | Receive transaction is pending                                                                                                              |
- |        |            | EN            | 4   | 4   | RW     |            | Enable the receive channel                                                                                                                  |
- |        |            | CONTINUOUS    | 0   | 0   | RW     |            | 0x0: stop after last transfer for channel<br> 0x1: after last transfer for channel,reload buffer size and start address and restart channel |
- | 0x10   | TX_SADDR   |               |     |     |        |            |                                                                                                                                             |
- |        |            | SADDR         | 11  | 0   | RW     |            | Address of transmit buffer on write<br> current address on read                                                                             |
- | 0x14   | TX_SIZE    |               |     |     |        |            |                                                                                                                                             |
- |        |            | SIZE          | 15  | 0   | RW     |            | Size of receive buffer on write; bytes left on read                                                                                         |
- | 0x18   | TX_CFG     |               |     |     |        |            |                                                                                                                                             |
- |        |            | CLR           | 6   | 6   | WO     |            | Clear the transmit channel                                                                                                                  |
- |        |            | PENDING       | 5   | 5   | RO     |            | Transmit transaction is pending                                                                                                             |
- |        |            | EN            | 4   | 4   | RW     |            | Enable the transmit channel                                                                                                                 |
- |        |            | CONTINUOUS    | 0   | 0   | RW     |            | 0x0: stop after last transfer for channel<br> 0x1: after last transfer for channel,reload buffer size and start address and restart channel |
- | 0x20   | STATUS     |               |     |     |        |            |                                                                                                                                             |
- |        |            | RX_BUSY       | 1   | 1   | RO     |            | 0x1: receiver is busy                                                                                                                       |
- |        |            | TX_BUSY       | 0   | 0   | RO     |            | 0x1: transmitter is busy                                                                                                                    |
- | 0x24   | UART_SETUP |               |     |     |        |            |                                                                                                                                             |
- |        |            | DIV           | 31  | 16  | RW     |            |                                                                                                                                             |
- |        |            | EN_RX         | 9   | 9   | RW     |            | Enable the reciever                                                                                                                         |
- |        |            | EN_TX         | 8   | 8   | RW     |            | Enable the transmitter                                                                                                                      |
- |        |            | RX_CLEAN_FIFO | 5   | 5   | RW     |            | Empty the receive FIFO                                                                                                                      |
- |        |            | RX_POLLING_EN | 4   | 4   | RW     |            | Enable polling mode for receiver                                                                                                            |
- |        |            | STOP_BITS     | 3   | 3   | RW     |            | 0x0: 1 stop bit<br> 0x1: 2 stop bits                                                                                                        |
- |        |            | BITS          | 2   | 1   | RW     |            | 0x0: 5 bit transfers<br> 0x1: 6 bit transfers<br> 0x2: 7 bit transfers<br> 0x3: 8 bit transfers                                             |
- |        |            | PARITY_EN     | 0   | 0   | RW     |            | Enable parity                                                                                                                               |
- | 0x28   | ERROR      |               |     |     |        |            |                                                                                                                                             |
- |        |            | PARITY_ERR    | 1   | 1   | RC     |            | 0x1 indicates parity error; read clears the bit                                                                                             |
- |        |            | OVERFLOW_ERR  | 0   | 0   | RC     |            | 0x1 indicates overflow error; read clears the bit                                                                                           |
- | 0x2C   | IRQ_EN     |               |     |     |        |            |                                                                                                                                             |
- |        |            | ERR_IRQ_EN    | 1   | 1   | RW     |            | Enable the error interrupt                                                                                                                  |
- |        |            | RX_IRQ_EN     | 0   | 0   | RW     |            | Enable the receiver interrupt                                                                                                               |
- | 0x30   | VALID      |               |     |     |        |            |                                                                                                                                             |
- |        |            | RX_DATA_VALID | 0   | 0   | RO     |            | Cleared when RX_DATA is read                                                                                                                |
- | 0x34   | DATA       |               |     |     |        |            |                                                                                                                                             |
- |        |            | RX_DATA       | 7   | 0   | RO     |            | Receive data; reading clears RX_DATA_VALID                                                                                                  |
+ | Offset | Register   | Field         | MSB | LSB | Access | PoR | Description                                                                                                                                 |
+ |------- | ---------- | ------------- | ---:| ---:| ------:|:--- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+ | 0x00   | RX_SADDR   |               |     |     |        |     |                                                                                                                                             |
+ |        |            | SADDR         | 11  | 0   | RW     |     | Address of receive buffer on write<br> current address on read                                                                              |
+ | 0x04   | RX_SIZE    |               |     |     |        |     |                                                                                                                                             |
+ |        |            | SIZE          | 15  | 0   | RW     |     | Size of receive buffer on write; bytes left on read                                                                                         |
+ | 0x08   | RX_CFG     |               |     |     |        |     |                                                                                                                                             |
+ |        |            | CLR           | 6   | 6   | WO     |     | Clear the receive channel                                                                                                                   |
+ |        |            | PENDING       | 5   | 5   | RO     |     | Receive transaction is pending                                                                                                              |
+ |        |            | EN            | 4   | 4   | RW     |     | Enable the receive channel                                                                                                                  |
+ |        |            | CONTINUOUS    | 0   | 0   | RW     |     | 0x0: stop after last transfer for channel<br> 0x1: after last transfer for channel,reload buffer size and start address and restart channel |
+ | 0x10   | TX_SADDR   |               |     |     |        |     |                                                                                                                                             |
+ |        |            | SADDR         | 11  | 0   | RW     |     | Address of transmit buffer on write<br> current address on read                                                                             |
+ | 0x14   | TX_SIZE    |               |     |     |        |     |                                                                                                                                             |
+ |        |            | SIZE          | 15  | 0   | RW     |     | Size of receive buffer on write; bytes left on read                                                                                         |
+ | 0x18   | TX_CFG     |               |     |     |        |     |                                                                                                                                             |
+ |        |            | CLR           | 6   | 6   | WO     |     | Clear the transmit channel                                                                                                                  |
+ |        |            | PENDING       | 5   | 5   | RO     |     | Transmit transaction is pending                                                                                                             |
+ |        |            | EN            | 4   | 4   | RW     |     | Enable the transmit channel                                                                                                                 |
+ |        |            | CONTINUOUS    | 0   | 0   | RW     |     | 0x0: stop after last transfer for channel<br> 0x1: after last transfer for channel,reload buffer size and start address and restart channel |
+ | 0x20   | STATUS     |               |     |     |        |     |                                                                                                                                             |
+ |        |            | RX_BUSY       | 1   | 1   | RO     |     | 0x1: receiver is busy                                                                                                                       |
+ |        |            | TX_BUSY       | 0   | 0   | RO     |     | 0x1: transmitter is busy                                                                                                                    |
+ | 0x24   | UART_SETUP |               |     |     |        |     |                                                                                                                                             |
+ |        |            | DIV           | 31  | 16  | RW     |     |                                                                                                                                             |
+ |        |            | EN_RX         | 9   | 9   | RW     |     | Enable the reciever                                                                                                                         |
+ |        |            | EN_TX         | 8   | 8   | RW     |     | Enable the transmitter                                                                                                                      |
+ |        |            | RX_CLEAN_FIFO | 5   | 5   | RW     |     | Empty the receive FIFO                                                                                                                      |
+ |        |            | RX_POLLING_EN | 4   | 4   | RW     |     | Enable polling mode for receiver                                                                                                            |
+ |        |            | STOP_BITS     | 3   | 3   | RW     |     | 0x0: 1 stop bit<br> 0x1: 2 stop bits                                                                                                        |
+ |        |            | BITS          | 2   | 1   | RW     |     | 0x0: 5 bit transfers<br> 0x1: 6 bit transfers<br> 0x2: 7 bit transfers<br> 0x3: 8 bit transfers                                             |
+ |        |            | PARITY_EN     | 0   | 0   | RW     |     | Enable parity                                                                                                                               |
+ | 0x28   | ERROR      |               |     |     |        |     |                                                                                                                                             |
+ |        |            | PARITY_ERR    | 1   | 1   | RC     |     | 0x1 indicates parity error; read clears the bit                                                                                             |
+ |        |            | OVERFLOW_ERR  | 0   | 0   | RC     |     | 0x1 indicates overflow error; read clears the bit                                                                                           |
+ | 0x2C   | IRQ_EN     |               |     |     |        |     |                                                                                                                                             |
+ |        |            | ERR_IRQ_EN    | 1   | 1   | RW     |     | Enable the error interrupt                                                                                                                  |
+ |        |            | RX_IRQ_EN     | 0   | 0   | RW     |     | Enable the receiver interrupt                                                                                                               |
+ | 0x30   | VALID      |               |     |     |        |     |                                                                                                                                             |
+ |        |            | RX_DATA_VALID | 0   | 0   | RO     |     | Cleared when RX_DATA is read                                                                                                                |
+ | 0x34   | DATA       |               |     |     |        |     |                                                                                                                                             |
+ |        |            | RX_DATA       | 7   | 0   | RO     |     | Receive data; reading clears RX_DATA_VALID                                                                                                  |
 
 #### I2Cm
 <!--
