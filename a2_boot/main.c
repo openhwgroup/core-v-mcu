@@ -163,6 +163,12 @@ int main(void)
 	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
 	bootsel = *(volatile int*)0x1c010000;
 	bootsel = psoc->bootsel & 0x1;
+	udma_qspim_open(0, 5000000);
+	udma_flash_reset_enable(0, 0);
+	//for (i = 0; i < 10000; i++);
+	udma_flash_reset_memory(0, 0);
+	//for (i = 0; i < 10000; i++);
+	udma_flash_readid(tstring);
 
 	hal_set_apb_i2cs_slave_on_off(1);
 	if( hal_get_apb_i2cs_slave_address() !=  MY_I2C_SLAVE_ADDRESS )
