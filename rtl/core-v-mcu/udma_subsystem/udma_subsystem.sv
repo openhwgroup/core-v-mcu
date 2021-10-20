@@ -936,7 +936,7 @@ module udma_subsystem #(
 
   // FPGA
   generate
-    for (genvar g_fpga = 0; g_fpga < `N_FILTER; g_fpga++) begin : i_fpga_gen
+    for (genvar g_fpga = 0; g_fpga < `N_FPGA; g_fpga++) begin : i_fpga_gen
       assign s_events[4*(PER_ID_FPGA+g_fpga)+0] = s_rx_ch_events[CH_ID_RX_FPGA+g_fpga];
       assign s_events[4*(PER_ID_FPGA+g_fpga)+1] = s_tx_ch_events[CH_ID_TX_FPGA+g_fpga];
       assign s_events[4*(PER_ID_FPGA+g_fpga)+2] = 1'b0;
