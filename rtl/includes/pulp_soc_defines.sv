@@ -76,7 +76,7 @@
 
 //PARAMETERS
 `define CORE_TYPE     3   // 3 for cv32e40p , 0, pulp, 1 for IBEX RV32IMC (formeryly ZERORI5CY), 2 for IBEX RV32EC (formerly MICRORI5CY)
-`define USE_FPU       0
+`define USE_FPU       1
 `define USE_HWPE      0
 `define NB_CLUSTERS   0
 `define NB_CORES      0
@@ -148,12 +148,12 @@
 `define N_I2S	      `N_I2SC		// ToDo: Cpmpatibility
 `define N_CSI2    	0
 `define N_HYPER   	0
-`define N_SDIO    	0
+`define N_SDIO    	1
 `define N_CAM     	1
 `define N_JTAG    	0
 `define N_MRAM    	0
 `define N_FILTER  	1
-`define N_FPGA    	1
+`define N_FPGA    	0
 `define N_EXT_PER   0			// ToDo: Only set to one if PULP_TRAINING -- do we still need?
 
 
