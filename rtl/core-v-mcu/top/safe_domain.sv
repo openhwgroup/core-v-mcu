@@ -24,7 +24,6 @@ module safe_domain #(
 
     output logic test_clk_o,
     output logic test_mode_o,
-    output logic mode_select_o,
     output logic dft_cg_enable_o,
 
     //**********************************************************
@@ -136,6 +135,5 @@ module safe_domain #(
   assign test_clk_o      = 1'b0;
   assign dft_cg_enable_o = 1'b0;
   assign test_mode_o     = 1'b0;
-  assign mode_select_o   = 1'b0;
 
 endmodule  // safe_domain

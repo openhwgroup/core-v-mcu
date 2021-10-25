@@ -49,12 +49,10 @@ module soc_domain
     input logic ref_clk_i,
     input logic sclk_in,
     input logic test_clk_i,
-    input logic emul_clk,
     input logic rstn_glob_i,
 
     input  logic                         dft_test_mode_i,
     input  logic                         dft_cg_enable_i,
-    input  logic                         mode_select_i,
     input  logic                         bootsel_i,
     // AXI4 SLAVE
     input  logic [                  7:0] data_slave_aw_writetoken_i,
@@ -446,7 +444,7 @@ module soc_domain
       .dmactive_i     (s_dmactive),
       .wd_expired_o   (s_wd_expired),
       .dft_test_mode_i(dft_test_mode_i),
-      .dft_cg_enable_i(1'b0),
+      .dft_cg_enable_i(dft_cg_enable_i),
 
       .stoptimer_i(s_stoptimer),
       .bootsel_i(bootsel_i),
@@ -540,7 +538,6 @@ module soc_domain
   soc_clk_rst_gen i_clk_rst_gen (
       .ref_clk_i    (ref_clk_i),
       .sclk_in      (sclk_in),
-      //      .emul_clk     (emul_clk),
       .test_clk_i   (test_clk_i),
       .sel_fll_clk_i(s_sel_fll_clk),
 

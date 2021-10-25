@@ -644,7 +644,8 @@ module udma_subsystem #(
       logic       s_sdio_eot;
       logic       s_sdio_err;
       logic [3:0] s_sddata_oen;
-
+       logic 	  s_sdcmd_oen;
+       
       assign s_events[4*(PER_ID_SDIO+g_sdio)+0] = s_rx_ch_events[CH_ID_RX_SDIO+g_sdio];
       assign s_events[4*(PER_ID_SDIO+g_sdio)+1] = s_tx_ch_events[CH_ID_TX_SDIO+g_sdio];
       assign s_events[4*(PER_ID_SDIO+g_sdio)+2] = s_sdio_eot;
@@ -653,7 +654,8 @@ module udma_subsystem #(
       assign s_rx_cfg_stream_id[CH_ID_RX_SDIO+g_sdio] = 'h0;
       assign s_rx_ch_destination[CH_ID_RX_SDIO+g_sdio] = 'h0;
       assign s_tx_ch_destination[CH_ID_TX_SDIO+g_sdio] = 'h0;
-
+       assign perio_oe_o[`PERIO_SDIO0_CMD+`PERIO_SDIO_NPORTS*g_sdio] = ~s_sdcmd_oen;
+       
       assign perio_oe_o[`PERIO_SDIO_NPORTS * g_sdio + `PERIO_SDIO0_DATA3 : `PERIO_SDIO_NPORTS * g_sdio + `PERIO_SDIO0_DATA0] = ~s_sddata_oen;
       assign s_per_rst[PER_ID_SDIO+g_sdio] = sys_resetn_i & !s_rst_periphs[PER_ID_SDIO+g_sdio];
       udma_sdio_top #(
@@ -670,7 +672,7 @@ module udma_subsystem #(
           .sdclk_o(perio_out_o[`PERIO_SDIO0_CLK+`PERIO_SDIO_NPORTS*g_sdio]),
           .sdcmd_i(perio_in_i[`PERIO_SDIO0_CMD+`PERIO_SDIO_NPORTS*g_sdio]),
           .sdcmd_o(perio_out_o[`PERIO_SDIO0_CMD+`PERIO_SDIO_NPORTS*g_sdio]),
-          .sdcmd_oen_o(perio_oe_o[`PERIO_SDIO0_CMD+`PERIO_SDIO_NPORTS*g_sdio]),
+          .sdcmd_oen_o(s_sdcmd_oen),
           .sddata_i            ( perio_in_i[`PERIO_SDIO0_DATA3 + `PERIO_SDIO_NPORTS * g_sdio : `PERIO_SDIO0_DATA0 + `PERIO_SDIO_NPORTS * g_sdio]     ),
           .sddata_o            ( perio_out_o[`PERIO_SDIO0_DATA3 + `PERIO_SDIO_NPORTS * g_sdio : `PERIO_SDIO0_DATA0 + `PERIO_SDIO_NPORTS * g_sdio]     ),
           .sddata_oen_o(s_sddata_oen),

@@ -89,7 +89,7 @@ module core_v_mcu #(
 
   logic                                   s_test_mode;
   logic                                   s_dft_cg_enable;
-  logic                                   s_mode_select;
+
   //PERIO
   logic [ `N_PERIO-1:0]                   s_perio_out;
   logic [ `N_PERIO-1:0]                   s_perio_in;
@@ -267,7 +267,6 @@ module core_v_mcu #(
 
       .test_clk_o     (s_test_clk),
       .test_mode_o    (s_test_mode),
-      .mode_select_o  (s_mode_select),
       .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
@@ -349,13 +348,11 @@ module core_v_mcu #(
   ) i_soc_domain (
       .ref_clk_i(ref_clk_i),
       .sclk_in(io_in_i[5]),  // only used in fpga emulation for FLL
-      .emul_clk(s_efpga_clk),
       .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
       .dft_test_mode_i(s_test_mode),
       .dft_cg_enable_i(s_dft_cg_enable),
-      .mode_select_i(s_mode_select),
       .bootsel_i(bootsel_i),
 
       .data_slave_aw_writetoken_i('0),
@@ -486,10 +483,7 @@ module core_v_mcu #(
   );
 
    assign s_test_mode = '0;
-   
    assign s_dft_cg_enable = '0;
-   assign s_mode_select = '0;
-   
 
   assign s_dma_pe_evt_valid = '0;
   assign s_dma_pe_irq_valid = '0;
