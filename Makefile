@@ -33,7 +33,11 @@ help:
 			@echo "nexys-emul:     generate bitstream for Nexys-A7-100T emulation)"
 			@echo "buildsim:       build for Questa sim"
 			@echo "sim:            run Questa sim"
-			@echo "clean:          remove generated files"
+			@echo "build-vivado:   build for Vivado simulation (xelab)"
+			@echo "sim-vivado:     run Vivado simulation (xsim)"
+			@echo "clean-vivado:   remove generated build files from Vivado build and/or sim"
+			@echo "all-vivado:     clean-, build-, sim-vivado (in that order)"
+			@echo "clean:          remove generated doc and sw files"
 
 all:	${IOSCRIPT_OUT} docs sw
 
@@ -42,6 +46,21 @@ src:	${IOSCRIPT_OUT}
 clean:
 	(cd docs; make clean)
 	(cd sw; make clean)
+
+all-vivado:	clean-vivado build-vivado sim-vivado
+
+clean-vivado:
+	rm -rf build
+	rm -rf xelab.* vivado-sim.log
+
+.PHONY: build-vivado
+build-vivado:
+	fusesoc --cores-root . run --target=sim --tool=xsim --setup \
+		--build openhwgroup.org:systems:core-v-mcu | tee vivado-sim.log
+
+.PHONY:sim-vivado
+sim-vivado:
+	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-xsim; make run) 2>&1 | tee sim.log
 
 .PHONY: model-lib
 model-lib:

@@ -3,6 +3,7 @@ __pycache__/
 *.bak
 *~
 *.bit
+*.swp
 install/
 build/
 buildsim.log
