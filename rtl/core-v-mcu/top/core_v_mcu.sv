@@ -482,8 +482,8 @@ module core_v_mcu #(
 
   );
 
-   assign s_test_mode = '0;
-   assign s_dft_cg_enable = '0;
+  assign s_test_mode        = '0;
+  assign s_dft_cg_enable    = '0;
 
   assign s_dma_pe_evt_valid = '0;
   assign s_dma_pe_irq_valid = '0;

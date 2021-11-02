@@ -52,8 +52,7 @@ module l2_ram_multi_bank #(
 
     core_v_mcu_interleaved_ram #(
         .ADDR_WIDTH(INTL_MEM_ADDR_WIDTH)
-    ) 
-       bank_i (
+    ) bank_i (
         .clk_i,
         .rst_ni,
         .csn_i(~mem_slave[i].req),
