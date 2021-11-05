@@ -9,7 +9,7 @@
 // specific language governing permissions and limitations under the License.
 
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,

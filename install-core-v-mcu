@@ -18,7 +18,7 @@ echo "######################################"
   && echo "#" \
   && echo "######################################" \
   && python3 util/ioscript.py\
-      --soc-defines rtl/includes/pulp_soc_defines.sv\
+      --soc-defines rtl/includes/pulp_soc_defines.svh\
       --peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
       --periph-bus-defines rtl/includes/periph_bus_defines.sv\
       --pin-table pin-table.csv\

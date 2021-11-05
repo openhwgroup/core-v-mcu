@@ -43,7 +43,7 @@ filesets:
     files:
     - ../includes/periph_bus_defines.sv: {is_include_file: true, include_path: ../includes}
     - ../includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: ../includes}
-    - ../includes/pulp_soc_defines.sv: {is_include_file: true, include_path: ../includes}
+    - ../includes/pulp_soc_defines.svh: {is_include_file: true, include_path: ../includes}
     - ../includes/soc_mem_map.svh: {is_include_file: true, include_path: ../includes}
     - include/tcdm_macros.svh: {is_include_file: true, include_path: include/}
     - soc/pkg_soc_interconnect.sv

@@ -250,7 +250,7 @@ module A2_design (
 
 
 
-  QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 A2 (
+  ql737b_top A2 (
       .A2F_CLK0(CLK[0]),
       .A2F_CLK1(CLK[1]),
       .A2F_CLK2(CLK[2]),

@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 
 module udma_subsystem #(

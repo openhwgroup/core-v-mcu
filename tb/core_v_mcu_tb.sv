@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "../includes/pulp_soc_defines.sv"
+`include "../includes/pulp_soc_defines.svh"
 
 module core_v_mcu_tb;
    localparam IO_REF_CLK = 5;

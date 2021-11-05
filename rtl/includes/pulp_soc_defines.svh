@@ -1,5 +1,5 @@
 /*
- * pulp_soc_defines.sv
+ * pulp_soc_defines.svh
  *
  * Copyright (C) 2013-2018 ETH Zurich, University of Bologna.
  *

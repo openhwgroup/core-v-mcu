@@ -42,7 +42,7 @@ filesets:
     files:
     - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
-    - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/pulp_soc_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: rtl/core-v-mcu/include/}
     - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv

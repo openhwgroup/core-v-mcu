@@ -7,7 +7,7 @@
 // this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 
 module fc_subsystem #(
     parameter USE_FPU             = 1,
@@ -153,8 +153,11 @@ module fc_subsystem #(
 
 
   cv32e40p_core #(
-      .FPU(`USE_FPU),
-      .PULP_XPULP(1)
+		  .FPU(0),
+		  .NUM_MHPMCOUNTERS (1),
+		  .PULP_CLUSTER(0),
+		  .PULP_XPULP(1),
+		  .PULP_ZFINX(0)
   ) lFC_CORE (
       .clk_i              (clk_i),
       .rst_ni             (rst_ni),

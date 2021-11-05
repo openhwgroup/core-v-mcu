@@ -9,7 +9,7 @@
 // specific language governing permissions and limitations under the License.
 
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 
 module soc_domain
