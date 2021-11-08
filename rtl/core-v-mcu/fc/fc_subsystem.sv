@@ -153,11 +153,11 @@ module fc_subsystem #(
 
 
   cv32e40p_core #(
-		  .FPU(0),
-		  .NUM_MHPMCOUNTERS (1),
-		  .PULP_CLUSTER(0),
-		  .PULP_XPULP(1),
-		  .PULP_ZFINX(0)
+      .FPU(0),
+      .NUM_MHPMCOUNTERS(1),
+      .PULP_CLUSTER(0),
+      .PULP_XPULP(0),
+      .PULP_ZFINX(0)
   ) lFC_CORE (
       .clk_i              (clk_i),
       .rst_ni             (rst_ni),

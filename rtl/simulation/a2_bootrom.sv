@@ -8,6 +8,7 @@ module a2_bootrom #(
     output logic [DATA_WIDTH-1:0] Q
 );
   logic [31:0] value[(2**ADDR_WIDTH)-1:0];
+  logic [31:0] read_data;
 
   initial begin
     $readmemh("mem_init/boot.mem", value);
@@ -15,6 +16,11 @@ module a2_bootrom #(
 
 
   always @(posedge CLK) begin
-    Q <= value[A];
+    if (CEN == 0) begin
+      read_data <= value[A];
+      Q <= value[A];
+    end else begin
+      Q <= read_data;
+    end
   end
 endmodule
