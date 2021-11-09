@@ -10,8 +10,8 @@
 `include "pulp_soc_defines.svh"
 
 module fc_subsystem #(
-    parameter USE_FPU             = 1,
-    parameter USE_HWPE            = 1,
+    parameter USE_FPU             = 0,
+    parameter USE_HWPE            = 0,
     parameter N_EXT_PERF_COUNTERS = 1,
     parameter EVENT_ID_WIDTH      = 8,
     parameter PER_ID_WIDTH        = 32,
