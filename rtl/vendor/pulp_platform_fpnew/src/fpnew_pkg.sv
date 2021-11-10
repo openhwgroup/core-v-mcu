@@ -299,11 +299,7 @@ package fpnew_pkg;
   // -------------------------------------------
   // Returns the width of a FP format
   function automatic int unsigned fp_width(fp_format_e fmt);
-`ifdef XSIM
-    return 32; // FIXME: only valid for FP32
-`else
     return FP_ENCODINGS[fmt].exp_bits + FP_ENCODINGS[fmt].man_bits + 1;
-`endif
   endfunction
 
   // Returns the widest FP format present
