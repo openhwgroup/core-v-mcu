@@ -317,9 +317,7 @@ module axi_burst_splitter #(
   // --------------------------------------------------
   `ifndef VERILATOR
   // pragma translate_off
-  `ifndef XSIM
   default disable iff (!rst_ni);
-  `endif
   // Inputs
   assume property (@(posedge clk_i) slv_req_i.aw_valid |->
       txn_supported(slv_req_i.aw.atop, slv_req_i.aw.burst, slv_req_i.aw.cache, slv_req_i.aw.len)
@@ -337,7 +335,7 @@ module axi_burst_splitter #(
   assert property (@(posedge clk_i) mst_req_o.ar_valid |-> mst_req_o.ar.len == '0)
     else $fatal(1, "AR burst longer than a single beat emitted!");
   // pragma translate_on
-  `endif // VERILATOR
+  `endif
 
 endmodule
 
