@@ -335,7 +335,7 @@ module axi_burst_splitter #(
   assert property (@(posedge clk_i) mst_req_o.ar_valid |-> mst_req_o.ar.len == '0)
     else $fatal(1, "AR burst longer than a single beat emitted!");
   // pragma translate_on
-  `endif // VERILATOR
+  `endif
 
 endmodule
 
