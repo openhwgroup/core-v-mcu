@@ -39,13 +39,13 @@ module sdio_txrx_data
 
     output logic         eot_o,
 
-    input  logic  [31:0] in_data_if_data_i, 
+    input  logic  [31:0] in_data_if_data_i,
     input  logic         in_data_if_valid_i,
-    output logic         in_data_if_ready_o, 
+    output logic         in_data_if_ready_o,
 
-    output logic  [31:0] out_data_if_data_o, 
+    output logic  [31:0] out_data_if_data_o,
     output logic         out_data_if_valid_o,
-    input  logic         out_data_if_ready_i, 
+    input  logic         out_data_if_ready_i,
 
     output logic   [3:0] sddata_o,
     input  logic   [3:0] sddata_i,
@@ -119,13 +119,17 @@ module sdio_txrx_data
     logic   [3:0] s_dataout;
     logic  [31:0] s_datain;
     logic         s_busy;
- 
+
     logic         s_in_data_ready;
     logic         s_lastbitofword;
 
     logic       s_clk_en;
     logic       s_rx_en;
     logic       s_out_data_valid;
+
+  logic [10:0]  r_sdio_timeout;
+    logic [10:0]  s_sdio_timeout;
+
 
     assign s_crc_in = s_crc_intx ? sddata_i : s_sddata;
 
@@ -436,6 +440,7 @@ module sdio_txrx_data
       s_eot           = 1'b0;
       s_cnt_block_upd = 1'b0;
       s_cnt_block     = r_cnt_block;
+      s_sdio_timeout = 0;
 
       s_in_data_ready = 1'b0;
       s_out_data_valid = 1'b0;
@@ -504,11 +509,11 @@ module sdio_txrx_data
         end
         ST_TX_CRCSTAT:
         begin
-          s_sddata_oen = 1'b1; // outup disabled 
+          s_sddata_oen = 1'b1; // outup disabled
           if(s_cnt_done)
-          begin 
+          begin
             s_cnt_start  = 1'b1;  // starts counting
-            s_cnt_target = 9'h1FF;// waits max 512 cycles          
+            s_cnt_target = 9'h1FF;// waits max 512 cycles
             s_state = ST_TX_BUSY;
           end
         end
@@ -516,8 +521,16 @@ module sdio_txrx_data
         begin
           s_sddata_oen = 1'b1; // outup disabled
           if(s_cnt_done) //means timeout
-          begin
-            s_state = ST_IDLE;
+            begin
+              if (r_sdio_timeout == 11'h3ff) begin
+                s_state = ST_IDLE;
+                s_eot = 1'b1;
+              end
+              else begin
+                s_sdio_timeout = r_sdio_timeout + 1;
+                s_cnt_start  = 1'b1;  // starts counting
+                s_cnt_target = 9'h1FF;// waits max 512 cycles
+              end
           end
           else
           begin
@@ -598,6 +611,13 @@ module sdio_txrx_data
     end
 
     assign s_cnt_done = r_cnt_byte ? ((r_cnt == 0) && s_cnt_byte_evnt) : (r_cnt == 0);
+  always_ff @(posedge clk_i or negedge rstn_i) begin
+    if (rstn_i == 0)
+        r_sdio_timeout <= 0;
+    else
+      r_sdio_timeout <= s_sdio_timeout;
+  end
+
 
     always_ff @(posedge clk_i or negedge rstn_i) begin : proc_r_cnt
       if(~rstn_i) begin
@@ -606,6 +626,8 @@ module sdio_txrx_data
         r_cnt_byte    <= 0;
         r_cnt_block   <= 0;
         r_byte_in_word <= 0;
+
+
       end else begin
         if(s_cnt_block_upd)
         begin
@@ -639,14 +661,14 @@ module sdio_txrx_data
     assign s_cnt_block_done = (r_cnt_block == 0);
 
     //bit counter used to count the TX/RX bits(each byte)
-    //if in quad mode only 0..1 quad bits 
+    //if in quad mode only 0..1 quad bits
     //if in single count 0..7
     assign s_bit_cnt_target = data_quad_i ? 3'h1 : 3'h7;
     assign s_cnt_byte_evnt  = (r_bit_cnt == s_bit_cnt_target);
     always_ff @(posedge clk_i or negedge rstn_i) begin : proc_r_bit_cnt
       if(~rstn_i) begin
         r_bit_cnt <= 3'h0;
-      end else 
+      end else
       begin
         if(r_cnt_byte)
         begin
@@ -659,13 +681,13 @@ module sdio_txrx_data
     end
 
 
-    always_ff @(posedge clk_i or negedge rstn_i) 
+    always_ff @(posedge clk_i or negedge rstn_i)
     begin
       if(~rstn_i) begin
         r_state  <=  ST_IDLE;
         r_status <=  'h0;
         r_data   <=  'h0;
-      end else 
+      end else
       begin
         if(clr_stat_i)
         begin
@@ -674,7 +696,7 @@ module sdio_txrx_data
           r_data   <=  'h0;
         end
         else
-        begin 
+        begin
           r_state  <= s_state;
           if(s_status_sample)
             r_status <= s_status;
@@ -695,4 +717,3 @@ module sdio_txrx_data
     end
 
 endmodule
-
