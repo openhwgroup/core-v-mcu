@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 `include "periph_bus_defines.svh"
 
@@ -673,6 +673,8 @@ module soc_peripherals #(
       .i2c_sda_oe(apbio_oe_o[`N_GPIO+17]),
       .i2c_interrupt_o(apbio_out_o[`N_GPIO+18])
   );
-  assign apbio_oe_o[`N_GPIO+18] = 1'b1;
+  assign apbio_oe_o[`N_GPIO+16]  = 1'b0;  // scl is input only for i2c slave
+  assign apbio_out_o[`N_GPIO+16] = 1'b0;
+  assign apbio_oe_o[`N_GPIO+18]  = 1'b1;
 
 endmodule

@@ -21,7 +21,7 @@
 // specific language governing permissions and limitations under the License.
 //-----------------------------------------------------------------------------
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "soc_mem_map.svh"
 `include "tcdm_macros.svh"
 `include "axi/assign.svh"

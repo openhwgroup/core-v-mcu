@@ -43,8 +43,8 @@
 static uint8_t aucclkdiv;
 
 uint16_t udma_qspim_open (uint8_t qspim_id, uint32_t clk_freq) {
-	volatile UdmaCtrl_t*		pudma_ctrl = (UdmaCtrl_t*)UDMA_CH_ADDR_CTRL;
-	UdmaQspi_t*					pqspim_regs = (UdmaQspi_t*)(UDMA_CH_ADDR_QSPIM + qspim_id * UDMA_CH_SIZE);
+	volatile UdmaCtrl_t* pudma_ctrl = (UdmaCtrl_t*)UDMA_CH_ADDR_CTRL;
+	UdmaQspi_t*  pqspim_regs = (UdmaQspi_t*)(UDMA_CH_ADDR_QSPIM + qspim_id * UDMA_CH_SIZE);
 	uint32_t					clk_divisor;
 
 	/* Enable reset and enable the spi clock */
