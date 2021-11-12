@@ -68,15 +68,8 @@ module A2_MATH_UNIT (
            wire [11:0] coef_raddr,
     coef_waddr
 );
-  parameter USE_BW = 0;
-  parameter MU = 0;
 
-
-  MATH_BLOCK #(
-      .MU(MU),
-      .BLOCK(0),
-      .USE_BW(0)
-  ) U_MATH_BLOCK_0 (
+  MATH_BLOCK U_MATH_BLOCK_0 (
       // output
       .FMATHB_EFPGA_MAC_OUT(m0_dataout),
       // Inputs
@@ -98,11 +91,7 @@ module A2_MATH_UNIT (
       .EFPGA_MATHB_DATAOUT_SEL(m0_mode),
       .reset(m0_reset)
   );
-  MATH_BLOCK #(
-      .MU(MU),
-      .BLOCK(1),
-      .USE_BW(0)
-  ) U_MATH_BLOCK_1 (
+  MATH_BLOCK U_MATH_BLOCK_1 (
       // output
       .FMATHB_EFPGA_MAC_OUT(m1_dataout),
       // Inputs

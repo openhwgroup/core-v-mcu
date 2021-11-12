@@ -4,7 +4,7 @@
  *
  *********************************************************************************/
 
-module DW02_mac #(
+module bw_mac #(
     parameter A_width = 8,
     parameter B_width = 8
 ) (

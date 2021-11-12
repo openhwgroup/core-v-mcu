@@ -1,4 +1,8 @@
 [
+	{ "name": "stm",
+	  "type": "sysio",
+	  "direction": "snoop"
+	},
 	{ "name": "bootsel",
 	  "type": "sysio",
 	  "direction": "snoop"

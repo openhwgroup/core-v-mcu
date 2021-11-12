@@ -18,8 +18,9 @@
 // -----------------------------------------------------------------------------
 
 
-module sim_clk_gen (
+module clk_gen (
     input  logic        ref_clk_i,
+    input               emul_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
     input  logic        shift_enable_i,
@@ -48,25 +49,35 @@ module sim_clk_gen (
     output logic [31:0] cluster_cfg_r_data_o,
     input  logic        cluster_cfg_wrn_i
 );
-   localparam SOC_PERIOD = 2.5;
-   localparam PER_PERIOD = 5.0;
-   localparam FPGA_PERIOD = 10.0;
-   
-  initial begin
-     soc_clk_o = 1'b0;
-     per_clk_o = 1'b0;
-     cluster_clk_o = 1'b0;
+  localparam SOC_PERIOD = 2.5;
+  localparam PER_PERIOD = 5.0;
+  localparam FPGA_PERIOD = 10.0;
+
+
+`ifdef VERILATOR
+  reg [2:0] count;
+  assign soc_clk_o = ref_clk_i;
+  always @(posedge ref_clk_i or negedge rstn_glob_i) begin
+    if (rstn_glob_i == 0) begin
+      per_clk_o <= 0;
+      cluster_clk_o <= 0;
+      count <= 0;
+    end else begin
+      count <= count + 1;
+      per_clk_o <= count[0];
+      cluster_clk_o <= count[1];
+    end  // else: !if(rstn_glob_i == 0)
   end
-   
-
-  initial forever #(SOC_PERIOD/2)soc_clk_o = ~soc_clk_o;
-  initial forever #(PER_PERIOD/2)per_clk_o = ~per_clk_o;
-  initial forever #(FPGA_PERIOD/2)cluster_clk_o = ~cluster_clk_o;
-
-  //assign soc_cfg_lock_o = 1'b1;
-  //assign per_cfg_lock_o = 1'b1;
-  //assign soc_clk_o = ref_clk_i;
-  //assign per_clk_o = ref_clk_i;
+`else  // !`ifdef VERILATOR
+  initial begin
+    soc_clk_o = 1'b0;
+    per_clk_o = 1'b0;
+    cluster_clk_o = 1'b0;
+  end
+  initial forever #(SOC_PERIOD / 2) soc_clk_o = ~soc_clk_o;
+  initial forever #(PER_PERIOD / 2) per_clk_o = ~per_clk_o;
+  initial forever #(FPGA_PERIOD / 2) cluster_clk_o = ~cluster_clk_o;
+`endif  // !`ifdef VERILATOR
 
   always_comb begin
     soc_cfg_ack_o     = 1'b0;
@@ -83,7 +94,29 @@ module sim_clk_gen (
     end
   end
 
-  assign soc_cfg_r_data_o = (soc_cfg_add_i == 2'b00 ? 32'hbeef0001 : (soc_cfg_add_i == 2'b01 ? 32'hbeef0003 : (soc_cfg_add_i == 2'b00 ? 32'hbeef0005 : 32'hbeef0007)));
-  assign per_cfg_r_data_o = 32'hdeadda7a;
+  always_comb begin
+    case (soc_cfg_add_i)
+      2'b00: soc_cfg_r_data_o = 32'h00010001;
+      2'b01: soc_cfg_r_data_o = 32'h00010002;
+      2'b10: soc_cfg_r_data_o = 32'h00010003;
+      2'b11: soc_cfg_r_data_o = 32'hfffefffc;
+    endcase  // case (soc_cfg_i)
+  end
+  always_comb begin
+    case (per_cfg_add_i)
+      2'b00: per_cfg_r_data_o = 32'h00020001;
+      2'b01: per_cfg_r_data_o = 32'h00020002;
+      2'b10: per_cfg_r_data_o = 32'h00020003;
+      2'b11: per_cfg_r_data_o = 32'hfffdfffc;
+    endcase  // case (soc_cfg_i)
+  end
+  always_comb begin
+    case (cluster_cfg_add_i)
+      2'b00: cluster_cfg_r_data_o = 32'h00030001;
+      2'b01: cluster_cfg_r_data_o = 32'h00030002;
+      2'b10: cluster_cfg_r_data_o = 32'h00030003;
+      2'b11: cluster_cfg_r_data_o = 32'hfffcfffc;
+    endcase  // case (soc_cfg_i)
+  end
 
-endmodule : sim_clk_gen
+endmodule : clk_gen

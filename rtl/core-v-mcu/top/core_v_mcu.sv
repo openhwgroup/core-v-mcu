@@ -23,6 +23,7 @@ module core_v_mcu #(
     input                                ref_clk_i,
     input                                rstn_i,
     input                                bootsel_i,
+    input                                stm_i,
     input  [`N_IO-1:0]                   io_in_i,
     output [`N_IO-1:0]                   io_out_o,
     output [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
@@ -44,195 +45,191 @@ module core_v_mcu #(
   localparam CVP_ADDR_WIDTH = 32;
   localparam CVP_DATA_WIDTH = 32;
 
-  //
-  // PAD FRAME TO PAD CONTROL SIGNALS
-  //
-
-  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;
-
-  //  logic [       `N_IO-1:0]                   s_io_out;
-  //  logic [       `N_IO-1:0]                   s_io_oe;
-  //  logic [       `N_IO-1:0]                   s_io_in;
-
 
   //
   // OTHER PAD FRAME SIGNALS
   //
 
-  logic                                      s_ref_clk;
-  logic                                      s_clk_in;  // clock in from pad
-  logic                                      s_rstn;
-  logic                                      s_pad_rstn;
 
-  logic                                      s_jtag_tck;
-  logic                                      s_jtag_tdi;
-  logic                                      s_jtag_tdo;
-  logic                                      s_jtag_tms;
-  logic                                      s_jtag_trst;
+
+  logic                                   s_ref_clk;
+  logic                                   s_clk_in;  // clock in from pad
+  logic                                   s_rstn;
+  logic                                   s_pad_rstn;
+
+  logic                                   s_jtag_tck;
+  logic                                   s_jtag_tdi;
+  logic                                   s_jtag_tdo;
+  logic                                   s_jtag_tms;
+  logic                                   s_jtag_trst;
+  logic [    `N_IO-1:0]                   s_io_in;
+  logic [    `N_IO-1:0]                   s_io_out;
+  logic [    `N_IO-1:0]                   s_io_oe;
+
 
   //
   // SOC TO SAFE DOMAINS SIGNALS
   //
 
-  logic                                      s_test_clk;
-  logic                                      s_slow_clk;
+  logic                                   s_test_clk;
+  logic                                   s_slow_clk;
 
-  logic                                      s_sel_fll_clk;
+  logic                                   s_sel_fll_clk;
 
-  logic [            11:0]                   s_pm_cfg_data;
-  logic                                      s_pm_cfg_req;
-  logic                                      s_pm_cfg_ack;
+  logic [         11:0]                   s_pm_cfg_data;
+  logic                                   s_pm_cfg_req;
+  logic                                   s_pm_cfg_ack;
 
-  logic                                      s_cluster_busy;
+  logic                                   s_cluster_busy;
 
-  logic                                      s_soc_tck;
-  logic                                      s_soc_trstn;
-  logic                                      s_soc_tms;
-  logic                                      s_soc_tdi;
+  logic                                   s_soc_tck;
+  logic                                   s_soc_trstn;
+  logic                                   s_soc_tms;
+  logic                                   s_soc_tdi;
 
-  logic                                      s_test_mode;
-  logic                                      s_dft_cg_enable;
-  logic                                      s_mode_select;
+  logic                                   s_test_mode;
+  logic                                   s_dft_cg_enable;
+  logic                                   s_mode_select;
   //PERIO
-  logic [    `N_PERIO-1:0]                   s_perio_out;
-  logic [    `N_PERIO-1:0]                   s_perio_in;
-  logic [    `N_PERIO-1:0]                   s_perio_oe;
+  logic [ `N_PERIO-1:0]                   s_perio_out;
+  logic [ `N_PERIO-1:0]                   s_perio_in;
+  logic [ `N_PERIO-1:0]                   s_perio_oe;
   //APBIO
-  logic [    `N_APBIO-1:0]                   s_apbio_out;
-  logic [    `N_APBIO-1:0]                   s_apbio_in;
-  logic [    `N_APBIO-1:0]                   s_apbio_oe;
+  logic [ `N_APBIO-1:0]                   s_apbio_out;
+  logic [ `N_APBIO-1:0]                   s_apbio_in;
+  logic [ `N_APBIO-1:0]                   s_apbio_oe;
   // FPGAIO
-  logic [   `N_FPGAIO-1:0]                   s_fpgaio_out;
-  logic [   `N_FPGAIO-1:0]                   s_fpgaio_in;
-  logic [   `N_FPGAIO-1:0]                   s_fpgaio_oe;
+  logic [`N_FPGAIO-1:0]                   s_fpgaio_out;
+  logic [`N_FPGAIO-1:0]                   s_fpgaio_in;
+  logic [`N_FPGAIO-1:0]                   s_fpgaio_oe;
 
-  logic                                      s_efpga_clk;
-  logic                                      s_fpga_clk_1_i;
-  logic                                      s_fpga_clk_2_i;
-  logic                                      s_fpga_clk_3_i;
-  logic                                      s_fpga_clk_4_i;
-  logic                                      s_fpga_clk_5_i;
+  logic                                   s_efpga_clk;
+  logic                                   s_fpga_clk_1_i;
+  logic                                   s_fpga_clk_2_i;
+  logic                                   s_fpga_clk_3_i;
+  logic                                   s_fpga_clk_4_i;
+  logic                                   s_fpga_clk_5_i;
 
-  logic                                      s_rf_tx_clk;
-  logic                                      s_rf_tx_oeb;
-  logic                                      s_rf_tx_enb;
-  logic                                      s_rf_tx_mode;
-  logic                                      s_rf_tx_vsel;
-  logic                                      s_rf_tx_data;
-  logic                                      s_rf_rx_clk;
-  logic                                      s_rf_rx_enb;
-  logic                                      s_rf_rx_data;
+  logic                                   s_rf_tx_clk;
+  logic                                   s_rf_tx_oeb;
+  logic                                   s_rf_tx_enb;
+  logic                                   s_rf_tx_mode;
+  logic                                   s_rf_tx_vsel;
+  logic                                   s_rf_tx_data;
+  logic                                   s_rf_rx_clk;
+  logic                                   s_rf_rx_enb;
+  logic                                   s_rf_rx_data;
 
-  logic                                      s_uart_tx;
-  logic                                      s_uart_rx;
+  logic                                   s_uart_tx;
+  logic                                   s_uart_rx;
 
-  logic                                      s_i2c0_scl_out;
-  logic                                      s_i2c0_scl_in;
-  logic                                      s_i2c0_scl_oe;
-  logic                                      s_i2c0_sda_out;
-  logic                                      s_i2c0_sda_in;
-  logic                                      s_i2c0_sda_oe;
-  logic                                      s_i2c1_scl_out;
-  logic                                      s_i2c1_scl_in;
-  logic                                      s_i2c1_scl_oe;
-  logic                                      s_i2c1_sda_out;
-  logic                                      s_i2c1_sda_in;
-  logic                                      s_i2c1_sda_oe;
-  logic                                      s_i2s_sd0_in;
-  logic                                      s_i2s_sd1_in;
-  logic                                      s_i2s_sck_in;
-  logic                                      s_i2s_ws_in;
-  logic                                      s_i2s_sck0_out;
-  logic                                      s_i2s_ws0_out;
-  logic [             1:0]                   s_i2s_mode0_out;
-  logic                                      s_i2s_sck1_out;
-  logic                                      s_i2s_ws1_out;
-  logic [             1:0]                   s_i2s_mode1_out;
-  logic                                      s_i2s_slave_sck_oe;
-  logic                                      s_i2s_slave_ws_oe;
-  logic                                      s_spi_master0_csn0;
-  logic                                      s_spi_master0_csn1;
-  logic                                      s_spi_master0_sck;
-  logic                                      s_spi_master0_sdi0;
-  logic                                      s_spi_master0_sdi1;
-  logic                                      s_spi_master0_sdi2;
-  logic                                      s_spi_master0_sdi3;
-  logic                                      s_spi_master0_sdo0;
-  logic                                      s_spi_master0_sdo1;
-  logic                                      s_spi_master0_sdo2;
-  logic                                      s_spi_master0_sdo3;
-  logic                                      s_spi_master0_oen0;
-  logic                                      s_spi_master0_oen1;
-  logic                                      s_spi_master0_oen2;
-  logic                                      s_spi_master0_oen3;
+  logic                                   s_i2c0_scl_out;
+  logic                                   s_i2c0_scl_in;
+  logic                                   s_i2c0_scl_oe;
+  logic                                   s_i2c0_sda_out;
+  logic                                   s_i2c0_sda_in;
+  logic                                   s_i2c0_sda_oe;
+  logic                                   s_i2c1_scl_out;
+  logic                                   s_i2c1_scl_in;
+  logic                                   s_i2c1_scl_oe;
+  logic                                   s_i2c1_sda_out;
+  logic                                   s_i2c1_sda_in;
+  logic                                   s_i2c1_sda_oe;
+  logic                                   s_i2s_sd0_in;
+  logic                                   s_i2s_sd1_in;
+  logic                                   s_i2s_sck_in;
+  logic                                   s_i2s_ws_in;
+  logic                                   s_i2s_sck0_out;
+  logic                                   s_i2s_ws0_out;
+  logic [          1:0]                   s_i2s_mode0_out;
+  logic                                   s_i2s_sck1_out;
+  logic                                   s_i2s_ws1_out;
+  logic [          1:0]                   s_i2s_mode1_out;
+  logic                                   s_i2s_slave_sck_oe;
+  logic                                   s_i2s_slave_ws_oe;
+  logic                                   s_spi_master0_csn0;
+  logic                                   s_spi_master0_csn1;
+  logic                                   s_spi_master0_sck;
+  logic                                   s_spi_master0_sdi0;
+  logic                                   s_spi_master0_sdi1;
+  logic                                   s_spi_master0_sdi2;
+  logic                                   s_spi_master0_sdi3;
+  logic                                   s_spi_master0_sdo0;
+  logic                                   s_spi_master0_sdo1;
+  logic                                   s_spi_master0_sdo2;
+  logic                                   s_spi_master0_sdo3;
+  logic                                   s_spi_master0_oen0;
+  logic                                   s_spi_master0_oen1;
+  logic                                   s_spi_master0_oen2;
+  logic                                   s_spi_master0_oen3;
 
-  logic                                      s_spi_master1_csn0;
-  logic                                      s_spi_master1_csn1;
-  logic                                      s_spi_master1_sck;
-  logic                                      s_spi_master1_sdi;
-  logic                                      s_spi_master1_sdo;
-  logic [             1:0]                   s_spi_master1_mode;
+  logic                                   s_spi_master1_csn0;
+  logic                                   s_spi_master1_csn1;
+  logic                                   s_spi_master1_sck;
+  logic                                   s_spi_master1_sdi;
+  logic                                   s_spi_master1_sdo;
+  logic [          1:0]                   s_spi_master1_mode;
 
-  logic                                      s_sdio_clk;
-  logic                                      s_sdio_cmdi;
-  logic                                      s_sdio_cmdo;
-  logic                                      s_sdio_cmd_oen;
-  logic [             3:0]                   s_sdio_datai;
-  logic [             3:0]                   s_sdio_datao;
-  logic [             3:0]                   s_sdio_data_oen;
+  logic                                   s_sdio_clk;
+  logic                                   s_sdio_cmdi;
+  logic                                   s_sdio_cmdo;
+  logic                                   s_sdio_cmd_oen;
+  logic [          3:0]                   s_sdio_datai;
+  logic [          3:0]                   s_sdio_datao;
+  logic [          3:0]                   s_sdio_data_oen;
 
 
-  logic                                      s_cam_pclk;
-  logic [             7:0]                   s_cam_data;
-  logic                                      s_cam_hsync;
-  logic                                      s_cam_vsync;
+  logic                                   s_cam_pclk;
+  logic [          7:0]                   s_cam_data;
+  logic                                   s_cam_hsync;
+  logic                                   s_cam_vsync;
 
-  logic                                      s_jtag_shift_dr;
-  logic                                      s_jtag_update_dr;
-  logic                                      s_jtag_capture_dr;
+  logic                                   s_jtag_shift_dr;
+  logic                                   s_jtag_update_dr;
+  logic                                   s_jtag_capture_dr;
 
-  logic                                      s_axireg_sel;
-  logic                                      s_axireg_tdi;
-  logic                                      s_axireg_tdo;
+  logic                                   s_axireg_sel;
+  logic                                   s_axireg_tdi;
+  logic                                   s_axireg_tdo;
 
-  logic [             7:0]                   s_soc_jtag_regi;
-  logic [             7:0]                   s_soc_jtag_rego;
+  logic [          7:0]                   s_soc_jtag_regi;
+  logic [          7:0]                   s_soc_jtag_rego;
 
-  logic                                      s_rstn_por;
+  logic                                   s_rstn_por;
 
-  logic                                      s_dma_pe_irq_ack;
-  logic                                      s_dma_pe_irq_valid;
+  logic                                   s_dma_pe_irq_ack;
+  logic                                   s_dma_pe_irq_valid;
 
-  logic [       `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
+  logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
   //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
-  logic [             1:0]                   s_selected_pad_mode;
+  logic [          1:0]                   s_selected_pad_mode;
 
-  logic [             5:0]                   efpga_test_M;
-  logic                                      efpga_test_fcb_pif_vldi;
-  logic [             3:0]                   efpga_test_fcb_pif_di_l;
-  logic [             3:0]                   efpga_test_fcb_pif_di_h;
-  logic                                      efpga_test_fcb_pif_vldo_en;
-  logic                                      efpga_test_fcb_pif_vldo;
-  logic                                      efpga_test_fcb_pif_do_l_en;
-  logic [             3:0]                   efpga_test_fcb_pif_do_l;
-  logic                                      efpga_test_fcb_pif_do_h_en;
-  logic [             3:0]                   efpga_test_fcb_pif_do_h;
-  logic [             3:0]                   efpga_test_FB_SPE_OUT;
-  logic [             3:0]                   efpga_test_FB_SPE_IN;
-  logic                                      efpga_test_MLATCH;
+  logic [          5:0]                   efpga_test_M;
+  logic                                   efpga_test_fcb_pif_vldi;
+  logic [          3:0]                   efpga_test_fcb_pif_di_l;
+  logic [          3:0]                   efpga_test_fcb_pif_di_h;
+  logic                                   efpga_test_fcb_pif_vldo_en;
+  logic                                   efpga_test_fcb_pif_vldo;
+  logic                                   efpga_test_fcb_pif_do_l_en;
+  logic [          3:0]                   efpga_test_fcb_pif_do_l;
+  logic                                   efpga_test_fcb_pif_do_h_en;
+  logic [          3:0]                   efpga_test_fcb_pif_do_h;
+  logic [          3:0]                   efpga_test_FB_SPE_OUT;
+  logic [          3:0]                   efpga_test_FB_SPE_IN;
+  logic                                   efpga_test_MLATCH;
 
-  logic [      `N_SPI-1:0]                   s_spi_clk;
-  logic [      `N_SPI-1:0][             3:0] s_spi_csn;
-  logic [      `N_SPI-1:0][             3:0] s_spi_oen;
-  logic [      `N_SPI-1:0][             3:0] s_spi_sdo;
-  logic [      `N_SPI-1:0][             3:0] s_spi_sdi;
+  logic [   `N_SPI-1:0]                   s_spi_clk;
+  logic [   `N_SPI-1:0][             3:0] s_spi_csn;
+  logic [   `N_SPI-1:0][             3:0] s_spi_oen;
+  logic [   `N_SPI-1:0][             3:0] s_spi_sdo;
+  logic [   `N_SPI-1:0][             3:0] s_spi_sdi;
 
-  logic [      `N_I2C-1:0]                   s_i2c_scl_in;
-  logic [      `N_I2C-1:0]                   s_i2c_scl_out;
-  logic [      `N_I2C-1:0]                   s_i2c_scl_oe;
-  logic [      `N_I2C-1:0]                   s_i2c_sda_in;
-  logic [      `N_I2C-1:0]                   s_i2c_sda_out;
-  logic [      `N_I2C-1:0]                   s_i2c_sda_oe;
+  logic [   `N_I2C-1:0]                   s_i2c_scl_in;
+  logic [   `N_I2C-1:0]                   s_i2c_scl_out;
+  logic [   `N_I2C-1:0]                   s_i2c_scl_oe;
+  logic [   `N_I2C-1:0]                   s_i2c_sda_in;
+  logic [   `N_I2C-1:0]                   s_i2c_sda_out;
+  logic [   `N_I2C-1:0]                   s_i2c_sda_oe;
 
 
   //
@@ -240,68 +237,19 @@ module core_v_mcu #(
   //
   // PULPissimo doens't have a cluster so we ignore them
 
-  logic                                      s_dma_pe_evt_ack;
-  logic                                      s_dma_pe_evt_valid;
-  logic                                      s_dma_pe_int_ack;
-  logic                                      s_dma_pe_int_valid;
-  logic                                      s_pf_evt_ack;
-  logic                                      s_pf_evt_valid;
-
-  logic [BUFFER_WIDTH-1:0]                   s_event_writetoken;
-  logic [BUFFER_WIDTH-1:0]                   s_event_readpointer;
-  logic [ EVENT_WIDTH-1:0]                   s_event_dataasync;
-
+  logic                                   s_dma_pe_evt_ack;
+  logic                                   s_dma_pe_evt_valid;
+  logic                                   s_dma_pe_int_ack;
+  logic                                   s_dma_pe_int_valid;
+  logic                                   s_pf_evt_ack;
+  logic                                   s_pf_evt_valid;
 
 
 
   //
   // OTHER PAD FRAME SIGNALS
   //
-  logic                                      s_bootsel;
-  logic                                      debug1;
-  logic                                      debug0;
-  /*
-`ifdef VERILATOR
-  logic [`N_IO-1:0] io_pos;
-
-  assign s_clk_in = io[6];
-  assign s_rstn = (io[6] == 1) ? io[7] : io_pos[7];
-  assign s_jtag_tck = (io[6] == 1) ? io[8] : io_pos[8];
-  assign s_jtag_tdi = (io[6] == 1) ? io[9] : io_pos[9];
-  assign io[10] = s_jtag_tdo;
-  assign s_jtag_tms = (io[6] == 1) ? io[11] : io_pos[11];
-  assign s_jtag_trst = (io[6] == 1) ? io[12] : io_pos[12];
-  assign s_bootsel = (io[6] == 1) ? io[15] : io_pos[15];
-
-  always @(posedge io[6]) io_pos <= io;
-`else
-  //
-  // PAD FRAME
-  //
-  assign s_rstn = ~(~s_pad_rstn | s_wd_expired);
-
-  pad_frame i_pad_frame (
-      .pad_cfg_i(s_pad_cfg),
-      .bootsel_o(s_bootsel),
-
-      .ref_clk_o  (s_clk_in),
-      .rstn_o     (s_pad_rstn),
-      .jtag_tdo_i (s_jtag_tdo),
-      .jtag_tck_o (s_jtag_tck),
-      .jtag_tdi_o (s_jtag_tdi),
-      .jtag_tms_o (s_jtag_tms),
-      .jtag_trst_o(s_jtag_trst),
-
-      // internal io signals
-      .io_out_i(s_io_out),  // data going to pads
-      .io_oe_i (s_io_oe),  // enable going to pads
-      .io_in_o (s_io_in),  // data coming from pads
-
-      // pad signals
-      .io(io)  // pad wires
-  );
-`endif
-*/
+  logic                                   s_bootsel;
   //
   // SAFE DOMAIN
   //
@@ -326,9 +274,9 @@ module core_v_mcu #(
       //      .pad_cfg_i      (s_pad_cfg_soc),
       .pad_mux_i      (s_pad_mux_soc),
       // IO signals
-      .io_out_o       (io_out_o),
-      .io_in_i        (io_in_i),
-      .io_oe_o        (io_oe_o),
+      .io_out_o       (s_io_out),
+      .io_in_i        (s_io_in),
+      .io_oe_o        (s_io_oe),
       // PERIO signals
       .perio_out_i    (s_perio_out),
       .perio_in_o     (s_perio_in),
@@ -349,7 +297,44 @@ module core_v_mcu #(
 
   logic [20:0] testio_i;  //
   logic [15:0] testio_o;  //
-  assign testio_i = '0;
+
+
+  assign io_out_o[20:0] = stm_i ? 0 : s_io_out[20:0];
+  assign io_out_o[28:23] = stm_i ? 0 : s_io_out[28:23];
+  assign io_out_o[`N_IO-1:43] = stm_i ? 0 : s_io_out[`N_IO-1:43];
+  assign io_oe_o[20:0] = stm_i ? 0 : s_io_oe[20:0];
+  assign io_oe_o[28:22] = stm_i ? 0 : s_io_oe[28:22];
+  assign io_oe_o[38:37] = stm_i ? 0 : s_io_oe[38:37];
+  assign io_oe_o[`N_IO-1:43] = stm_i ? 0 : s_io_oe[`N_IO-1:43];
+
+
+  assign io_out_o[32:29] = stm_i ? testio_o[3:0] : s_io_out[32:29];  //  efpga_test_fcb_pif_do_l_o;
+  assign io_out_o[36:33] = stm_i ? testio_o[7:4] : s_io_out[36:33];  //  efpga_test_fcb_pif_do_h_o;
+  assign io_out_o[42:39] = stm_i ? testio_o[11:8] : s_io_out[42:39];  // efpga_test_FB_SPE_OUT_o;
+  //assign io_out_o[37] = stm_i ? testio_o[12] : s_io_out[37]; // efpga_test_fcb_pif_do_l_en_o;
+  //assign io_out_o[38] = stm_i ? testio_o[13] : s_io_out[38]; // efpga_test_fcb_pif_do_h_en_o;
+  assign io_out_o[21] = stm_i ? testio_o[14] : s_io_out[21];  // efpga_fcb_pif_vldo_o;
+  //assign io_out_o[22] = stm_i ? testio_o[15] : s_io_out[22]; // efpga_fcb_pif_vldo_en_o;
+
+  assign io_oe_o[32:29] = stm_i ? {4{testio_o[12]}} : s_io_oe[32:29];  //  efpga_test_fcb_pif_do_l_o;
+  assign io_oe_o[36:33] = stm_i ? {4{testio_o[13]}} : s_io_oe[36:33];  //  efpga_test_fcb_pif_do_h_o;
+  assign io_oe_o[42:39] = stm_i ? 1 : s_io_oe[42:39];  // efpga_test_FB_SPE_OUT_o;
+  //assign io_oe_o[37] = stm_i ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
+  //assign io_oe_o[38] = stm_i ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
+  assign io_oe_o[21] = stm_i ? testio_o[15] : s_io_oe[21];  // efpga_fcb_pif_vldo_o;
+  //assign io_oe_o[22] = stm_i ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
+
+  assign s_io_in[`N_IO-1:0] = stm_i ? 0 : io_in_i[`N_IO-1:0];
+
+  assign testio_i[3:0] = stm_i ? io_in_i[32:29] : 4'b0;  // efpga_test_fcb_pif_di_l_i
+  assign testio_i[7:4] = stm_i ? io_in_i[36:33] : 4'b0;  // efpga_test_fcb_pif_di_h_i
+  assign testio_i[11:8] = stm_i ? io_in_i[28:25] : 4'b0;  //efpga_test_FB_SPE_IN_i =
+  assign testio_i[17:12] = stm_i ? io_in_i[12:7] : 6'b0;  // io_efpga_test_M_i =
+  assign testio_i[18] = stm_i ? io_in_i[23] : 0;  // efpga_test_MLATCH_i =
+  assign testio_i[19] = stm_i ? io_in_i[21] : 0;  //efpga_test_fcb_pif_vldi_i =
+  assign testio_i[20] = stm_i;  //efpga_STM_i = testio_i[20];
+
+
   soc_domain #(
       .USE_FPU           (USE_FPU),
       .USE_HWPE          (USE_HWPE),
@@ -361,8 +346,8 @@ module core_v_mcu #(
       .BUFFER_WIDTH      (BUFFER_WIDTH),
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
-      .ref_clk_i(s_ref_clk),
-      .sclk_in(ref_clk_i),
+      .ref_clk_i(ref_clk_i),
+      .sclk_in(io_in_i[5]),  // only used in fpga emulation for FLL
       .emul_clk(s_efpga_clk),
       .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),

@@ -7,7 +7,7 @@
 ******************************************************************/
 
 
-module QL_eFPGA_ArcticPro2_32X32_GF_22 (
+module QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 (
     input  A2F_B_10_0,
     input  A2F_B_10_1,
     input  A2F_B_10_2,

@@ -12,10 +12,10 @@ filesets:
     files:
     - eFPGA_wrapper.sv
     - A2_design.sv
-    - top1_wrapper.sv
-    - top.sv
+#    - top1_wrapper.sv
+#    - top.sv
     - a2_math_unit.sv
-    - ql_math_unit/rtl/DW02_mac.sv
+#    - ql_math_unit/rtl/DW02_mac.sv
     - ql_math_unit/rtl/bw_mac.sv
     - ql_math_unit/rtl/bw_multiplier.sv
     - ql_math_unit/rtl/mac_16bit.v
@@ -25,7 +25,7 @@ filesets:
     - ql_math_unit/rtl/mac_array.v
     - ql_math_unit/rtl/math_block.v
     - ql_math_unit/rtl/tpram_wrap.v
-    - ql_math_unit/rtl/sram512x64.v
+#    - ql_math_unit/rtl/sram512x64.v
     - ql_fcb/rtl/baud_generator.v
     - ql_fcb/rtl/fcbaps.sv
     - ql_fcb/rtl/fcbclp.sv
