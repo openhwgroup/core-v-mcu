@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 
 module core_v_mcu #(
@@ -89,7 +89,7 @@ module core_v_mcu #(
 
   logic                                   s_test_mode;
   logic                                   s_dft_cg_enable;
-  logic                                   s_mode_select;
+
   //PERIO
   logic [ `N_PERIO-1:0]                   s_perio_out;
   logic [ `N_PERIO-1:0]                   s_perio_in;
@@ -261,13 +261,12 @@ module core_v_mcu #(
       .ref_clk_i  (ref_clk_i),
       .slow_clk_o (s_ref_clk),
       .efpga_clk_o(s_efpga_clk),
-      .bootsel_i  (bootsel_i),
+      //      .bootsel_i  (bootsel_i),
       .rst_ni     (rstn_i),
       .rst_no     (s_rstn_por),
 
       .test_clk_o     (s_test_clk),
       .test_mode_o    (s_test_mode),
-      .mode_select_o  (s_mode_select),
       .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
@@ -300,7 +299,8 @@ module core_v_mcu #(
 
 
   assign io_out_o[20:0] = stm_i ? 0 : s_io_out[20:0];
-  assign io_out_o[28:23] = stm_i ? 0 : s_io_out[28:23];
+  assign io_out_o[28:22] = stm_i ? 0 : s_io_out[28:22];
+  assign io_out_o[38:37] = stm_i ? 0 : s_io_out[38:37];
   assign io_out_o[`N_IO-1:43] = stm_i ? 0 : s_io_out[`N_IO-1:43];
   assign io_oe_o[20:0] = stm_i ? 0 : s_io_oe[20:0];
   assign io_oe_o[28:22] = stm_i ? 0 : s_io_oe[28:22];
@@ -348,13 +348,11 @@ module core_v_mcu #(
   ) i_soc_domain (
       .ref_clk_i(ref_clk_i),
       .sclk_in(io_in_i[5]),  // only used in fpga emulation for FLL
-      .emul_clk(s_efpga_clk),
       .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
       .dft_test_mode_i(s_test_mode),
       .dft_cg_enable_i(s_dft_cg_enable),
-      .mode_select_i(s_mode_select),
       .bootsel_i(bootsel_i),
 
       .data_slave_aw_writetoken_i('0),
@@ -483,6 +481,9 @@ module core_v_mcu #(
       .testio_o(testio_o)
 
   );
+
+  assign s_test_mode        = '0;
+  assign s_dft_cg_enable    = '0;
 
   assign s_dma_pe_evt_valid = '0;
   assign s_dma_pe_irq_valid = '0;

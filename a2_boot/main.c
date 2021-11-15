@@ -1,18 +1,12 @@
-//==========================================================
-// Copyright 2021 QuickLogic Corporation
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//==========================================================
-
+/*
+ ============================================================================
+ Name        : main.c
+ Author      :
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello RISC-V World in C
+ ============================================================================
+ */
 
 #include <stdio.h>
 
@@ -167,7 +161,9 @@ int main(void)
 	//TODO: FLL clock settings need to be taken care in the actual chip.
 	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
 	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
-	bootsel = *(volatile int*)0x1c010000;
+
+
+      	bootsel = *(volatile int*)0x1c010000;
 	bootsel = psoc->bootsel & 0x1;
 
 	hal_set_apb_i2cs_slave_on_off(1);
@@ -175,6 +171,7 @@ int main(void)
 			hal_set_apb_i2cs_slave_address(MY_I2C_SLAVE_ADDRESS);
 
 	udma_uart_open (id,115200);
+
 	dbg_str("\nA2 Bootloader Bootsel=");
 
 	if (bootsel == 1) dbg_str("1");

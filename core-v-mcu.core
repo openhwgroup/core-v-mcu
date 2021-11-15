@@ -42,7 +42,7 @@ filesets:
     files:
     - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
-    - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/pulp_soc_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: rtl/core-v-mcu/include/}
     - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv
@@ -52,7 +52,6 @@ filesets:
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
-    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
@@ -95,6 +94,7 @@ filesets:
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
+    - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
 
   rom_init:
@@ -150,7 +150,7 @@ filesets:
     - emulation/xilinx/rtl/DW02_mac.sv
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
-
+    - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
 
   xilinx-ips:
@@ -238,6 +238,16 @@ targets:
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
+      xsim:
+        xelab_options:
+        - --define XSIM
+        - --incr
+        - -dup_entity_as_module
+        - -relax
+        - --O0
+        - -v 0
+        - -timescale 1ns/1ps
+        xsim_options:
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see

@@ -9,7 +9,7 @@
 // specific language governing permissions and limitations under the License.
 
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,
@@ -65,28 +65,6 @@ module soc_clk_rst_gen (
   logic s_rstn_soc_sync;
   logic s_rstn_cluster_sync;
 
-  //synopsys translate_off
-`ifndef SYNTHESIS
-  freq_meter #(
-      .FLL_NAME  ("SOC_FLL"),
-      .MAX_SAMPLE(4096)
-  ) SOC_METER (
-      .clk(s_clk_fll_soc)
-  );
-  freq_meter #(
-      .FLL_NAME  ("PER_FLL"),
-      .MAX_SAMPLE(4096)
-  ) PER_METER (
-      .clk(s_clk_fll_per)
-  );
-  freq_meter #(
-      .FLL_NAME  ("CLUSTER_FLL"),
-      .MAX_SAMPLE(4096)
-  ) CLUSTER_METER (
-      .clk(s_clk_fll_cluster)
-  );
-`endif
-  //synopsys translate_on
 
   clk_gen clk_gen_i (
       .ref_clk_i(ref_clk_i),

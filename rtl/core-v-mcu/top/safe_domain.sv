@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 
 module safe_domain #(
@@ -18,13 +18,12 @@ module safe_domain #(
     input  logic ref_clk_i,
     output logic slow_clk_o,
     output logic efpga_clk_o,
-    input  logic bootsel_i,
+    //    input  logic bootsel_i,
     input  logic rst_ni,
     output logic rst_no,
 
     output logic test_clk_o,
     output logic test_mode_o,
-    output logic mode_select_o,
     output logic dft_cg_enable_o,
 
     //**********************************************************
@@ -136,6 +135,5 @@ module safe_domain #(
   assign test_clk_o      = 1'b0;
   assign dft_cg_enable_o = 1'b0;
   assign test_mode_o     = 1'b0;
-  assign mode_select_o   = 1'b0;
 
 endmodule  // safe_domain

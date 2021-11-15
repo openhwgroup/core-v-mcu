@@ -1,7 +1,7 @@
 // Copyright 2021 QuickLogic
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 module eFPGA_wrapper (
     output logic [ 3:0] test_fb_spe_out,
     input  logic [ 3:0] test_fb_spe_in,
