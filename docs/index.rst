@@ -13,6 +13,13 @@ CORE-V-MCU User Manual
     doc-src/overview.md
 
 ..  toctree::
+    :caption: Memory Map
+    :maxdepth: 2
+    :glob:
+
+    doc-src/mmap.rst
+
+..  toctree::
     :caption: Contributing
     :maxdepth: 2
     :glob:
