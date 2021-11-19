@@ -3,7 +3,6 @@
 
 
 module clk_and_control (
-    input        [ 2:0] num,
     output logic        FLLCLK,
     input  logic        FLLOE,
     input  logic        REFCLK,
@@ -56,7 +55,6 @@ module clk_and_control (
   logic r_tmp;
 
   pPLL02F u0 (
-      .num(num),
       .rstn(RSTB),
       .PWRDN(PWD),
       .CK_XTAL_IN(REFCLK),

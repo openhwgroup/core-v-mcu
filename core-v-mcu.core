@@ -100,7 +100,7 @@ filesets:
   not_emulation-rtl:
     files:
     - rtl/core-v-mcu/soc/clk_gen.sv
-    - rtl/core-v-mcu/soc/clock_and_control.sv
+    - rtl/core-v-mcu/soc/clk_and_control.sv
     file_type: systemVerilogSource
 
   emulation-rtl:
@@ -289,6 +289,7 @@ targets:
     toplevel: [core_v_mcu]
     filesets_append:
     - rtl-simulation
+    - not_emulation-rtl
     tools:
       verilator:
         mode: lint-only
