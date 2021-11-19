@@ -49,74 +49,66 @@ module clk_gen (
     output logic [31:0] cluster_cfg_r_data_o,
     input  logic        cluster_cfg_wrn_i
 );
-  localparam SOC_PERIOD = 2.5;
-  localparam PER_PERIOD = 5.0;
-  localparam FPGA_PERIOD = 10.0;
-
-
-`ifdef VERILATOR
-  reg [2:0] count;
-  assign soc_clk_o = ref_clk_i;
-  always @(posedge ref_clk_i or negedge rstn_glob_i) begin
-    if (rstn_glob_i == 0) begin
-      per_clk_o <= 0;
-      cluster_clk_o <= 0;
-      count <= 0;
-    end else begin
-      count <= count + 1;
-      per_clk_o <= count[0];
-      cluster_clk_o <= count[1];
-    end  // else: !if(rstn_glob_i == 0)
-  end
-`else  // !`ifdef VERILATOR
-  initial begin
-    soc_clk_o = 1'b0;
-    per_clk_o = 1'b0;
-    cluster_clk_o = 1'b0;
-  end
-  initial forever #(SOC_PERIOD / 2) soc_clk_o = ~soc_clk_o;
-  initial forever #(PER_PERIOD / 2) per_clk_o = ~per_clk_o;
-  initial forever #(FPGA_PERIOD / 2) cluster_clk_o = ~cluster_clk_o;
-`endif  // !`ifdef VERILATOR
-
-  always_comb begin
-    soc_cfg_ack_o     = 1'b0;
-    per_cfg_ack_o     = 1'b0;
-    cluster_cfg_ack_o = 1'b0;
-    if (soc_cfg_req_i) begin
-      soc_cfg_ack_o = 1'b1;
-    end
-    if (per_cfg_req_i) begin
-      per_cfg_ack_o = 1'b1;
-    end
-    if (cluster_cfg_req_i) begin
-      cluster_cfg_ack_o = 1'b1;
-    end
-  end
-
-  always_comb begin
-    case (soc_cfg_add_i)
-      2'b00: soc_cfg_r_data_o = 32'h00010001;
-      2'b01: soc_cfg_r_data_o = 32'h00010002;
-      2'b10: soc_cfg_r_data_o = 32'h00010003;
-      2'b11: soc_cfg_r_data_o = 32'hfffefffc;
-    endcase  // case (soc_cfg_i)
-  end
-  always_comb begin
-    case (per_cfg_add_i)
-      2'b00: per_cfg_r_data_o = 32'h00020001;
-      2'b01: per_cfg_r_data_o = 32'h00020002;
-      2'b10: per_cfg_r_data_o = 32'h00020003;
-      2'b11: per_cfg_r_data_o = 32'hfffdfffc;
-    endcase  // case (soc_cfg_i)
-  end
-  always_comb begin
-    case (cluster_cfg_add_i)
-      2'b00: cluster_cfg_r_data_o = 32'h00030001;
-      2'b01: cluster_cfg_r_data_o = 32'h00030002;
-      2'b10: cluster_cfg_r_data_o = 32'h00030003;
-      2'b11: cluster_cfg_r_data_o = 32'hfffcfffc;
-    endcase  // case (soc_cfg_i)
-  end
-
-endmodule : clk_gen
+   clk_and_control i_fll_soc (
+       .FLLCLK(soc_clk_o),
+       .FLLOE(1'b1),
+       .REFCLK(ref_clk_i),
+       .LOCK(soc_cfg_lock_o),
+       .CFGREQ(soc_cfg_req_i),
+       .CFGACK(soc_cfg_ack_o),
+       .CFGAD(soc_cfg_add_i[1:0]),
+       .CFGD(soc_cfg_data_i),
+       .CFGQ(soc_cfg_r_data_o),
+       .CFGWEB(soc_cfg_wrn_i),
+       .RSTB(rstn_glob_i),
+       .PWD(1'b0),
+       .RET(1'b0),
+       .TM(test_mode_i),
+       .TE(shift_enable_i),
+       .TD(1'b0),  //TO FIX.DF()T
+       .TQ(),  //TO FIX.DF()T
+       .JTD(1'b0),  //TO FIX.DF()T
+       .JTQ()  //TO FIX.DF()T
+  );
+   clk_and_control i_fll_cluster (
+       .FLLCLK(cluster_clk_o),
+       .FLLOE(1'b1),
+       .REFCLK(ref_clk_i),
+       .LOCK(cluster_cfg_lock_o),
+       .CFGREQ(cluster_cfg_req_i),
+       .CFGACK(cluster_cfg_ack_o),
+       .CFGAD(cluster_cfg_add_i[1:0]),
+       .CFGD(cluster_cfg_data_i),
+       .CFGQ(cluster_cfg_r_data_o),
+       .CFGWEB(cluster_cfg_wrn_i),
+       .RSTB(rstn_glob_i),
+       .PWD(1'b0),
+       .RET(1'b0),
+       .TM(test_mode_i),
+       .TE(shift_enable_i),
+        .TD(1'b0),  //TO FIX.DF()T
+        .TQ(),  //TO FIX.DF()T
+        .JTD(1'b0),  //TO FIX.DF()T
+        .JTQ()  //TO FIX.DF()T
+  );
+   clk_and_control i_fll_per (
+       .FLLCLK(per_clk_o),
+       .FLLOE(1'b1),
+       .REFCLK(ref_clk_i),
+       .LOCK(per_cfg_lock_o),
+       .CFGREQ(per_cfg_req_i),
+       .CFGACK(per_cfg_ack_o),
+       .CFGAD(per_cfg_add_i[1:0]),
+       .CFGD(per_cfg_data_i),
+       .CFGQ(per_cfg_r_data_o),
+       .CFGWEB(per_cfg_wrn_i),
+       .RSTB(rstn_glob_i),
+       .PWD(1'b0),
+       .RET(1'b0),
+       .TM(test_mode_i),
+       .TE(shift_enable_i),
+       .TD(1'b0),  //TO FIX.DF()T
+       .TQ(),  //TO FIX.DF()T
+       .JTD(1'b0),  //TO FIX.DF()T
+       .JTQ()  //TO FIX.DF()T
+  );
