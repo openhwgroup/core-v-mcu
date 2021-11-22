@@ -15,8 +15,8 @@
 module soc_domain
   import dm::*;
 #(
-    parameter USE_FPU = 1,
-    parameter USE_HWPE = 1,
+    parameter USE_FPU = 0,
+    parameter USE_HWPE = 0,
     parameter USE_CLUSTER_EVENT = 1,
     parameter AXI_ADDR_WIDTH = 32,
     parameter AXI_DATA_IN_WIDTH = 64,
@@ -27,7 +27,7 @@ module soc_domain
     parameter BUFFER_WIDTH = 8,
     parameter EVNT_WIDTH = 8,
     parameter NB_CORES = 1,  // was 8
-    parameter NB_HWPE_PORTS = 4,
+    parameter NB_HWPE_PORTS = 0,
     parameter NGPIO = 43,
     parameter NPAD = 64,  //Must not be changed as other parts
     //downstreams are not parametrci
@@ -591,7 +591,7 @@ module soc_domain
       .tcdm_udma_rx         (s_lint_udma_rx_bus),
       .tcdm_udma_tx         (s_lint_udma_tx_bus),
       .tcdm_debug           (s_lint_riscv_jtag_bus),
-      .tcdm_hwpe            (s_lint_hwpe_bus),
+//      .tcdm_hwpe            (s_lint_hwpe_bus),
       .tcdm_efpga           (s_lint_efpga_bus),
       .axi_master_plug      (s_data_in_bus),
       .axi_slave_plug       (s_data_out_bus),

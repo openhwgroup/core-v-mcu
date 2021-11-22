@@ -12,8 +12,8 @@
 `include "pulp_peripheral_defines.svh"
 
 module core_v_mcu #(
-    parameter USE_FPU  = 1,
-    parameter USE_HWPE = 1
+    parameter USE_FPU  = 0,
+    parameter USE_HWPE = 0
 ) (
     input                                jtag_tck_i,
     input                                jtag_tdi_i,

@@ -56,7 +56,7 @@ module soc_interconnect
     input logic rst_ni,
     input logic test_en_i,  // 0 Normal operation, 1 put sub-IPs into testmode (bypass clock gates)
     XBAR_TCDM_BUS.Slave master_ports[NR_MASTER_PORTS],
-    XBAR_TCDM_BUS.Slave master_ports_interleaved_only[NR_MASTER_PORTS_INTERLEAVED_ONLY],
+//    XBAR_TCDM_BUS.Slave master_ports_interleaved_only[NR_MASTER_PORTS_INTERLEAVED_ONLY],
     input addr_map_rule_t [NR_ADDR_RULES_L2_DEMUX-1:0] addr_space_l2_demux,
     //Interleaved Slave
     input addr_map_rule_t [NR_ADDR_RULES_SLAVE_PORTS_INTLVD-1:0] addr_space_interleaved,
@@ -110,7 +110,7 @@ module soc_interconnect
         .slave_ports(demux_slaves)
     );
   end
-
+/*
   ///////////////////////////////////////
   // Interleaved only address checkers //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ module soc_interconnect
     );
   end
 
-
+*/
   //////////////////////////
   // Interleaved Crossbar //
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

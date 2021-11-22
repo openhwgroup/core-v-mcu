@@ -51,7 +51,7 @@ module soc_interconnect_wrap
     XBAR_TCDM_BUS.Slave tcdm_udma_tx,  //TX Channel for the uDMA
     XBAR_TCDM_BUS.Slave tcdm_udma_rx,  //RX Channel for the uDMA
     XBAR_TCDM_BUS.Slave      tcdm_debug, //Debug access port from either the legacy or the riscv-debug unit
-    XBAR_TCDM_BUS.Slave tcdm_hwpe[NR_HWPE_PORTS],  //Hardware Processing Element ports
+//    XBAR_TCDM_BUS.Slave tcdm_hwpe[NR_HWPE_PORTS],  //Hardware Processing Element ports
     XBAR_TCDM_BUS.Slave tcdm_efpga[`N_EFPGA_TCDM_PORTS-1:0],  // EFPGA ports
     AXI_BUS.Slave axi_master_plug,  // Normally used for cluster -> SoC communication
     AXI_BUS.Master axi_slave_plug,  // Normally used for SoC -> cluster communication
@@ -218,7 +218,7 @@ module soc_interconnect_wrap
       .rst_ni,
       .test_en_i,
       .master_ports(master_ports),
-      .master_ports_interleaved_only(tcdm_hwpe),
+//      .master_ports_interleaved_only(tcdm_hwpe),
       .addr_space_l2_demux(L2_DEMUX_RULES),
       .addr_space_interleaved(INTERLEAVED_ADDR_SPACE),
       .interleaved_slaves(l2_interleaved_slaves),
