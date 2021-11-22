@@ -50,6 +50,7 @@ module clk_gen (
     input  logic        cluster_cfg_wrn_i
 );
   clk_and_control i_fll_soc (
+                             .clk(soc_clk_o),
       .FLLCLK(soc_clk_o),
       .FLLOE(1'b1),
       .REFCLK(ref_clk_i),
@@ -71,6 +72,7 @@ module clk_gen (
       .JTQ()  //TO FIX.DF()T
   );
   clk_and_control i_fll_cluster (
+                                                              .clk(soc_clk_o),
       .FLLCLK(cluster_clk_o),
       .FLLOE(1'b1),
       .REFCLK(ref_clk_i),
@@ -92,6 +94,7 @@ module clk_gen (
       .JTQ()  //TO FIX.DF()T
   );
   clk_and_control i_fll_per (
+                                                          .clk(soc_clk_o),
       .FLLCLK(per_clk_o),
       .FLLOE(1'b1),
       .REFCLK(ref_clk_i),

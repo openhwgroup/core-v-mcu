@@ -105,18 +105,18 @@ module apb_fll_if
         end
         else
         begin
-            fll1_ack_sync0  <= fll1_ack & !PREADY;
-            fll1_ack_sync   <= fll1_ack_sync0 &  !PREADY ;
-            fll2_ack_sync0  <= fll2_ack &  !PREADY;
-            fll2_ack_sync   <= fll2_ack_sync0 &  !PREADY;
-            fll3_ack_sync0  <= fll3_ack &  !PREADY;
-            fll3_ack_sync   <= fll3_ack_sync0 &  !PREADY;
-            fll1_lock_sync0 <= fll1_lock &  !PREADY;
-            fll1_lock_sync  <= fll1_lock_sync0 &  !PREADY;
-            fll2_lock_sync0 <= fll2_lock &  !PREADY;
-            fll2_lock_sync  <= fll2_lock_sync0 &  !PREADY;
-            fll3_lock_sync0 <= fll3_lock &  !PREADY;
-            fll3_lock_sync  <= fll3_lock_sync0 &  !PREADY;
+            fll1_ack_sync0  <= fll1_ack & !PREADY & PENABLE;
+            fll1_ack_sync   <= fll1_ack_sync0 &  !PREADY & PENABLE ;
+            fll2_ack_sync0  <= fll2_ack &  !PREADY & PENABLE;
+            fll2_ack_sync   <= fll2_ack_sync0 &  !PREADY & PENABLE;
+            fll3_ack_sync0  <= fll3_ack &  !PREADY & PENABLE;
+            fll3_ack_sync   <= fll3_ack_sync0 &  !PREADY & PENABLE;
+            fll1_lock_sync0 <= fll1_lock &  !PREADY & PENABLE;
+            fll1_lock_sync  <= fll1_lock_sync0 &  !PREADY & PENABLE;
+            fll2_lock_sync0 <= fll2_lock &  !PREADY & PENABLE;
+            fll2_lock_sync  <= fll2_lock_sync0 &  !PREADY & PENABLE;
+            fll3_lock_sync0 <= fll3_lock &  !PREADY & PENABLE;
+            fll3_lock_sync  <= fll3_lock_sync0 &  !PREADY & PENABLE;
 //            state           <= state_next;
             case (state)
               IDLE: begin
@@ -131,7 +131,7 @@ module apb_fll_if
                   else state <= READ;
               end
               WRITE: begin
-                case (PADDR[3:2])
+                case (PADDR[5:4])
                   0: fll1_valid <= 1;
                   1: fll2_valid <= 1;
                   2: fll3_valid <= 1;
@@ -142,7 +142,7 @@ module apb_fll_if
                 end
               end // case: WRITE
               READ: begin
-                case (PADDR[3:2])
+                case (PADDR[5:4])
                   0: begin
                     fll1_valid <= 1;
                     read_data <= fll1_r_data;

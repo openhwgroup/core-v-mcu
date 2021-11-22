@@ -56,6 +56,7 @@ filesets:
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
     - rtl/core-v-mcu/soc/soc_clk_rst_gen.sv
+    - rtl/core-v-mcu/soc/clk_and_control.sv
     - rtl/core-v-mcu/soc/soc_event_arbiter.sv
     - rtl/core-v-mcu/soc/soc_event_generator.sv
     - rtl/core-v-mcu/soc/soc_event_queue.sv
@@ -100,7 +101,6 @@ filesets:
   not_emulation-rtl:
     files:
     - rtl/core-v-mcu/soc/clk_gen.sv
-    - rtl/core-v-mcu/soc/clk_and_control.sv
     file_type: systemVerilogSource
 
   emulation-rtl:
@@ -116,6 +116,7 @@ filesets:
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     - emulation/xilinx/rtl/sram512x64.v
     - emulation/xilinx/rtl/DW02_mac.sv
+    - rtl/simulation/pPLL02F.sv
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
     - rtl/simulation/a2_bootrom.sv
