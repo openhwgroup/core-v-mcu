@@ -19,7 +19,7 @@ module core_v_mcu_tb;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
 
-   localparam  REF_CLK_PERIOD =  763ns; // external reference clock (32KHz)
+   localparam  REF_CLK_PERIOD =  1.25ns; // external reference clock (32KHz)
    localparam  BAUD_CLK_FREQ = 12500000;
    localparam  BAUD_CLK_PERIOD = 2ns;
 
@@ -52,6 +52,7 @@ module core_v_mcu_tb;
    reg 		    resetn;
    reg 		    bootsel;
    reg 		    uart_clk;
+   reg          ref_clk;
    wire 	    pup_qspi,pdown_qspi ;
    
       wire [`N_IO-1:0]	    pup;
@@ -62,7 +63,9 @@ module core_v_mcu_tb;
    assign rstn_i = resetn;
 
    initial uart_clk = 0;
+   initial ref_clk = 0;
    initial forever #(BAUD_CLK_PERIOD/2) uart_clk=~uart_clk;
+   initial forever #(REF_CLK_PERIOD) ref_clk=~ref_clk;
 
    GD25Q128B # (.initfile("mem_init/cli.txt"))
    qspi (
@@ -213,7 +216,7 @@ module core_v_mcu_tb;
 		  .jtag_tdo_o(jtag_tdo_o),
 		  .jtag_tms_i(jtag_tms_i),
 		  .jtag_trst_i(jtag_trst_i),
-		  .ref_clk_i(ref_clk_i),
+		  .ref_clk_i(ref_clk),
 		  .rstn_i(rstn_i),
 		  .bootsel_i(bootsel_i),
       .stm_i(1'b0),
