@@ -53,8 +53,8 @@ module soc_interconnect_wrap
     XBAR_TCDM_BUS.Slave      tcdm_debug, //Debug access port from either the legacy or the riscv-debug unit
 //    XBAR_TCDM_BUS.Slave tcdm_hwpe[NR_HWPE_PORTS],  //Hardware Processing Element ports
     XBAR_TCDM_BUS.Slave tcdm_efpga[`N_EFPGA_TCDM_PORTS-1:0],  // EFPGA ports
-    AXI_BUS.Slave axi_master_plug,  // Normally used for cluster -> SoC communication
-    AXI_BUS.Master axi_slave_plug,  // Normally used for SoC -> cluster communication
+//    AXI_BUS.Slave axi_master_plug,  // Normally used for cluster -> SoC communication
+//    AXI_BUS.Master axi_slave_plug,  // Normally used for SoC -> cluster communication
     APB_BUS.Master apb_peripheral_bus,  // Connects to all the SoC Peripherals
     XBAR_TCDM_BUS.Master tcdm_efpga_apbt1,
     XBAR_TCDM_BUS.Master     l2_interleaved_slaves[NR_L2_PORTS], // Connects to the interleaved memory banks
@@ -70,7 +70,7 @@ module soc_interconnect_wrap
   //////////////////////////////////////////////////////////////
   // 64-bit AXI to TCDM Bridge (Cluster to SoC communication) //
   //////////////////////////////////////////////////////////////
-  XBAR_TCDM_BUS axi_bridge_2_interconnect[pkg_soc_interconnect::NR_CLUSTER_2_SOC_TCDM_MASTER_PORTS](); //We need 4
+ // XBAR_TCDM_BUS axi_bridge_2_interconnect[pkg_soc_interconnect::NR_CLUSTER_2_SOC_TCDM_MASTER_PORTS](); //We need 4
   //32-bit TCDM
   //ports to
   //achieve full
@@ -78,7 +78,7 @@ module soc_interconnect_wrap
   //with one
   //64-bit AXI
   //port
-
+/*
   axi64_2_lint32_wrap #(
       .AXI_USER_WIDTH(AXI_USER_WIDTH),
       .AXI_ID_WIDTH  (AXI_IN_ID_WIDTH)
@@ -89,7 +89,7 @@ module soc_interconnect_wrap
       .axi_master (axi_master_plug),
       .tcdm_slaves(axi_bridge_2_interconnect)
   );
-
+*/
 
 
   ////////////////////////////////////////
@@ -174,10 +174,10 @@ module soc_interconnect_wrap
   //Synopsys 2019.3 has a bug; It doesn't handle expressions for array indices on the left-hand side of assignments.
   // Using a macro instead of a package parameter is an ugly but necessary workaround.
   // E.g. assign a[param+i] = b[i] doesn't work, but assign a[i] = b[i-param] does.
-  `define NR_SOC_TCDM_MASTER_PORTS 9  // 5 orig + 4xeFPGA
-  for (genvar i = 0; i < 4; i++) begin
-    `TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS+i], axi_bridge_2_interconnect[i])
-  end
+//  `define NR_SOC_TCDM_MASTER_PORTS 9  // 5 orig + 4xeFPGA
+//  for (genvar i = 0; i < 4; i++) begin
+//    `TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS+i], axi_bridge_2_interconnect[i])
+//  end
 
   XBAR_TCDM_BUS contiguous_slaves[4] ();
   `TCDM_ASSIGN_INTF(l2_private_slaves[0], contiguous_slaves[0])

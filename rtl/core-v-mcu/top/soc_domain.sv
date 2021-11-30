@@ -342,7 +342,7 @@ module soc_domain
   logic spi_master0_csn3, spi_master0_csn2;
 
   APB_BUS s_apb_debug_bus ();
-
+/*
   AXI_BUS #(
       .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH),
       .AXI_DATA_WIDTH(AXI_DATA_IN_WIDTH),
@@ -357,7 +357,7 @@ module soc_domain
       .AXI_ID_WIDTH  (AXI_ID_OUT_WIDTH),
       .AXI_USER_WIDTH(AXI_USER_WIDTH)
   ) s_data_out_bus ();
-
+*/
 
   FLL_BUS #(
       .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
@@ -593,15 +593,15 @@ module soc_domain
       .tcdm_debug           (s_lint_riscv_jtag_bus),
 //      .tcdm_hwpe            (s_lint_hwpe_bus),
       .tcdm_efpga           (s_lint_efpga_bus),
-      .axi_master_plug      (s_data_in_bus),
-      .axi_slave_plug       (s_data_out_bus),
+//      .axi_master_plug      (s_data_in_bus),
+//      .axi_slave_plug       (s_data_out_bus),
       .apb_peripheral_bus   (s_apb_periph_bus),
       .tcdm_efpga_apbt1     (s_lint_efpga_apbt1_bus),
       .l2_interleaved_slaves(s_mem_l2_bus),
       .l2_private_slaves    (s_mem_l2_pri_bus),
       .boot_rom_slave       (s_mem_rom_bus)
   );
-
+/*
   assign s_data_out_bus.aw_ready = 1'b0;
   assign s_data_out_bus.w_ready  = 1'b0;
   assign s_data_out_bus.b_valid  = 1'b0;
@@ -613,7 +613,7 @@ module soc_domain
   assign s_data_in_bus.b_ready   = 1'b0;
   assign s_data_in_bus.ar_valid  = 1'b0;
   assign s_data_in_bus.r_ready   = 1'b0;
-
+*/
   /* Debug Subsystem */
 
   dmi_jtag #(
