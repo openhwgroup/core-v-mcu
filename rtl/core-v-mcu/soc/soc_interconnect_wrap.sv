@@ -100,7 +100,7 @@ module soc_interconnect_wrap
   localparam addr_map_rule_t [NR_RULES_L2_DEMUX-1:0] L2_DEMUX_RULES = '{
       '{ idx: 1 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK1_END_ADDR} , //Both , bank0 and bank1 are in the  same address block
   '{ idx: 1 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}      ,
-        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}, 
+        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR},
         '{ idx: 2 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }
   };
 
@@ -117,10 +117,10 @@ module soc_interconnect_wrap
         '{ idx: 3 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}
   };
 
-  localparam NR_RULES_AXI_CROSSBAR = 2;
+  localparam NR_RULES_AXI_CROSSBAR = 1;
   localparam addr_map_rule_t [NR_RULES_AXI_CROSSBAR-1:0] AXI_CROSSBAR_RULES = '{
-      '{ idx: 0, start_addr: `SOC_MEM_MAP_AXI_PLUG_START_ADDR,    end_addr: `SOC_MEM_MAP_AXI_PLUG_END_ADDR},
-       '{ idx: 1, start_addr: `SOC_MEM_MAP_PERIPHERALS_START_ADDR, end_addr: `SOC_MEM_MAP_PERIPHERALS_END_ADDR}
+//      '{ idx: 0, start_addr: `SOC_MEM_MAP_AXI_PLUG_START_ADDR,    end_addr: `SOC_MEM_MAP_AXI_PLUG_END_ADDR},
+       '{ idx: 0, start_addr: `SOC_MEM_MAP_PERIPHERALS_START_ADDR, end_addr: `SOC_MEM_MAP_PERIPHERALS_END_ADDR}
   };
 
   //For legacy reasons, the fc_data port can alias the address prefix 0x000 to 0x1c0. E.g. an access to 0x00001234 is
@@ -190,9 +190,9 @@ module soc_interconnect_wrap
       .AXI_DATA_WIDTH(32),
       .AXI_ID_WIDTH  (pkg_soc_interconnect::AXI_ID_OUT_WIDTH),
       .AXI_USER_WIDTH(AXI_USER_WIDTH)
-  ) axi_slaves[2] ();
-  `AXI_ASSIGN(axi_slave_plug, axi_slaves[0])
-  `AXI_ASSIGN(axi_to_axi_lite_bridge, axi_slaves[1])
+  ) axi_slaves[1] ();
+ // `AXI_ASSIGN(axi_slave_plug, axi_slaves[0])
+  `AXI_ASSIGN(axi_to_axi_lite_bridge, axi_slaves[0])
 
   //Interconnect instantiation
   soc_interconnect #(
@@ -207,7 +207,7 @@ module soc_interconnect_wrap
       // programm instructions and 1 for programm stack )
       // efpga async apb port
       .NR_ADDR_RULES_SLAVE_PORTS_CONTIG(NR_RULES_CONTIG_CROSSBAR),
-      .NR_AXI_SLAVE_PORTS(2),  // 1 for AXI to cluster, 1 for SoC peripherals (converted to APB)
+      .NR_AXI_SLAVE_PORTS(1),  // 1 for AXI to cluster, 1 for SoC peripherals (converted to APB)
       .NR_ADDR_RULES_AXI_SLAVE_PORTS(NR_RULES_AXI_CROSSBAR),
       .AXI_MASTER_ID_WIDTH(1),  //Doesn't need to be changed. All axi masters in the current
       //interconnect come from a TCDM protocol converter and thus do not have and AXI ID.
