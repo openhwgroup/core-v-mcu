@@ -54,7 +54,8 @@ module soc_domain
     input  logic                         dft_test_mode_i,
     input  logic                         dft_cg_enable_i,
     input  logic                         bootsel_i,
-    // AXI4 SLAVE
+/*
+     // AXI4 SLAVE
     input  logic [                  7:0] data_slave_aw_writetoken_i,
     input  logic [   AXI_ADDR_WIDTH-1:0] data_slave_aw_addr_i,
     input  logic [                  2:0] data_slave_aw_prot_i,
@@ -147,7 +148,7 @@ module soc_domain
     input  logic [  AXI_ID_OUT_WIDTH-1:0] data_master_b_id_i,
     input  logic [    AXI_USER_WIDTH-1:0] data_master_b_user_i,
     output logic [                   7:0] data_master_b_readpointer_o,
-
+*/
     output logic                               dma_pe_evt_ack_o,
     input  logic                               dma_pe_evt_valid_i,
     output logic                               dma_pe_irq_ack_o,
