@@ -354,7 +354,7 @@ module core_v_mcu #(
       .dft_test_mode_i(s_test_mode),
       .dft_cg_enable_i(s_dft_cg_enable),
       .bootsel_i(bootsel_i),
-
+/*
       .data_slave_aw_writetoken_i('0),
       .data_slave_aw_addr_i('0),
       .data_slave_aw_prot_i('0),
@@ -445,7 +445,7 @@ module core_v_mcu #(
       .data_master_b_id_i('0),
       .data_master_b_user_i('0),
       .data_master_b_readpointer_o(),
-
+*/
 
       .jtag_tck_i  (jtag_tck_i),
       .jtag_trst_ni(jtag_trst_i),
