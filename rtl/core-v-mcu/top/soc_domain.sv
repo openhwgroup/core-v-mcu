@@ -54,101 +54,6 @@ module soc_domain
     input  logic                         dft_test_mode_i,
     input  logic                         dft_cg_enable_i,
     input  logic                         bootsel_i,
-/*
-     // AXI4 SLAVE
-    input  logic [                  7:0] data_slave_aw_writetoken_i,
-    input  logic [   AXI_ADDR_WIDTH-1:0] data_slave_aw_addr_i,
-    input  logic [                  2:0] data_slave_aw_prot_i,
-    input  logic [                  3:0] data_slave_aw_region_i,
-    input  logic [                  7:0] data_slave_aw_len_i,
-    input  logic [                  2:0] data_slave_aw_size_i,
-    //input  logic [5:0]                    data_slave_aw_atop_i,
-    input  logic [                  1:0] data_slave_aw_burst_i,
-    input  logic                         data_slave_aw_lock_i,
-    input  logic [                  3:0] data_slave_aw_cache_i,
-    input  logic [                  3:0] data_slave_aw_qos_i,
-    input  logic [  AXI_ID_IN_WIDTH-1:0] data_slave_aw_id_i,
-    input  logic [   AXI_USER_WIDTH-1:0] data_slave_aw_user_i,
-    output logic [                  7:0] data_slave_aw_readpointer_o,
-    input  logic [                  7:0] data_slave_ar_writetoken_i,
-    input  logic [   AXI_ADDR_WIDTH-1:0] data_slave_ar_addr_i,
-    input  logic [                  2:0] data_slave_ar_prot_i,
-    input  logic [                  3:0] data_slave_ar_region_i,
-    input  logic [                  7:0] data_slave_ar_len_i,
-    input  logic [                  2:0] data_slave_ar_size_i,
-    input  logic [                  1:0] data_slave_ar_burst_i,
-    input  logic                         data_slave_ar_lock_i,
-    input  logic [                  3:0] data_slave_ar_cache_i,
-    input  logic [                  3:0] data_slave_ar_qos_i,
-    input  logic [  AXI_ID_IN_WIDTH-1:0] data_slave_ar_id_i,
-    input  logic [   AXI_USER_WIDTH-1:0] data_slave_ar_user_i,
-    output logic [                  7:0] data_slave_ar_readpointer_o,
-    input  logic [                  7:0] data_slave_w_writetoken_i,
-    input  logic [AXI_DATA_IN_WIDTH-1:0] data_slave_w_data_i,
-    input  logic [AXI_STRB_WIDTH_IN-1:0] data_slave_w_strb_i,
-    input  logic [   AXI_USER_WIDTH-1:0] data_slave_w_user_i,
-    input  logic                         data_slave_w_last_i,
-    output logic [                  7:0] data_slave_w_readpointer_o,
-    output logic [                  7:0] data_slave_r_writetoken_o,
-    output logic [AXI_DATA_IN_WIDTH-1:0] data_slave_r_data_o,
-    output logic [                  1:0] data_slave_r_resp_o,
-    output logic                         data_slave_r_last_o,
-    output logic [  AXI_ID_IN_WIDTH-1:0] data_slave_r_id_o,
-    output logic [   AXI_USER_WIDTH-1:0] data_slave_r_user_o,
-    input  logic [                  7:0] data_slave_r_readpointer_i,
-    output logic [                  7:0] data_slave_b_writetoken_o,
-    output logic [                  1:0] data_slave_b_resp_o,
-    output logic [  AXI_ID_IN_WIDTH-1:0] data_slave_b_id_o,
-    output logic [   AXI_USER_WIDTH-1:0] data_slave_b_user_o,
-    input  logic [                  7:0] data_slave_b_readpointer_i,
-
-    // AXI4 MASTER
-    output logic [                   7:0] data_master_aw_writetoken_o,
-    output logic [    AXI_ADDR_WIDTH-1:0] data_master_aw_addr_o,
-    output logic [                   2:0] data_master_aw_prot_o,
-    output logic [                   3:0] data_master_aw_region_o,
-    output logic [                   7:0] data_master_aw_len_o,
-    output logic [                   2:0] data_master_aw_size_o,
-    // output logic [5:0]                    data_master_aw_atop_o,
-    output logic [                   1:0] data_master_aw_burst_o,
-    output logic                          data_master_aw_lock_o,
-    output logic [                   3:0] data_master_aw_cache_o,
-    output logic [                   3:0] data_master_aw_qos_o,
-    output logic [  AXI_ID_OUT_WIDTH-1:0] data_master_aw_id_o,
-    output logic [    AXI_USER_WIDTH-1:0] data_master_aw_user_o,
-    input  logic [                   7:0] data_master_aw_readpointer_i,
-    output logic [                   7:0] data_master_ar_writetoken_o,
-    output logic [    AXI_ADDR_WIDTH-1:0] data_master_ar_addr_o,
-    output logic [                   2:0] data_master_ar_prot_o,
-    output logic [                   3:0] data_master_ar_region_o,
-    output logic [                   7:0] data_master_ar_len_o,
-    output logic [                   2:0] data_master_ar_size_o,
-    output logic [                   1:0] data_master_ar_burst_o,
-    output logic                          data_master_ar_lock_o,
-    output logic [                   3:0] data_master_ar_cache_o,
-    output logic [                   3:0] data_master_ar_qos_o,
-    output logic [  AXI_ID_OUT_WIDTH-1:0] data_master_ar_id_o,
-    output logic [    AXI_USER_WIDTH-1:0] data_master_ar_user_o,
-    input  logic [                   7:0] data_master_ar_readpointer_i,
-    output logic [                   7:0] data_master_w_writetoken_o,
-    output logic [AXI_DATA_OUT_WIDTH-1:0] data_master_w_data_o,
-    output logic [AXI_STRB_WIDTH_OUT-1:0] data_master_w_strb_o,
-    output logic [    AXI_USER_WIDTH-1:0] data_master_w_user_o,
-    output logic                          data_master_w_last_o,
-    input  logic [                   7:0] data_master_w_readpointer_i,
-    input  logic [                   7:0] data_master_r_writetoken_i,
-    input  logic [AXI_DATA_OUT_WIDTH-1:0] data_master_r_data_i,
-    input  logic [                   1:0] data_master_r_resp_i,
-    input  logic                          data_master_r_last_i,
-    input  logic [  AXI_ID_OUT_WIDTH-1:0] data_master_r_id_i,
-    input  logic [    AXI_USER_WIDTH-1:0] data_master_r_user_i,
-    output logic [                   7:0] data_master_r_readpointer_o,
-    input  logic [                   7:0] data_master_b_writetoken_i,
-    input  logic [                   1:0] data_master_b_resp_i,
-    input  logic [  AXI_ID_OUT_WIDTH-1:0] data_master_b_id_i,
-    input  logic [    AXI_USER_WIDTH-1:0] data_master_b_user_i,
-    output logic [                   7:0] data_master_b_readpointer_o,
-*/
     output logic                               dma_pe_evt_ack_o,
     input  logic                               dma_pe_evt_valid_i,
     output logic                               dma_pe_irq_ack_o,
@@ -343,23 +248,6 @@ module soc_domain
   logic spi_master0_csn3, spi_master0_csn2;
 
   APB_BUS s_apb_debug_bus ();
-/*
-  AXI_BUS #(
-      .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH),
-      .AXI_DATA_WIDTH(AXI_DATA_IN_WIDTH),
-      .AXI_ID_WIDTH  (AXI_ID_IN_WIDTH),
-      .AXI_USER_WIDTH(AXI_USER_WIDTH)
-  ) s_data_in_bus ();
-
-
-  AXI_BUS #(
-      .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH),
-      .AXI_DATA_WIDTH(AXI_DATA_OUT_WIDTH),
-      .AXI_ID_WIDTH  (AXI_ID_OUT_WIDTH),
-      .AXI_USER_WIDTH(AXI_USER_WIDTH)
-  ) s_data_out_bus ();
-*/
-
   FLL_BUS #(
       .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
       .FLL_DATA_WIDTH(FLL_DATA_WIDTH)
@@ -592,29 +480,13 @@ module soc_domain
       .tcdm_udma_rx         (s_lint_udma_rx_bus),
       .tcdm_udma_tx         (s_lint_udma_tx_bus),
       .tcdm_debug           (s_lint_riscv_jtag_bus),
-//      .tcdm_hwpe            (s_lint_hwpe_bus),
       .tcdm_efpga           (s_lint_efpga_bus),
-//      .axi_master_plug      (s_data_in_bus),
-//      .axi_slave_plug       (s_data_out_bus),
       .apb_peripheral_bus   (s_apb_periph_bus),
       .tcdm_efpga_apbt1     (s_lint_efpga_apbt1_bus),
       .l2_interleaved_slaves(s_mem_l2_bus),
       .l2_private_slaves    (s_mem_l2_pri_bus),
       .boot_rom_slave       (s_mem_rom_bus)
   );
-/*
-  assign s_data_out_bus.aw_ready = 1'b0;
-  assign s_data_out_bus.w_ready  = 1'b0;
-  assign s_data_out_bus.b_valid  = 1'b0;
-  assign s_data_out_bus.ar_ready = 1'b0;
-  assign s_data_out_bus.r_valid  = 1'b0;
-
-  assign s_data_in_bus.aw_valid  = 1'b0;
-  assign s_data_in_bus.w_valid   = 1'b0;
-  assign s_data_in_bus.b_ready   = 1'b0;
-  assign s_data_in_bus.ar_valid  = 1'b0;
-  assign s_data_in_bus.r_ready   = 1'b0;
-*/
   /* Debug Subsystem */
 
   dmi_jtag #(
