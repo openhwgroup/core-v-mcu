@@ -276,8 +276,9 @@ module soc_domain
   XBAR_TCDM_BUS s_lint_udma_rx_bus ();
   XBAR_TCDM_BUS s_lint_fc_data_bus ();
   XBAR_TCDM_BUS s_lint_fc_instr_bus ();
+if(NB_HWPE_PORTS > 0 ) begin
   XBAR_TCDM_BUS s_lint_hwpe_bus[NB_HWPE_PORTS-1:0] ();
-
+end
   XBAR_TCDM_BUS s_lint_efpga_bus[`N_EFPGA_TCDM_PORTS-1:0] ();
   XBAR_TCDM_BUS s_lint_efpga_apbt1_bus ();
 
