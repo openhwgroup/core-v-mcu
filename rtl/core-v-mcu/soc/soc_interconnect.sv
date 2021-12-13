@@ -141,16 +141,16 @@ module soc_interconnect
     `TCDM_ASSIGN(interleaved_masters, [i], l2_demux_2_interleaved_xbar, [i])
   end
 `ifndef VERILATOR
-if (NR_MASTER_PORTS_INTERLEAVED_ONLY > 0) begin
-  `TCDM_EXPLODE_ARRAY_DECLARE(master_ports_interleaved_only_checked,
-                              NR_MASTER_PORTS_INTERLEAVED_ONLY)
-  for (genvar i = 0; i < NR_MASTER_PORTS_INTERLEAVED_ONLY; i++) begin
-    `TCDM_MASTER_EXPLODE(master_ports_interleaved_only_checked[i],
-                         master_ports_interleaved_only_checked, [i])
-    `TCDM_ASSIGN(interleaved_masters, [NR_MASTER_PORTS + i], master_ports_interleaved_only_checked,
-                 [i])
+  if (NR_MASTER_PORTS_INTERLEAVED_ONLY > 0) begin
+    `TCDM_EXPLODE_ARRAY_DECLARE(master_ports_interleaved_only_checked,
+                                NR_MASTER_PORTS_INTERLEAVED_ONLY)
+    for (genvar i = 0; i < NR_MASTER_PORTS_INTERLEAVED_ONLY; i++) begin
+      `TCDM_MASTER_EXPLODE(master_ports_interleaved_only_checked[i],
+                           master_ports_interleaved_only_checked, [i])
+      `TCDM_ASSIGN(interleaved_masters, [NR_MASTER_PORTS + i],
+                   master_ports_interleaved_only_checked, [i])
+    end
   end
-end
 `endif
   interleaved_crossbar #(
       .NR_MASTER_PORTS(NR_MASTER_PORTS + NR_MASTER_PORTS_INTERLEAVED_ONLY),

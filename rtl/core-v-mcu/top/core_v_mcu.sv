@@ -105,7 +105,7 @@ module core_v_mcu #(
 
   logic                                   s_efpga_clk;
 
-/* -----\/----- EXCLUDED -----\/-----
+  /* -----\/----- EXCLUDED -----\/-----
   logic                                   s_fpga_clk_1_i;
   logic                                   s_fpga_clk_2_i;
   logic                                   s_fpga_clk_3_i;
@@ -113,7 +113,7 @@ module core_v_mcu #(
   logic                                   s_fpga_clk_5_i;
 
  -----/\----- EXCLUDED -----/\----- */
-/* -----\/----- EXCLUDED -----\/-----
+  /* -----\/----- EXCLUDED -----\/-----
   logic                                   s_rf_tx_clk;
   logic                                   s_rf_tx_oeb;
   logic                                   s_rf_tx_enb;
@@ -273,23 +273,23 @@ module core_v_mcu #(
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
       //      .pad_cfg_i      (s_pad_cfg_soc),
-      .pad_mux_i      (s_pad_mux_soc),
+      .pad_mux_i   (s_pad_mux_soc),
       // IO signals
-      .io_out_o       (s_io_out),
-      .io_in_i        (s_io_in),
-      .io_oe_o        (s_io_oe),
+      .io_out_o    (s_io_out),
+      .io_in_i     (s_io_in),
+      .io_oe_o     (s_io_oe),
       // PERIO signals
-      .perio_out_i    (s_perio_out),
-      .perio_in_o     (s_perio_in),
-      .perio_oe_i     (s_perio_oe),
+      .perio_out_i (s_perio_out),
+      .perio_in_o  (s_perio_in),
+      .perio_oe_i  (s_perio_oe),
       // GPIO signals
-      .apbio_out_i    (s_apbio_out),
-      .apbio_in_o     (s_apbio_in),
-      .apbio_oe_i     (s_apbio_oe),
+      .apbio_out_i (s_apbio_out),
+      .apbio_in_o  (s_apbio_in),
+      .apbio_oe_i  (s_apbio_oe),
       // FPGAIO signals
-      .fpgaio_out_i   (s_fpgaio_out),
-      .fpgaio_in_o    (s_fpgaio_in),
-      .fpgaio_oe_i    (s_fpgaio_oe)
+      .fpgaio_out_i(s_fpgaio_out),
+      .fpgaio_in_o (s_fpgaio_in),
+      .fpgaio_oe_i (s_fpgaio_oe)
   );
 
   //
@@ -393,7 +393,7 @@ module core_v_mcu #(
 
   assign s_test_mode        = '0;
   assign s_dft_cg_enable    = '0;
-  assign s_test_clk = '0;
+  assign s_test_clk         = '0;
 
 
   assign s_dma_pe_evt_valid = '0;

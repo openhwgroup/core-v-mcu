@@ -126,8 +126,8 @@ module safe_domain #(
 `endif
 
 
-  assign s_rstn          = rst_ni;
-  assign rst_no          = s_rstn;
+  assign s_rstn = rst_ni;
+  assign rst_no = s_rstn;
 
 
 endmodule  // safe_domain

@@ -51,9 +51,9 @@ module soc_domain
     input logic test_clk_i,
     input logic rstn_glob_i,
 
-    input  logic                         dft_test_mode_i,
-    input  logic                         dft_cg_enable_i,
-    input  logic                         bootsel_i,
+    input  logic                               dft_test_mode_i,
+    input  logic                               dft_cg_enable_i,
+    input  logic                               bootsel_i,
     output logic                               dma_pe_evt_ack_o,
     input  logic                               dma_pe_evt_valid_i,
     output logic                               dma_pe_irq_ack_o,
@@ -276,9 +276,9 @@ module soc_domain
   XBAR_TCDM_BUS s_lint_udma_rx_bus ();
   XBAR_TCDM_BUS s_lint_fc_data_bus ();
   XBAR_TCDM_BUS s_lint_fc_instr_bus ();
-if(NB_HWPE_PORTS > 0 ) begin
-  XBAR_TCDM_BUS s_lint_hwpe_bus[NB_HWPE_PORTS-1:0] ();
-end
+  if (NB_HWPE_PORTS > 0) begin
+    XBAR_TCDM_BUS s_lint_hwpe_bus[NB_HWPE_PORTS-1:0] ();
+  end
   XBAR_TCDM_BUS s_lint_efpga_bus[`N_EFPGA_TCDM_PORTS-1:0] ();
   XBAR_TCDM_BUS s_lint_efpga_apbt1_bus ();
 

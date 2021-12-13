@@ -86,7 +86,7 @@ module pPLL02F (
   initial clk = 0;
   //initial forever #(0.625) clk = ~clk;
   //always @(posedge clk) begin
-    always @(posedge CK_XTAL_IN) begin
+  always @(posedge CK_XTAL_IN) begin
     counter <= counter + 1;
     if (counter == PS0_L2_INT) begin
       clkOut  <= ~clkOut;

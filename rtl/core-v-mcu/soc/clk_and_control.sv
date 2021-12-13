@@ -3,26 +3,26 @@
 
 
 module clk_and_control (
-                        input               clk,
-                        output logic        FLLCLK,
-                        input logic         FLLOE,
-                        input logic         REFCLK,
-                        output logic        LOCK,
-                        input logic         CFGREQ,
-                        output logic        CFGACK,
-                        input logic [ 1:0]  CFGAD,
-                        input logic [31:0]  CFGD,
-                        output logic [31:0] CFGQ,
-                        input logic         CFGWEB,
-                        input logic         RSTB,
-                        input logic         PWD,
-                        input logic         RET,
-                        input logic         TM,
-                        input logic         TE,
-                        input logic         TD, //TO FIX DFT
-                        output logic        TQ, //TO FIX DFT
-                        input logic         JTD, //TO FIX DFT
-                        output logic        JTQ  //TO FIX DFT
+    input               clk,
+    output logic        FLLCLK,
+    input  logic        FLLOE,
+    input  logic        REFCLK,
+    output logic        LOCK,
+    input  logic        CFGREQ,
+    output logic        CFGACK,
+    input  logic [ 1:0] CFGAD,
+    input  logic [31:0] CFGD,
+    output logic [31:0] CFGQ,
+    input  logic        CFGWEB,
+    input  logic        RSTB,
+    input  logic        PWD,
+    input  logic        RET,
+    input  logic        TM,
+    input  logic        TE,
+    input  logic        TD,  //TO FIX DFT
+    output logic        TQ,  //TO FIX DFT
+    input  logic        JTD,  //TO FIX DFT
+    output logic        JTQ  //TO FIX DFT
 
 );
 
@@ -121,7 +121,7 @@ module clk_and_control (
       config1 <= 32'h0000000C;
       config2 <= 0;
       config3 <= 0;
-              CFGACK <= 1'b0;
+      CFGACK  <= 1'b0;
     end else begin
       if (CFGREQ == 1'b1) begin
         if (CFGWEB == 0) begin
@@ -133,19 +133,18 @@ module clk_and_control (
             r_tmp   <= config2[30];
           end
           CFGACK <= 1'b1;
-        end
-        else begin
+        end else begin
           if (CFGAD == 2'b00) CFGQ <= config0;
           else if (CFGAD == 2'b01) CFGQ <= config1;
           else if (CFGAD == 2'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
           else if (CFGAD == 2'b11) CFGQ <= config3;
           CFGACK <= 1'b1;
-                  end // else: !if(CFGWEB)
+        end  // else: !if(CFGWEB)
       end // if (CFGREQ == 1'b1)
       else begin
         CFGACK <= 1'b0;
-      end // else: !if(CFGREQ == 1'b1)
-    end // else: !if(RSTB == 1'b0)
-  end // always_ff @ (posedge clk, negedge RSTB)
+      end  // else: !if(CFGREQ == 1'b1)
+    end  // else: !if(RSTB == 1'b0)
+  end  // always_ff @ (posedge clk, negedge RSTB)
 
 endmodule
