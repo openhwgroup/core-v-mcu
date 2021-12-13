@@ -104,12 +104,16 @@ module core_v_mcu #(
   logic [`N_FPGAIO-1:0]                   s_fpgaio_oe;
 
   logic                                   s_efpga_clk;
+
+/* -----\/----- EXCLUDED -----\/-----
   logic                                   s_fpga_clk_1_i;
   logic                                   s_fpga_clk_2_i;
   logic                                   s_fpga_clk_3_i;
   logic                                   s_fpga_clk_4_i;
   logic                                   s_fpga_clk_5_i;
 
+ -----/\----- EXCLUDED -----/\----- */
+/* -----\/----- EXCLUDED -----\/-----
   logic                                   s_rf_tx_clk;
   logic                                   s_rf_tx_oeb;
   logic                                   s_rf_tx_enb;
@@ -184,6 +188,7 @@ module core_v_mcu #(
   logic                                   s_cam_hsync;
   logic                                   s_cam_vsync;
 
+ -----/\----- EXCLUDED -----/\----- */
   logic                                   s_jtag_shift_dr;
   logic                                   s_jtag_update_dr;
   logic                                   s_jtag_capture_dr;
@@ -265,9 +270,6 @@ module core_v_mcu #(
       .rst_ni     (rstn_i),
       .rst_no     (s_rstn_por),
 
-      .test_clk_o     (s_test_clk),
-      .test_mode_o    (s_test_mode),
-      .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
       //      .pad_cfg_i      (s_pad_cfg_soc),
@@ -391,6 +393,8 @@ module core_v_mcu #(
 
   assign s_test_mode        = '0;
   assign s_dft_cg_enable    = '0;
+  assign s_test_clk = '0;
+
 
   assign s_dma_pe_evt_valid = '0;
   assign s_dma_pe_irq_valid = '0;
