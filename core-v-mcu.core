@@ -56,6 +56,7 @@ filesets:
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
     - rtl/core-v-mcu/soc/soc_clk_rst_gen.sv
+    - rtl/core-v-mcu/soc/clk_and_control.sv
     - rtl/core-v-mcu/soc/soc_event_arbiter.sv
     - rtl/core-v-mcu/soc/soc_event_generator.sv
     - rtl/core-v-mcu/soc/soc_event_queue.sv
@@ -89,13 +90,45 @@ filesets:
 
   rtl-simulation:
     files:
-    - rtl/simulation/clk_gen.sv
+    - rtl/simulation/pPLL02F.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
     - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
+
+  not_emulation-rtl:
+    files:
+    - rtl/core-v-mcu/soc/clk_gen.sv
+    file_type: systemVerilogSource
+
+  emulation-rtl:
+    depend:
+    - pulp-platform.org::tech_cells_xilinx
+    files:
+    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
+    - emulation/xilinx/rtl/fpga_clk_gen.sv
+    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
+    - emulation/xilinx/rtl/fpga_private_ram.sv
+    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
+    - emulation/xilinx/rtl/pad_functional_xilinx.sv
+    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    - emulation/xilinx/rtl/sram512x64.v
+    - emulation/xilinx/rtl/DW02_mac.sv
+    - rtl/simulation/pPLL02F.sv
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
+    - rtl/simulation/a2_bootrom.sv
+    file_type: systemVerilogSource
+
+  xilinx-ips:
+    files:
+    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
+    - emulation/xilinx/ips/xilinx_private_ram.tcl
+    file_type: tclSource
 
   rom_init:
     files:
@@ -135,31 +168,6 @@ filesets:
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
-  emulation-rtl:
-    depend:
-    - pulp-platform.org::tech_cells_xilinx
-    files:
-    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - emulation/xilinx/rtl/fpga_clk_gen.sv
-    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
-    - emulation/xilinx/rtl/fpga_private_ram.sv
-    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
-    - emulation/xilinx/rtl/pad_functional_xilinx.sv
-    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
-    - emulation/xilinx/rtl/sram512x64.v
-    - emulation/xilinx/rtl/DW02_mac.sv
-    - rtl/simulation/top.sv
-    - rtl/simulation/top1_wrapper.sv
-    - rtl/simulation/a2_bootrom.sv
-    file_type: systemVerilogSource
-
-  xilinx-ips:
-    files:
-    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
-    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
-    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
-    - emulation/xilinx/ips/xilinx_private_ram.tcl
-    file_type: tclSource
 
   nexys-rtl:
     files:
@@ -223,6 +231,7 @@ targets:
     <<: *default_target
     default_tool: modelsim
     filesets_append:
+    - not_emulation-rtl
     - rtl-simulation
     - mem_init_modelsim
     - rtl-behavioral
@@ -263,6 +272,7 @@ targets:
     - verilator-waiver
     - mem_init_verilator
     - rtl-simulation
+    - not_emulation-rtl
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
@@ -280,6 +290,7 @@ targets:
     toplevel: [core_v_mcu]
     filesets_append:
     - rtl-simulation
+    - not_emulation-rtl
     tools:
       verilator:
         mode: lint-only
