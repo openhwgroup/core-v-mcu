@@ -22,9 +22,6 @@ module safe_domain #(
     input  logic rst_ni,
     output logic rst_no,
 
-    output logic test_clk_o,
-    output logic test_mode_o,
-    output logic dft_cg_enable_o,
 
     //**********************************************************
     //*** PERIPHERALS SIGNALS **********************************
@@ -129,11 +126,8 @@ module safe_domain #(
 `endif
 
 
-  assign s_rstn          = rst_ni;
-  assign rst_no          = s_rstn;
+  assign s_rstn = rst_ni;
+  assign rst_no = s_rstn;
 
-  assign test_clk_o      = 1'b0;
-  assign dft_cg_enable_o = 1'b0;
-  assign test_mode_o     = 1'b0;
 
 endmodule  // safe_domain

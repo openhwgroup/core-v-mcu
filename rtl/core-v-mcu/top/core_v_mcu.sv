@@ -12,8 +12,8 @@
 `include "pulp_peripheral_defines.svh"
 
 module core_v_mcu #(
-    parameter USE_FPU  = 1,
-    parameter USE_HWPE = 1
+    parameter USE_FPU  = 0,
+    parameter USE_HWPE = 0
 ) (
     input                                jtag_tck_i,
     input                                jtag_tdi_i,
@@ -104,12 +104,16 @@ module core_v_mcu #(
   logic [`N_FPGAIO-1:0]                   s_fpgaio_oe;
 
   logic                                   s_efpga_clk;
+
+  /* -----\/----- EXCLUDED -----\/-----
   logic                                   s_fpga_clk_1_i;
   logic                                   s_fpga_clk_2_i;
   logic                                   s_fpga_clk_3_i;
   logic                                   s_fpga_clk_4_i;
   logic                                   s_fpga_clk_5_i;
 
+ -----/\----- EXCLUDED -----/\----- */
+  /* -----\/----- EXCLUDED -----\/-----
   logic                                   s_rf_tx_clk;
   logic                                   s_rf_tx_oeb;
   logic                                   s_rf_tx_enb;
@@ -184,6 +188,7 @@ module core_v_mcu #(
   logic                                   s_cam_hsync;
   logic                                   s_cam_vsync;
 
+ -----/\----- EXCLUDED -----/\----- */
   logic                                   s_jtag_shift_dr;
   logic                                   s_jtag_update_dr;
   logic                                   s_jtag_capture_dr;
@@ -265,29 +270,26 @@ module core_v_mcu #(
       .rst_ni     (rstn_i),
       .rst_no     (s_rstn_por),
 
-      .test_clk_o     (s_test_clk),
-      .test_mode_o    (s_test_mode),
-      .dft_cg_enable_o(s_dft_cg_enable),
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
       //      .pad_cfg_i      (s_pad_cfg_soc),
-      .pad_mux_i      (s_pad_mux_soc),
+      .pad_mux_i   (s_pad_mux_soc),
       // IO signals
-      .io_out_o       (s_io_out),
-      .io_in_i        (s_io_in),
-      .io_oe_o        (s_io_oe),
+      .io_out_o    (s_io_out),
+      .io_in_i     (s_io_in),
+      .io_oe_o     (s_io_oe),
       // PERIO signals
-      .perio_out_i    (s_perio_out),
-      .perio_in_o     (s_perio_in),
-      .perio_oe_i     (s_perio_oe),
+      .perio_out_i (s_perio_out),
+      .perio_in_o  (s_perio_in),
+      .perio_oe_i  (s_perio_oe),
       // GPIO signals
-      .apbio_out_i    (s_apbio_out),
-      .apbio_in_o     (s_apbio_in),
-      .apbio_oe_i     (s_apbio_oe),
+      .apbio_out_i (s_apbio_out),
+      .apbio_in_o  (s_apbio_in),
+      .apbio_oe_i  (s_apbio_oe),
       // FPGAIO signals
-      .fpgaio_out_i   (s_fpgaio_out),
-      .fpgaio_in_o    (s_fpgaio_in),
-      .fpgaio_oe_i    (s_fpgaio_oe)
+      .fpgaio_out_i(s_fpgaio_out),
+      .fpgaio_in_o (s_fpgaio_in),
+      .fpgaio_oe_i (s_fpgaio_oe)
   );
 
   //
@@ -354,99 +356,6 @@ module core_v_mcu #(
       .dft_test_mode_i(s_test_mode),
       .dft_cg_enable_i(s_dft_cg_enable),
       .bootsel_i(bootsel_i),
-
-      .data_slave_aw_writetoken_i('0),
-      .data_slave_aw_addr_i('0),
-      .data_slave_aw_prot_i('0),
-      .data_slave_aw_region_i('0),
-      .data_slave_aw_len_i('0),
-      .data_slave_aw_size_i('0),
-      .data_slave_aw_burst_i('0),
-      .data_slave_aw_lock_i('0),
-      .data_slave_aw_cache_i('0),
-      .data_slave_aw_qos_i('0),
-      .data_slave_aw_id_i('0),
-      .data_slave_aw_user_i('0),
-      .data_slave_aw_readpointer_o(),
-      .data_slave_ar_writetoken_i('0),
-      .data_slave_ar_addr_i('0),
-      .data_slave_ar_prot_i('0),
-      .data_slave_ar_region_i('0),
-      .data_slave_ar_len_i('0),
-      .data_slave_ar_size_i('0),
-      .data_slave_ar_burst_i('0),
-      .data_slave_ar_lock_i('0),
-      .data_slave_ar_cache_i('0),
-      .data_slave_ar_qos_i('0),
-      .data_slave_ar_id_i('0),
-      .data_slave_ar_user_i('0),
-      .data_slave_ar_readpointer_o(),
-      .data_slave_w_writetoken_i('0),
-      .data_slave_w_data_i('0),
-      .data_slave_w_strb_i('0),
-      .data_slave_w_user_i('0),
-      .data_slave_w_last_i('0),
-      .data_slave_w_readpointer_o(),
-      .data_slave_r_writetoken_o(),
-      .data_slave_r_data_o(),
-      .data_slave_r_resp_o(),
-      .data_slave_r_last_o(),
-      .data_slave_r_id_o(),
-      .data_slave_r_user_o(),
-      .data_slave_r_readpointer_i('0),
-      .data_slave_b_writetoken_o(),
-      .data_slave_b_resp_o(),
-      .data_slave_b_id_o(),
-      .data_slave_b_user_o(),
-      .data_slave_b_readpointer_i('0),
-
-      .data_master_aw_writetoken_o(),
-      .data_master_aw_addr_o(),
-      .data_master_aw_prot_o(),
-      .data_master_aw_region_o(),
-      .data_master_aw_len_o(),
-      .data_master_aw_size_o(),
-      //.data_master_aw_atop_o(),
-      .data_master_aw_burst_o(),
-      .data_master_aw_lock_o(),
-      .data_master_aw_cache_o(),
-      .data_master_aw_qos_o(),
-      .data_master_aw_id_o(),
-      .data_master_aw_user_o(),
-      .data_master_aw_readpointer_i('0),
-      .data_master_ar_writetoken_o(),
-      .data_master_ar_addr_o(),
-      .data_master_ar_prot_o(),
-      .data_master_ar_region_o(),
-      .data_master_ar_len_o(),
-      .data_master_ar_size_o(),
-      .data_master_ar_burst_o(),
-      .data_master_ar_lock_o(),
-      .data_master_ar_cache_o(),
-      .data_master_ar_qos_o(),
-      .data_master_ar_id_o(),
-      .data_master_ar_user_o(),
-      .data_master_ar_readpointer_i('0),
-      .data_master_w_writetoken_o(),
-      .data_master_w_data_o(),
-      .data_master_w_strb_o(),
-      .data_master_w_user_o(),
-      .data_master_w_last_o(),
-      .data_master_w_readpointer_i('0),
-      .data_master_r_writetoken_i('0),
-      .data_master_r_data_i('0),
-      .data_master_r_resp_i('0),
-      .data_master_r_last_i('0),
-      .data_master_r_id_i('0),
-      .data_master_r_user_i('0),
-      .data_master_r_readpointer_o(),
-      .data_master_b_writetoken_i('0),
-      .data_master_b_resp_i('0),
-      .data_master_b_id_i('0),
-      .data_master_b_user_i('0),
-      .data_master_b_readpointer_o(),
-
-
       .jtag_tck_i  (jtag_tck_i),
       .jtag_trst_ni(jtag_trst_i),
       .jtag_tms_i  (jtag_tms_i),
@@ -484,6 +393,8 @@ module core_v_mcu #(
 
   assign s_test_mode        = '0;
   assign s_dft_cg_enable    = '0;
+  assign s_test_clk         = '0;
+
 
   assign s_dma_pe_evt_valid = '0;
   assign s_dma_pe_irq_valid = '0;
