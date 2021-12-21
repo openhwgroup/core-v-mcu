@@ -36,7 +36,7 @@ filesets:
     - openhwgroup.org:ip:logint_dc_fifo_xbar
     - openhwgroup.org:ip:l2_tcdm_hybrid_interco
     - quicklogic.com:ip:efpga
-    - openhwgroup.org:ip:generic_fll
+#    - openhwgroup.org:ip:generic_fll
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
@@ -46,7 +46,7 @@ filesets:
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: rtl/core-v-mcu/include/}
     - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv
-    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
+#    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
     - rtl/core-v-mcu/soc/lint_2_axi_wrap.sv
     - rtl/core-v-mcu/soc/contiguous_crossbar.sv
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
@@ -90,7 +90,7 @@ filesets:
 
   rtl-simulation:
     files:
-    - rtl/simulation/pPLL02F.sv
+    - rtl/simulation/pd_gf22_PLL02_model.v
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
@@ -223,6 +223,7 @@ targets:
   default: &default_target
     filesets:
     - files_rtl_generic
+    - not_emulation-rtl
     - target_lint? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
@@ -247,6 +248,8 @@ targets:
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
+      xcelium:
+
       xsim:
         xelab_options:
         - --define XSIM

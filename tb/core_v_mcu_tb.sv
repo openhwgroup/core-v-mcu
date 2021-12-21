@@ -19,7 +19,7 @@ module core_v_mcu_tb;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
 
-   localparam  REF_CLK_PERIOD =  2.5ns; // external reference clock (32KHz)
+   localparam  REF_CLK_PERIOD =  100ns; // external reference clock (32KHz)
    localparam  BAUD_CLK_FREQ = 12500000;
    localparam  BAUD_CLK_PERIOD = 2ns;
 

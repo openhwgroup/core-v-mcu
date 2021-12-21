@@ -26,31 +26,31 @@ module soc_interconnect
   import axi_pkg::xbar_cfg_t;
 #(
     // TCDM Bus Master Config
-    parameter int unsigned  NR_MASTER_PORTS, //Master Ports to the SoC interconnect with access to all memory regions
-    parameter int unsigned  NR_MASTER_PORTS_INTERLEAVED_ONLY, //Master ports with access restricted to only the interleaved
+    parameter int unsigned  NR_MASTER_PORTS = 2, //Master Ports to the SoC interconnect with access to all memory regions
+    parameter int unsigned  NR_MASTER_PORTS_INTERLEAVED_ONLY = 2, //Master ports with access restricted to only the interleaved
     //ports (no axes to APB, AXI, or contiguous slaves) TCDM Bus
     //Slave Config
     // L2 Demux Addr rules
-    parameter int unsigned NR_ADDR_RULES_L2_DEMUX,
+    parameter int unsigned NR_ADDR_RULES_L2_DEMUX = 2,
     // Interleaved TCDM slave
-    parameter int unsigned NR_SLAVE_PORTS_INTERLEAVED,
-    parameter int unsigned NR_ADDR_RULES_SLAVE_PORTS_INTLVD,
+    parameter int unsigned NR_SLAVE_PORTS_INTERLEAVED=2,
+    parameter int unsigned NR_ADDR_RULES_SLAVE_PORTS_INTLVD=2,
     // Contiguous TCDM slave
-    parameter int unsigned NR_SLAVE_PORTS_CONTIG,
-    parameter int unsigned NR_ADDR_RULES_SLAVE_PORTS_CONTIG,
+    parameter int unsigned NR_SLAVE_PORTS_CONTIG=2,
+    parameter int unsigned NR_ADDR_RULES_SLAVE_PORTS_CONTIG=2,
     // AXI Master ID Width
     parameter int unsigned  AXI_MASTER_ID_WIDTH = 1, // Not really used since we only connect TCDM masters to the
     // axi_xbar with protocol converters. However, the value must not be zero.
     // AXI Slaves
-    parameter int unsigned NR_AXI_SLAVE_PORTS,
-    parameter int unsigned NR_ADDR_RULES_AXI_SLAVE_PORTS,
+    parameter int unsigned NR_AXI_SLAVE_PORTS=2,
+    parameter int unsigned NR_ADDR_RULES_AXI_SLAVE_PORTS=2,
     localparam int unsigned AXI_SLAVE_ID_WIDTH = AXI_MASTER_ID_WIDTH + $clog2(
         NR_MASTER_PORTS
     ),  //The actual ID
     //width of the AXI slaves is clog2(NR_AXI_MASTERS) larger than the master id width since the
     //axi_mux in the XBAR will append an identificatoin tag to the outgoing transactions
     //towards the axi slaves so it can backroute the responses
-    parameter int unsigned AXI_USER_WIDTH
+    parameter int unsigned AXI_USER_WIDTH=32
 ) (
     input logic clk_i,
     input logic rst_ni,

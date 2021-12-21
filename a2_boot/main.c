@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : main.c
- Author      :
+ Author      : 
  Version     :
  Copyright   : Your copyright notice
  Description : Hello RISC-V World in C
@@ -24,10 +24,16 @@
 #include <string.h>
 #include "flash.h"
 #include "dbg.h"
-#include "spi.h"
 #include "hal_apb_i2cs.h"
 #include "I2CProtocol.h"
 #include "crc.h"
+
+#define FAKE_PLL		0
+#define PERCEPTIA_PLL	1
+
+#define FLL1_START_ADDR 0x1A100000
+#define FLL2_START_ADDR 0x1A100010
+#define FLL3_START_ADDR 0x1A100020
 
 uint16_t udma_uart_open (uint8_t uart_id, uint32_t xbaudrate);
 uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer) ;
@@ -148,9 +154,10 @@ static void bootFromRom(int hyperflash, int qpi)
   if (hyperflash) newData->blockSize = HYPER_FLASH_BLOCK_SIZE;
   else newData->blockSize = FLASH_BLOCK_SIZE;
 
-  //loadBinaryAndStart_newStack(newData);
-loadBinaryAndStart(data);
+  loadBinaryAndStart_newStack(newData);
+
 }
+
 
 
 int main(void)
@@ -158,12 +165,103 @@ int main(void)
 	int id = 1, i = 0;
 	unsigned int bootsel, flash_present;
 	char tstring[8];
+	uint32_t lCfgVal = 0;
+	volatile uint32_t *lFFL1StartAddress = (uint32_t *)FLL1_START_ADDR;
+	volatile uint32_t *lFFL2StartAddress = (uint32_t *)FLL2_START_ADDR;
+	volatile uint32_t *lFFL3StartAddress = (uint32_t *)FLL3_START_ADDR;
+#if FAKE_PLL == 1
+	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
+	//FLL1 Config 0 register
+	*lFFL1StartAddress = 0;
+	//FLL1 Config 1 register
+	*(lFFL1StartAddress + 1) = 0x0000000C;	//Already this is the default value set in HW.
+	//FLL1 Config 2 register
+	*(lFFL1StartAddress + 2) = 0;
+	//FLL1 Config 3 register
+	*(lFFL1StartAddress + 3) = 0;
+
+
+	//FLL2 is connected to peripheral clock. Run at half of reference clock. Set the divisor to 0 and disable bypass
+	//FLL2 Config 0 register
+	*lFFL2StartAddress = 0;		//Set divisor to half of reference clock.
+	//FLL2 Config 1 register
+	*(lFFL2StartAddress + 1) = 0;	//Disable bypass.
+	//FLL2 Config 2 register
+	*(lFFL2StartAddress + 2) = 0;
+	//FLL2 Config 3 register
+	*(lFFL2StartAddress + 3) = 0;
+
+	//FLL3 is connected to Cluster clock. Run at quarter of reference clock. Set the divisor to 1 and disable bypass
+	//FLL3 Config 0 register
+	*lFFL3StartAddress = 0x00000010;	//Set divisor to quarter of reference clock.
+	//FLL3 Config 1 register
+	*(lFFL3StartAddress + 1) = 0;	//Disable bypass.
+	//FLL3 Config 2 register
+	*(lFFL3StartAddress + 2) = 0;
+	//FLL3 Config 3 register
+	*(lFFL3StartAddress + 3) = 0;
+
+#elif (PERCEPTIA_PLL == 1 )
+	*(uint32_t*)0x1c000000 = 0x55667788;
+
+	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
+	//FLL1 Config 0 register
+	*lFFL1StartAddress = 4;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
+	*lFFL1StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
+	*(lFFL1StartAddress + 1) = 4;//lCfgVal;
+	//FLL1 Config 2 register
+	*(lFFL1StartAddress + 2) = 0x64;
+	//FLL1 Config 3 register
+	*(lFFL1StartAddress + 3) = 0x269;
+	*lFFL1StartAddress = 4;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
+	//FLL1 Config 1 register
+	lCfgVal = 0;
+	lCfgVal |= (1 << 0 ); //PS0_EN
+	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
+	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
+	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
+	while (!((*lFFL1StartAddress+2)& 0x80000000)) ;
+	*(lFFL1StartAddress + 1) &=  ~0x4;
+
+
+	//FLL2 is connected to peripheral clock. Run at half of reference clock. Set the divisor to 0 and disable bypass
+	//FLL2 Config 0 register
+	*lFFL2StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] = 00
+	//FLL2 Config 1 register
+	lCfgVal = 0;
+	lCfgVal |= (1 << 0 ); //PS0_EN
+	lCfgVal |= (0x14 << 4 ); //MULT_INT	0x14 = 20 (20*10 = 200MHz)
+	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
+	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
+
+	*(lFFL2StartAddress + 1) = lCfgVal;
+	//FLL2 Config 2 register
+	*(lFFL2StartAddress + 2) = 0;
+	//FLL2 Config 3 register
+	*(lFFL2StartAddress + 3) = 0;
+
+	//FLL3 is connected to Cluster clock. Run at quarter of reference clock. Set the divisor to 1 and disable bypass
+	//FLL3 Config 0 register
+	*lFFL3StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] = 00
+	//FLL3 Config 1 register
+	lCfgVal = 0;
+	lCfgVal |= (1 << 0 ); //PS0_EN
+	lCfgVal |= (0x0A << 4 ); //MULT_INT	0x0A = 10 (10*10 = 100MHz)
+	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
+	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
+
+	*(lFFL3StartAddress + 1) = lCfgVal;
+	//FLL3 Config 2 register
+	*(lFFL3StartAddress + 2) = 0;
+	//FLL3 Config 3 register
+	*(lFFL3StartAddress + 3) = 0;
+#else
+	#error "Enable any one of the PLL configurations FAKE_PLL or PERCEPTIA_PLL"
+#endif
 	//TODO: FLL clock settings need to be taken care in the actual chip.
 	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
 	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
-
-
-      	bootsel = *(volatile int*)0x1c010000;
+	bootsel = *(volatile int*)0x1c010000;
 	bootsel = psoc->bootsel & 0x1;
 
 	hal_set_apb_i2cs_slave_on_off(1);
@@ -171,11 +269,18 @@ int main(void)
 			hal_set_apb_i2cs_slave_address(MY_I2C_SLAVE_ADDRESS);
 
 	udma_uart_open (id,115200);
-
+	dbg_str(__DATE__);
+	dbg_str("  ");
+	dbg_str(__TIME__);
 	dbg_str("\nA2 Bootloader Bootsel=");
 
 	if (bootsel == 1) dbg_str("1");
 	else dbg_str("0");
+#ifdef VERILATOR
+	dbg_str("\nJumping to address 0x1C000880");
+	jump_to_address(0x1C000880);
+#endif
+
 	udma_qspim_open(0, 2500000);
 	udma_flash_reset_enable(0, 0);
 	//for (i = 0; i < 10000; i++);
@@ -200,10 +305,19 @@ int main(void)
 		crcInit();
 		bootsel = 0;
 		//TODO: Send a single byte message indicating the reset type. POR / Button reset / WDT
+		if( psoc->reset_reason == 1 )	//1 = POR
+		{
+			hal_set_i2cs_msg_apb_i2c(A2_RESET_REASON_POR);
+		}
+		else if( psoc->reset_reason & 0x02 )	//3 = WDT
+		{
+			hal_set_i2cs_msg_apb_i2c(A2_RESET_REASON_WDT);
+		}
+
 		psoc->jtagreg = 1;
 		while (1) {
 			if (psoc->jtagreg != 0x1)
-				dbg_hex32(psoc->jtagreg);
+				jump_to_address(0x1C008080);
 			processI2CProtocolFrames();
 			bootsel++;
 			//for (bootsel = 0; bootsel < 1000000; bootsel++);

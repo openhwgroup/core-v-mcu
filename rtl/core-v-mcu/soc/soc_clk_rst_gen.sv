@@ -97,28 +97,6 @@ module soc_clk_rst_gen (
       .cluster_cfg_r_data_o(cluster_fll_slave_r_data_o),
       .cluster_cfg_wrn_i(cluster_fll_slave_wrn_i)
   );
-  /*
-  pulp_clock_mux2 clk_mux_fll_soc_i (
-      .clk0_i   (s_clk_fll_soc),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_soc)
-  );
-
-  pulp_clock_mux2 clk_mux_fll_per_i (
-      .clk0_i   (s_clk_fll_per),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_per)
-  );
-
-  pulp_clock_mux2 clk_mux_fll_cluster_i (
-      .clk0_i   (s_clk_fll_cluster),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_cluster)
-  );
- */
   assign s_clk_soc     = s_clk_fll_soc;
   assign s_clk_cluster = s_clk_fll_cluster;  //emul_clk;
   assign s_clk_per     = s_clk_fll_per;
