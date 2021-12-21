@@ -59,13 +59,14 @@ module clk_and_control (
 
    assign pll_rstn = RSTB & config0[2];
    
-   
+/*   
   pulp_clock_mux2 ck_i (
       .clk0_i   (pll_clk),
       .clk1_i   (REFCLK),
       .clk_sel_i(s_PS0_BYPASS),
       .clk_o    (FLLCLK)
   );
+ */
 
    pPLL02F u0 (
 	       .RST_N(pll_rstn),
@@ -82,10 +83,10 @@ module clk_and_control (
 	       .LDET_CONFIG(s_LDET_CONFIG),
 	       .LF_CONFIG(s_LF_CONFIG),
 	       .PS0_EN(s_PS0_EN),
-	       .PS0_BYPASS(1'b0),
+	       .PS0_BYPASS(s_PS0_BYPASS),
 	       .PS0_L1(s_PS0_L1),
 	       .PS0_L2(s_PS0_L2),
-	       .CK_PLL_OUT0(pll_clk),
+	       .CK_PLL_OUT0(FLLCLK),
 	       .PS1_EN(1'b0),
 	       .PS1_BYPASS(1'b1),
 	       .PS1_L1(2'b00),
