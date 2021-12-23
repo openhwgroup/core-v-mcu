@@ -19,7 +19,8 @@ module core_v_mcu_tb;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
 
-   localparam  REF_CLK_PERIOD =  100ns; // external reference clock (32KHz)
+   //localparam  REF_CLK_PERIOD =  2.5ns; // Use this for fake PLL pPLL02F.sv
+   localparam  REF_CLK_PERIOD =  100ns; // Use this for Perceptia PLL pd_gf22_PLL02_model.v (10 MHz ref)
    localparam  BAUD_CLK_FREQ = 12500000;
    localparam  BAUD_CLK_PERIOD = 2ns;
 

@@ -12,7 +12,7 @@
 // language governing permissions and limitations under the License.
 // -----------------------------------------------------------------------------
 
-module pPLL02F (
+module pPLL02F_x (
     input  wire RST_N,                //Reset - asserted low
 
 
@@ -72,7 +72,7 @@ module pPLL02F (
   initial counter = 0;
   initial clkOut = 0;
   initial clk = 0;
-  //initial forever #(0.625) clk = ~clk;
+  //initial forever #(1.25) clk = ~clk;
   //always @(posedge clk) begin
     always @(posedge CK_XTAL_IN) begin
     counter <= counter + 1;

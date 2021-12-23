@@ -2,7 +2,10 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 
-module clk_and_control (
+/*module clk_and_control #(
+parameter PLLNUM = 1)*/
+module clk_and_control
+(
                         input               clk,
                         output logic        FLLCLK,
                         input logic         FLLOE,
@@ -67,8 +70,40 @@ module clk_and_control (
       .clk_o    (FLLCLK)
   );
  */
-
+//generate 
+//if ( PLLNUM == 1 )
    pPLL02F u0 (
+           .RST_N(pll_rstn),
+	       .CK_XTAL_IN(REFCLK),
+	       .CK_AUX_IN(REFCLK),
+	       .PRESCALE(s_PRESCALE),
+	       .SSC_EN(s_SSC_EN),
+	       .SSC_STEP(s_SSC_STEP),
+	       .SSC_PERIOD(s_SSC_PERIOD),
+	       .INTEGER_MODE(s_INTEGER_MODE),
+	       .MUL_INT(s_MUL_INT),
+	       .MUL_FRAC(s_MUL_FRAC),
+	       .LOCKED(LOCK),
+	       .LDET_CONFIG(s_LDET_CONFIG),
+	       .LF_CONFIG(s_LF_CONFIG),
+	       .PS0_EN(s_PS0_EN),
+	       .PS0_BYPASS(s_PS0_BYPASS),
+	       .PS0_L1(s_PS0_L1),
+	       .PS0_L2(s_PS0_L2),
+	       .CK_PLL_OUT0(FLLCLK),
+	       .PS1_EN(1'b0),
+	       .PS1_BYPASS(1'b1),
+	       .PS1_L1(2'b00),
+	       .PS1_L2(8'h0),
+	       .CK_PLL_OUT1(),
+	       .SCAN_IN(TD),
+	       .SCAN_CK(1'b0),
+	       .SCAN_EN(TE),
+	       .SCAN_MODE(TM),
+	       .SCAN_OUT(TQ)
+	       );
+/*else
+   pPLL02F_x u0 (
 	       .RST_N(pll_rstn),
 	       .CK_XTAL_IN(REFCLK),
 	       .CK_AUX_IN(REFCLK),
@@ -98,6 +133,7 @@ module clk_and_control (
 	       .SCAN_MODE(TM),
 	       .SCAN_OUT(TQ)
 	       );
+endgenerate*/
    localparam PS0_L1 = 2'b00;  //config0[1:0]
    localparam PS0_RSTN = 1'b0; // config0[2]
    localparam PS0_L2 = 8'b00000000; // config[11:4]
@@ -142,8 +178,8 @@ module clk_and_control (
                else if (CFGAD == 2'b01) config1 <= CFGD;
                else if (CFGAD == 2'b10) config2 <= CFGD;
                else if (CFGAD == 2'b11) begin
-		  config3 <= CFGD;
-		  r_tmp[2:0]   <= config2[31:29];
+		        config3 <= CFGD;
+		        r_tmp[2:0]   <= config2[31:29];
                end
                CFGACK <= 1'b1;
             end
@@ -160,5 +196,5 @@ module clk_and_control (
 	 end // else: !if(CFGREQ == 1'b1)
       end // else: !if(RSTB == 1'b0)
    end // always_ff @ (posedge clk, negedge RSTB)
-   
 endmodule
+

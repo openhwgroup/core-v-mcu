@@ -28,6 +28,7 @@
 #include "I2CProtocol.h"
 #include "crc.h"
 
+
 #define FAKE_PLL		0
 #define PERCEPTIA_PLL	1
 
@@ -169,6 +170,7 @@ int main(void)
 	volatile uint32_t *lFFL1StartAddress = (uint32_t *)FLL1_START_ADDR;
 	volatile uint32_t *lFFL2StartAddress = (uint32_t *)FLL2_START_ADDR;
 	volatile uint32_t *lFFL3StartAddress = (uint32_t *)FLL3_START_ADDR;
+
 #if FAKE_PLL == 1
 	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
 	//FLL1 Config 0 register
@@ -202,13 +204,14 @@ int main(void)
 	*(lFFL3StartAddress + 3) = 0;
 
 #elif (PERCEPTIA_PLL == 1 )
+
 	*(uint32_t*)0x1c000000 = 0x55667788;
 
 	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
 	//FLL1 Config 0 register
-	*lFFL1StartAddress = 4;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
+	*lFFL1StartAddress = 4;   //Reset high
 	*lFFL1StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
-	*(lFFL1StartAddress + 1) = 4;//lCfgVal;
+	*(lFFL1StartAddress + 1) = 4;//Bypass on;
 	//FLL1 Config 2 register
 	*(lFFL1StartAddress + 2) = 0x64;
 	//FLL1 Config 3 register
@@ -221,42 +224,59 @@ int main(void)
 	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
 	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
 	*(lFFL1StartAddress + 1) = lCfgVal;
+	
 	*lFFL1StartAddress = 4;   // release reset
-	while (!((*lFFL1StartAddress+2)& 0x80000000)) ;
+	while (!(*(lFFL1StartAddress+2)& 0x80000000)) ;
 
-	*(lFFL1StartAddress + 1) &= ~(0x4) ;
-
-	//FLL2 is connected to peripheral clock. Run at half of reference clock. Set the divisor to 0 and disable bypass
+	*(lFFL1StartAddress + 1) &= ~(0x4) ;//Bypass off;
+/*-------------------------------------------------------------------------*/
 	//FLL2 Config 0 register
-	*lFFL2StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] = 00
-	//FLL2 Config 1 register
-	lCfgVal = 0;
-	lCfgVal |= (1 << 0 ); //PS0_EN
-	lCfgVal |= (0x14 << 4 ); //MULT_INT	0x14 = 20 (20*10 = 200MHz)
-	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
-	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
-
-	*(lFFL2StartAddress + 1) = lCfgVal;
+	*lFFL2StartAddress = 4;   //Reset high
+	*lFFL2StartAddress = 0;   //Reset Low
+	*lFFL2StartAddress |= 1;   //PS0_L1 1 which is /2
+	*(lFFL2StartAddress + 1) = 4;//Bypass on;
 	//FLL2 Config 2 register
-	*(lFFL2StartAddress + 2) = 0;
+	*(lFFL2StartAddress + 2) = 0x64;
 	//FLL2 Config 3 register
-	*(lFFL2StartAddress + 3) = 0;
+	*(lFFL2StartAddress + 3) = 0x269;
 
-	//FLL3 is connected to Cluster clock. Run at quarter of reference clock. Set the divisor to 1 and disable bypass
-	//FLL3 Config 0 register
-	*lFFL3StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] = 00
-	//FLL3 Config 1 register
-	lCfgVal = 4;  // bypass
+	//FLL2 Config 1 register
+	lCfgVal = 4; // bypass
 	lCfgVal |= (1 << 0 ); //PS0_EN
-	lCfgVal |= (0x0A << 4 ); //MULT_INT	0x0A = 10 (10*10 = 100MHz)
+	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
 	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
 	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
+	*(lFFL2StartAddress + 1) = lCfgVal;
+	
+	*lFFL2StartAddress |= 1<<2;   // release reset
+	while (!(*(lFFL2StartAddress+2)& 0x80000000)) ;
 
-	*(lFFL3StartAddress + 1) = lCfgVal;
+	*(lFFL2StartAddress + 1) &= ~(0x4) ;//Bypass off;
+
+/*-------------------------------------------------------------------------*/
+	//FLL3 Config 0 register
+	*lFFL3StartAddress = 4;   //Reset high
+	*lFFL3StartAddress = 0;   //Reset Low
+	*lFFL3StartAddress |= 2;   //PS0_L1 2 which is /4
+	*(lFFL3StartAddress + 1) = 4;//Bypass on;
 	//FLL3 Config 2 register
-	*(lFFL3StartAddress + 2) = 0;
+	*(lFFL3StartAddress + 2) = 0x64;
 	//FLL3 Config 3 register
-	*(lFFL3StartAddress + 3) = 0;
+	*(lFFL3StartAddress + 3) = 0x269;
+
+	//FLL3 Config 1 register
+	lCfgVal = 4; // bypass
+	lCfgVal |= (1 << 0 ); //PS0_EN
+	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
+	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
+	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
+	*(lFFL3StartAddress + 1) = lCfgVal;
+	
+	*lFFL3StartAddress |= 1<<2;   // release reset
+	while (!(*(lFFL3StartAddress+2)& 0x80000000)) ;
+
+	*(lFFL3StartAddress + 1) &= ~(0x4) ;//Bypass off;
+
 #else
 	#error "Enable any one of the PLL configurations FAKE_PLL or PERCEPTIA_PLL"
 #endif
