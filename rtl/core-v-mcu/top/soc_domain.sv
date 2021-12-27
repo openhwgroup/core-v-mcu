@@ -441,7 +441,7 @@ module soc_domain
 
       .soc_fll_slave_req_i   (s_soc_fll_master.req),
       .soc_fll_slave_wrn_i   (s_soc_fll_master.wrn),
-      .soc_fll_slave_add_i   (s_soc_fll_master.add[1:0]),
+      .soc_fll_slave_add_i   (s_soc_fll_master.add[3:0]),
       .soc_fll_slave_data_i  (s_soc_fll_master.data),
       .soc_fll_slave_ack_o   (s_soc_fll_master.ack),
       .soc_fll_slave_r_data_o(s_soc_fll_master.r_data),
@@ -449,7 +449,7 @@ module soc_domain
 
       .per_fll_slave_req_i   (s_per_fll_master.req),
       .per_fll_slave_wrn_i   (s_per_fll_master.wrn),
-      .per_fll_slave_add_i   (s_per_fll_master.add[1:0]),
+      .per_fll_slave_add_i   (s_per_fll_master.add[3:0]),
       .per_fll_slave_data_i  (s_per_fll_master.data),
       .per_fll_slave_ack_o   (s_per_fll_master.ack),
       .per_fll_slave_r_data_o(s_per_fll_master.r_data),
@@ -457,7 +457,7 @@ module soc_domain
 
       .cluster_fll_slave_req_i   (s_cluster_fll_master.req),
       .cluster_fll_slave_wrn_i   (s_cluster_fll_master.wrn),
-      .cluster_fll_slave_add_i   (s_cluster_fll_master.add[1:0]),
+      .cluster_fll_slave_add_i   (s_cluster_fll_master.add[3:0]),
       .cluster_fll_slave_data_i  (s_cluster_fll_master.data),
       .cluster_fll_slave_ack_o   (s_cluster_fll_master.ack),
       .cluster_fll_slave_r_data_o(s_cluster_fll_master.r_data),

@@ -13,7 +13,7 @@ module clk_and_control
                         output logic        LOCK,
                         input logic         CFGREQ,
                         output logic        CFGACK,
-                        input logic [ 1:0]  CFGAD,
+                        input logic [ 3:0]  CFGAD,
                         input logic [31:0]  CFGD,
                         output logic [31:0] CFGQ,
                         input logic         CFGWEB,
@@ -61,8 +61,8 @@ module clk_and_control
    logic      pll_rstn;
 
    assign pll_rstn = RSTB & config0[2];
-   
-/*   
+
+/*
   pulp_clock_mux2 ck_i (
       .clk0_i   (pll_clk),
       .clk1_i   (REFCLK),
@@ -70,7 +70,7 @@ module clk_and_control
       .clk_o    (FLLCLK)
   );
  */
-//generate 
+//generate
 //if ( PLLNUM == 1 )
    pPLL02F u0 (
            .RST_N(pll_rstn),
@@ -141,7 +141,7 @@ endgenerate*/
 
 
 
-   
+
    assign s_PS0_L1 = config0[1:0];    //2
    assign s_PS0_L2 = config0[11:4]; //8
    assign s_PS0_L2_FRAC = config0[17:12];    //6
@@ -154,12 +154,12 @@ endgenerate*/
    assign s_MUL_FRAC = config1[26:15];   //12
    assign s_INTEGER_MODE = config1[27];     //1
    assign s_PRESCALE = config1[31:28];    //4
-   
+
    assign s_LDET_CONFIG = config2[8:0]; //9
    assign s_SSC_EN = config2[9];     //1
    assign s_SSC_STEP = config2[17:10];  //8
    assign s_SSC_PERIOD = config2[28:18];   //11
-   
+
    assign s_LF_CONFIG[31:0] = config3[31:0];   //32
    assign s_LF_CONFIG[34:32] = r_tmp[2:0];   //3
 
@@ -174,20 +174,20 @@ endgenerate*/
       end else begin
 	 if (CFGREQ == 1'b1) begin
             if (CFGWEB == 0) begin
-               if (CFGAD == 2'b00) config0 <= CFGD;
-               else if (CFGAD == 2'b01) config1 <= CFGD;
-               else if (CFGAD == 2'b10) config2 <= CFGD;
-               else if (CFGAD == 2'b11) begin
+               if (CFGAD == 4'b00) config0 <= CFGD;
+               else if (CFGAD == 4'b01) config1 <= CFGD;
+               else if (CFGAD == 4'b10) config2 <= CFGD;
+               else if (CFGAD == 4'b11) begin
 		        config3 <= CFGD;
 		        r_tmp[2:0]   <= config2[31:29];
                end
                CFGACK <= 1'b1;
             end
             else begin
-               if (CFGAD == 2'b00) CFGQ <= config0;
-               else if (CFGAD == 2'b01) CFGQ <= config1;
-               else if (CFGAD == 2'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
-               else if (CFGAD == 2'b11) CFGQ <= config3;
+               if (CFGAD == 4'b00) CFGQ <= config0;
+               else if (CFGAD == 4'b01) CFGQ <= config1;
+               else if (CFGAD == 4'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
+               else if (CFGAD == 4'b11) CFGQ <= config3;
                CFGACK <= 1'b1;
             end // else: !if(CFGWEB)
 	 end // if (CFGREQ == 1'b1)
@@ -197,4 +197,3 @@ endgenerate*/
       end // else: !if(RSTB == 1'b0)
    end // always_ff @ (posedge clk, negedge RSTB)
 endmodule
-

@@ -26,21 +26,21 @@ module apb_fll_if
 
     output logic                      fll1_req,
     output logic                      fll1_wrn,
-    output logic                [1:0] fll1_add,
+    output logic                [3:0] fll1_add,
     output logic               [31:0] fll1_data,
     input  logic                      fll1_ack,
     input  logic               [31:0] fll1_r_data,
     input  logic                      fll1_lock,
     output logic                      fll2_req,
     output logic                      fll2_wrn,
-    output logic                [1:0] fll2_add,
+    output logic                [3:0] fll2_add,
     output logic               [31:0] fll2_data,
     input  logic                      fll2_ack,
     input  logic               [31:0] fll2_r_data,
     input  logic                      fll2_lock,
     output logic                      fll3_req,
     output logic                      fll3_wrn,
-    output logic                [1:0] fll3_add,
+    output logic                [3:0] fll3_add,
     output logic               [31:0] fll3_data,
     input  logic                      fll3_ack,
     input  logic               [31:0] fll3_r_data,
@@ -131,7 +131,7 @@ module apb_fll_if
                   else state <= READ;
               end
               WRITE: begin
-                case (PADDR[5:4])
+                case (PADDR[7:6])
                   0: fll1_valid <= 1;
                   1: fll2_valid <= 1;
                   2: fll3_valid <= 1;
@@ -142,7 +142,7 @@ module apb_fll_if
                 end
               end // case: WRITE
               READ: begin
-                case (PADDR[5:4])
+                case (PADDR[7:6])
                   0: begin
                     fll1_valid <= 1;
                     read_data <= fll1_r_data;
@@ -174,15 +174,15 @@ module apb_fll_if
   assign fll3_req = fll3_valid;
 
   assign fll1_wrn   =  ~PWRITE;
-  assign fll1_add   = fll1_valid ? PADDR[3:2] : '0;
+  assign fll1_add   = fll1_valid ? PADDR[5:2] : '0;
   assign fll1_data  = fll1_valid ? PWDATA     : '0;
 
   assign fll2_wrn   =  ~PWRITE;
-  assign fll2_add   = fll2_valid ? PADDR[3:2] : '0;
+  assign fll2_add   = fll2_valid ? PADDR[5:2] : '0;
   assign fll2_data  = fll2_valid ? PWDATA     : '0;
 
   assign fll3_wrn   =  ~PWRITE;
-  assign fll3_add   = fll3_valid ? PADDR[3:2] : '0;
+  assign fll3_add   = fll3_valid ? PADDR[5:2] : '0;
   assign fll3_data  = fll3_valid ? PWDATA     : '0;
 
 
