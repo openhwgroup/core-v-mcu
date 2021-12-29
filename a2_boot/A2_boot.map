@@ -276,16 +276,16 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .comment       0x000000000000004a       0x4b spi.o
  .comment       0x000000000000004a       0x4b uart.o
 
-.debug_line     0x0000000000000000     0x327c
+.debug_line     0x0000000000000000     0x3278
  .debug_line    0x0000000000000000      0x11b crt0.o
  .debug_line    0x000000000000011b      0x87b I2CProtocol.o
  .debug_line    0x0000000000000996      0x3a1 crc.o
  .debug_line    0x0000000000000d37      0x2ec dbg.o
- .debug_line    0x0000000000001023      0x509 hal_apb_i2cs.o
- .debug_line    0x000000000000152c      0xd96 main.o
- .debug_line    0x00000000000022c2      0xb89 spi.o
- .debug_line    0x0000000000002e4b      0x388 uart.o
- .debug_line    0x00000000000031d3       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_line    0x0000000000001023      0x510 hal_apb_i2cs.o
+ .debug_line    0x0000000000001533      0xd7d main.o
+ .debug_line    0x00000000000022b0      0xb90 spi.o
+ .debug_line    0x0000000000002e40      0x38f uart.o
+ .debug_line    0x00000000000031cf       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
 .debug_info     0x0000000000000000     0x3cbe
  .debug_info    0x0000000000000000       0x26 crt0.o
@@ -329,23 +329,23 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .debug_aranges
                 0x0000000000000218       0x20 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_str      0x0000000000000000     0x192e
- .debug_str     0x0000000000000000       0x42 crt0.o
- .debug_str     0x0000000000000042      0x44e I2CProtocol.o
-                                        0x4fc (size before relaxing)
- .debug_str     0x0000000000000490       0x37 crc.o
-                                        0x172 (size before relaxing)
- .debug_str     0x00000000000004c7       0x4e dbg.o
-                                        0x168 (size before relaxing)
- .debug_str     0x0000000000000515      0x9e1 hal_apb_i2cs.o
-                                        0xdb4 (size before relaxing)
- .debug_str     0x0000000000000ef6      0x5f1 main.o
-                                        0x917 (size before relaxing)
- .debug_str     0x00000000000014e7      0x2af spi.o
-                                        0x514 (size before relaxing)
- .debug_str     0x0000000000001796       0xe4 uart.o
-                                        0x43d (size before relaxing)
- .debug_str     0x000000000000187a       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+.debug_str      0x0000000000000000     0x1935
+ .debug_str     0x0000000000000000       0x49 crt0.o
+ .debug_str     0x0000000000000049      0x44e I2CProtocol.o
+                                        0x503 (size before relaxing)
+ .debug_str     0x0000000000000497       0x37 crc.o
+                                        0x179 (size before relaxing)
+ .debug_str     0x00000000000004ce       0x4e dbg.o
+                                        0x16f (size before relaxing)
+ .debug_str     0x000000000000051c      0x9e1 hal_apb_i2cs.o
+                                        0xdbb (size before relaxing)
+ .debug_str     0x0000000000000efd      0x5f1 main.o
+                                        0x91e (size before relaxing)
+ .debug_str     0x00000000000014ee      0x2af spi.o
+                                        0x51b (size before relaxing)
+ .debug_str     0x000000000000179d       0xe4 uart.o
+                                        0x444 (size before relaxing)
+ .debug_str     0x0000000000001881       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
                                          0xc3 (size before relaxing)
 
 .debug_loc      0x0000000000000000     0x1114

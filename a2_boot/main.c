@@ -33,8 +33,8 @@
 #define PERCEPTIA_PLL	1
 
 #define FLL1_START_ADDR 0x1A100000
-#define FLL2_START_ADDR 0x1A100010
-#define FLL3_START_ADDR 0x1A100020
+#define FLL2_START_ADDR 0x1A100020
+#define FLL3_START_ADDR 0x1A100040
 
 uint16_t udma_uart_open (uint8_t uart_id, uint32_t xbaudrate);
 uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer) ;
@@ -209,9 +209,10 @@ int main(void)
 
 	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
 	//FLL1 Config 0 register
+	*(lFFL1StartAddress + 1) = 4;//Bypass on;
 	*lFFL1StartAddress = 4;   //Reset high
 	*lFFL1StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
-	*(lFFL1StartAddress + 1) = 4;//Bypass on;
+
 	//FLL1 Config 2 register
 	*(lFFL1StartAddress + 2) = 0x64;
 	//FLL1 Config 3 register
@@ -231,10 +232,11 @@ int main(void)
 	*(lFFL1StartAddress + 1) &= ~(0x4) ;//Bypass off;
 /*-------------------------------------------------------------------------*/
 	//FLL2 Config 0 register
+	*(lFFL2StartAddress + 1) = 4;//Bypass on;
 	*lFFL2StartAddress = 4;   //Reset high
 	*lFFL2StartAddress = 0;   //Reset Low
 	*lFFL2StartAddress |= 1;   //PS0_L1 1 which is /2
-	*(lFFL2StartAddress + 1) = 4;//Bypass on;
+
 	//FLL2 Config 2 register
 	*(lFFL2StartAddress + 2) = 0x64;
 	//FLL2 Config 3 register
@@ -255,10 +257,11 @@ int main(void)
 
 /*-------------------------------------------------------------------------*/
 	//FLL3 Config 0 register
+	*(lFFL3StartAddress + 1) = 4;//Bypass on;
 	*lFFL3StartAddress = 4;   //Reset high
 	*lFFL3StartAddress = 0;   //Reset Low
 	*lFFL3StartAddress |= 2;   //PS0_L1 2 which is /4
-	*(lFFL3StartAddress + 1) = 4;//Bypass on;
+
 	//FLL3 Config 2 register
 	*(lFFL3StartAddress + 2) = 0x64;
 	//FLL3 Config 3 register
