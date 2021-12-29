@@ -292,7 +292,7 @@ module soc_peripherals #(
 
       .fll1_req   (soc_fll_master.req),
       .fll1_wrn   (soc_fll_master.wrn),
-      .fll1_add   (soc_fll_master.add[3:0]),
+      .fll1_add   (soc_fll_master.add[2:0]),
       .fll1_data  (soc_fll_master.data),
       .fll1_ack   (soc_fll_master.ack),
       .fll1_r_data(soc_fll_master.r_data),
@@ -300,7 +300,7 @@ module soc_peripherals #(
 
       .fll2_req   (per_fll_master.req),
       .fll2_wrn   (per_fll_master.wrn),
-      .fll2_add   (per_fll_master.add[3:0]),
+      .fll2_add   (per_fll_master.add[2:0]),
       .fll2_data  (per_fll_master.data),
       .fll2_ack   (per_fll_master.ack),
       .fll2_r_data(per_fll_master.r_data),
@@ -308,7 +308,7 @@ module soc_peripherals #(
 
       .fll3_req   (cluster_fll_master.req),
       .fll3_wrn   (cluster_fll_master.wrn),
-      .fll3_add   (cluster_fll_master.add[3:0]),
+      .fll3_add   (cluster_fll_master.add[2:0]),
       .fll3_data  (cluster_fll_master.data),
       .fll3_ack   (cluster_fll_master.ack),
       .fll3_r_data(cluster_fll_master.r_data),

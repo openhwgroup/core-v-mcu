@@ -13,7 +13,7 @@ module clk_and_control
                         output logic        LOCK,
                         input logic         CFGREQ,
                         output logic        CFGACK,
-                        input logic [ 3:0]  CFGAD,
+                        input logic [ 2:0]  CFGAD,
                         input logic [31:0]  CFGD,
                         output logic [31:0] CFGQ,
                         input logic         CFGWEB,
@@ -174,20 +174,20 @@ endgenerate*/
       end else begin
 	 if (CFGREQ == 1'b1) begin
             if (CFGWEB == 0) begin
-               if (CFGAD == 4'b00) config0 <= CFGD;
-               else if (CFGAD == 4'b01) config1 <= CFGD;
-               else if (CFGAD == 4'b10) config2 <= CFGD;
-               else if (CFGAD == 4'b11) begin
+               if (CFGAD == 3'b00) config0 <= CFGD;
+               else if (CFGAD == 3'b01) config1 <= CFGD;
+               else if (CFGAD == 3'b10) config2 <= CFGD;
+               else if (CFGAD == 3'b11) begin
 		        config3 <= CFGD;
 		        r_tmp[2:0]   <= config2[31:29];
                end
                CFGACK <= 1'b1;
             end
             else begin
-               if (CFGAD == 4'b00) CFGQ <= config0;
-               else if (CFGAD == 4'b01) CFGQ <= config1;
-               else if (CFGAD == 4'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
-               else if (CFGAD == 4'b11) CFGQ <= config3;
+               if (CFGAD == 3'b00) CFGQ <= config0;
+               else if (CFGAD == 3'b01) CFGQ <= config1;
+               else if (CFGAD == 3'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
+               else if (CFGAD == 3'b11) CFGQ <= config3;
                CFGACK <= 1'b1;
             end // else: !if(CFGWEB)
 	 end // if (CFGREQ == 1'b1)
