@@ -155,6 +155,11 @@ endgenerate*/
    localparam PS1_EN = 1'b0; // config1[18]
    localparam PS1_BYPASS = 1'b1; // config1[19]
 
+   localparam MUL_INT = 11'b00000101000;
+   localparam MUL_FRAC = 12'b0;
+   localparam INTEGER_MODE = 1'b1;
+   localparam PRESCALE = 4'b1;
+   
    assign s_PS0_L1 = config0[1:0];    //2
    assign s_PS0_L2 = config0[11:4]; //8
    assign s_PS0_L2_FRAC = config0[17:12];    //6
@@ -185,6 +190,8 @@ endgenerate*/
       if (RSTB == 1'b0) begin
 	 config0 <= {12'b0, PS0_BYPASS, PS0_EN, PS0_L2_FRAC, PS0_L2, 1'b0/*Dummy bit*/, PS0_RSTN, PS0_L1};
 	 config1 <= {12'b0, PS1_BYPASS, PS1_EN, PS1_L2_FRAC, PS1_L2, 1'b0/*Dummy bit*/, PS1_RSTN, PS1_L1}; 
+	 config2 <= {PRESCALE,INTEGER_MODE, MUL_FRAC,MUL_INT,4'b0};
+	 config3 <= 32'h0;
 	 config4 <= 32'h64;     //LDET intial value as per datasheet
 	 config5 <= 32'h269;    //LF_CONFIG initial value as per datasheet
          CFGACK <= 1'b0;

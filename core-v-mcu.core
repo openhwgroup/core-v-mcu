@@ -252,7 +252,7 @@ targets:
       xcelium:
         xrun_options:
         - -64bit
-        - +nctimescale+1ns/1fs
+        - +nctimescale+1fs/1fs
         xmsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi.so
       xsim:

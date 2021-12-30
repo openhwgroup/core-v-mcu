@@ -108,7 +108,9 @@ reg  [6:0] ps0_l2_count, ps1_l2_count;
 wire [14:0] ld_time;
 reg  [14:0] ld_count;
 reg  [9:0] fctl_count;
-time last_time, ref_period, last_period, pll_period;
+time last_time, ref_period, last_period, pll_period, mult;
+
+assign mult = MUL_INT;
 
 `ifdef POWER_AND_GROUND
     assign pwr_ok = ((VDD_DIG === 1'b1) && (VDD_ANA === 1'b1) && (GND_DIG === 1'b0) && (GND_ANA === 1'b0)) ? 1'b1 : 1'b0;
@@ -222,10 +224,10 @@ assign clk_ref = (PRESCALE[3:1] == 3'b000) ? CK_XTAL_IN : (pr_toggle | pr_sync_n
       last_time <= $time;
       ref_period <= $time - last_time;
       //Don't change the PLL period if ref_period is out of range. Will get separate error message about ref_period 
-      //pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? (ref_period * (2 ** 17)) / ssc_full_mult : pll_period;
-      pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? 2500000 : pll_period;
+      pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? (ref_period * (2 ** 17)) / ssc_full_mult : pll_period;
+      //pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? 2500000 : pll_period;
       //pll_period <= 2500000;
-      //pll_period <= 100000000 / MUL_INT;
+      //pll_period <= 100ns / mult; //100000000 / mult;
       last_period <= pll_period;
     end
   end  // seq_period
