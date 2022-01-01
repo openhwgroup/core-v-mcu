@@ -159,7 +159,99 @@ static void bootFromRom(int hyperflash, int qpi)
 
 }
 
+uint8_t setFLLFrequencyInIntegerMode(uint8_t aFLLNum, uint8_t aRefFreqInMHz, uint16_t aMultiplier, uint8_t aDivideRatio_R_Prescale, uint8_t aPS0_L1, uint8_t aPS0_L2  )
+{
+    uint8_t lSts = 0;
+	volatile uint32_t *lPLLStartAddress = (uint32_t *)NULL;
+    uint32_t lCounter = 0;
+    uint32_t lCfgVal = 0;
 
+    uint8_t lPS0_L1 = aPS0_L1 & 0x03;
+    uint8_t lPS0_L2 = aPS0_L2 & 0xFF;
+    
+    if( aFLLNum == 0 )
+        lPLLStartAddress = (uint32_t *)FLL1_START_ADDR;
+    else if( aFLLNum == 1 )
+        lPLLStartAddress = (uint32_t *)FLL2_START_ADDR;
+    else if( aFLLNum == 2 )
+        lPLLStartAddress = (uint32_t *)FLL3_START_ADDR;
+    else
+        lPLLStartAddress = (uint32_t *)NULL;
+        
+    if( lPLLStartAddress != NULL )
+    {    
+	    if( ( aRefFreqInMHz >= 5 ) && ( aRefFreqInMHz <= 500 ) )
+	    {
+	        if( ( aMultiplier > 0 ) && ( aMultiplier < 2048 ) )
+	        {
+	            if( aDivideRatio_R_Prescale < 16 )
+	            {
+                    *lPLLStartAddress |= (1 << 19);//Bypass on;
+                    *lPLLStartAddress |= (1 << 2);   //Reset high
+                    *lPLLStartAddress &= ~(1 << 2) ;//Reset low;
+                    *lPLLStartAddress &= ~(1 << 18); //PS0_EN is set to low
+                    *lPLLStartAddress |= (lPS0_L1 << 0);   //PS0_L1 0 which gives L01 = 1
+                    *lPLLStartAddress |= (lPS0_L2 << 4);   //PS0_L2_INT 0 and PS0_L2_FRAC 0 which gives L02 = 1
+                    *lPLLStartAddress |= (0 << 12);   //PS0_L2_INT 0 and PS0_L2_FRAC 0 which gives L02 = 1
+                    
+                    
+                    //FLL1 Config 1 register not configuring PS1
+                    *(lPLLStartAddress + 1) = 0;
+
+                    //FLL1 Config 2 register
+                    lCfgVal = 0;
+                    lCfgVal |= (aMultiplier << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz) Multiplier cannot hold 0
+                    lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
+                    lCfgVal |= (aDivideRatio_R_Prescale << 28 ); //PRESCALE value (Divide Ratio R = 1)
+
+                    *(lPLLStartAddress + 2) = lCfgVal;
+                    
+                    //FLL1 Config 3 register not configuring SSC
+                    *(lPLLStartAddress + 3) = 0;
+
+                    //FLL1 Config 4 register
+                    *(lPLLStartAddress + 4) = 0x64;
+                    
+                    //FLL1 Config 5 register
+                    *(lPLLStartAddress + 5) = 0x269;
+
+                    *lPLLStartAddress |= (1<<2);   //Reset high
+                    *lPLLStartAddress |= (1<<18); //PS0_EN;
+                    //lCounter = 0;
+                    while ( (*(lPLLStartAddress+4) & 0x80000000) == 0 )  //Wait for lock detect to go high
+                    {
+                        lCounter++;
+                        if( lCounter >= 0x00010000)
+                        {
+                            lSts = 5;     //Unable to achieve lock
+                            lCounter = 0;
+                            break;
+                        }
+                    }
+                    if( lSts == 0 )
+                        *(lPLLStartAddress) &= ~(1<<19) ;//Bypass off;
+                }
+                else
+                {
+                    lSts = 1;   //aDivideRatio_R_Prescale
+                }
+            }
+            else
+            {
+                lSts = 2;   //Invalid aMultiplier
+            }
+        }
+        else
+        {
+            lSts = 3;   //Invalid reference freq
+        }
+    }
+    else
+    {
+        lSts = 4;   //Invalid PLL number
+    }
+    return lSts;
+}
 
 int main(void)
 {
@@ -167,10 +259,11 @@ int main(void)
 	unsigned int bootsel, flash_present;
 	char tstring[8];
 	uint32_t lCfgVal = 0;
-	volatile uint32_t *lFFL1StartAddress = (uint32_t *)FLL1_START_ADDR;
-	volatile uint32_t *lFFL2StartAddress = (uint32_t *)FLL2_START_ADDR;
-	volatile uint32_t *lFFL3StartAddress = (uint32_t *)FLL3_START_ADDR;
 
+	uint32_t *lFFL1StartAddress = (uint32_t *)FLL1_START_ADDR;
+	uint32_t *lFFL2StartAddress = (uint32_t *)FLL2_START_ADDR;
+	uint32_t *lFFL3StartAddress = (uint32_t *)FLL3_START_ADDR;
+	
 #if FAKE_PLL == 1
 	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
 	//FLL1 Config 0 register
@@ -204,7 +297,13 @@ int main(void)
 	*(lFFL3StartAddress + 3) = 0;
 
 #elif (PERCEPTIA_PLL == 1 )
+    setFLLFrequencyInIntegerMode(0, 10, 40, 1, 0, 0);   // 400/1
 
+    setFLLFrequencyInIntegerMode(1, 10, 20, 1, 0, 0);   // 400/2
+
+    setFLLFrequencyInIntegerMode(2, 10, 10, 1, 0, 0);   // 400/4
+    
+#if 0
 	*(uint32_t*)0x1c000000 = 0x55667788;
 
 	//FLL1 is connected to soc_clk_o.
@@ -294,7 +393,7 @@ int main(void)
 	while (!(*(lFFL3StartAddress+4)& 0x80000000)) ; //Wait for lock detect to go high
 
 	*(lFFL3StartAddress) &= ~(1<<19) ;//Bypass off;
-
+#endif
 #else
 	#error "Enable any one of the PLL configurations FAKE_PLL or PERCEPTIA_PLL"
 #endif

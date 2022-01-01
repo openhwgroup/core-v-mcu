@@ -85,7 +85,7 @@ LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../l
 LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/rv32imac/ilp32/libgcc.a
                 0x0000000000000000                __DYNAMIC = 0x0
 
-.text           0x000000001a000000      0xba8
+.text           0x000000001a000000      0xb68
                 0x000000001a000000                . = ALIGN (0x4)
  *(.vectors)
  .vectors       0x000000001a000000       0xa0 crt0.o
@@ -152,31 +152,34 @@ LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../l
                 0x000000001a000434       0x4a main.o
  .text.loadBinaryAndStart
                 0x000000001a00047e       0xd0 main.o
+ .text.setFLLFrequencyInIntegerMode
+                0x000000001a00054e      0x108 main.o
+                0x000000001a00054e                setFLLFrequencyInIntegerMode
  .text.startup.main
-                0x000000001a00054e      0x31a main.o
-                0x000000001a00054e                main
+                0x000000001a000656      0x1d2 main.o
+                0x000000001a000656                main
  .text.udma_qspim_open
-                0x000000001a000868       0x38 spi.o
-                0x000000001a000868                udma_qspim_open
+                0x000000001a000828       0x38 spi.o
+                0x000000001a000828                udma_qspim_open
  .text.udma_flash_readid
-                0x000000001a0008a0       0x8c spi.o
-                0x000000001a0008a0                udma_flash_readid
+                0x000000001a000860       0x8c spi.o
+                0x000000001a000860                udma_flash_readid
  .text.udma_flash_reset_enable
-                0x000000001a00092c       0x64 spi.o
-                0x000000001a00092c                udma_flash_reset_enable
+                0x000000001a0008ec       0x64 spi.o
+                0x000000001a0008ec                udma_flash_reset_enable
  .text.udma_flash_reset_memory
-                0x000000001a000990       0x64 spi.o
-                0x000000001a000990                udma_flash_reset_memory
+                0x000000001a000950       0x64 spi.o
+                0x000000001a000950                udma_flash_reset_memory
  .text.udma_flash_read
-                0x000000001a0009f4       0xaa spi.o
-                0x000000001a0009f4                udma_flash_read
+                0x000000001a0009b4       0xaa spi.o
+                0x000000001a0009b4                udma_flash_read
  .text.udma_uart_open
-                0x000000001a000a9e       0x64 uart.o
-                0x000000001a000a9e                udma_uart_open
+                0x000000001a000a5e       0x64 uart.o
+                0x000000001a000a5e                udma_uart_open
  .text.udma_uart_writeraw
-                0x000000001a000b02       0x36 uart.o
-                0x000000001a000b02                udma_uart_writeraw
-                0x000000001a000b38                _etext = .
+                0x000000001a000ac2       0x36 uart.o
+                0x000000001a000ac2                udma_uart_writeraw
+                0x000000001a000af8                _etext = .
  *(.lit)
  *(.shdata)
  *(.boot)
@@ -184,30 +187,30 @@ LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../l
  *(.rodata)
  *(.rodata.*)
  .rodata.parseI2CProtocolFrame.str1.4
-                0x000000001a000b38        0xd I2CProtocol.o
+                0x000000001a000af8        0xd I2CProtocol.o
                                          0x12 (size before relaxing)
- *fill*         0x000000001a000b45        0x3 
+ *fill*         0x000000001a000b05        0x3 
  .rodata.loadBinaryAndStart.str1.4
-                0x000000001a000b48       0x21 main.o
+                0x000000001a000b08       0x21 main.o
                                          0x2e (size before relaxing)
- *fill*         0x000000001a000b69        0x3 
+ *fill*         0x000000001a000b29        0x3 
  .rodata.main.str1.4
-                0x000000001a000b6c       0x3a main.o
+                0x000000001a000b2c       0x3a main.o
  *(.eh_frame*)
  *(.data)
  *(.data.*)
  *(COMMON)
-                0x000000001a000ba8                . = ALIGN (0x4)
- *fill*         0x000000001a000ba6        0x2 
-                0x000000001a000ba8                _bss_start = .
-                0x000000001a000ba8                . = ALIGN (0x4)
-                0x000000001a000ba8                _bss_end = .
+                0x000000001a000b68                . = ALIGN (0x4)
+ *fill*         0x000000001a000b66        0x2 
+                0x000000001a000b68                _bss_start = .
+                0x000000001a000b68                . = ALIGN (0x4)
+                0x000000001a000b68                _bss_end = .
  *(.boot)
  *(.boot.data)
-                0x000000001a000ba8                _endtext = .
+                0x000000001a000b68                _endtext = .
 
-.rela.dyn       0x000000001a000ba8        0x0
- .rela.vectors  0x000000001a000ba8        0x0 crt0.o
+.rela.dyn       0x000000001a000b68        0x0
+ .rela.vectors  0x000000001a000b68        0x0 crt0.o
 
 .heapl2ram      0x000000001c07c000     0x1c6b
  *(.ram)
@@ -275,40 +278,40 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .comment       0x000000000000004a       0x4b spi.o
  .comment       0x000000000000004a       0x4b uart.o
 
-.debug_line     0x0000000000000000     0x3394
+.debug_line     0x0000000000000000     0x3292
  .debug_line    0x0000000000000000      0x11b crt0.o
  .debug_line    0x000000000000011b      0x87b I2CProtocol.o
  .debug_line    0x0000000000000996      0x3a1 crc.o
  .debug_line    0x0000000000000d37      0x2ec dbg.o
  .debug_line    0x0000000000001023      0x510 hal_apb_i2cs.o
- .debug_line    0x0000000000001533      0xe99 main.o
- .debug_line    0x00000000000023cc      0xb90 spi.o
- .debug_line    0x0000000000002f5c      0x38f uart.o
- .debug_line    0x00000000000032eb       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_line    0x0000000000001533      0xd97 main.o
+ .debug_line    0x00000000000022ca      0xb90 spi.o
+ .debug_line    0x0000000000002e5a      0x38f uart.o
+ .debug_line    0x00000000000031e9       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_info     0x0000000000000000     0x3cbb
+.debug_info     0x0000000000000000     0x3e28
  .debug_info    0x0000000000000000       0x26 crt0.o
  .debug_info    0x0000000000000026      0x6ee I2CProtocol.o
  .debug_info    0x0000000000000714      0x190 crc.o
  .debug_info    0x00000000000008a4      0x274 dbg.o
  .debug_info    0x0000000000000b18      0xe3d hal_apb_i2cs.o
- .debug_info    0x0000000000001955     0x1335 main.o
- .debug_info    0x0000000000002c8a      0x918 spi.o
- .debug_info    0x00000000000035a2      0x6f3 uart.o
- .debug_info    0x0000000000003c95       0x26 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_info    0x0000000000001955     0x14a2 main.o
+ .debug_info    0x0000000000002df7      0x918 spi.o
+ .debug_info    0x000000000000370f      0x6f3 uart.o
+ .debug_info    0x0000000000003e02       0x26 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_abbrev   0x0000000000000000      0xef9
+.debug_abbrev   0x0000000000000000      0xf39
  .debug_abbrev  0x0000000000000000       0x14 crt0.o
  .debug_abbrev  0x0000000000000014      0x2f6 I2CProtocol.o
  .debug_abbrev  0x000000000000030a      0x108 crc.o
  .debug_abbrev  0x0000000000000412      0x157 dbg.o
  .debug_abbrev  0x0000000000000569      0x1cf hal_apb_i2cs.o
- .debug_abbrev  0x0000000000000738      0x49b main.o
- .debug_abbrev  0x0000000000000bd3      0x1be spi.o
- .debug_abbrev  0x0000000000000d91      0x154 uart.o
- .debug_abbrev  0x0000000000000ee5       0x14 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_abbrev  0x0000000000000738      0x4db main.o
+ .debug_abbrev  0x0000000000000c13      0x1be spi.o
+ .debug_abbrev  0x0000000000000dd1      0x154 uart.o
+ .debug_abbrev  0x0000000000000f25       0x14 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_aranges  0x0000000000000000      0x238
+.debug_aranges  0x0000000000000000      0x240
  .debug_aranges
                 0x0000000000000000       0x20 crt0.o
  .debug_aranges
@@ -320,15 +323,15 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .debug_aranges
                 0x00000000000000e0       0x90 hal_apb_i2cs.o
  .debug_aranges
-                0x0000000000000170       0x30 main.o
+                0x0000000000000170       0x38 main.o
  .debug_aranges
-                0x00000000000001a0       0x50 spi.o
+                0x00000000000001a8       0x50 spi.o
  .debug_aranges
-                0x00000000000001f0       0x28 uart.o
+                0x00000000000001f8       0x28 uart.o
  .debug_aranges
-                0x0000000000000218       0x20 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+                0x0000000000000220       0x20 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_str      0x0000000000000000     0x1935
+.debug_str      0x0000000000000000     0x19cb
  .debug_str     0x0000000000000000       0x49 crt0.o
  .debug_str     0x0000000000000049      0x44e I2CProtocol.o
                                         0x503 (size before relaxing)
@@ -338,38 +341,38 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
                                         0x16f (size before relaxing)
  .debug_str     0x000000000000051c      0x9e1 hal_apb_i2cs.o
                                         0xdbb (size before relaxing)
- .debug_str     0x0000000000000efd      0x5f1 main.o
-                                        0x91e (size before relaxing)
- .debug_str     0x00000000000014ee      0x2af spi.o
+ .debug_str     0x0000000000000efd      0x687 main.o
+                                        0x9b4 (size before relaxing)
+ .debug_str     0x0000000000001584      0x2af spi.o
                                         0x51b (size before relaxing)
- .debug_str     0x000000000000179d       0xe4 uart.o
+ .debug_str     0x0000000000001833       0xe4 uart.o
                                         0x444 (size before relaxing)
- .debug_str     0x0000000000001881       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_str     0x0000000000001917       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
                                          0xc3 (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x10f0
+.debug_loc      0x0000000000000000     0x1377
  .debug_loc     0x0000000000000000      0x588 I2CProtocol.o
  .debug_loc     0x0000000000000588      0x1af crc.o
  .debug_loc     0x0000000000000737      0x167 dbg.o
  .debug_loc     0x000000000000089e       0x75 hal_apb_i2cs.o
- .debug_loc     0x0000000000000913      0x342 main.o
- .debug_loc     0x0000000000000c55      0x41c spi.o
- .debug_loc     0x0000000000001071       0x7f uart.o
+ .debug_loc     0x0000000000000913      0x5c9 main.o
+ .debug_loc     0x0000000000000edc      0x41c spi.o
+ .debug_loc     0x00000000000012f8       0x7f uart.o
 
-.debug_ranges   0x0000000000000000      0x320
+.debug_ranges   0x0000000000000000      0x328
  .debug_ranges  0x0000000000000000       0x60 I2CProtocol.o
  .debug_ranges  0x0000000000000060       0x20 crc.o
  .debug_ranges  0x0000000000000080       0x78 dbg.o
  .debug_ranges  0x00000000000000f8       0x80 hal_apb_i2cs.o
- .debug_ranges  0x0000000000000178      0x150 main.o
- .debug_ranges  0x00000000000002c8       0x40 spi.o
- .debug_ranges  0x0000000000000308       0x18 uart.o
+ .debug_ranges  0x0000000000000178      0x158 main.o
+ .debug_ranges  0x00000000000002d0       0x40 spi.o
+ .debug_ranges  0x0000000000000310       0x18 uart.o
 
-.debug_frame    0x0000000000000000      0x464
+.debug_frame    0x0000000000000000      0x474
  .debug_frame   0x0000000000000000      0x104 I2CProtocol.o
  .debug_frame   0x0000000000000104       0x40 crc.o
  .debug_frame   0x0000000000000144       0xdc dbg.o
  .debug_frame   0x0000000000000220      0x100 hal_apb_i2cs.o
- .debug_frame   0x0000000000000320       0x94 main.o
- .debug_frame   0x00000000000003b4       0x80 spi.o
- .debug_frame   0x0000000000000434       0x30 uart.o
+ .debug_frame   0x0000000000000320       0xa4 main.o
+ .debug_frame   0x00000000000003c4       0x80 spi.o
+ .debug_frame   0x0000000000000444       0x30 uart.o

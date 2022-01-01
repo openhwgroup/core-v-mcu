@@ -225,9 +225,6 @@ assign clk_ref = (PRESCALE[3:1] == 3'b000) ? CK_XTAL_IN : (pr_toggle | pr_sync_n
       ref_period <= $time - last_time;
       //Don't change the PLL period if ref_period is out of range. Will get separate error message about ref_period 
       pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? (ref_period * (2 ** 17)) / ssc_full_mult : pll_period;
-      //pll_period <= ((ref_period >= 8000000) && (ref_period <= 200000000)) ? 2500000 : pll_period;
-      //pll_period <= 2500000;
-      //pll_period <= 100ns / mult; //100000000 / mult;
       last_period <= pll_period;
     end
   end  // seq_period
