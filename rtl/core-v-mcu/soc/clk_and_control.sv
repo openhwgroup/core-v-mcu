@@ -182,7 +182,7 @@ endgenerate*/
    assign s_SSC_PERIOD = config3[28:18];   //11
    
    assign s_LDET_CONFIG = config4[8:0]; //9
-   assign s_LF_CONFIG[34:32] = config4[11:9]; //3
+   assign s_LF_CONFIG[34:32] = r_tmp[2:0]; //3
 
    assign s_LF_CONFIG[31:0] = config5[31:0];   //32
 
@@ -203,7 +203,10 @@ endgenerate*/
                else if (CFGAD == 3'b010) config2 <= CFGD;
                else if (CFGAD == 3'b011) config3 <= CFGD;
                else if (CFGAD == 3'b100) config4 <= CFGD;
-               else if (CFGAD == 3'b101) config5 <= CFGD;
+               else if (CFGAD == 3'b101) begin 
+                    config5 <= CFGD;
+                    r_tmp[2:0] <= config4[11:9];
+               end
                else if (CFGAD == 3'b110) config6 <= CFGD;
                else if (CFGAD == 3'b111) config7 <= CFGD;
                CFGACK <= 1'b1;
