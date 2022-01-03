@@ -33,7 +33,11 @@ module clk_and_control
   logic [31:0] config1;
   logic [31:0] config2;
   logic [31:0] config3;
-
+  logic [31:0] config4;
+  logic [31:0] config5;
+  logic [31:0] config6;
+  logic [31:0] config7;
+  
   logic [1:0] s_PS0_L1;
   logic [1:0] s_PS1_L1;
   logic [7:0] s_PS0_L2;
@@ -91,10 +95,10 @@ module clk_and_control
 	       .PS0_L1(s_PS0_L1),
 	       .PS0_L2(s_PS0_L2),
 	       .CK_PLL_OUT0(FLLCLK),
-	       .PS1_EN(1'b0),
-	       .PS1_BYPASS(1'b1),
-	       .PS1_L1(2'b00),
-	       .PS1_L2(8'h0),
+	       .PS1_EN(s_PS1_EN),
+	       .PS1_BYPASS(s_PS1_BYPASS),
+	       .PS1_L1(s_PS1_L1),
+	       .PS1_L2(s_PS1_L2),
 	       .CK_PLL_OUT1(),
 	       .SCAN_IN(TD),
 	       .SCAN_CK(1'b0),
@@ -134,60 +138,89 @@ module clk_and_control
 	       .SCAN_OUT(TQ)
 	       );
 endgenerate*/
+    //Set initial values for config 0
    localparam PS0_L1 = 2'b00;  //config0[1:0]
    localparam PS0_RSTN = 1'b0; // config0[2]
-   localparam PS0_L2 = 8'b00000000; // config[11:4]
+                               //Dummy config0[3]
+   localparam PS0_L2 = 8'b00000000; // config0[11:4]
    localparam PS0_L2_FRAC = 6'b000000; // config0[17:12]
+   localparam PS0_EN = 1'b0; // config0[18]
+   localparam PS0_BYPASS = 1'b1; // config0[19]
 
+   localparam PS1_L1 = 2'b00;  //config1[1:0]
+   localparam PS1_RSTN = 1'b0; // config1[2]
+                               //Dummy config1[3]
+   localparam PS1_L2 = 8'b00000000; // config1[11:4]
+   localparam PS1_L2_FRAC = 6'b000000; // config1[17:12]
+   localparam PS1_EN = 1'b0; // config1[18]
+   localparam PS1_BYPASS = 1'b1; // config1[19]
 
-
-
+   localparam MUL_INT = 11'b00000101000;
+   localparam MUL_FRAC = 12'b0;
+   localparam INTEGER_MODE = 1'b1;
+   localparam PRESCALE = 4'b1;
+   
    assign s_PS0_L1 = config0[1:0];    //2
    assign s_PS0_L2 = config0[11:4]; //8
    assign s_PS0_L2_FRAC = config0[17:12];    //6
+   assign s_PS0_EN = config0[18];  //1
+   assign s_PS0_BYPASS = config0[19];  //1
 
+   assign s_PS1_L1 = config1[1:0];    //2
+   assign s_PS1_L2 = config1[11:4]; //8
+   assign s_PS1_L2_FRAC = config1[17:12];    //6
+   assign s_PS1_EN = config1[18];  //1
+   assign s_PS1_BYPASS = config1[19];  //1
+   
+   assign s_MUL_INT = config2[14:4];    //11
+   assign s_MUL_FRAC = config2[26:15];   //12
+   assign s_INTEGER_MODE = config2[27];     //1
+   assign s_PRESCALE = config2[31:28];    //4
 
-   assign s_PS0_EN = config1[0];  //1
-   assign s_PS0_BYPASS = config1[2];  //1
+   assign s_SSC_EN = config3[9];     //1
+   assign s_SSC_STEP = config3[17:10];  //8
+   assign s_SSC_PERIOD = config3[28:18];   //11
+   
+   assign s_LDET_CONFIG = config4[8:0]; //9
+   assign s_LF_CONFIG[34:32] = r_tmp[2:0]; //3
 
-   assign s_MUL_INT = config1[14:4];    //11
-   assign s_MUL_FRAC = config1[26:15];   //12
-   assign s_INTEGER_MODE = config1[27];     //1
-   assign s_PRESCALE = config1[31:28];    //4
-
-   assign s_LDET_CONFIG = config2[8:0]; //9
-   assign s_SSC_EN = config2[9];     //1
-   assign s_SSC_STEP = config2[17:10];  //8
-   assign s_SSC_PERIOD = config2[28:18];   //11
-
-   assign s_LF_CONFIG[31:0] = config3[31:0];   //32
-   assign s_LF_CONFIG[34:32] = r_tmp[2:0];   //3
+   assign s_LF_CONFIG[31:0] = config5[31:0];   //32
 
    always_ff @(posedge clk, negedge RSTB) begin
       if (RSTB == 1'b0) begin
-	 r_tmp[2:0] <= 0;
-	 config0 <= {14'b0,PS0_L2_FRAC,PS0_L2,1'b0,PS0_RSTN,PS0_L1};
-	 config1 <= 32'h00000004;
-	 config2 <= 32'h64;
-	 config3 <= 32'h269;
+	 config0 <= {12'b0, PS0_BYPASS, PS0_EN, PS0_L2_FRAC, PS0_L2, 1'b0/*Dummy bit*/, PS0_RSTN, PS0_L1};
+	 config1 <= {12'b0, PS1_BYPASS, PS1_EN, PS1_L2_FRAC, PS1_L2, 1'b0/*Dummy bit*/, PS1_RSTN, PS1_L1}; 
+	 config2 <= {PRESCALE,INTEGER_MODE, MUL_FRAC,MUL_INT,4'b0};
+	 config3 <= 32'h0;
+	 config4 <= 32'h64;     //LDET intial value as per datasheet
+	 config5 <= 32'h269;    //LF_CONFIG initial value as per datasheet
          CFGACK <= 1'b0;
       end else begin
 	 if (CFGREQ == 1'b1) begin
             if (CFGWEB == 0) begin
-               if (CFGAD == 3'b00) config0 <= CFGD;
-               else if (CFGAD == 3'b01) config1 <= CFGD;
-               else if (CFGAD == 3'b10) config2 <= CFGD;
-               else if (CFGAD == 3'b11) begin
-		        config3 <= CFGD;
-		        r_tmp[2:0]   <= config2[31:29];
+               if (CFGAD == 3'b000) config0 <= CFGD;
+               else if (CFGAD == 3'b001) config1 <= CFGD;
+               else if (CFGAD == 3'b010) config2 <= CFGD;
+               else if (CFGAD == 3'b011) config3 <= CFGD;
+               else if (CFGAD == 3'b100) config4 <= CFGD;
+               else if (CFGAD == 3'b101) begin 
+                    config5 <= CFGD;
+                    r_tmp[2:0] <= config4[11:9];
                end
+               else if (CFGAD == 3'b110) config6 <= CFGD;
+               else if (CFGAD == 3'b111) config7 <= CFGD;
                CFGACK <= 1'b1;
             end
             else begin
-               if (CFGAD == 3'b00) CFGQ <= config0;
-               else if (CFGAD == 3'b01) CFGQ <= config1;
-               else if (CFGAD == 3'b10) CFGQ <= {LOCK, s_LF_CONFIG[32], config2[29:0]};
-               else if (CFGAD == 3'b11) CFGQ <= config3;
+               if (CFGAD == 3'b000) CFGQ <= config0;
+               else if (CFGAD == 3'b001) CFGQ <= config1;
+               else if (CFGAD == 3'b010) CFGQ <= config2;
+               else if (CFGAD == 3'b011) CFGQ <= config3;
+               else if (CFGAD == 3'b100) CFGQ <= {LOCK, config4[30:0]};
+               else if (CFGAD == 3'b101) CFGQ <= config5;
+               else if (CFGAD == 3'b110) CFGQ <= config6;
+               else if (CFGAD == 3'b111) CFGQ <= config7;
+               
                CFGACK <= 1'b1;
             end // else: !if(CFGWEB)
 	 end // if (CFGREQ == 1'b1)

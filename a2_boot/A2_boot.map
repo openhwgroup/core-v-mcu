@@ -50,6 +50,8 @@ Discarded input sections
  .text          0x0000000000000000        0x0 main.o
  .data          0x0000000000000000        0x0 main.o
  .bss           0x0000000000000000        0x0 main.o
+ .text.setFLLFrequencyInIntegerMode
+                0x0000000000000000      0x108 main.o
  .text          0x0000000000000000        0x0 spi.o
  .data          0x0000000000000000        0x0 spi.o
  .bss           0x0000000000000000        0x0 spi.o
@@ -85,7 +87,7 @@ LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../l
 LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/rv32imac/ilp32/libgcc.a
                 0x0000000000000000                __DYNAMIC = 0x0
 
-.text           0x000000001a000000      0xaf4
+.text           0x000000001a000000      0xa7c
                 0x000000001a000000                . = ALIGN (0x4)
  *(.vectors)
  .vectors       0x000000001a000000       0xa0 crt0.o
@@ -107,108 +109,111 @@ LOAD /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../l
  .text.crcFast  0x000000001a0002b4       0x40 crc.o
                 0x000000001a0002b4                crcFast
  .text.dbg_ch_raw
-                0x000000001a0002f4       0x16 dbg.o
+                0x000000001a0002f4       0x14 dbg.o
                 0x000000001a0002f4                dbg_ch_raw
- .text.dbg_nl   0x000000001a00030a       0x10 dbg.o
-                0x000000001a00030a                dbg_nl
- .text.dbg_ch   0x000000001a00031a        0xa dbg.o
-                0x000000001a00031a                dbg_ch
- .text.dbg_str  0x000000001a000324       0x1c dbg.o
-                0x000000001a000324                dbg_str
+ .text.dbg_nl   0x000000001a000308       0x10 dbg.o
+                0x000000001a000308                dbg_nl
+ .text.dbg_ch   0x000000001a000318        0xa dbg.o
+                0x000000001a000318                dbg_ch
+ .text.dbg_str  0x000000001a000322       0x1c dbg.o
+                0x000000001a000322                dbg_str
  .text.dbg_hex8
-                0x000000001a000340       0x3a dbg.o
-                0x000000001a000340                dbg_hex8
+                0x000000001a00033e       0x3a dbg.o
+                0x000000001a00033e                dbg_hex8
  .text.dbg_hex16
-                0x000000001a00037a       0x16 dbg.o
-                0x000000001a00037a                dbg_hex16
+                0x000000001a000378       0x16 dbg.o
+                0x000000001a000378                dbg_hex16
  .text.dbg_hex32
-                0x000000001a000390       0x16 dbg.o
-                0x000000001a000390                dbg_hex32
+                0x000000001a00038e       0x16 dbg.o
+                0x000000001a00038e                dbg_hex32
  .text.hal_get_apb_i2cs_slave_address
-                0x000000001a0003a6        0xc hal_apb_i2cs.o
-                0x000000001a0003a6                hal_get_apb_i2cs_slave_address
+                0x000000001a0003a4        0xc hal_apb_i2cs.o
+                0x000000001a0003a4                hal_get_apb_i2cs_slave_address
  .text.hal_set_apb_i2cs_slave_address
-                0x000000001a0003b2       0x18 hal_apb_i2cs.o
-                0x000000001a0003b2                hal_set_apb_i2cs_slave_address
+                0x000000001a0003b0       0x18 hal_apb_i2cs.o
+                0x000000001a0003b0                hal_set_apb_i2cs_slave_address
  .text.hal_set_apb_i2cs_slave_on_off
-                0x000000001a0003ca       0x2e hal_apb_i2cs.o
-                0x000000001a0003ca                hal_set_apb_i2cs_slave_on_off
+                0x000000001a0003c8       0x2e hal_apb_i2cs.o
+                0x000000001a0003c8                hal_set_apb_i2cs_slave_on_off
  .text.hal_get_i2cs_fifo_i2c_apb_read_data_port
-                0x000000001a0003f8        0xe hal_apb_i2cs.o
-                0x000000001a0003f8                hal_get_i2cs_fifo_i2c_apb_read_data_port
+                0x000000001a0003f6        0xe hal_apb_i2cs.o
+                0x000000001a0003f6                hal_get_i2cs_fifo_i2c_apb_read_data_port
  .text.hal_get_i2cs_fifo_i2c_apb_read_flags
-                0x000000001a000406        0xe hal_apb_i2cs.o
-                0x000000001a000406                hal_get_i2cs_fifo_i2c_apb_read_flags
+                0x000000001a000404        0xe hal_apb_i2cs.o
+                0x000000001a000404                hal_get_i2cs_fifo_i2c_apb_read_flags
  .text.hal_get_i2cs_msg_i2c_apb
-                0x000000001a000414        0xc hal_apb_i2cs.o
-                0x000000001a000414                hal_get_i2cs_msg_i2c_apb
+                0x000000001a000412        0xc hal_apb_i2cs.o
+                0x000000001a000412                hal_get_i2cs_msg_i2c_apb
  .text.hal_get_i2cs_msg_i2c_apb_status
-                0x000000001a000420        0xc hal_apb_i2cs.o
-                0x000000001a000420                hal_get_i2cs_msg_i2c_apb_status
+                0x000000001a00041e        0xc hal_apb_i2cs.o
+                0x000000001a00041e                hal_get_i2cs_msg_i2c_apb_status
  .text.hal_set_i2cs_msg_apb_i2c
-                0x000000001a00042c        0x8 hal_apb_i2cs.o
-                0x000000001a00042c                hal_set_i2cs_msg_apb_i2c
+                0x000000001a00042a        0x8 hal_apb_i2cs.o
+                0x000000001a00042a                hal_set_i2cs_msg_apb_i2c
  .text.getMemAreas
-                0x000000001a000434       0x4a main.o
+                0x000000001a000432       0x4a main.o
  .text.loadBinaryAndStart
-                0x000000001a00047e       0xd0 main.o
+                0x000000001a00047c       0xd0 main.o
+ .text.setFLLInResetAndBypass
+                0x000000001a00054c       0x3e main.o
+                0x000000001a00054c                setFLLInResetAndBypass
  .text.startup.main
-                0x000000001a00054e      0x266 main.o
-                0x000000001a00054e                main
+                0x000000001a00058a      0x1b2 main.o
+                0x000000001a00058a                main
  .text.udma_qspim_open
-                0x000000001a0007b4       0x38 spi.o
-                0x000000001a0007b4                udma_qspim_open
+                0x000000001a00073c       0x38 spi.o
+                0x000000001a00073c                udma_qspim_open
  .text.udma_flash_readid
-                0x000000001a0007ec       0x8c spi.o
-                0x000000001a0007ec                udma_flash_readid
+                0x000000001a000774       0x8c spi.o
+                0x000000001a000774                udma_flash_readid
  .text.udma_flash_reset_enable
-                0x000000001a000878       0x64 spi.o
-                0x000000001a000878                udma_flash_reset_enable
+                0x000000001a000800       0x64 spi.o
+                0x000000001a000800                udma_flash_reset_enable
  .text.udma_flash_reset_memory
-                0x000000001a0008dc       0x64 spi.o
-                0x000000001a0008dc                udma_flash_reset_memory
+                0x000000001a000864       0x64 spi.o
+                0x000000001a000864                udma_flash_reset_memory
  .text.udma_flash_read
-                0x000000001a000940       0xaa spi.o
-                0x000000001a000940                udma_flash_read
+                0x000000001a0008c8       0xaa spi.o
+                0x000000001a0008c8                udma_flash_read
  .text.udma_uart_open
-                0x000000001a0009ea       0x64 uart.o
-                0x000000001a0009ea                udma_uart_open
+                0x000000001a000972       0x64 uart.o
+                0x000000001a000972                udma_uart_open
  .text.udma_uart_writeraw
-                0x000000001a000a4e       0x36 uart.o
-                0x000000001a000a4e                udma_uart_writeraw
-                0x000000001a000a84                _etext = .
+                0x000000001a0009d6       0x36 uart.o
+                0x000000001a0009d6                udma_uart_writeraw
+                0x000000001a000a0c                _etext = .
  *(.lit)
  *(.shdata)
  *(.boot)
  *(.boot.data)
  *(.rodata)
  *(.rodata.*)
- *fill*         0x000000001a000a84        0x0 
+ *fill*         0x000000001a000a0c        0x0 
  .rodata.parseI2CProtocolFrame.str1.4
-                0x000000001a000a84        0xd I2CProtocol.o
+                0x000000001a000a0c        0xd I2CProtocol.o
                                          0x12 (size before relaxing)
- *fill*         0x000000001a000a91        0x3 
+ *fill*         0x000000001a000a19        0x3 
  .rodata.loadBinaryAndStart.str1.4
-                0x000000001a000a94       0x21 main.o
+                0x000000001a000a1c       0x21 main.o
                                          0x2e (size before relaxing)
- *fill*         0x000000001a000ab5        0x3 
+ *fill*         0x000000001a000a3d        0x3 
  .rodata.main.str1.4
-                0x000000001a000ab8       0x3a main.o
+                0x000000001a000a40       0x3a main.o
  *(.eh_frame*)
  *(.data)
  *(.data.*)
  *(COMMON)
-                0x000000001a000af4                . = ALIGN (0x4)
- *fill*         0x000000001a000af2        0x2 
-                0x000000001a000af4                _bss_start = .
-                0x000000001a000af4                . = ALIGN (0x4)
-                0x000000001a000af4                _bss_end = .
+                0x000000001a000a7c                . = ALIGN (0x4)
+ *fill*         0x000000001a000a7a        0x2 
+                0x000000001a000a7c                _bss_start = .
+                0x000000001a000a7c                . = ALIGN (0x4)
+                0x000000001a000a7c                _bss_end = .
  *(.boot)
  *(.boot.data)
-                0x000000001a000af4                _endtext = .
+                0x000000001a000a7c                _endtext = .
 
-.rela.dyn       0x000000001a000af4        0x0
- .rela.vectors  0x000000001a000af4        0x0 crt0.o
+.rela.dyn       0x000000001a000a7c        0x0
+ .rela.vectors  0x000000001a000a7c        0x0 crt0.o
 
 .heapl2ram      0x000000001c07c000     0x1c6b
  *(.ram)
@@ -276,40 +281,40 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .comment       0x000000000000004a       0x4b spi.o
  .comment       0x000000000000004a       0x4b uart.o
 
-.debug_line     0x0000000000000000     0x327c
+.debug_line     0x0000000000000000     0x3338
  .debug_line    0x0000000000000000      0x11b crt0.o
  .debug_line    0x000000000000011b      0x87b I2CProtocol.o
  .debug_line    0x0000000000000996      0x3a1 crc.o
  .debug_line    0x0000000000000d37      0x2ec dbg.o
- .debug_line    0x0000000000001023      0x509 hal_apb_i2cs.o
- .debug_line    0x000000000000152c      0xd96 main.o
- .debug_line    0x00000000000022c2      0xb89 spi.o
- .debug_line    0x0000000000002e4b      0x388 uart.o
- .debug_line    0x00000000000031d3       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_line    0x0000000000001023      0x510 hal_apb_i2cs.o
+ .debug_line    0x0000000000001533      0xe3d main.o
+ .debug_line    0x0000000000002370      0xb90 spi.o
+ .debug_line    0x0000000000002f00      0x38f uart.o
+ .debug_line    0x000000000000328f       0xa9 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_info     0x0000000000000000     0x3cbe
+.debug_info     0x0000000000000000     0x3e11
  .debug_info    0x0000000000000000       0x26 crt0.o
  .debug_info    0x0000000000000026      0x6ee I2CProtocol.o
  .debug_info    0x0000000000000714      0x190 crc.o
  .debug_info    0x00000000000008a4      0x274 dbg.o
  .debug_info    0x0000000000000b18      0xe3d hal_apb_i2cs.o
- .debug_info    0x0000000000001955     0x1338 main.o
- .debug_info    0x0000000000002c8d      0x918 spi.o
- .debug_info    0x00000000000035a5      0x6f3 uart.o
- .debug_info    0x0000000000003c98       0x26 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_info    0x0000000000001955     0x148b main.o
+ .debug_info    0x0000000000002de0      0x918 spi.o
+ .debug_info    0x00000000000036f8      0x6f3 uart.o
+ .debug_info    0x0000000000003deb       0x26 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_abbrev   0x0000000000000000      0xee8
+.debug_abbrev   0x0000000000000000      0xf66
  .debug_abbrev  0x0000000000000000       0x14 crt0.o
  .debug_abbrev  0x0000000000000014      0x2f6 I2CProtocol.o
  .debug_abbrev  0x000000000000030a      0x108 crc.o
  .debug_abbrev  0x0000000000000412      0x157 dbg.o
  .debug_abbrev  0x0000000000000569      0x1cf hal_apb_i2cs.o
- .debug_abbrev  0x0000000000000738      0x48a main.o
- .debug_abbrev  0x0000000000000bc2      0x1be spi.o
- .debug_abbrev  0x0000000000000d80      0x154 uart.o
- .debug_abbrev  0x0000000000000ed4       0x14 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+ .debug_abbrev  0x0000000000000738      0x508 main.o
+ .debug_abbrev  0x0000000000000c40      0x1be spi.o
+ .debug_abbrev  0x0000000000000dfe      0x154 uart.o
+ .debug_abbrev  0x0000000000000f52       0x14 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_aranges  0x0000000000000000      0x238
+.debug_aranges  0x0000000000000000      0x248
  .debug_aranges
                 0x0000000000000000       0x20 crt0.o
  .debug_aranges
@@ -321,56 +326,56 @@ OUTPUT(A2_boot.elf elf32-littleriscv)
  .debug_aranges
                 0x00000000000000e0       0x90 hal_apb_i2cs.o
  .debug_aranges
-                0x0000000000000170       0x30 main.o
+                0x0000000000000170       0x40 main.o
  .debug_aranges
-                0x00000000000001a0       0x50 spi.o
+                0x00000000000001b0       0x50 spi.o
  .debug_aranges
-                0x00000000000001f0       0x28 uart.o
+                0x0000000000000200       0x28 uart.o
  .debug_aranges
-                0x0000000000000218       0x20 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+                0x0000000000000228       0x20 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
 
-.debug_str      0x0000000000000000     0x192e
- .debug_str     0x0000000000000000       0x42 crt0.o
- .debug_str     0x0000000000000042      0x44e I2CProtocol.o
-                                        0x4fc (size before relaxing)
- .debug_str     0x0000000000000490       0x37 crc.o
-                                        0x172 (size before relaxing)
- .debug_str     0x00000000000004c7       0x4e dbg.o
-                                        0x168 (size before relaxing)
- .debug_str     0x0000000000000515      0x9e1 hal_apb_i2cs.o
-                                        0xdb4 (size before relaxing)
- .debug_str     0x0000000000000ef6      0x5f1 main.o
-                                        0x917 (size before relaxing)
- .debug_str     0x00000000000014e7      0x2af spi.o
-                                        0x514 (size before relaxing)
- .debug_str     0x0000000000001796       0xe4 uart.o
-                                        0x43d (size before relaxing)
- .debug_str     0x000000000000187a       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
+.debug_str      0x0000000000000000     0x19e2
+ .debug_str     0x0000000000000000       0x49 crt0.o
+ .debug_str     0x0000000000000049      0x44e I2CProtocol.o
+                                        0x503 (size before relaxing)
+ .debug_str     0x0000000000000497       0x37 crc.o
+                                        0x179 (size before relaxing)
+ .debug_str     0x00000000000004ce       0x4e dbg.o
+                                        0x16f (size before relaxing)
+ .debug_str     0x000000000000051c      0x9e1 hal_apb_i2cs.o
+                                        0xdbb (size before relaxing)
+ .debug_str     0x0000000000000efd      0x69e main.o
+                                        0x9cb (size before relaxing)
+ .debug_str     0x000000000000159b      0x2af spi.o
+                                        0x51b (size before relaxing)
+ .debug_str     0x000000000000184a       0xe4 uart.o
+                                        0x444 (size before relaxing)
+ .debug_str     0x000000000000192e       0xb4 /n/design3/projects/ASIC/arnold2/corev-openhw-gcc-centos6-20200913/bin/../lib/gcc/riscv32-corev-elf/11.0.0/../../../../riscv32-corev-elf/lib/rv32imac/ilp32/libc.a(lib_a-memcpy-asm.o)
                                          0xc3 (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x1114
+.debug_loc      0x0000000000000000     0x13a2
  .debug_loc     0x0000000000000000      0x588 I2CProtocol.o
  .debug_loc     0x0000000000000588      0x1af crc.o
  .debug_loc     0x0000000000000737      0x167 dbg.o
  .debug_loc     0x000000000000089e       0x75 hal_apb_i2cs.o
- .debug_loc     0x0000000000000913      0x366 main.o
- .debug_loc     0x0000000000000c79      0x41c spi.o
- .debug_loc     0x0000000000001095       0x7f uart.o
+ .debug_loc     0x0000000000000913      0x5f4 main.o
+ .debug_loc     0x0000000000000f07      0x41c spi.o
+ .debug_loc     0x0000000000001323       0x7f uart.o
 
-.debug_ranges   0x0000000000000000      0x320
+.debug_ranges   0x0000000000000000      0x330
  .debug_ranges  0x0000000000000000       0x60 I2CProtocol.o
  .debug_ranges  0x0000000000000060       0x20 crc.o
  .debug_ranges  0x0000000000000080       0x78 dbg.o
  .debug_ranges  0x00000000000000f8       0x80 hal_apb_i2cs.o
- .debug_ranges  0x0000000000000178      0x150 main.o
- .debug_ranges  0x00000000000002c8       0x40 spi.o
- .debug_ranges  0x0000000000000308       0x18 uart.o
+ .debug_ranges  0x0000000000000178      0x160 main.o
+ .debug_ranges  0x00000000000002d8       0x40 spi.o
+ .debug_ranges  0x0000000000000318       0x18 uart.o
 
-.debug_frame    0x0000000000000000      0x464
+.debug_frame    0x0000000000000000      0x484
  .debug_frame   0x0000000000000000      0x104 I2CProtocol.o
  .debug_frame   0x0000000000000104       0x40 crc.o
  .debug_frame   0x0000000000000144       0xdc dbg.o
  .debug_frame   0x0000000000000220      0x100 hal_apb_i2cs.o
- .debug_frame   0x0000000000000320       0x94 main.o
- .debug_frame   0x00000000000003b4       0x80 spi.o
- .debug_frame   0x0000000000000434       0x30 uart.o
+ .debug_frame   0x0000000000000320       0xb4 main.o
+ .debug_frame   0x00000000000003d4       0x80 spi.o
+ .debug_frame   0x0000000000000454       0x30 uart.o
