@@ -159,6 +159,22 @@ static void bootFromRom(int hyperflash, int qpi)
 
 }
 
+void setFLLInResetAndBypass(uint8_t aFLLNum)
+{
+	volatile uint32_t *lPLLStartAddress = (uint32_t *)NULL;
+	if( aFLLNum == 0 )
+		lPLLStartAddress = (uint32_t *)FLL1_START_ADDR;
+	else if( aFLLNum == 1 )
+		lPLLStartAddress = (uint32_t *)FLL2_START_ADDR;
+	else if( aFLLNum == 2 )
+		lPLLStartAddress = (uint32_t *)FLL3_START_ADDR;
+	else
+		lPLLStartAddress = (uint32_t *)NULL;
+
+	*lPLLStartAddress |= (1 << 19);//Bypass on;
+	*lPLLStartAddress &= ~(1 << 2) ;//Reset low;
+
+}
 uint8_t setFLLFrequencyInIntegerMode(uint8_t aFLLNum, uint8_t aRefFreqInMHz, uint16_t aMultiplier, uint8_t aDivideRatio_R_Prescale, uint8_t aPS0_L1, uint8_t aPS0_L2  )
 {
     uint8_t lSts = 0;
@@ -297,11 +313,14 @@ int main(void)
 	*(lFFL3StartAddress + 3) = 0;
 
 #elif (PERCEPTIA_PLL == 1 )
-    setFLLFrequencyInIntegerMode(0, 10, 40, 1, 0, 0);   // 400/1
+	setFLLInResetAndBypass(0);
+    //setFLLFrequencyInIntegerMode(0, 10, 40, 1, 0, 0);   // 400
 
-    setFLLFrequencyInIntegerMode(1, 10, 20, 1, 0, 0);   // 400/2
+	setFLLInResetAndBypass(1);
+    //setFLLFrequencyInIntegerMode(1, 10, 20, 1, 0, 0);   // 400
 
-    setFLLFrequencyInIntegerMode(2, 10, 10, 1, 0, 0);   // 400/4
+	setFLLInResetAndBypass(2);
+    //setFLLFrequencyInIntegerMode(2, 10, 10, 1, 0, 0);   // 400
     
 #if 0
 	*(uint32_t*)0x1c000000 = 0x55667788;
