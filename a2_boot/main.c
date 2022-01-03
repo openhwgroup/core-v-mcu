@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : main.c
- Author      : 
+ Author      :
  Version     :
  Copyright   : Your copyright notice
  Description : Hello RISC-V World in C
@@ -29,8 +29,8 @@
 #include "crc.h"
 
 
-#define FAKE_PLL		0
-#define PERCEPTIA_PLL	1
+#define FAKE_PLL		1
+#define PERCEPTIA_PLL	0
 
 #define FLL1_START_ADDR 0x1A100000
 #define FLL2_START_ADDR 0x1A100010
@@ -167,119 +167,6 @@ int main(void)
 	unsigned int bootsel, flash_present;
 	char tstring[8];
 	uint32_t lCfgVal = 0;
-	volatile uint32_t *lFFL1StartAddress = (uint32_t *)FLL1_START_ADDR;
-	volatile uint32_t *lFFL2StartAddress = (uint32_t *)FLL2_START_ADDR;
-	volatile uint32_t *lFFL3StartAddress = (uint32_t *)FLL3_START_ADDR;
-
-#if FAKE_PLL == 1
-	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
-	//FLL1 Config 0 register
-	*lFFL1StartAddress = 0;
-	//FLL1 Config 1 register
-	*(lFFL1StartAddress + 1) = 0x0000000C;	//Already this is the default value set in HW.
-	//FLL1 Config 2 register
-	*(lFFL1StartAddress + 2) = 0;
-	//FLL1 Config 3 register
-	*(lFFL1StartAddress + 3) = 0;
-
-
-	//FLL2 is connected to peripheral clock. Run at half of reference clock. Set the divisor to 0 and disable bypass
-	//FLL2 Config 0 register
-	*lFFL2StartAddress = 0;		//Set divisor to half of reference clock.
-	//FLL2 Config 1 register
-	*(lFFL2StartAddress + 1) = 0;	//Disable bypass.
-	//FLL2 Config 2 register
-	*(lFFL2StartAddress + 2) = 0;
-	//FLL2 Config 3 register
-	*(lFFL2StartAddress + 3) = 0;
-
-	//FLL3 is connected to Cluster clock. Run at quarter of reference clock. Set the divisor to 1 and disable bypass
-	//FLL3 Config 0 register
-	*lFFL3StartAddress = 0x00000010;	//Set divisor to quarter of reference clock.
-	//FLL3 Config 1 register
-	*(lFFL3StartAddress + 1) = 0;	//Disable bypass.
-	//FLL3 Config 2 register
-	*(lFFL3StartAddress + 2) = 0;
-	//FLL3 Config 3 register
-	*(lFFL3StartAddress + 3) = 0;
-
-#elif (PERCEPTIA_PLL == 1 )
-
-	*(uint32_t*)0x1c000000 = 0x55667788;
-
-	//FLL1 is connected to soc_clk_o. Run at reference clock, use by pass.
-	//FLL1 Config 0 register
-	*lFFL1StartAddress = 4;   //Reset high
-	*lFFL1StartAddress = 0;   //PS0_L1 Cfg[1:0] = 00; PS0_L2 Cfg [11:4] =0
-	*(lFFL1StartAddress + 1) = 4;//Bypass on;
-	//FLL1 Config 2 register
-	*(lFFL1StartAddress + 2) = 0x64;
-	//FLL1 Config 3 register
-	*(lFFL1StartAddress + 3) = 0x269;
-
-	//FLL1 Config 1 register
-	lCfgVal = 4; // bypass
-	lCfgVal |= (1 << 0 ); //PS0_EN
-	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
-	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
-	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
-	*(lFFL1StartAddress + 1) = lCfgVal;
-	
-	*lFFL1StartAddress = 4;   // release reset
-	while (!(*(lFFL1StartAddress+2)& 0x80000000)) ;
-
-	*(lFFL1StartAddress + 1) &= ~(0x4) ;//Bypass off;
-/*-------------------------------------------------------------------------*/
-	//FLL2 Config 0 register
-	*lFFL2StartAddress = 4;   //Reset high
-	*lFFL2StartAddress = 0;   //Reset Low
-	*lFFL2StartAddress |= 1;   //PS0_L1 1 which is /2
-	*(lFFL2StartAddress + 1) = 4;//Bypass on;
-	//FLL2 Config 2 register
-	*(lFFL2StartAddress + 2) = 0x64;
-	//FLL2 Config 3 register
-	*(lFFL2StartAddress + 3) = 0x269;
-
-	//FLL2 Config 1 register
-	lCfgVal = 4; // bypass
-	lCfgVal |= (1 << 0 ); //PS0_EN
-	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
-	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
-	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
-	*(lFFL2StartAddress + 1) = lCfgVal;
-	
-	*lFFL2StartAddress |= 1<<2;   // release reset
-	while (!(*(lFFL2StartAddress+2)& 0x80000000)) ;
-
-	*(lFFL2StartAddress + 1) &= ~(0x4) ;//Bypass off;
-
-/*-------------------------------------------------------------------------*/
-	//FLL3 Config 0 register
-	*lFFL3StartAddress = 4;   //Reset high
-	*lFFL3StartAddress = 0;   //Reset Low
-	*lFFL3StartAddress |= 2;   //PS0_L1 2 which is /4
-	*(lFFL3StartAddress + 1) = 4;//Bypass on;
-	//FLL3 Config 2 register
-	*(lFFL3StartAddress + 2) = 0x64;
-	//FLL3 Config 3 register
-	*(lFFL3StartAddress + 3) = 0x269;
-
-	//FLL3 Config 1 register
-	lCfgVal = 4; // bypass
-	lCfgVal |= (1 << 0 ); //PS0_EN
-	lCfgVal |= (0x28 << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz)
-	lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
-	lCfgVal |= (1 << 28 ); //PRESCALE value (Divide Ratio R = 1)
-	*(lFFL3StartAddress + 1) = lCfgVal;
-	
-	*lFFL3StartAddress |= 1<<2;   // release reset
-	while (!(*(lFFL3StartAddress+2)& 0x80000000)) ;
-
-	*(lFFL3StartAddress + 1) &= ~(0x4) ;//Bypass off;
-
-#else
-	#error "Enable any one of the PLL configurations FAKE_PLL or PERCEPTIA_PLL"
-#endif
 	//TODO: FLL clock settings need to be taken care in the actual chip.
 	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
 	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
@@ -296,8 +183,8 @@ int main(void)
 	dbg_str(__TIME__);
 	dbg_str("\nA2 Bootloader Bootsel=");
 
-	if (bootsel == 1) dbg_str("1");
-	else dbg_str("0");
+    if (bootsel == 1) dbg_str("1 ");
+	else dbg_str("0 ");
 #ifdef VERILATOR
 	dbg_str("\nJumping to address 0x1C000880");
 	jump_to_address(0x1C000880);
