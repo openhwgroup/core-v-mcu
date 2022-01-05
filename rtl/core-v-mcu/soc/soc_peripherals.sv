@@ -281,7 +281,7 @@ module soc_peripherals #(
       .HCLK   (clk_i),
       .HRESETn(apb_reset),
 
-      .PADDR  (s_fll_bus.paddr),
+      .PADDR  (s_fll_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_fll_bus.pwdata),
       .PWRITE (s_fll_bus.pwrite),
       .PSEL   (s_fll_bus.psel),
@@ -332,7 +332,7 @@ module soc_peripherals #(
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
-      .PADDR  (s_gpio_bus.paddr),
+      .PADDR  (s_gpio_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_gpio_bus.pwdata),
       .PWRITE (s_gpio_bus.pwrite),
       .PSEL   (s_gpio_bus.psel),
@@ -388,7 +388,7 @@ module soc_peripherals #(
       .efpga_clk_i (periph_clk_i),  // FIXME if udma stays
       .sys_resetn_i(apb_reset),
 
-      .udma_apb_paddr  (s_udma_bus.paddr),
+      .udma_apb_paddr  (s_udma_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .udma_apb_pwdata (s_udma_bus.pwdata),
       .udma_apb_pwrite (s_udma_bus.pwrite),
       .udma_apb_psel   (s_udma_bus.psel),
@@ -437,7 +437,7 @@ module soc_peripherals #(
       .HCLK   (clk_i),
       .HRESETn(rst_ni),
 
-      .PADDR  (s_soc_ctrl_bus.paddr),
+      .PADDR  (s_soc_ctrl_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_ctrl_bus.pwdata),
       .PWRITE (s_soc_ctrl_bus.pwrite),
       .PSEL   (s_soc_ctrl_bus.psel),
@@ -492,7 +492,7 @@ module soc_peripherals #(
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
-      .PADDR  (s_adv_timer_bus.paddr),
+      .PADDR  (s_adv_timer_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_adv_timer_bus.pwdata),
       .PWRITE (s_adv_timer_bus.pwrite),
       .PSEL   (s_adv_timer_bus.psel),
@@ -535,7 +535,7 @@ module soc_peripherals #(
       .HCLK   (clk_i),
       .HRESETn(apb_reset),
 
-      .PADDR  (s_soc_evnt_gen_bus.paddr),
+      .PADDR  (s_soc_evnt_gen_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_evnt_gen_bus.pwdata),
       .PWRITE (s_soc_evnt_gen_bus.pwrite),
       .PSEL   (s_soc_evnt_gen_bus.psel),
@@ -575,7 +575,7 @@ module soc_peripherals #(
   ) i_apb_timer_unit (
       .HCLK       (clk_i),
       .HRESETn    (rst_ni),
-      .PADDR      (s_apb_timer_bus.paddr),
+      .PADDR      (s_apb_timer_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA     (s_apb_timer_bus.pwdata),
       .PWRITE     (s_apb_timer_bus.pwrite),
       .PSEL       (s_apb_timer_bus.psel),
@@ -656,7 +656,8 @@ module soc_peripherals #(
   // ╚═╝  ╚═╝╚═╝     ╚═════╝                                   //
   ///////////////////////////////////////////////////////////////
 
-  apb_i2cs i_apb_i2cs (
+  apb_i2cs  #(.APB_ADDR_WIDTH(APB_ADDR_WIDTH))
+  i_apb_i2cs (
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(apb_reset),
       .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),

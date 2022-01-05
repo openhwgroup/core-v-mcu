@@ -20,10 +20,10 @@ Supports 7-bit I2C addressing.
 
 ---------------------------------------------------------------------------- */
 
-module apb_i2cs (
+module  apb_i2cs #(parameter APB_ADDR_WIDTH = 12) (
   input apb_pclk_i,
   input apb_presetn_i,
-  input [11:0] apb_paddr_i,
+  input [APB_ADDR_WIDTH-1:0] apb_paddr_i,
   input apb_psel_i,
   input apb_penable_i,
   input apb_pwrite_i,
@@ -106,7 +106,8 @@ module apb_i2cs (
 
 
   // APB slave interface
-  apb_slave_interface apb_slave_interface_i0 (
+  apb_slave_interface #(.APB_ADDR_WIDTH(APB_ADDR_WIDTH))
+  apb_slave_interface_i0 (
       .apb_pclk_i   (clk),
       .apb_preset_i (rst),
       .apb_paddr_i  (apb_paddr_i),

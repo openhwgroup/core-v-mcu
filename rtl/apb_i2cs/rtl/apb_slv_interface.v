@@ -8,7 +8,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-module apb_slave_interface (
+module apb_slave_interface  # (parameter APB_ADDR_WIDTH = 12)
+  (
   input apb_pclk_i,
   input apb_preset_i,
   input [11:0] apb_paddr_i,

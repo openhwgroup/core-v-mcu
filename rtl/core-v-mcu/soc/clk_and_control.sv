@@ -13,7 +13,7 @@ module clk_and_control
                         output logic        LOCK,
                         input logic         CFGREQ,
                         output logic        CFGACK,
-                        input logic [ 2:0]  CFGAD,
+                        input logic [ 4:0]  CFGAD,
                         input logic [31:0]  CFGD,
                         output logic [31:0] CFGQ,
                         input logic         CFGWEB,
@@ -37,7 +37,7 @@ module clk_and_control
   logic [31:0] config5;
   logic [31:0] config6;
   logic [31:0] config7;
-  
+
   logic [1:0] s_PS0_L1;
   logic [1:0] s_PS1_L1;
   logic [7:0] s_PS0_L2;
@@ -159,7 +159,7 @@ endgenerate*/
    localparam MUL_FRAC = 12'b0;
    localparam INTEGER_MODE = 1'b1;
    localparam PRESCALE = 4'b1;
-   
+
    assign s_PS0_L1 = config0[1:0];    //2
    assign s_PS0_L2 = config0[11:4]; //8
    assign s_PS0_L2_FRAC = config0[17:12];    //6
@@ -171,7 +171,7 @@ endgenerate*/
    assign s_PS1_L2_FRAC = config1[17:12];    //6
    assign s_PS1_EN = config1[18];  //1
    assign s_PS1_BYPASS = config1[19];  //1
-   
+
    assign s_MUL_INT = config2[14:4];    //11
    assign s_MUL_FRAC = config2[26:15];   //12
    assign s_INTEGER_MODE = config2[27];     //1
@@ -180,7 +180,7 @@ endgenerate*/
    assign s_SSC_EN = config3[9];     //1
    assign s_SSC_STEP = config3[17:10];  //8
    assign s_SSC_PERIOD = config3[28:18];   //11
-   
+
    assign s_LDET_CONFIG = config4[8:0]; //9
    assign s_LF_CONFIG[34:32] = r_tmp[2:0]; //3
 
@@ -189,7 +189,7 @@ endgenerate*/
    always_ff @(posedge clk, negedge RSTB) begin
       if (RSTB == 1'b0) begin
 	 config0 <= {12'b0, PS0_BYPASS, PS0_EN, PS0_L2_FRAC, PS0_L2, 1'b0/*Dummy bit*/, PS0_RSTN, PS0_L1};
-	 config1 <= {12'b0, PS1_BYPASS, PS1_EN, PS1_L2_FRAC, PS1_L2, 1'b0/*Dummy bit*/, PS1_RSTN, PS1_L1}; 
+	 config1 <= {12'b0, PS1_BYPASS, PS1_EN, PS1_L2_FRAC, PS1_L2, 1'b0/*Dummy bit*/, PS1_RSTN, PS1_L1};
 	 config2 <= {PRESCALE,INTEGER_MODE, MUL_FRAC,MUL_INT,4'b0};
 	 config3 <= 32'h0;
 	 config4 <= 32'h64;     //LDET intial value as per datasheet
@@ -198,29 +198,29 @@ endgenerate*/
       end else begin
 	 if (CFGREQ == 1'b1) begin
             if (CFGWEB == 0) begin
-               if (CFGAD == 3'b000) config0 <= CFGD;
-               else if (CFGAD == 3'b001) config1 <= CFGD;
-               else if (CFGAD == 3'b010) config2 <= CFGD;
-               else if (CFGAD == 3'b011) config3 <= CFGD;
-               else if (CFGAD == 3'b100) config4 <= CFGD;
-               else if (CFGAD == 3'b101) begin 
+               if (CFGAD == 0) config0 <= CFGD;
+               else if (CFGAD == 4) config1 <= CFGD;
+               else if (CFGAD == 8) config2 <= CFGD;
+               else if (CFGAD == 12) config3 <= CFGD;
+               else if (CFGAD == 16) config4 <= CFGD;
+               else if (CFGAD == 20) begin
                     config5 <= CFGD;
                     r_tmp[2:0] <= config4[11:9];
                end
-               else if (CFGAD == 3'b110) config6 <= CFGD;
-               else if (CFGAD == 3'b111) config7 <= CFGD;
+               else if (CFGAD == 24) config6 <= CFGD;
+               else if (CFGAD == 28) config7 <= CFGD;
                CFGACK <= 1'b1;
             end
             else begin
-               if (CFGAD == 3'b000) CFGQ <= config0;
-               else if (CFGAD == 3'b001) CFGQ <= config1;
-               else if (CFGAD == 3'b010) CFGQ <= config2;
-               else if (CFGAD == 3'b011) CFGQ <= config3;
-               else if (CFGAD == 3'b100) CFGQ <= {LOCK, config4[30:0]};
-               else if (CFGAD == 3'b101) CFGQ <= config5;
-               else if (CFGAD == 3'b110) CFGQ <= config6;
-               else if (CFGAD == 3'b111) CFGQ <= config7;
-               
+               if (CFGAD == 0) CFGQ <= config0;
+               else if (CFGAD == 4) CFGQ <= config1;
+               else if (CFGAD == 8) CFGQ <= config2;
+               else if (CFGAD == 12) CFGQ <= config3;
+               else if (CFGAD == 16) CFGQ <= {LOCK, config4[30:0]};
+               else if (CFGAD == 20) CFGQ <= config5;
+               else if (CFGAD == 24) CFGQ <= config6;
+               else if (CFGAD == 28) CFGQ <= config7;
+
                CFGACK <= 1'b1;
             end // else: !if(CFGWEB)
 	 end // if (CFGREQ == 1'b1)

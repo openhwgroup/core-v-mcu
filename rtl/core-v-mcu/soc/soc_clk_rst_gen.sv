@@ -22,7 +22,7 @@ module soc_clk_rst_gen (
     input  logic        shift_enable_i,
     input  logic        soc_fll_slave_req_i,
     input  logic        soc_fll_slave_wrn_i,
-    input  logic [ 2:0] soc_fll_slave_add_i,
+    input  logic [ 4:0] soc_fll_slave_add_i,
     input  logic [31:0] soc_fll_slave_data_i,
     output logic        soc_fll_slave_ack_o,
     output logic [31:0] soc_fll_slave_r_data_o,
@@ -30,7 +30,7 @@ module soc_clk_rst_gen (
 
     input  logic        per_fll_slave_req_i,
     input  logic        per_fll_slave_wrn_i,
-    input  logic [ 2:0] per_fll_slave_add_i,
+    input  logic [ 4:0] per_fll_slave_add_i,
     input  logic [31:0] per_fll_slave_data_i,
     output logic        per_fll_slave_ack_o,
     output logic [31:0] per_fll_slave_r_data_o,
@@ -38,7 +38,7 @@ module soc_clk_rst_gen (
 
     input  logic        cluster_fll_slave_req_i,
     input  logic        cluster_fll_slave_wrn_i,
-    input  logic [ 2:0] cluster_fll_slave_add_i,
+    input  logic [ 4:0] cluster_fll_slave_add_i,
     input  logic [31:0] cluster_fll_slave_data_i,
     output logic        cluster_fll_slave_ack_o,
     output logic [31:0] cluster_fll_slave_r_data_o,

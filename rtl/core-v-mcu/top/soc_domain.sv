@@ -54,12 +54,12 @@ module soc_domain
     input  logic                               dft_test_mode_i,
     input  logic                               dft_cg_enable_i,
     input  logic                               bootsel_i,
-    output logic                               dma_pe_evt_ack_o,
-    input  logic                               dma_pe_evt_valid_i,
-    output logic                               dma_pe_irq_ack_o,
-    input  logic                               dma_pe_irq_valid_i,
-    output logic                               pf_evt_ack_o,
-    input  logic                               pf_evt_valid_i,
+//    output logic                               dma_pe_evt_ack_o,
+//    input  logic                               dma_pe_evt_valid_i,
+//    output logic                               dma_pe_irq_ack_o,
+//    input  logic                               dma_pe_irq_valid_i,
+//    output logic                               pf_evt_ack_o,
+//    input  logic                               pf_evt_valid_i,
     ///////////////////////////////////////////////////
     //      To I/O Controller and padframe           //
     ///////////////////////////////////////////////////
@@ -81,7 +81,7 @@ module soc_domain
     ///////////////////////////////////////////////////
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
-    input  logic [          1:0] selected_mode_i,
+//    input  logic [          1:0] selected_mode_i,
 
 
     //eFPGA SPIS

@@ -28,13 +28,7 @@
 #include "I2CProtocol.h"
 #include "crc.h"
 
-
-#define FAKE_PLL		1
-#define PERCEPTIA_PLL	0
-
-#define FLL1_START_ADDR 0x1A100000
-#define FLL2_START_ADDR 0x1A100020
-#define FLL3_START_ADDR 0x1A100040
+#define FLL_START_ADDR 0x1A100000
 
 uint16_t udma_uart_open (uint8_t uart_id, uint32_t xbaudrate);
 uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer) ;
@@ -162,122 +156,25 @@ static void bootFromRom(int hyperflash, int qpi)
 void setFLLInResetAndBypass(uint8_t aFLLNum)
 {
 	volatile uint32_t *lPLLStartAddress = (uint32_t *)NULL;
-	if( aFLLNum == 0 )
-		lPLLStartAddress = (uint32_t *)FLL1_START_ADDR;
-	else if( aFLLNum == 1 )
-		lPLLStartAddress = (uint32_t *)FLL2_START_ADDR;
-	else if( aFLLNum == 2 )
-		lPLLStartAddress = (uint32_t *)FLL3_START_ADDR;
-	else
-		lPLLStartAddress = (uint32_t *)NULL;
-
-	*lPLLStartAddress |= (1 << 19);//Bypass on;
-	*lPLLStartAddress &= ~(1 << 2) ;//Reset low;
-
-}
-uint8_t setFLLFrequencyInIntegerMode(uint8_t aFLLNum, uint8_t aRefFreqInMHz, uint16_t aMultiplier, uint8_t aDivideRatio_R_Prescale, uint8_t aPS0_L1, uint8_t aPS0_L2  )
-{
-    uint8_t lSts = 0;
-	volatile uint32_t *lPLLStartAddress = (uint32_t *)NULL;
-    uint32_t lCounter = 0;
-    uint32_t lCfgVal = 0;
-
-    uint8_t lPS0_L1 = aPS0_L1 & 0x03;
-    uint8_t lPS0_L2 = aPS0_L2 & 0xFF;
-
-    if( aFLLNum == 0 )
-        lPLLStartAddress = (uint32_t *)FLL1_START_ADDR;
-    else if( aFLLNum == 1 )
-        lPLLStartAddress = (uint32_t *)FLL2_START_ADDR;
-    else if( aFLLNum == 2 )
-        lPLLStartAddress = (uint32_t *)FLL3_START_ADDR;
-    else
-        lPLLStartAddress = (uint32_t *)NULL;
-
-    if( lPLLStartAddress != NULL )
-    {
-	    if( ( aRefFreqInMHz >= 5 ) && ( aRefFreqInMHz <= 500 ) )
-	    {
-	        if( ( aMultiplier > 0 ) && ( aMultiplier < 2048 ) )
-	        {
-	            if( aDivideRatio_R_Prescale < 16 )
-	            {
-                    *lPLLStartAddress |= (1 << 19);//Bypass on;
-                    *lPLLStartAddress |= (1 << 2);   //Reset high
-                    *lPLLStartAddress &= ~(1 << 2) ;//Reset low;
-                    *lPLLStartAddress &= ~(1 << 18); //PS0_EN is set to low
-                    *lPLLStartAddress |= (lPS0_L1 << 0);   //PS0_L1 0 which gives L01 = 1
-                    *lPLLStartAddress |= (lPS0_L2 << 4);   //PS0_L2_INT 0 and PS0_L2_FRAC 0 which gives L02 = 1
-                    *lPLLStartAddress |= (0 << 12);   //PS0_L2_INT 0 and PS0_L2_FRAC 0 which gives L02 = 1
-
-
-                    //FLL1 Config 1 register not configuring PS1
-                    *(lPLLStartAddress + 1) = 0;
-
-                    //FLL1 Config 2 register
-                    lCfgVal = 0;
-                    lCfgVal |= (aMultiplier << 4 ); //MULT_INT	0x28 = 40 (40*10 = 400MHz) Multiplier cannot hold 0
-                    lCfgVal |= (1 << 27 ); //INTEGER_MODE is enabled
-                    lCfgVal |= (aDivideRatio_R_Prescale << 28 ); //PRESCALE value (Divide Ratio R = 1)
-
-                    *(lPLLStartAddress + 2) = lCfgVal;
-
-                    //FLL1 Config 3 register not configuring SSC
-                    *(lPLLStartAddress + 3) = 0;
-
-                    //FLL1 Config 4 register
-                    *(lPLLStartAddress + 4) = 0x64;
-
-                    //FLL1 Config 5 register
-                    *(lPLLStartAddress + 5) = 0x269;
-
-                    *lPLLStartAddress |= (1<<2);   //Reset high
-                    *lPLLStartAddress |= (1<<18); //PS0_EN;
-                    //lCounter = 0;
-                    while ( (*(lPLLStartAddress+4) & 0x80000000) == 0 )  //Wait for lock detect to go high
-                    {
-                        lCounter++;
-                        if( lCounter >= 0x00010000)
-                        {
-                            lSts = 5;     //Unable to achieve lock
-                            lCounter = 0;
-                            break;
-                        }
-                    }
-                    if( lSts == 0 )
-                        *(lPLLStartAddress) &= ~(1<<19) ;//Bypass off;
-                }
-                else
-                {
-                    lSts = 1;   //aDivideRatio_R_Prescale
-                }
-            }
-            else
-            {
-                lSts = 2;   //Invalid aMultiplier
-            }
-        }
-        else
-        {
-            lSts = 3;   //Invalid reference freq
-        }
+	if( aFLLNum <= 2 ) {
+        lPLLStartAddress = (uint32_t *)(FLL_START_ADDR+(aFLLNum*32));
+        *lPLLStartAddress |= (1 << 19);//Bypass on;
+        *lPLLStartAddress &= ~(1 << 2) ;//Reset low;
     }
-    else
-    {
-        lSts = 4;   //Invalid PLL number
-    }
-    return lSts;
 }
 
 int main(void)
 {
-	int id = 1, i = 0;
+	int id = 1;
+    uint8_t i = 0;
 	unsigned int bootsel, flash_present;
 	char tstring[8];
 	uint32_t lCfgVal = 0;
 	//TODO: FLL clock settings need to be taken care in the actual chip.
 	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
 	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
+    for (i=0;i<3;i++)
+        setFLLInResetAndBypass(i);
 	bootsel = *(volatile int*)0x1c010000;
 	bootsel = psoc->bootsel & 0x1;
 
