@@ -292,7 +292,7 @@ module soc_peripherals #(
 
       .fll1_req   (soc_fll_master.req),
       .fll1_wrn   (soc_fll_master.wrn),
-      .fll1_add   (soc_fll_master.add[2:0]),
+      .fll1_add   (soc_fll_master.add[4:0]),
       .fll1_data  (soc_fll_master.data),
       .fll1_ack   (soc_fll_master.ack),
       .fll1_r_data(soc_fll_master.r_data),
@@ -300,7 +300,7 @@ module soc_peripherals #(
 
       .fll2_req   (per_fll_master.req),
       .fll2_wrn   (per_fll_master.wrn),
-      .fll2_add   (per_fll_master.add[2:0]),
+      .fll2_add   (per_fll_master.add[4:0]),
       .fll2_data  (per_fll_master.data),
       .fll2_ack   (per_fll_master.ack),
       .fll2_r_data(per_fll_master.r_data),
@@ -308,7 +308,7 @@ module soc_peripherals #(
 
       .fll3_req   (cluster_fll_master.req),
       .fll3_wrn   (cluster_fll_master.wrn),
-      .fll3_add   (cluster_fll_master.add[2:0]),
+      .fll3_add   (cluster_fll_master.add[4:0]),
       .fll3_data  (cluster_fll_master.data),
       .fll3_ack   (cluster_fll_master.ack),
       .fll3_r_data(cluster_fll_master.r_data),
@@ -660,7 +660,7 @@ module soc_peripherals #(
   i_apb_i2cs (
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(apb_reset),
-      .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),
+      .apb_paddr_i  (s_apb_i2cs_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
       .apb_pwrite_i (s_apb_i2cs_bus.pwrite),
       .apb_psel_i   (s_apb_i2cs_bus.psel),

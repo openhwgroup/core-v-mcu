@@ -40,9 +40,9 @@ module  apb_i2cs #(parameter APB_ADDR_WIDTH = 12) (
   output wire i2c_interrupt_o
 );
 
-  parameter [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 0;
-  parameter [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 0;
-  parameter [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 0;
+  localparam [7:0] I2C_DEFAULT_DEBOUNCE_LEN = 0;
+  localparam [7:0] I2C_DEFAULT_SCL_DELAY_LEN = 0;
+  localparam [7:0] I2C_DEFAULT_SDA_DELAY_LEN = 0;
   // internal versions of the I2C signals
   wire        i2c_scl_in;
   wire        i2c_sda_in;
