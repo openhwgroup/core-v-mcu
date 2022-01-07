@@ -131,10 +131,10 @@ module apb_fll_if
                   else state <= READ;
               end
               WRITE: begin
-                case (PADDR[APB_ADDR_WIDTH-1:0])
+                case (PADDR[APB_ADDR_WIDTH-1:5])
                   0: fll1_valid <= 1;
-                  32: fll2_valid <= 1;
-                  64: fll3_valid <= 1;
+                  1: fll2_valid <= 1;
+                  2: fll3_valid <= 1;
                 endcase // case (PADDR[3:2])
                 if (fll1_ack_sync | fll2_ack_sync | fll3_ack_sync) begin
                   write_ready <= 1;
@@ -142,16 +142,16 @@ module apb_fll_if
                 end
               end // case: WRITE
               READ: begin
-                case (PADDR[APB_ADDR_WIDTH-1:0])
+                case (PADDR[APB_ADDR_WIDTH-1:5])
                   0: begin
                     fll1_valid <= 1;
                     read_data <= fll1_r_data;
                   end
-                  32: begin
+                  1: begin
                     fll2_valid <= 1;
                     read_data <= fll2_r_data;
                   end
-                  64: begin
+                  2: begin
                     fll3_valid <= 1;
                     read_data <= fll3_r_data;
                   end
