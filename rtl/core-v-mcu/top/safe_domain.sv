@@ -11,11 +11,11 @@
 `include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 
-module safe_domain  (
-//    input  logic ref_clk_i,
-//    output logic slow_clk_o,
-//    output logic efpga_clk_o,
-//    input  logic bootsel_i,
+module safe_domain (
+    //    input  logic ref_clk_i,
+    //    output logic slow_clk_o,
+    //    output logic efpga_clk_o,
+    //    input  logic bootsel_i,
     input  logic rst_ni,
     output logic rst_no,
 
@@ -53,9 +53,9 @@ module safe_domain  (
 
   logic                    s_test_clk;
 
-//  logic                    s_rtc_int;
-//  logic                    s_gpio_wake;
-//  logic                    s_rstn_sync;
+  //  logic                    s_rtc_int;
+  //  logic                    s_gpio_wake;
+  //  logic                    s_rstn_sync;
   logic                    s_rstn;
 
 
@@ -91,7 +91,7 @@ module safe_domain  (
       .fpgaio_oe_i (fpgaio_oe_i)
   );
 
-/*
+  /*
 `ifndef PULP_FPGA_EMUL
   assign slow_clk_o = ref_clk_i;
   rstgen i_rstgen (

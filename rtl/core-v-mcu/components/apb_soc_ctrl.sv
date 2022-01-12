@@ -62,6 +62,7 @@ module apb_soc_ctrl #(
 ) (
     input logic HCLK,
     input logic HRESETn,
+    input       ref_clk_i,
 
     input  logic [APB_ADDR_WIDTH-1:0] PADDR,
     input  logic [              31:0] PWDATA,
@@ -147,6 +148,10 @@ module apb_soc_ctrl #(
   logic [             30:0]                   wd_count;
   logic                                       wd_enabled;
   logic [              1:0]                   reset_reason;
+  logic [             15:0]                   por_reg;
+
+  logic wd_reset, wd_cleared, reset_reason_clear;
+
 
   localparam FSM_IDLE = 0, FSM_READ = 1, FSM_WRITE = 2, FSM_WAIT = 3;
 
@@ -165,10 +170,37 @@ module apb_soc_ctrl #(
   assign n_cores = NB_CORES;
   assign n_clusters = NB_CLUSTERS;
 
+
+  always_ff @(posedge ref_clk_i, negedge HRESETn) begin
+    if (HRESETn == 0) begin
+      wd_current_count <= 32768;
+      wd_cleared <= 0;
+    end else begin
+      wd_cleared <= 0;
+      if (wd_reset == 1) begin
+        wd_current_count = wd_count;
+        wd_cleared <= 1;
+      end else if ((wd_enabled == 1) && (stoptimer_i == 0)) begin
+        wd_current_count = wd_current_count - 1;
+        wd_expired_o <= 1'b0;
+        if (wd_current_count == 1) begin
+          wd_expired_o <= 1'b1;
+        end
+      end
+    end  // else: !if(HRESETn  == 0)
+  end  // always_ff @ (posedge ref_clk_i, negedge HRESETn)
+
+  always_latch begin
+    if (HRESETn == 0) reset_reason[0] <= 1;
+    if (wd_expired_o == 1) reset_reason[1] <= 0;
+    if (reset_reason_clear == 0) reset_reason = 2'b00;
+  end
+
+
+
   always_ff @(posedge HCLK, negedge HRESETn) begin
     if (~HRESETn) begin
       wd_enabled <= 0;  // Watchdog disabled on power up.
-      wd_current_count <= 32768;
       wd_count <= 32768;
       wd_expired_o <= 0;
       APB_fsm <= FSM_IDLE;
@@ -195,21 +227,9 @@ module apb_soc_ctrl #(
       periph_rto_reg <= 32'h0;
       rto_o <= 1'b0;
       soft_reset_o <= 1'b0;
-      reset_reason <= {
-        (wd_expired_o | reset_reason[1]), ((!wd_expired_o & !reset_reason[1]) | reset_reason[0])
-      };
-
+      reset_reason_clear <= 0;
     end else begin  // if (~HRESETn)
-
-      wd_expired_o <= 1'b0;
-      if (wd_current_count == 0) begin
-        wd_expired_o <= 1'b1;
-        reset_reason <= 2'b0;
-      end
-      if ((wd_enabled == 1) && (stoptimer_i == 0)) begin
-        wd_current_count <= ref_clk_rising ? wd_current_count - 1 : wd_current_count;
-      end
-
+      if (wd_cleared == 1) wd_reset <= 0;
       if (start_rto_i == 1) ready_timeout_count <= ready_timeout_count - 1;
       else ready_timeout_count <= rto_count_reg[19:0];
       if (ready_timeout_count == 0) rto_o <= 1'b1;
@@ -220,9 +240,13 @@ module apb_soc_ctrl #(
       r_jtag_regi_sync[0] <= r_jtag_regi_sync[1];
 
       soft_reset_o <= 0;
+      reset_reason_clear <= 0;
 
       case (APB_fsm)
         FSM_WAIT: begin
+          casex (PADDR[11:0])
+            `REG_RESET_REASON: reset_reason_clear = 1;
+          endcase
           PREADY  <= 0;
           APB_fsm <= FSM_IDLE;
         end
@@ -250,13 +274,13 @@ module apb_soc_ctrl #(
             `REG_WD_CONTROL: begin
               if (PWDATA[31] == 1'b1) begin
                 wd_enabled <= 1;
-                wd_current_count <= wd_count;
+                wd_reset   <= 1;
               end
               if (wd_enabled) begin
-                if (PWDATA[15:0] == 16'h6699) wd_current_count <= wd_count;
+                if (PWDATA[15:0] == 16'h6699) wd_reset <= 1;
+
               end
             end
-            `REG_RESET_REASON: reset_reason <= 2'b0;
             `RTO_PERIPHERAL: periph_rto_reg <= 32'h0;
             `RTO_COUNT: rto_count_reg <= {PWDATA[19:4], 4'hf};
             `RESET_TYPE1_EFPGA: r_reset_type1_efpga <= PWDATA[3:0];

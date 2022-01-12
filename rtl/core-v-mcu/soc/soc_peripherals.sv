@@ -656,8 +656,9 @@ module soc_peripherals #(
   // ╚═╝  ╚═╝╚═╝     ╚═════╝                                   //
   ///////////////////////////////////////////////////////////////
 
-  apb_i2cs  #(.APB_ADDR_WIDTH(APB_ADDR_WIDTH))
-  i_apb_i2cs (
+  apb_i2cs #(
+      .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
+  ) i_apb_i2cs (
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(apb_reset),
       .apb_paddr_i  (s_apb_i2cs_bus.paddr[APB_ADDR_WIDTH-1:0]),

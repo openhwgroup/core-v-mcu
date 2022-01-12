@@ -194,11 +194,12 @@ void setFLLInResetAndBypass(uint8_t aFLLNum)
 
 int main(void)
 {
-    uint8_t i = 0, flash_present = 0;
-    uint32_t bootsel = 0;
+	int id = 1;
+    uint8_t i = 0;
     uint32_t lFlashID = 0;
+	unsigned int bootsel, flash_present, resetreason;
 	char tstring[8] = {0};
-	volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
+    volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
 
 	//TODO: FLL clock settings need to be taken care in the actual chip.
 	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
@@ -206,6 +207,8 @@ int main(void)
 	//Set soc clock, peripheral clock and cluster clock in reset and bypass mode.
     for (i=0;i<3;i++)
         setFLLInResetAndBypass(i);
+	resetreason = psoc->reset_reason;
+	bootsel = psoc->bootsel & 0x1;
 
 	bootsel = psoc->bootsel & 0x1;	//This reads the bootsel pin status
 
@@ -223,13 +226,10 @@ int main(void)
 	dbg_str(__TIME__);
 	dbg_str("\nA2 Bootloader Bootsel=");
 
-    if (bootsel == 1)
-    	dbg_str("1 ");
-	else
-		dbg_str("0 ");
-
-    //For verilator we do not have a SPI flash model.
-    //So we jump directly to the app in verilator simulation
+    if (bootsel == 1) dbg_str("1 ");
+	else dbg_str("0 ");
+    dbg_str("rr=");
+    dbg_hex8(resetreason);
 #ifdef VERILATOR
 	dbg_str("\nJumping to address 0x1C000880");
 	jump_to_address(0x1C000880);
