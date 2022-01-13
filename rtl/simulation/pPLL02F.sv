@@ -64,11 +64,11 @@ module pPLL02F (
   always @(posedge CK_XTAL_IN or negedge RST_N) begin
     if (RST_N == 0) begin
       counter <= 0;
-      clkOut  <= 0;
+      clkInternal <= 0;
     end else begin
       counter <= counter + 1;
       if (counter == PS0_L2) begin
-        clkOut  <= ~clkOut;
+        clkInternal  <= ~clkInternal;
         counter <= 0;
       end
     end  // else: !if(RST_N == 0)
