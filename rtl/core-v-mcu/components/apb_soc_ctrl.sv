@@ -245,7 +245,7 @@ module apb_soc_ctrl #(
       case (APB_fsm)
         FSM_WAIT: begin
           casex (PADDR[11:0])
-            `REG_RESET_REASON: reset_reason_clear = 1;
+            `REG_RESET_REASON: reset_reason_clear <= 1;
           endcase
           PREADY  <= 0;
           APB_fsm <= FSM_IDLE;
