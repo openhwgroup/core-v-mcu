@@ -53,7 +53,7 @@ module clk_and_control (
   logic        s_INTEGER_MODE;
   logic [ 3:0] s_PRESCALE;
 
-  logic [ 9:0] s_LDET_CONFIG;
+  logic [ 8:0] s_LDET_CONFIG;
   logic        s_SSC_EN;
   logic [ 7:0] s_SSC_STEP;
   logic [10:0] s_SSC_PERIOD;

@@ -12,7 +12,7 @@
 // language governing permissions and limitations under the License.
 // -----------------------------------------------------------------------------
 
-module pPLL02F_x (
+module pPLL02F (
     input wire RST_N,  //Reset - asserted low
 
 
@@ -53,8 +53,12 @@ module pPLL02F_x (
 );
 
   logic       clk;
+  logic       clkInternal;
   logic       clkOut;
   logic [7:0] counter;
+  assign LOCKED = 1'b1;
+  assign clkOut = ( PS0_L2 == 8'h1 ) ? clk : clkInternal;
+  
 `ifdef VERILATOR
   always @(posedge CK_XTAL_IN or negedge RST_N) begin
     if (RST_N == 0) begin
@@ -70,17 +74,24 @@ module pPLL02F_x (
   end  // always @ (posedge ref_clk_i or negedge RST_N)
 `else
   initial counter = 0;
-  initial clkOut = 0;
+  initial clkInternal = 0;
   initial clk = 0;
-  //initial forever #(1.25) clk = ~clk;
-  //always @(posedge clk) begin
-  always @(posedge CK_XTAL_IN) begin
-    counter <= counter + 1;
-    if (counter == PS0_L2) begin
-      clkOut  <= ~clkOut;
-      counter <= 0;
+  initial forever #(1.25) clk = ~clk;
+    always @(posedge clk) begin
+        //always @(posedge CK_XTAL_IN) begin
+        counter <= counter + 1;
+        case (PS0_L2)
+            0,1,2: clkInternal  <= ~clkInternal;
+            default: begin
+                if( counter == ((PS0_L2 -1) >> 1))
+                    clkInternal <= 1;
+                if (counter == (PS0_L2 - 1) ) begin
+                    clkInternal  <= ~clkInternal;
+                    counter <= 0;
+                end
+            end
+        endcase
     end
-  end
 `endif
 
   assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : clkOut;

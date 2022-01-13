@@ -148,7 +148,6 @@ module apb_soc_ctrl #(
   logic [             30:0]                   wd_count;
   logic                                       wd_enabled;
   logic [              1:0]                   reset_reason;
-  logic [             15:0]                   por_reg;
 
   logic wd_reset, wd_cleared, reset_reason_clear;
 
@@ -171,17 +170,17 @@ module apb_soc_ctrl #(
   assign n_clusters = NB_CLUSTERS;
 
 
-  always_ff @(posedge ref_clk_i, negedge HRESETn) begin
+  always_ff @(posedge ref_clk_i or negedge HRESETn) begin
     if (HRESETn == 0) begin
       wd_current_count <= 32768;
       wd_cleared <= 0;
     end else begin
       wd_cleared <= 0;
       if (wd_reset == 1) begin
-        wd_current_count = wd_count;
+        wd_current_count <= wd_count;
         wd_cleared <= 1;
       end else if ((wd_enabled == 1) && (stoptimer_i == 0)) begin
-        wd_current_count = wd_current_count - 1;
+        wd_current_count <= wd_current_count - 1;
         wd_expired_o <= 1'b0;
         if (wd_current_count == 1) begin
           wd_expired_o <= 1'b1;
@@ -191,9 +190,9 @@ module apb_soc_ctrl #(
   end  // always_ff @ (posedge ref_clk_i, negedge HRESETn)
 
   always_latch begin
-    if (HRESETn == 0) reset_reason[0] <= 1;
+    if (HRESETn == 0) reset_reason <= reset_reason[1] ? 2'b10 : 2'b00;
     if (wd_expired_o == 1) reset_reason[1] <= 0;
-    if (reset_reason_clear == 0) reset_reason = 2'b00;
+    if (reset_reason_clear == 1) reset_reason = 2'b00;
   end
 
 
@@ -228,6 +227,7 @@ module apb_soc_ctrl #(
       rto_o <= 1'b0;
       soft_reset_o <= 1'b0;
       reset_reason_clear <= 0;
+      wd_reset <= 0;
     end else begin  // if (~HRESETn)
       if (wd_cleared == 1) wd_reset <= 0;
       if (start_rto_i == 1) ready_timeout_count <= ready_timeout_count - 1;

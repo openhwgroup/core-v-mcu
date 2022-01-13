@@ -90,8 +90,8 @@ filesets:
 
   rtl-simulation:
     files:
-    - rtl/simulation/pd_gf22_PLL02_model.v
-#    - rtl/simulation/pPLL02F.sv
+#    - rtl/simulation/pd_gf22_PLL02_model.v
+    - rtl/simulation/pPLL02F.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
@@ -245,7 +245,7 @@ targets:
     tools:
       modelsim:
         vlog_options:
-        - -override_timescale 1fs/1fs
+        - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"

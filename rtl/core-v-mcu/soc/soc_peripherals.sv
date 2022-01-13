@@ -436,7 +436,7 @@ module soc_peripherals #(
   ) i_apb_soc_ctrl (
       .HCLK   (clk_i),
       .HRESETn(rst_ni),
-
+      .ref_clk_i(ref_clk_i),
       .PADDR  (s_soc_ctrl_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_ctrl_bus.pwdata),
       .PWRITE (s_soc_ctrl_bus.pwrite),
