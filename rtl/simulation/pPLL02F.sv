@@ -68,7 +68,7 @@ module pPLL02F (
     end else begin
       counter <= counter + 1;
       if (counter == PS0_L2) begin
-        clkInternal  <= ~clkInternal;
+        clkInternal <= ~clkInternal;
         counter <= 0;
       end
     end  // else: !if(RST_N == 0)
