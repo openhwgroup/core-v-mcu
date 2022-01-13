@@ -56,9 +56,10 @@ module pPLL02F (
   logic       clkInternal;
   logic       clkOut;
   logic [7:0] counter;
+
   assign LOCKED = 1'b1;
-  assign clkOut = ( PS0_L2 == 8'h1 ) ? clk : clkInternal;
-  
+  assign clkOut = (PS0_L2 == 8'h1) ? clk : clkInternal;
+
 `ifdef VERILATOR
   always @(posedge CK_XTAL_IN or negedge RST_N) begin
     if (RST_N == 0) begin
@@ -77,23 +78,22 @@ module pPLL02F (
   initial clkInternal = 0;
   initial clk = 0;
   initial forever #(1.25) clk = ~clk;
-    always @(posedge clk) begin
-        //always @(posedge CK_XTAL_IN) begin
-        counter <= counter + 1;
-        case (PS0_L2)
-            0,1,2: clkInternal  <= ~clkInternal;
-            default: begin
-                if( counter == ((PS0_L2 -1) >> 1))
-                    clkInternal <= 1;
-                if (counter == (PS0_L2 - 1) ) begin
-                    clkInternal  <= ~clkInternal;
-                    counter <= 0;
-                end
-            end
-        endcase
-    end
+  always @(posedge clk) begin
+    //always @(posedge CK_XTAL_IN) begin
+    counter <= counter + 1;
+    case (PS0_L2)
+      0, 1, 2: clkInternal <= ~clkInternal;
+      default: begin
+        if (counter == ((PS0_L2 - 1) >> 1)) clkInternal <= 1;
+        if (counter == (PS0_L2 - 1)) begin
+          clkInternal <= ~clkInternal;
+          counter <= 0;
+        end
+      end
+    endcase
+  end
 `endif
 
-  assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : clkOut;
+  assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : RST_N ? clkOut : 1'b0;
 
 endmodule  // pPLL02F

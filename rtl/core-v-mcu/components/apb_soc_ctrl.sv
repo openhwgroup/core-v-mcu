@@ -60,10 +60,10 @@ module apb_soc_ctrl #(
     parameter int unsigned N_IO = 64,  // not used... see pulp_soc_defines
     parameter int unsigned IO_IDX_WIDTH = 6  // not used (LOG2 macro below)
 ) (
-    input logic HCLK,
-    input logic HRESETn,
-    input       ref_clk_i,
-
+    input  logic                      HCLK,
+    input  logic                      HRESETn,
+    input                             ref_clk_i,
+    input                             rstpin_ni,
     input  logic [APB_ADDR_WIDTH-1:0] PADDR,
     input  logic [              31:0] PWDATA,
     input  logic                      PWRITE,
@@ -77,7 +77,6 @@ module apb_soc_ctrl #(
     input  logic        bootsel_i,
     input        [31:0] status_out,
     input        [ 7:0] version,
-    input               ref_clk_rising,
     input               stoptimer_i,
     input               dmactive_i,
     output logic        wd_expired_o,
@@ -170,12 +169,14 @@ module apb_soc_ctrl #(
   assign n_clusters = NB_CLUSTERS;
 
 
-  always_ff @(posedge ref_clk_i or negedge HRESETn) begin
-    if (HRESETn == 0) begin
+  always_ff @(posedge ref_clk_i or negedge rstpin_ni) begin
+    if (rstpin_ni == 0) begin
       wd_current_count <= 32768;
       wd_cleared <= 0;
+      wd_expired_o <= 0;
     end else begin
-      wd_cleared <= 0;
+      wd_expired_o <= 0;
+      wd_cleared   <= 0;
       if (wd_reset == 1) begin
         wd_current_count <= wd_count;
         wd_cleared <= 1;
@@ -190,18 +191,17 @@ module apb_soc_ctrl #(
   end  // always_ff @ (posedge ref_clk_i, negedge HRESETn)
 
   always_latch begin
-    if (HRESETn == 0) reset_reason <= reset_reason[1] ? 2'b10 : 2'b00;
-    if (wd_expired_o == 1) reset_reason[1] <= 0;
+    if (rstpin_ni == 0) reset_reason <= 2'b01;
+    if (wd_expired_o == 1) reset_reason <= 2'b10;
     if (reset_reason_clear == 1) reset_reason = 2'b00;
   end
 
 
 
-  always_ff @(posedge HCLK, negedge HRESETn) begin
+  always_ff @(posedge HCLK or negedge HRESETn) begin
     if (~HRESETn) begin
       wd_enabled <= 0;  // Watchdog disabled on power up.
       wd_count <= 32768;
-      wd_expired_o <= 0;
       APB_fsm <= FSM_IDLE;
       r_io_pad <= '0;
       r_padmux <= '0;

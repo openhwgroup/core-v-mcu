@@ -90,7 +90,6 @@ filesets:
 
   rtl-simulation:
     files:
-#    - rtl/simulation/pd_gf22_PLL02_model.v
     - rtl/simulation/pPLL02F.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v

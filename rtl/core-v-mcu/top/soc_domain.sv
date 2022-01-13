@@ -329,6 +329,7 @@ module soc_domain
       .clk_i          (s_soc_clk),
       .periph_clk_i   (s_periph_clk),
       .rst_ni         (s_soc_rstn),
+      .rstpin_ni      (rstn_glob_i),
       .sel_fll_clk_i  (s_sel_fll_clk),
       .ref_clk_i      (ref_clk_i),
       .dmactive_i     (s_dmactive),

@@ -24,6 +24,7 @@ module soc_peripherals #(
     input  logic                 periph_clk_i,
     input  logic                 fpga_clk_in,
     input  logic                 rst_ni,
+    input  logic                 rstpin_ni,
     input  logic                 ref_clk_i,
     input  logic                 dmactive_i,
     input  logic                 sel_fll_clk_i,
@@ -436,6 +437,7 @@ module soc_peripherals #(
   ) i_apb_soc_ctrl (
       .HCLK   (clk_i),
       .HRESETn(rst_ni),
+      .rstpin_ni(rstpin_ni),
       .ref_clk_i(ref_clk_i),
       .PADDR  (s_soc_ctrl_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_ctrl_bus.pwdata),
@@ -475,7 +477,6 @@ module soc_peripherals #(
 
       .fc_fetchen_o    (fc_fetchen_o),
       .stoptimer_i     (stoptimer_i),
-      .ref_clk_rising  (s_ref_rise_event),
       .wd_expired_o    (wd_expired_o),
       .rto_o           (s_rto),
       .start_rto_i     (s_start_rto),
