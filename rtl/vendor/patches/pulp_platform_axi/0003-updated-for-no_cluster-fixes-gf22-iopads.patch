@@ -1,0 +1,48 @@
+From 0286899cdadb83b3d2074b5607ace35e3ae4ba03 Mon Sep 17 00:00:00 2001
+From: Greg Martin <gmartin@quicklogic.com>
+Date: Tue, 21 Dec 2021 09:11:49 -0600
+Subject: [PATCH 01/29] updated for no_cluster fixes gf22 iopads
+
+Signed-off-by: Greg Martin <gmartin@quicklogic.com>
+---
+ src/axi_xbar.sv | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 rtl/vendor/pulp_platform_axi/src/axi_xbar.sv
+
+diff --git a/src/axi_xbar.sv b/src/axi_xbar.sv
+old mode 100644
+new mode 100755
+index ae1e6ec..ef0cb84
+--- a/src/axi_xbar.sv
++++ b/src/axi_xbar.sv
+@@ -42,7 +42,7 @@ module axi_xbar #(
+   input  mst_resp_t [Cfg.NoMstPorts-1:0]                             mst_ports_resp_i,
+   input  rule_t     [Cfg.NoAddrRules-1:0]                            addr_map_i,
+   input  logic      [Cfg.NoSlvPorts-1:0]                             en_default_mst_port_i,
+-  input  logic      [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts)-1:0] default_mst_port_i
++  input  logic      [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts+1)-1:0] default_mst_port_i
+ );
+
+   typedef logic [Cfg.AxiAddrWidth-1:0]           addr_t;
+@@ -61,7 +61,8 @@ module axi_xbar #(
+   slv_resp_t [Cfg.NoMstPorts-1:0][Cfg.NoSlvPorts-1:0] mst_resps;
+
+   for (genvar i = 0; i < Cfg.NoSlvPorts; i++) begin : gen_slv_port_demux
+-    logic [$clog2(Cfg.NoMstPorts)-1:0] dec_aw,        dec_ar;
++    logic [$clog2(Cfg.NoMstPorts+1)-1:0] dec_aw,        dec_ar;
++
+     mst_port_idx_t                     slv_aw_select, slv_ar_select;
+     logic                              dec_aw_valid,  dec_aw_error;
+     logic                              dec_ar_valid,  dec_ar_error;
+@@ -250,7 +251,7 @@ module axi_xbar_intf #(
+   AXI_BUS.Master                                                  mst_ports [Cfg.NoMstPorts-1:0],
+   input  rule_t [Cfg.NoAddrRules-1:0]                             addr_map_i,
+   input  logic  [Cfg.NoSlvPorts-1:0]                              en_default_mst_port_i,
+-  input  logic  [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts)-1:0]  default_mst_port_i
++  input  logic  [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts+1)-1:0]  default_mst_port_i
+ );
+
+   localparam int unsigned AxiIdWidthMstPorts = Cfg.AxiIdWidthSlvPorts + $clog2(Cfg.NoSlvPorts);
+--
+2.32.0 (Apple Git-132)
+
