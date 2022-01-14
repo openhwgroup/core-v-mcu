@@ -192,8 +192,8 @@ module apb_soc_ctrl #(
 
   always_latch begin
     if (rstpin_ni == 0) reset_reason <= 2'b01;
-    if (wd_expired_o == 1) reset_reason <= 2'b10;
-    if (reset_reason_clear == 1) reset_reason = 2'b00;
+    else if (wd_expired_o == 1) reset_reason <= 2'b10;
+    else if (reset_reason_clear == 1) reset_reason <= 2'b00;
   end
 
 
