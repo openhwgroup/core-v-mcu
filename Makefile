@@ -94,6 +94,7 @@ nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*                                   *"
 				@echo "*************************************"
 				mkdir -p emulation/core-v-mcu-nexys/rtl
+				util/format-verible
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
