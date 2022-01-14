@@ -47,9 +47,8 @@ Register,Offset/Field,MSB,LSB,Type,Default,Description
 0x00D0,WD_COUNT,,,,,Watch Dog Count register (number of Ref clocks before Watchdog expires)
 ,COUNT,30,0,R/W,0x8000,Only writable before Watchdog is enabled
 0x00D4,WD_CONTROL,,,,,Watchdog Control
-,ENABLE_STATUS,31,31,R0,,"1=Watchdog Enabled, 0=Watchdog not enabled"
+,ENABLE_STATUS,31,31,R0,,"1=Watchdog Enabled, 0=Watchdog not enabled,Enabled Watch dog, once enable, cannot be disabled "
 ,WD_VALUE,15,0,WO,NA,"Set to 0x6699 to reset watchdog when enabled, read current WD value"
-,ENABLE_WD,0,0,WO,,"Enabled Watch dog,, once enable, cannot be disabled"
 0x00D8,RESET_REASON,,,,,Reset for most reset reset
 ,REASON,1,0,R/W,,"2'b01= reset pin, 2'b11=Watchdog expired"
 0x00E0,RTO_PERIPHERAL_ERROR,,,,,Indicates which APB peripheral cause a ready timeout error

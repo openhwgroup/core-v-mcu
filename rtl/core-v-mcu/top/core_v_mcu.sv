@@ -52,7 +52,7 @@ module core_v_mcu #(
 
 
 
-  logic                                   s_ref_clk;
+  //  logic                                   s_ref_clk;
   logic                                   s_clk_in;  // clock in from pad
   logic                                   s_rstn;
   logic                                   s_pad_rstn;
@@ -72,15 +72,15 @@ module core_v_mcu #(
   //
 
   logic                                   s_test_clk;
-  logic                                   s_slow_clk;
+  //  logic                                   s_slow_clk;
 
-  logic                                   s_sel_fll_clk;
+  //  logic                                   s_sel_fll_clk;
 
-  logic [         11:0]                   s_pm_cfg_data;
-  logic                                   s_pm_cfg_req;
-  logic                                   s_pm_cfg_ack;
+  //  logic [         11:0]                   s_pm_cfg_data;
+  //  logic                                   s_pm_cfg_req;
+  //  logic                                   s_pm_cfg_ack;
 
-  logic                                   s_cluster_busy;
+  //  logic                                   s_cluster_busy;
 
   logic                                   s_soc_tck;
   logic                                   s_soc_trstn;
@@ -189,21 +189,21 @@ module core_v_mcu #(
   logic                                   s_cam_vsync;
 
  -----/\----- EXCLUDED -----/\----- */
-  logic                                   s_jtag_shift_dr;
-  logic                                   s_jtag_update_dr;
-  logic                                   s_jtag_capture_dr;
+  //  logic                                   s_jtag_shift_dr;
+  //  logic                                   s_jtag_update_dr;
+  //  logic                                   s_jtag_capture_dr;
 
-  logic                                   s_axireg_sel;
-  logic                                   s_axireg_tdi;
-  logic                                   s_axireg_tdo;
+  //  logic                                   s_axireg_sel;
+  //  logic                                   s_axireg_tdi;
+  //  logic                                   s_axireg_tdo;
 
-  logic [          7:0]                   s_soc_jtag_regi;
-  logic [          7:0]                   s_soc_jtag_rego;
+  //  logic [          7:0]                   s_soc_jtag_regi;
+  //  logic [          7:0]                   s_soc_jtag_rego;
 
   logic                                   s_rstn_por;
 
-  logic                                   s_dma_pe_irq_ack;
-  logic                                   s_dma_pe_irq_valid;
+  //  logic                                   s_dma_pe_irq_ack;
+  //  logic                                   s_dma_pe_irq_valid;
 
   logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
   //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
@@ -242,12 +242,12 @@ module core_v_mcu #(
   //
   // PULPissimo doens't have a cluster so we ignore them
 
-  logic                                   s_dma_pe_evt_ack;
-  logic                                   s_dma_pe_evt_valid;
-  logic                                   s_dma_pe_int_ack;
-  logic                                   s_dma_pe_int_valid;
-  logic                                   s_pf_evt_ack;
-  logic                                   s_pf_evt_valid;
+  //  logic                                   s_dma_pe_evt_ack;
+  //  logic                                   s_dma_pe_evt_valid;
+  //  logic                                   s_dma_pe_int_ack;
+  //  logic                                   s_dma_pe_int_valid;
+  //  logic                                   s_pf_evt_ack;
+  //  logic                                   s_pf_evt_valid;
 
 
 
@@ -258,17 +258,14 @@ module core_v_mcu #(
   //
   // SAFE DOMAIN
   //
-  safe_domain #(
-      .FLL_DATA_WIDTH(32),
-      .FLL_ADDR_WIDTH(2)
-  ) i_safe_domain (
+  safe_domain i_safe_domain (
 
-      .ref_clk_i  (ref_clk_i),
-      .slow_clk_o (s_ref_clk),
-      .efpga_clk_o(s_efpga_clk),
+      //      .ref_clk_i  (ref_clk_i),
+      //      .slow_clk_o (s_ref_clk),
+      //      .efpga_clk_o(s_efpga_clk),
       //      .bootsel_i  (bootsel_i),
-      .rst_ni     (rstn_i),
-      .rst_no     (s_rstn_por),
+      .rst_ni(rstn_i),
+      .rst_no(s_rstn_por),
 
       // PAD control signals
       //      .pad_cfg_o      (s_pad_cfg),
@@ -377,13 +374,13 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-      .selected_mode_i   ('0),
-      .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
-      .dma_pe_evt_valid_i(s_dma_pe_evt_valid),
-      .dma_pe_irq_ack_o  (s_dma_pe_irq_ack),
-      .dma_pe_irq_valid_i(s_dma_pe_irq_valid),
-      .pf_evt_ack_o      (s_pf_evt_ack),
-      .pf_evt_valid_i    (s_pf_evt_valid),
+      //    .selected_mode_i   ('0),
+      //      .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
+      //      .dma_pe_evt_valid_i(s_dma_pe_evt_valid),
+      //      .dma_pe_irq_ack_o  (s_dma_pe_irq_ack),
+      //      .dma_pe_irq_valid_i(s_dma_pe_irq_valid),
+      //      .pf_evt_ack_o      (s_pf_evt_ack),
+      //      .pf_evt_valid_i    (s_pf_evt_valid),
 
       //eFPGA TEST MODE
       .testio_i(testio_i),
@@ -391,14 +388,14 @@ module core_v_mcu #(
 
   );
 
-  assign s_test_mode        = '0;
-  assign s_dft_cg_enable    = '0;
-  assign s_test_clk         = '0;
+  assign s_test_mode     = '0;
+  assign s_dft_cg_enable = '0;
+  assign s_test_clk      = '0;
 
 
-  assign s_dma_pe_evt_valid = '0;
-  assign s_dma_pe_irq_valid = '0;
-  assign s_pf_evt_valid     = '0;
-  assign s_cluster_busy     = '0;
+  //  assign s_dma_pe_evt_valid = '0;
+  //  assign s_dma_pe_irq_valid = '0;
+  //  assign s_pf_evt_valid     = '0;
+  //  assign s_cluster_busy     = '0;
 
 endmodule

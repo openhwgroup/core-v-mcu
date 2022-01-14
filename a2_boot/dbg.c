@@ -1,13 +1,15 @@
+#include <stdint.h>
 
+uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer);
 
 void dbg_ch_raw( int c )
 {
-    	udma_uart_writeraw(1, 1, &c);
+	udma_uart_writeraw(1, 1, (uint8_t *)&c);
 }
 
 void dbg_nl( void )
 {
-    dbg_ch_raw('\r');
+	dbg_ch_raw('\r');
     dbg_ch_raw('\n');
 }
 

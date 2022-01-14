@@ -26,8 +26,8 @@
 `include "tcdm_macros.svh"
 
 module interleaved_crossbar #(
-    parameter int unsigned NR_MASTER_PORTS,
-    parameter int unsigned NR_SLAVE_PORTS  //Must be a power of two
+    parameter int unsigned NR_MASTER_PORTS = 2,
+    parameter int unsigned NR_SLAVE_PORTS  = 2  //Must be a power of two
 ) (
     input logic clk_i,
     input logic rst_ni,

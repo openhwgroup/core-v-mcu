@@ -54,12 +54,12 @@ module soc_domain
     input  logic                               dft_test_mode_i,
     input  logic                               dft_cg_enable_i,
     input  logic                               bootsel_i,
-    output logic                               dma_pe_evt_ack_o,
-    input  logic                               dma_pe_evt_valid_i,
-    output logic                               dma_pe_irq_ack_o,
-    input  logic                               dma_pe_irq_valid_i,
-    output logic                               pf_evt_ack_o,
-    input  logic                               pf_evt_valid_i,
+    //    output logic                               dma_pe_evt_ack_o,
+    //    input  logic                               dma_pe_evt_valid_i,
+    //    output logic                               dma_pe_irq_ack_o,
+    //    input  logic                               dma_pe_irq_valid_i,
+    //    output logic                               pf_evt_ack_o,
+    //    input  logic                               pf_evt_valid_i,
     ///////////////////////////////////////////////////
     //      To I/O Controller and padframe           //
     ///////////////////////////////////////////////////
@@ -81,7 +81,7 @@ module soc_domain
     ///////////////////////////////////////////////////
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
-    input  logic [          1:0] selected_mode_i,
+    //    input  logic [          1:0] selected_mode_i,
 
 
     //eFPGA SPIS
@@ -319,7 +319,7 @@ module soc_domain
 
   soc_peripherals #(
       .MEM_ADDR_WIDTH(L2_MEM_ADDR_WIDTH + $clog2(NB_L2_BANKS)),
-      .APB_ADDR_WIDTH(32),
+      .APB_ADDR_WIDTH(12),
       .APB_DATA_WIDTH(32),
       .NB_CORES      (NB_CORES),
       .NB_CLUSTERS   (`NB_CLUSTERS),
@@ -329,6 +329,7 @@ module soc_domain
       .clk_i          (s_soc_clk),
       .periph_clk_i   (s_periph_clk),
       .rst_ni         (s_soc_rstn),
+      .rstpin_ni      (rstn_glob_i),
       .sel_fll_clk_i  (s_sel_fll_clk),
       .ref_clk_i      (ref_clk_i),
       .dmactive_i     (s_dmactive),
@@ -441,7 +442,7 @@ module soc_domain
 
       .soc_fll_slave_req_i   (s_soc_fll_master.req),
       .soc_fll_slave_wrn_i   (s_soc_fll_master.wrn),
-      .soc_fll_slave_add_i   (s_soc_fll_master.add[1:0]),
+      .soc_fll_slave_add_i   (s_soc_fll_master.add[4:0]),
       .soc_fll_slave_data_i  (s_soc_fll_master.data),
       .soc_fll_slave_ack_o   (s_soc_fll_master.ack),
       .soc_fll_slave_r_data_o(s_soc_fll_master.r_data),
@@ -449,7 +450,7 @@ module soc_domain
 
       .per_fll_slave_req_i   (s_per_fll_master.req),
       .per_fll_slave_wrn_i   (s_per_fll_master.wrn),
-      .per_fll_slave_add_i   (s_per_fll_master.add[1:0]),
+      .per_fll_slave_add_i   (s_per_fll_master.add[4:0]),
       .per_fll_slave_data_i  (s_per_fll_master.data),
       .per_fll_slave_ack_o   (s_per_fll_master.ack),
       .per_fll_slave_r_data_o(s_per_fll_master.r_data),
@@ -457,7 +458,7 @@ module soc_domain
 
       .cluster_fll_slave_req_i   (s_cluster_fll_master.req),
       .cluster_fll_slave_wrn_i   (s_cluster_fll_master.wrn),
-      .cluster_fll_slave_add_i   (s_cluster_fll_master.add[1:0]),
+      .cluster_fll_slave_add_i   (s_cluster_fll_master.add[4:0]),
       .cluster_fll_slave_data_i  (s_cluster_fll_master.data),
       .cluster_fll_slave_ack_o   (s_cluster_fll_master.ack),
       .cluster_fll_slave_r_data_o(s_cluster_fll_master.r_data),
