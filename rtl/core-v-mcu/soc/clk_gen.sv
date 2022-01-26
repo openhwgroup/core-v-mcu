@@ -20,7 +20,7 @@
 
 module clk_gen (
     input  logic        ref_clk_i,
-    input               emul_clk_i,
+    input        [ 1:0] emul_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
     input  logic        shift_enable_i,

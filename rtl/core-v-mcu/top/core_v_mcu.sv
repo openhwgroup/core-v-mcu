@@ -21,6 +21,7 @@ module core_v_mcu #(
     input                                jtag_tms_i,
     input                                jtag_trst_i,
     input                                ref_clk_i,
+    output                               slow_clk_o,
     input                                rstn_i,
     input                                bootsel_i,
     input                                stm_i,
@@ -346,6 +347,7 @@ module core_v_mcu #(
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
       .ref_clk_i(ref_clk_i),
+      .slow_clk_o(slow_clk_o),
       .sclk_in(io_in_i[5]),  // only used in fpga emulation for FLL
       .test_clk_i(s_test_clk),
       .rstn_glob_i(s_rstn_por),

@@ -9,7 +9,7 @@ CSV_MIRROR_DIR=csv-mirror/
 DEF_FILES=../rtl/includes/pulp_soc_defines.svh\
 					../rtl/includes/pulp_peripheral_defines.svh\
 					../rtl/includes/periph_bus_defines.svh\
-					../pin-table.csv\
+					../nexys-pin-table.csv\
 					../perdef.json
 FOO=$(shell find ../rtl -name '*.csv' -exec mkdir -p ${CSV_MIRROR_DIR} \; -exec cp {} ${CSV_MIRROR_DIR} \;)
 $(info ${FOO})
@@ -34,7 +34,7 @@ ${HDR_DIR}/core-v-mcu-config.h:	${DEF_FILES}
 					--soc-defines ../rtl/includes/pulp_soc_defines.svh\
 					--periph-bus-defines ../rtl/includes/periph_bus_defines.svh\
 					--peripheral-defines ../rtl/includes/pulp_peripheral_defines.svh\
-					--pin-table ../pin-table.csv\
+					--pin-table ../nexys-pin-table.csv\
 					--perdef-json ../perdef.json\
 					--cvmcu-h $@
 
