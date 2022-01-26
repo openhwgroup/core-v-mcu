@@ -25,7 +25,7 @@ module tcdm_demux
   import pkg_soc_interconnect::addr_map_rule_t;
 #(
     parameter int unsigned NR_OUTPUTS = 2,
-    parameter int unsigned NR_ADDR_MAP_RULES,
+    parameter int unsigned NR_ADDR_MAP_RULES = 2,
     localparam int unsigned SLAVE_SEL_WIDTH = $clog2(NR_OUTPUTS)
 ) (
     input logic                                        clk_i,

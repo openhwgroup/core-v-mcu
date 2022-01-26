@@ -1,0 +1,7 @@
+xmverilog(64): 20.09-s011: (c) Copyright 1995-2021 Cadence Design Systems, Inc.
+TOOL:	xmverilog	20.09-s011: Started on Dec 21, 2021 at 11:57:46 PST
+xmverilog
+	+xm64bit
+	+gui
+xmverilog: *E,NOMOPT: You have not specified a -R (or a -r <snapshot>) option, nor have you specified a source file for compilation.
+TOOL:	xmverilog	20.09-s011: Exiting on Dec 21, 2021 at 11:57:46 PST  (total: 00:00:00)

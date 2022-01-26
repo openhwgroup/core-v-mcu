@@ -13,88 +13,87 @@
 // -----------------------------------------------------------------------------
 
 module pPLL02F (
-    input       rstn,
-    input logic PWRDN,
-    //Clock Inputs
-    input logic CK_XTAL_IN,
-    input logic CK_AUX_IN,
+    input wire RST_N,  //Reset - asserted low
 
-    //Clock Outputs
-    output logic CK_PLL_OUT,
-    output logic CK_PLL_DIV0,
-    output logic CK_PLL_DIV1,
 
-    //Control Inputs for Output Dividers
-    input logic       PS0_EN,
-    input logic       PS1_EN,
-    input logic       PS0_BYPASS,
-    input logic       PS1_BYPASS,
-    input logic [1:0] PS0_L1,
-    input logic [1:0] PS1_L1,
-    input logic [7:0] PS0_L2_INT,
-    input logic [5:0] PS0_L2_FRAC,
-    input logic [7:0] PS1_L2_INT,
-    input logic [5:0] PS1_L2_FRAC,
+    input wire       CK_AUX_IN,  //Clock input for bypass
+    input wire       CK_XTAL_IN,  //Reference clock input
+    input wire [3:0] PRESCALE,  //Divide ratio for the CK_XTAL prescaler
 
-    //Control Inputs for SSC Modulation Control
-    input logic        SSC_EN,
-    input logic [ 7:0] SSC_STEP,
-    input logic [10:0] SSC_PERIOD,
+    input wire        SSC_EN,  //Enable SSC
+    input wire [ 7:0] SSC_STEP,  //SSC frequency step
+    input wire [10:0] SSC_PERIOD,  //The number of reference clock cycles per SSC cycle
 
-    //Control Inputs for Multiplication Ratio
-    input logic [10:0] MUL_INT,
-    input logic [11:0] MUL_FRAC,
-    input logic        INTEGER_MODE,
-    input logic [ 3:0] PRESCALE,
+    input wire        INTEGER_MODE,  //Integer mode (not fractional mode)
+    input wire [10:0] MUL_INT,  //Integer component of multiplication ratio
+    input wire [11:0] MUL_FRAC,  //Fractional component of multiplication ratio
 
-    //Miscellaneous Control Inputs
-    input logic [ 9:0] LDET_CONFIG,
-    input logic [32:0] LF_CONFIG,
+    output wire LOCKED,  //Indicates when the PLL is locked
 
-    //Status Output
-    output logic LOCKED,
+    input wire [ 8:0] LDET_CONFIG,  //Settings for the lock detector
+    input wire [34:0] LF_CONFIG,  //Settings for the PLL loop filter
 
-    //Scan and Test Signals
-    output logic TEST_OUT,
-    input  logic SCAN_CK,
-    input  logic SCAN_IN,
-    input  logic SCAN_MODE,
-    input  logic SCAN_EN,
-    output logic SCAN_OUT
+    input  wire       PS0_EN,  //Enable first output
+    input  wire       PS0_BYPASS,  //Bypass first output
+    input  wire [1:0] PS0_L1,  //Divide ratio of L1 divider of first output
+    input  wire [7:0] PS0_L2,  //Divide ratio of L2 divider of first output
+    output            CK_PLL_OUT0,  //First clock output
 
+    input  wire       PS1_EN,  //Enable second output
+    input  wire       PS1_BYPASS,  //Bypass second output
+    input  wire [1:0] PS1_L1,  //Divide ratio of L1 divider of second output
+    input  wire [7:0] PS1_L2,  //Divide ratio of L2 divider of second output
+    output wire       CK_PLL_OUT1,  //Second clock output
+
+    input  wire SCAN_IN,  //Scan chain data input
+    input  wire SCAN_CK,  //Scan chain clock
+    input  wire SCAN_EN,  //Scan chain enable
+    input  wire SCAN_MODE,  //Configure for scan testing
+    output wire SCAN_OUT  //Scan chain output
 );
 
   logic       clk;
+  logic       clkInternal;
   logic       clkOut;
   logic [7:0] counter;
+
+  assign LOCKED = 1'b1;
+  assign clkOut = (PS0_L2 == 8'h1) ? clk : clkInternal;
+
 `ifdef VERILATOR
-  always @(posedge CK_XTAL_IN or negedge rstn) begin
-    if (rstn == 0) begin
+  always @(posedge CK_XTAL_IN or negedge RST_N) begin
+    if (RST_N == 0) begin
       counter <= 0;
-      clkOut  <= 0;
+      clkInternal <= 0;
     end else begin
       counter <= counter + 1;
-      if (counter == PS0_L2_INT) begin
-        clkOut  <= ~clkOut;
+      if (counter == PS0_L2) begin
+        clkInternal <= ~clkInternal;
         counter <= 0;
       end
-    end  // else: !if(rstn == 0)
-  end  // always @ (posedge ref_clk_i or negedge rstn)
+    end  // else: !if(RST_N == 0)
+  end  // always @ (posedge ref_clk_i or negedge RST_N)
 `else
   initial counter = 0;
-  initial clkOut = 0;
+  initial clkInternal = 0;
   initial clk = 0;
-  //initial forever #(0.625) clk = ~clk;
-  //always @(posedge clk) begin
-  always @(posedge CK_XTAL_IN) begin
+  initial forever #(1.25) clk = ~clk;
+  always @(posedge clk) begin
+    //always @(posedge CK_XTAL_IN) begin
     counter <= counter + 1;
-    if (counter == PS0_L2_INT) begin
-      clkOut  <= ~clkOut;
-      counter <= 0;
-    end
+    case (PS0_L2)
+      0, 1, 2: clkInternal <= ~clkInternal;
+      default: begin
+        if (counter == ((PS0_L2 - 1) >> 1)) clkInternal <= 1;
+        if (counter == (PS0_L2 - 1)) begin
+          clkInternal <= ~clkInternal;
+          counter <= 0;
+        end
+      end
+    endcase
   end
 `endif
 
-  assign CK_PLL_DIV0 = PS0_BYPASS ? CK_AUX_IN : clkOut;
+  assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : RST_N ? clkOut : 1'b0;
 
 endmodule  // pPLL02F

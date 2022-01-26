@@ -46,6 +46,7 @@ $ make nexys-emul
 ```
 
 Make sure you have the latest Xilinx board-parts installed.
+Current image is [core_v_nexys_200122.bit](http://core-v-mcu.s3-website-eu-west-1.amazonaws.com/core_v_mcu_nexys_200122.bit)
 
 
 Currently unsupported:

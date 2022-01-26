@@ -9,7 +9,7 @@
 
 uint8_t gStopUartMsgFlg = 0;
 uint8_t gsI2CProtocolFrameRxBuf[256] = {0};
-
+uint8_t gUseCRCFlg = 0;
 
 static uint8_t gsI2CProtocolFrameTxBuf[16] = {0};
 static uint16_t gsI2CProtocolFrameCounter = 0;
@@ -21,7 +21,7 @@ uint16_t I2CProtocolFrameCalChksum(uint8_t *cbuf, uint16_t pkt_size)
     return lCRC;
 }
 
-uint8_t formI2CProtocolFrame(uint8_t *aBuf, uint8_t aBufSize, uint8_t aCmdType, uint8_t *aData, uint8_t aDataLen)
+uint8_t formI2CProtocolFrame(uint8_t *aBuf, uint8_t aBufSize, uint8_t aCmdType, uint8_t *aData, uint8_t aDataLen, uint8_t aCRCOnOff)
 {
 	uint8_t i = 0;
 	uint16_t ui16Crc = 0;
@@ -39,9 +39,18 @@ uint8_t formI2CProtocolFrame(uint8_t *aBuf, uint8_t aBufSize, uint8_t aCmdType, 
 			}
 		}
 
-		ui16Crc = I2CProtocolFrameCalChksum(aBuf, i+I2C_PROTOCOL_FRAME_HEADER_SIZE);
-		lFillPtr->Data[i++] = (uint8_t)(ui16Crc >> 8 );
-		lFillPtr->Data[i++] = (uint8_t)ui16Crc;
+		if( aCRCOnOff == 1 )
+		{
+			ui16Crc = I2CProtocolFrameCalChksum(aBuf, i+I2C_PROTOCOL_FRAME_HEADER_SIZE);
+			lFillPtr->Data[i++] = (uint8_t)(ui16Crc >> 8 );
+			lFillPtr->Data[i++] = (uint8_t)ui16Crc;
+		}
+		else
+		{
+			lFillPtr->Data[i++] = 0;
+			lFillPtr->Data[i++] = 0;
+		}
+
 		return i + I2C_PROTOCOL_FRAME_HEADER_SIZE;
 	}
 	return 0;
@@ -84,29 +93,48 @@ void parseI2CProtocolFrame(uint8_t *aBuf, uint16_t aLen)
 	uint16_t ui16Crc = 0;
 	split_2Byte_t lRxdCrc;
 	lRxdCrc.hw = 0;
-	ui16Crc = I2CProtocolFrameCalChksum(aBuf, aLen-2);
-	lRxdCrc.b[0] = aBuf[aLen - 2];
-	lRxdCrc.b[0] = aBuf[aLen - 1];
+	if( gUseCRCFlg == 1 )
+	{
+		ui16Crc = I2CProtocolFrameCalChksum(aBuf, aLen-2);
+		lRxdCrc.b[0] = aBuf[aLen - 1];
+		lRxdCrc.b[1] = aBuf[aLen - 2];
+	}
+	else
+	{
+		lRxdCrc.hw = 0;
+		ui16Crc = 0;
+	}
+
 	if( lRxdCrc.hw == ui16Crc)
 	{
+		if(lParseFramePtr->SOF == HOST_TO_A2_FRAME_HEADER )
+		{
+			if( lParseFramePtr->CmdType == A2_LOAD_MEMORY_CMD)
+			{
+				memcpy((void *)(long)lParseFramePtr->A2RamAddress, (void *)(long)lParseFramePtr->Data, lParseFramePtr->DataLen);
+			}
+			else if ( lParseFramePtr->CmdType == A2_JUMP_TO_ADDRESS_CMD )
+			{
+				dbg_str("\nI2C BL JMP ");
+				dbg_hex32(lParseFramePtr->A2RamAddress);
+				dbg_str(" ");
+				jump_to_address(lParseFramePtr->A2RamAddress);
+			}
 
+			if( gUseCRCFlg == 1 )
+			{
+				//Inform master about correct CRC
+				hal_set_i2cs_msg_apb_i2c(A2_GOOD_FRAME_RCVD);
+			}
+		}
 	}
 	else
 	{
 		//TODO: Failed CRC, retry last frame?
-	}
-	if(lParseFramePtr->SOF == HOST_TO_A2_FRAME_HEADER )
-	{
-		if( lParseFramePtr->CmdType == A2_LOAD_MEMORY_CMD)
+		if( gUseCRCFlg == 1 )
 		{
-			memcpy((void *)(long)lParseFramePtr->A2RamAddress, (void *)(long)lParseFramePtr->Data, lParseFramePtr->DataLen);
-		}
-		else if ( lParseFramePtr->CmdType == A2_JUMP_TO_ADDRESS_CMD )
-		{
-			dbg_str("\nI2C BL JMP ");
-			dbg_hex32(lParseFramePtr->A2RamAddress);
-			dbg_str(" ");
-			jump_to_address(lParseFramePtr->A2RamAddress);
+			//Inform master about failed CRC, master might retry.
+			hal_set_i2cs_msg_apb_i2c(A2_CORRUPTED_FRAME_RCVD);
 		}
 	}
 }
@@ -117,8 +145,14 @@ void processI2CProtocolFrames(void)
 	if( hal_get_i2cs_msg_i2c_apb_status() != 0 )
 	{
 		gStopUartMsgFlg = 1;
-		if( hal_get_i2cs_msg_i2c_apb() == A2_I2C_BL_IS_READY_CHECK_CMD )
+		if( hal_get_i2cs_msg_i2c_apb() == A2_I2C_BL_WITHOUT_CRC_IS_READY_CHECK_CMD )
 		{
+			gUseCRCFlg = 0;
+			hal_set_i2cs_msg_apb_i2c(A2_I2C_BL_IS_READY_CHECK_RSP_YES);
+		}
+		else if( hal_get_i2cs_msg_i2c_apb() == A2_I2C_BL_WITH_CRC_IS_READY_CHECK_CMD )
+		{
+			gUseCRCFlg = 1;
 			hal_set_i2cs_msg_apb_i2c(A2_I2C_BL_IS_READY_CHECK_RSP_YES);
 		}
 		else if( hal_get_i2cs_msg_i2c_apb() == I2C_NEW_FRAME_READY_BYTE )

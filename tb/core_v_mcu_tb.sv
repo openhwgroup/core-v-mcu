@@ -19,9 +19,11 @@ module core_v_mcu_tb;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
 
-   localparam  REF_CLK_PERIOD =  2.5ns; // external reference clock (32KHz)
-   localparam  BAUD_CLK_FREQ = 12500000;
-   localparam  BAUD_CLK_PERIOD = 2ns;
+   //localparam  REF_CLK_PERIOD =  2.5ns; // Use this for fake PLL pPLL02F.sv
+   localparam  REF_CLK_PERIOD =  100ns; // Use this for Perceptia PLL pd_gf22_PLL02_model.v (10 MHz ref)
+   localparam  BAUD_CLK_PERIOD = 4ns;
+   localparam  BAUD_CLK_FREQ = 1000000000 / 4; //12500000;
+
 
 
 
@@ -76,7 +78,7 @@ module core_v_mcu_tb;
 	 .hold(pup_qspi),
 	 .so(io_in_i[15]));
 
-   uartdpi #(.BAUD(115200),
+   uartdpi #(.BAUD(115200 * 40),    //SW thinks the peripheral clk is 5MHZ, but per clock is running at 200 MHz in simulation, so 5 * 40 = 200
 	     .FREQ(BAUD_CLK_FREQ),
 	     .NAME("uart0"))
    uart_0 (
@@ -85,7 +87,7 @@ module core_v_mcu_tb;
 	   .tx(io_in_i[IO_UART0_TX]),
 	   .rx(io_out_o[IO_UART0_RX])
 	   );
-   uartdpi #(.BAUD(115200),
+   uartdpi #(.BAUD(115200 * 2),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
 	     .FREQ(BAUD_CLK_FREQ),
      	     .NAME("uart1"))
    uart_1 (
@@ -236,7 +238,7 @@ module core_v_mcu_tb;
         bootsel = 1'b1;
         resetn = 1'b0;
         resetn = #(4*BAUD_CLK_PERIOD) 1'b1;
-       #(5*BAUD_CLK_PERIOD) bootsel = 1'b0;
+       #(5*BAUD_CLK_PERIOD) bootsel = 1'b1;
 
         $display("releasing reset");
     end
