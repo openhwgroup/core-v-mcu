@@ -95,7 +95,6 @@ nexys-emul:
 				@echo "*                                   *"
 				@echo "*************************************"
 				mkdir -p emulation/core-v-mcu-nexys/rtl
-				util/format-verible
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
@@ -107,6 +106,7 @@ nexys-emul:
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
+				util/format-verible
 				@echo "*************************************"
 				@echo "*                                   *"
 				@echo "* running Vivado                    *"
@@ -135,7 +135,6 @@ genesys-emul:
 				@echo "*                                   *"
 				@echo "*************************************"
 				mkdir -p emulation/core-v-mcu-genesys2/rtl
-				util/format-verible
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
@@ -147,6 +146,7 @@ genesys-emul:
 					--emulation-toplevel core_v_mcu_genesys2\
 					--input-xdc emulation/core-v-mcu-genesys2/constraints/Genesys2-Master.xdc\
 					--output-xdc emulation/core-v-mcu-genesys2/constraints/core-v-mcu-pin-assignment.xdc
+				util/format-verible
 				@echo "*************************************"
 				@echo "*                                   *"
 				@echo "* running Vivado                    *"
