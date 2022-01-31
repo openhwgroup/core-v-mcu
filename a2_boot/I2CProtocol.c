@@ -3,16 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hal_apb_i2cs.h"
+#include "bootloader.h"
 #include "I2CProtocol.h"
 #include "crc.h"
 #include "dbg.h"
 
-uint8_t gStopUartMsgFlg = 0;
-uint8_t gsI2CProtocolFrameRxBuf[256] = {0};
-uint8_t gUseCRCFlg = 0;
+extern uint8_t gStopUartMsgFlg;
+extern uint8_t gStopUartBootLoaderFlg;
 
-static uint8_t gsI2CProtocolFrameTxBuf[16] = {0};
-static uint16_t gsI2CProtocolFrameCounter = 0;
+//All the global variables are initialized to 0 by the assembly code in crto.s.
+//So not initializing it here.
+
+uint8_t gStopI2CBootLoaderFlg;
+uint8_t gsI2CProtocolFrameRxBuf[256];
+uint8_t gUseCRCFlg;
+
+static uint8_t gsI2CProtocolFrameTxBuf[16];
+static uint16_t gsI2CProtocolFrameCounter;
 
 uint16_t I2CProtocolFrameCalChksum(uint8_t *cbuf, uint16_t pkt_size)
 {
@@ -145,6 +152,7 @@ void processI2CProtocolFrames(void)
 	if( hal_get_i2cs_msg_i2c_apb_status() != 0 )
 	{
 		gStopUartMsgFlg = 1;
+		gStopUartBootLoaderFlg = 1;
 		if( hal_get_i2cs_msg_i2c_apb() == A2_I2C_BL_WITHOUT_CRC_IS_READY_CHECK_CMD )
 		{
 			gUseCRCFlg = 0;

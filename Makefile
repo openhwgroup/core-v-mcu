@@ -99,8 +99,10 @@ nexys-emul:
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
+					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--pin-table nexys-pin-table.csv\
 					--perdef-json perdef.json\
+					--pad-control rtl/core-v-mcu/top/pad_control.sv\
 					--emulation-toplevel core_v_mcu_nexys\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
@@ -137,8 +139,10 @@ genesys-emul:
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
+					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--pin-table genesys2-pin-table.csv\
 					--perdef-json perdef.json\
+					--pad-control rtl/core-v-mcu/top/pad_control.sv\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v\
 					--emulation-toplevel core_v_mcu_genesys2\
 					--input-xdc emulation/core-v-mcu-genesys2/constraints/Genesys2-Master.xdc\

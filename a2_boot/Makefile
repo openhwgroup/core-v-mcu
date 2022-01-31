@@ -38,8 +38,8 @@ A2_Boot.srec: A2_boot.elf
 	$(OBJCOPY) -O srec -j .text -j .data A2_boot.elf A2_Boot.srec
 
 
-A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o hal_apb_i2cs.o crt0.o
-	$(CC) $(LDFLAGS) crt0.o I2CProtocol.o crc.o dbg.o hal_apb_i2cs.o main.o spi.o uart.o  -lc -lm -lgcc
+A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o uartProtocol.o hal_apb_i2cs.o crt0.o
+	$(CC) $(LDFLAGS) crt0.o I2CProtocol.o uartProtocol.o crc.o dbg.o hal_apb_i2cs.o main.o spi.o uart.o  -lc -lm -lgcc
 
 
 .PHONY: clean
