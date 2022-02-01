@@ -73,6 +73,8 @@ module pPLL02F (
       end
     end  // else: !if(RST_N == 0)
   end  // always @ (posedge ref_clk_i or negedge RST_N)
+  assign CK_PLL_OUT0 = CK_XTAL_IN;
+
 `else
   initial counter = 0;
   initial clkInternal = 0;
@@ -92,8 +94,9 @@ module pPLL02F (
       end
     endcase
   end
+  assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : RST_N ? clkOut : 1'b0;
 `endif
 
-  assign CK_PLL_OUT0 = PS0_BYPASS ? CK_AUX_IN : RST_N ? clkOut : 1'b0;
+
 
 endmodule  // pPLL02F
