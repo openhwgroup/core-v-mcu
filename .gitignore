@@ -4,6 +4,7 @@ __pycache__/
 *~
 *.bit
 *.swp
+*.log
 install/
 build/
 buildsim.log
@@ -21,3 +22,4 @@ sw/csv-mirror/
 emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 emulation/core-v-mcu-nexys/rtl/*.v
 vivado*
+xmverilog.*
