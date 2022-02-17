@@ -4,7 +4,7 @@
 
 YML=$(shell find . -name '*.yml' -print)
 
-IOSCRIPT=rtl/includes/pulp_soc_defines.sv
+IOSCRIPT=rtl/includes/pulp_soc_defines.svh
 IOSCRIPT+=rtl/includes/pulp_peripheral_defines.svh
 IOSCRIPT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT+=pin-table.csv
@@ -80,6 +80,11 @@ buildsim:
 	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
 	fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
+.PHONY:buildsim-xcelium
+buildsim-xcelium:
+	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+	fusesoc --cores-root . run --no-export --target=sim --setup --build --tool=xcelium openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+
 
 
 nexys-emul:		${IOSCRIPT_OUT}
@@ -89,8 +94,9 @@ nexys-emul:		${IOSCRIPT_OUT}
 				@echo "*                                   *"
 				@echo "*************************************"
 				mkdir -p emulation/core-v-mcu-nexys/rtl
+				util/format-verible
 				python3 util/ioscript.py\
-					--soc-defines rtl/includes/pulp_soc_defines.sv\
+					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
 					--pin-table pin-table.csv\
 					--perdef-json perdef.json\
@@ -111,7 +117,7 @@ nexys-emul:		${IOSCRIPT_OUT}
 					export FC_CLK_PERIOD_NS=100;\
 					export PER_CLK_PERIOD_NS=200;\
 					export FPGA_CLK_PERIOD_NS=125;\
-					export SLOW_CLK_PERIOD_NS=30517;\
+					export SLOW_CLK_PERIOD_NS=4000;\
 					fusesoc --cores-root . run --target=nexys-a7-100t --setup --build openhwgroup.org:systems:core-v-mcu\
 				) 2>&1 | tee lint.log
 				cp ./build/openhwgroup.org_systems_core-v-mcu_0/nexys-a7-100t-vivado/openhwgroup.org_systems_core-v-mcu_0.runs/impl_1/core_v_mcu_nexys.bit emulation/core_v_mcu_nexys.bit
@@ -126,7 +132,7 @@ sw:
 
 ${IOSCRIPT_OUT}:	${IOSCRIPT}
 				python3 util/ioscript.py\
-					--soc-defines rtl/includes/pulp_soc_defines.sv\
+					--soc-defines rtl/includes/pulp_soc_defines.svh\
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
 					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--pin-table pin-table.csv\

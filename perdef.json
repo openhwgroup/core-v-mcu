@@ -101,7 +101,7 @@
 		"udma_rx": ["rx_hyper" ]
 	},
 	{ "name": "sdio",
-		"usable":	false,
+		"usable":	true,
 		"type":		"udma",
 		"ports": {
 			"clk"	: "output",

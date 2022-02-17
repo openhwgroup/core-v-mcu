@@ -19,7 +19,8 @@ CC      = riscv32-corev-elf-gcc
 OBJCOPY = riscv32-corev-elf-objcopy
 
 CFLAGS   = -Os -g -msmall-data-limit=8 \
-	       -mno-save-restore -fmessage-length=0 \
+           -mno-save-restore -fmessage-length=0 \
+           -march=rv32imc \
            -fsigned-char -ffunction-sections -fdata-sections
 CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude
 ASFLAGS  = $(CFLAGS) -DLANGUAGE_ASSEMBLY

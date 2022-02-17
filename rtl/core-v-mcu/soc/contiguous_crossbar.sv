@@ -26,9 +26,9 @@
 module contiguous_crossbar
   import pkg_soc_interconnect::addr_map_rule_t;
 #(
-    parameter int unsigned NR_MASTER_PORTS,
-    parameter int unsigned NR_SLAVE_PORTS,
-    parameter int unsigned NR_ADDR_RULES
+    parameter int unsigned NR_MASTER_PORTS = 2,
+    parameter int unsigned NR_SLAVE_PORTS  = 2,
+    parameter int unsigned NR_ADDR_RULES   = 2
 ) (
     input logic                                    clk_i,
     input logic                                    rst_ni,

@@ -2517,7 +2517,7 @@ end
             end   
             else
             begin
-               if ($time != 0) $display("%t:  ERROR : False instruction, please retry ",$realtime); 
+               if ($time != 0) $display("%t:  ERROR : False instruction (%x), please retry ",$realtime,data_latch); 
             end 
          end 
          //---------------------------------------------------------------------
