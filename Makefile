@@ -10,6 +10,7 @@ IOSCRIPT+=rtl/includes/periph_bus_defines.svh
 IOSCRIPT+=nexys-pin-table.csv genesys2-pin-table.csv
 IOSCRIPT+=perdef.json
 NEXSY_XDC=emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc
+NEXYSA7_BITMAP?=emulation/core_v_mcu_nexys.bit
 GENESYS_XDC=emulation/core-v-mcu-nexys/constraints/Genesys2-Master.xdc
 
 IOSCRIPT_OUT=rtl/core-v-mcu/top/pad_control.sv
@@ -192,7 +193,7 @@ bitstream:	${SCRIPTS} ${IOSCRIPT_OUT}
 
 downloadn:
 	vivado -mode batch -source emulation/xilinx/tcl/download.tcl -tclargs\
-             emulation/core_v_mcu_nexys.bit xc7a100t_0
+             $(NEXYSA7_BITMAP) xc7a100t_0
 
 downloadg:
 	vivado -mode batch -source emulation/xilinx/tcl/download.tcl -tclargs\

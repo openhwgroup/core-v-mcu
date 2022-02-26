@@ -33,7 +33,7 @@ where you will be able to fetch the lastest pre-compiled FPGA bitmaps and test-p
 
 ### Push the BitMap to the Nexys A7:
 ```
-$ make -C ../../  downloadn
+$ make -C ../../  downloadn NEXYSA7_BITMAP=emulation/quickstart/core_v_mcu_nexys.bit
 ```
 
 ### Download the compiled test-program "cli_test.srec"
@@ -56,8 +56,9 @@ $ minicom usb1
 ```
 
 #### Understanding IO-muxing on CORE-V-MCU
+
 | Nexys A7 Resource | XC7A100T IO | IONUM | MUX_SEL=0 | MUX_SEL=1 | MUX_SEL=2 | MUX_SEL=3 |
-+-------------------+-------------+-------+-----------+-----------+-----------+-----------+
+|-------------------|-------------|-------|-----------|-----------|-----------|-----------|
 | LED[0]            | IO_11       | 11    | apbio_32  | apbio_47  | apbio_4   | fpgaio_4  |
 
 #### Toggle LED[0] on the Nexys-A7 board:
