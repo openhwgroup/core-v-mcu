@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1630061592 source:/home/somesh/codeBlocksWkSpace/parsePinMap/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<string.h>
+	<stdint.h>
+
+1630063562 source:/home/somesh/AddFCBTests/core-v-mcu-cli-test/cli_test/utils/parsePinMap/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<string.h>
+	<stdint.h>
+
