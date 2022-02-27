@@ -1,0 +1,7 @@
+system_pulp_ri5cy.c:106:6:timer_irq_handler	16	static
+system_pulp_ri5cy.c:64:6:system_init	16	static
+system_pulp_ri5cy.c:95:6:system_core_clock_update	16	static
+system_pulp_ri5cy.c:100:6:system_core_clock_get	16	static
+system_pulp_ri5cy.c:115:6:undefined_handler	16	static
+system_pulp_ri5cy.c:125:6:vPortSetupTimerInterrupt	16	static
+system_pulp_ri5cy.c:136:6:vSystemIrqHandler	16	static
