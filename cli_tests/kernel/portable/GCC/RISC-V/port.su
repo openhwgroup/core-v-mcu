@@ -1,0 +1,2 @@
+port.c:150:12:xPortStartScheduler	32	static
+port.c:206:6:vPortEndScheduler	0	static
