@@ -1,2 +1,0 @@
-heap_3.c:58:7:pvPortMalloc	16	static
-heap_3.c:83:6:vPortFree	16	static
