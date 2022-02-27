@@ -1,0 +1,18 @@
+#!/bin/bash
+if [ $# -eq 0 ] 
+then
+   riscv32-corev-elf-gdb -x gdb_run Default/cli_test& > /dev/null 2>&1
+else
+   riscv32-unknown-elf-gdb -x gdb_run_olimex Default/cli_test& > /dev/null 2>&1
+fi
+sleep 10
+GDBID=$!
+
+echo "gbb process = " $GDBID
+echo "kill -9" $GDBID
+kill -9 $GDBID
+echo "use \"kill -9" $GDBID"\" to terminate"
+
+   
+
+
