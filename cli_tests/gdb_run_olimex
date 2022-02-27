@@ -1,0 +1,3 @@
+target remote | openocd -c "gdb_port pipe; log_output openocd.log"  -f openocd-gdbpipe-olimex.cfg 
+load
+continue
