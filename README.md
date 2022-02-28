@@ -11,7 +11,7 @@
 
 ## Quick Start Guide
 
-The fastest way to get up and running with pre-built bit streams is to check out the [Quick Start Guide](https://github.com/MikeOpenHWGroup/core-v-mcu/blob/qsg/emulation/quickstart/README.md).
+The fastest way to get up and running with the CORE-V MCU is with pre-built bit streams for the Digilent Nexys A7 board. Check out the [Quick Start Guide](https://github.com/MikeOpenHWGroup/core-v-mcu/blob/qsg/emulation/quickstart/README.md).
 
 ## Getting Started
 
