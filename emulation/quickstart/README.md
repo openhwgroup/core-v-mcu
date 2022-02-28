@@ -1,42 +1,71 @@
 # CORE-V-MCU Quick Start Guide
-Eventually, this will be a Quick Start Guide document to guide you through
-running the CORE-V-MCU and 'real' test-programs on either a Verilator simulation
-model or in emulation on either the Nexys A7 or Genesys2 evaluation boards.
+The purpose of this Quick Start Guide (QSG) is to get you up and running quickly with the CORE-V-MCU on one of the various supported platforms.
+After working through this document you should have a [cli_test](https://github.com/QuickLogic-Corp/core-v-mcu-cli-test)
+running on the CORE-V-MCU on either an FPGA based emulation platform or in simulation using Verilator.  The emulation platform supports either a simple "CLI monitor" interface over a console terminal or an Eclipse IDE over JTAG.
+
+This QSG uses precompiled binaries available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
 The following assumes you are running on a Linux platform and has been tested under Ubuntu 20.04.
 
-## Nexys A7
+## Software Requirements:
 
-### Requirements:
-Install the free-to-use WebTalk version of Vivado. Then:
+### Python Modules
 ```
-$ apt install minicom
 $ pip3 install pyserial
 $ pip3 install pygame
 ```
 
-### Install and setup MINICOM terminal emulator:
-Note: you can use your favorite terminal emulator if you already have one.
-Installation and setup instructions can be found [here](https://help.ubuntu.com/community/Minicom).
+### Terminal Emulator:
+**Note**: you can use your favorite terminal emulator if you already have one.
+The content of this QSG has been tested using **Minicom**.
+
+Installation is trivial:
+```
+$ apt install minicom
+```
+Minicom setup instructions can be found [here](https://help.ubuntu.com/community/Minicom).
 The remainder of this document assumes you have attached Minicom to /dev/ttyUSB1 on your machine.
 
-### Files:
-At ths time, Nexys A7 Quickstart comes with the following pre-compiled files which you will find in this directory:
-- `core_v_mcu_nexys.bit`: Xilinx FPGA bitmap for XC7A100T on Nexys-A7 board
-- `cli_test.srec`: "S-record" file of compiled "cli_test" program.
+## Emulating the CORE-V-MCU on the Nexys A7-100T
+Throughout this section we will refer to the circled letters on the figure below:
 
-Also provide is `serialPort.py`, a Python script to push the bitmap to the Nexys-A7 over a serial port.
+![image](NexysA7_annotated.png)
 
-Future updates to this Quick Start will point you to the OpenHW Group
-[downloads](http://downloads.openhwgroup.org/)
-where you will be able to fetch the lastest pre-compiled FPGA bitmaps and test-programs.
+Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
+1. Load the FPGA with a bitmap of the CORE-V-MCU.
+2. Download the cli_test program into memory.
 
-### Push the BitMap to the Nexys A7:
+### Nexys A7-100T Hardware Steup
+Refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual).
+The "shared UART/JTAG USB port" on the upper left-hand side of the Board (**B**) is used either for pushing _bitmap_ files for the FPGA or as a CLI monitor.
+This port connects to a USB port on your PC and using the USB-to-MicroUSB cable that comes with the Nexys Board.
+
+In order to use the CORE-V-MCU on the Nexys A7, it is necessary to first download a _bitmap_ to configure the FPGA.
+There are two techniques for this, see "Option 1" and "Option 2" below.
+
+### Step 1, Option 1: Use a USB Thumb Drive to Load the BitMap:
+Copy the FPGA bitmap from `emulation/quickstart/core_v_mcu_nexys.bit` to a USB thumb-drive.  This drive must be formated with a FAT32 filesystem and the bitmp should be the _only_ file on the drive.  Once this is done, getting the FPGA loaded with the bitmap is straightforward:
+- Use the able supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
+- Start you terminal emulator on /dev/ttyUSB1: `minicom usb1`
+- Insert the USB thumb drive in the on-board USB port (**A**).
+- Configure the MODE straps (**D**) on the Nexys to load from USB (refer to the Reference Manual).
+- Power on the Nexys board.
+
+In a few moments the FPGA will enter a loop printing "A2 BOOTME" on the terminal.  Proceed to Step 2.
+
+### Step 1, Option 2: Use Vivado to Push the BitMap to the Nexys A7:
+This option requires installation the free-to-use WebTalk version of Vivado.
+- Use the able supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
+- Configure the MODE straps (**D**) on the Nexys Board to load from JTAG.
+
+The following command loads the bitmap to the FPGA over the "shared UART/JTAG USB port".
+
 ```
 $ make -C ../../  downloadn NEXYSA7_BITMAP=emulation/quickstart/core_v_mcu_nexys.bit
 ```
 
-### Download the compiled test-program "cli_test.srec"
+### Step 2: Download the compiled test-program "cli_test.srec"
+Once the bitmap has been loaded into the FPGA, halt the terminal (CTRL-A, Z, X with minicom) and use the supplied python script to download the "cli_test" program to the MCU:
 ```
 $ python3 serialPort.py /dev/ttyUSB1 cli_test.srec
 ```
@@ -45,7 +74,10 @@ This stake a little while... Then:
 $ minicom usb1
 ```
 
-### Running "cli_test" on minicom terminal:
+Hit "return" a few types to get the `[0]` prompt from cli_test.
+
+## Running "cli_test" on minicom terminal:
+Below is a few examples of commands available with cli_test:
 ```
 [0] help             # list of commands
 [0] help misc        # list of agruments for misc command
@@ -55,13 +87,13 @@ $ minicom usb1
 [0] misc simul 1 0   # full misc command: runs the 'simul' test.
 ```
 
-#### Understanding IO-muxing on CORE-V-MCU
+### Understanding IO-muxing on CORE-V-MCU
 
 | Nexys A7 Resource | XC7A100T IO | IONUM | MUX_SEL=0 | MUX_SEL=1 | MUX_SEL=2 | MUX_SEL=3 |
 |-------------------|-------------|-------|-----------|-----------|-----------|-----------|
 | LED[0]            | IO_11       | 11    | apbio_32  | apbio_47  | apbio_4   | fpgaio_4  |
 
-#### Toggle LED[0] on the Nexys-A7 board:
+### Toggle LED[0] on the Nexys-A7 board using cli_test
 ```
 [0] io setmux 11 2   # Set mux-select for IO 11 to 2 (apbio_4 now drives IO_11).
 [0] gpio mode 4 1    # Set 'mode' of GPIO 4 to 1.
@@ -70,3 +102,6 @@ $ minicom usb1
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 ```
+
+## Eclipse IDE
+TODO
