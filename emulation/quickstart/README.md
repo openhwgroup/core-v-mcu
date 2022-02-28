@@ -26,6 +26,13 @@ $ apt install minicom
 Minicom setup instructions can be found [here](https://help.ubuntu.com/community/Minicom).
 The remainder of this document assumes you have attached Minicom to /dev/ttyUSB1 on your machine.
 
+### Xilinx Vivado
+This is optional and only required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
+The free-to-use Vivado WebPACK is sufficient for our purposes and can be downloaded from the Xilinx [here](https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html).
+
+### Eclipse IDE
+The open-source Eclipse IDE supports CORE-V-MCU.
+
 ## Emulating the CORE-V-MCU on the Nexys A7-100T
 Throughout this section we will refer to the circled letters on the figure below:
 
