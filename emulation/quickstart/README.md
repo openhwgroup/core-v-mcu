@@ -1,9 +1,10 @@
 # CORE-V-MCU Quick Start Guide
 The purpose of this Quick Start Guide (QSG) is to get you up and running quickly with the CORE-V-MCU on one of the various supported platforms.
 After working through this document you should have a [cli_test](https://github.com/QuickLogic-Corp/core-v-mcu-cli-test)
-running on the CORE-V-MCU on either an FPGA based emulation platform or in simulation using Verilator.  The emulation platform supports either a simple "CLI monitor" interface over a console terminal or an Eclipse IDE over JTAG.
+running on the CORE-V-MCU on an FPGA based emulation platform.
+The emulation platform supports either a simple "CLI monitor" interface over a console terminal or an Eclipse IDE over JTAG.
 
-This QSG uses precompiled binaries available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
+**Coming soon**: this QSG uses precompiled binaries available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
 The following assumes you are running on a Linux platform and has been tested under Ubuntu 20.04.
 
@@ -27,13 +28,26 @@ Minicom setup instructions can be found [here](https://help.ubuntu.com/community
 The remainder of this document assumes you have attached Minicom to /dev/ttyUSB1 on your machine.
 
 ### Xilinx Vivado
-This is optional and only required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
-The free-to-use Vivado WebPACK is sufficient for our purposes and can be downloaded from the Xilinx [here](https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html).
+Vivado is required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
+If you will be using the pre-built bitmaps and loading them from a USB drive then you will not need Vivado.
+The free-to-use Vivado WebPACK is sufficient for working with the Nexys A7 and can be downloaded from the Xilinx [here](https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html).
 
 ### Eclipse IDE
 The open-source Eclipse IDE supports CORE-V-MCU.
 
+## Hardware Requirements:
+- Digilent [Nexys A7-100T](https://digilent.com/shop/nexys-a7-fpga-trainer-board-recommended-for-ece-curriculum/) evaulation board.
+- USB to MicroUSB cable (typically supplied with the Nexys board).
+- [JTAG-H2](https://digilent.com/shop/jtag-hs2-programming-cable) Pmod.
+- [6-pin Header Gender Changer](https://digilent.com/shop/6-pin-header-gender-changer-5-pack).
+- USB drive.
+
+Optional hardware includes:
+- [5V Power supply](https://digilent.com/shop/5v-2-5a-switching-power-supply/).  Note that the Nexys can typically be powered by the MicroUSB port.
+- [NOR Flash](https://digilent.com/shop/pmod-sf3-32-mb-serial-nor-flash) Pmod.
+
 ## Emulating the CORE-V-MCU on the Nexys A7-100T
+
 Throughout this section we will refer to the circled letters on the figure below:
 
 ![image](NexysA7_annotated.png)
@@ -41,6 +55,10 @@ Throughout this section we will refer to the circled letters on the figure below
 Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
 1. Load the FPGA with a bitmap of the CORE-V-MCU.
 2. Download the cli_test program into memory.
+
+The bitmap file has a _.bit_ file extension and the cli_test is an "S record" file with an _.srec_ extension.
+Currently an example bitmap and srec file can be found in this directory.
+In the near future these will be made available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
 ### Nexys A7-100T Hardware Steup
 Refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual).
@@ -50,11 +68,11 @@ This port connects to a USB port on your PC and using the USB-to-MicroUSB cable 
 In order to use the CORE-V-MCU on the Nexys A7, it is necessary to first download a _bitmap_ to configure the FPGA.
 There are two techniques for this, see "Option 1" and "Option 2" below.
 
-### Step 1, Option 1: Use a USB Thumb Drive to Load the BitMap:
-Copy the FPGA bitmap from `emulation/quickstart/core_v_mcu_nexys.bit` to a USB thumb-drive.  This drive must be formated with a FAT32 filesystem and the bitmp should be the _only_ file on the drive.  Once this is done, getting the FPGA loaded with the bitmap is straightforward:
-- Use the able supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
+### Step 1, Option 1: Use a USB Drive to Load the BitMap:
+Copy the FPGA bitmap from `emulation/quickstart/core_v_mcu_nexys.bit` to a USB drive.  This drive must be formated with a FAT32 filesystem and the bitmp should be the _only_ file on the drive.  Once this is done, getting the FPGA loaded with the bitmap is straightforward:
+- Use the cable supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
 - Start you terminal emulator on /dev/ttyUSB1: `minicom usb1`
-- Insert the USB thumb drive in the on-board USB port (**A**).
+- Insert the USB drive in the on-board USB port (**A**).
 - Configure the MODE straps (**D**) on the Nexys to load from USB (refer to the Reference Manual).
 - Power on the Nexys board.
 
