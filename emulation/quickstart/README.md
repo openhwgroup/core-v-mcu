@@ -61,16 +61,17 @@ Currently an example bitmap and srec file can be found in this directory.
 In the near future these will be made available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
 ### Nexys A7-100T Hardware Steup
-Refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual).
-The "shared UART/JTAG USB port" on the upper left-hand side of the Board (**B**) is used either for pushing _bitmap_ files for the FPGA or as a CLI monitor.
-This port connects to a USB port on your PC and using the USB-to-MicroUSB cable that comes with the Nexys Board.
+You will need to refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual)
+to complete all of the steps below.
 
 In order to use the CORE-V-MCU on the Nexys A7, it is necessary to first download a _bitmap_ to configure the FPGA.
 There are two techniques for this, see "Option 1" and "Option 2" below.
 
 ### Step 1, Option 1: Use a USB Drive to Load the BitMap:
-Copy the FPGA bitmap from `emulation/quickstart/core_v_mcu_nexys.bit` to a USB drive.  This drive must be formated with a FAT32 filesystem and the bitmp should be the _only_ file on the drive.  Once this is done, getting the FPGA loaded with the bitmap is straightforward:
-- Use the cable supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
+Copy the FPGA bitmap from `emulation/quickstart/core_v_mcu_nexys.bit` to a USB drive.
+This drive must be formated with a FAT32 filesystem and the bitmp should be the _only_ file on the drive.
+Once this is done, getting the FPGA loaded with the bitmap is straightforward:
+- Use the cable supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port" (**B**).
 - Start you terminal emulator on /dev/ttyUSB1: `minicom usb1`
 - Insert the USB drive in the on-board USB port (**A**).
 - Configure the MODE straps (**D**) on the Nexys to load from USB (refer to the Reference Manual).
@@ -80,6 +81,8 @@ In a few moments the FPGA will enter a loop printing "A2 BOOTME" on the terminal
 
 ### Step 1, Option 2: Use Vivado to Push the BitMap to the Nexys A7:
 This option requires installation the free-to-use WebTalk version of Vivado.
+In this option, the "shared UART/JTAG USB port" on the upper left-hand side of the Board (**B**) is used for pushing _bitmap_ files to the FPGA.
+This port connects to a USB port on your PC and uses the USB-to-MicroUSB cable that comes with the Nexys Board.
 - Use the able supplied with the Nexys A7 to connect the USB port configued as `dev/ttyUSB1` to the Nexys "shared UART/JTAG USB port".
 - Configure the MODE straps (**D**) on the Nexys Board to load from JTAG.
 
@@ -90,11 +93,13 @@ $ make -C ../../  downloadn NEXYSA7_BITMAP=emulation/quickstart/core_v_mcu_nexys
 ```
 
 ### Step 2: Download the compiled test-program "cli_test.srec"
-Once the bitmap has been loaded into the FPGA, halt the terminal (CTRL-A, Z, X with minicom) and use the supplied python script to download the "cli_test" program to the MCU:
+If you got here from Step 1, Option 1, once the bitmap has been loaded into the FPGA, halt the terminal (CTRL-A, Z, X with minicom).
+
+Use the supplied python script to download the "cli_test" program to the MCU:
 ```
 $ python3 serialPort.py /dev/ttyUSB1 cli_test.srec
 ```
-This stake a little while... Then:
+This takes a little while... Then:
 ```
 $ minicom usb1
 ```
