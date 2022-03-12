@@ -28,11 +28,13 @@
 #include <stdio.h>
 #include "core-v-mcu-config.h"
 #include "apb_soc_ctrl_reg_defs.h"
+#include "bootloader.h"
 #include <string.h>
 #include "flash.h"
 #include "dbg.h"
 #include "hal_apb_i2cs.h"
 #include "I2CProtocol.h"
+#include "uartProtocol.h"
 #include "crc.h"
 
 //#defines
@@ -41,6 +43,8 @@
 
 //Function prototypes
 uint16_t udma_uart_open (uint8_t uart_id, uint32_t xbaudrate);
+uint16_t udma_uart_writeraw(uint8_t uart_id, uint16_t write_len, uint8_t* write_buffer);
+uint8_t udma_uart_readraw(uint8_t uart_id, uint16_t read_len, uint8_t* read_buffer);
 uint16_t udma_qspim_open (uint8_t qspim_id, uint32_t clk_freq);
 void udma_flash_readid(uint32_t l2addr);
 uint32_t udma_flash_reset_enable(uint8_t qspim_id, uint8_t cs);
@@ -50,7 +54,13 @@ void dbg_str(const char *s);
 
 __attribute__((noreturn)) void changeStack(boot_code_t *data, unsigned int entry, unsigned int stack);
 
-extern uint8_t gStopUartMsgFlg;
+//All the global variables are initialized to 0 by the assembly code in crto.s.
+//So not initializing it here.
+
+uint8_t gStopUartMsgFlg;
+
+extern uint8_t gStopUartBootLoaderFlg;
+extern uint8_t gStopI2CBootLoaderFlg;
 
 PLP_L2_DATA static boot_code_t    bootCode;
 
@@ -196,8 +206,9 @@ int main(void)
 {
 	int id = 1;
     uint8_t i = 0;
+    uint8_t lChar = 0;
     uint32_t lFlashID = 0;
-	unsigned int bootsel, flash_present, resetreason;
+	volatile unsigned int bootsel, flash_present, resetreason;
 	char tstring[8] = {0};
     volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
 
@@ -220,6 +231,7 @@ int main(void)
 	if( hal_get_apb_i2cs_slave_address() !=  MY_I2C_SLAVE_ADDRESS )
 		hal_set_apb_i2cs_slave_address(MY_I2C_SLAVE_ADDRESS);
 
+	udma_uart_open (0, 115200);	//UART 1 is used to print debug msgs from Bootloader
 	udma_uart_open (1, 115200);	//UART 1 is used to print debug msgs from Bootloader
 	dbg_str(__DATE__);
 	dbg_str("  ");
@@ -278,15 +290,53 @@ int main(void)
 		while (1) {
 			if (psoc->jtagreg != 0x1)
 				jump_to_address(0x1C008080);
+
+			//Perform UART bootloader functionality
+			if( gStopUartBootLoaderFlg == 0 )
+				processUartProtocolFrames();
 			//Perform I2C bootloader functionality
-			processI2CProtocolFrames();
+			if( gStopI2CBootLoaderFlg == 0 )
+				processI2CProtocolFrames();
 			bootsel++;		//Reusing bootsel variable as a counter
-			if( bootsel >= 500000 )
+			if( bootsel >= 90000 )
 			{
 				if( gStopUartMsgFlg == 0 )	//Flag to control the continuous print of characters
+				{
 					dbg_str(tstring);
+					sendUartBootMeFrame();
+				}
 				bootsel = 0;
 			}
+
 		}
 	}
 }
+
+
+//stops parsing, if a NULL or space or is encountered or entire length of the buffer is read
+uint32_t atoh(uint8_t *aBuf, uint16_t aSize)
+{
+    uint16_t i = 0;
+    uint32_t lValue = 0;
+    uint8_t lChar = 0;
+
+    for(i=0; ( (i < aSize ) && (aBuf[i] != '\0') && (aBuf[i] != ' ') ); i++)
+    {
+        if( (aBuf[i] >= '0') && ( aBuf[i] <= '9') )
+        {
+            lChar = aBuf[i] - '0';
+        }
+        else if( (aBuf[i] >= 'A') && ( aBuf[i] <= 'F') )
+        {
+            lChar = (aBuf[i] - 'A') + 10;
+        }
+        else if( (aBuf[i] >= 'a') && ( aBuf[i] <= 'f') )
+        {
+            lChar = (aBuf[i] - 'a') + 10;
+        }
+        lValue *= 16;
+        lValue += lChar;
+    }
+    return lValue;
+}
+

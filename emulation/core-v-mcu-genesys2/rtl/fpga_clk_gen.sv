@@ -22,7 +22,7 @@
 
 module clk_gen (
                      input logic         ref_clk_i,
-                input logic [1:0] emul_clk_i,
+                     input logic         emul_clk_i,
                      input logic         rstn_glob_i,
                      input logic         test_mode_i,
                      input logic         shift_enable_i,
@@ -57,7 +57,7 @@ module clk_gen (
   xilinx_clk_mngr i_clk_manager
     (
      .resetn(rstn_glob_i),
-     .clk_in1(emul_clk_i[0]),
+     .clk_in1(emul_clk_i),
      .clk_out1(soc_clk_o),
      .clk_out2(per_clk_o),
      .clk_out3(cluster_clk_o),

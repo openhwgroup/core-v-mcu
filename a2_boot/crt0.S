@@ -62,13 +62,13 @@
 .global _start
 .type _start, @function
   _start:
-  jal x0, reset_handler
-
-  .org 0x84
-loop:
-  j loop
-
-reset_handler:
+  /* clear the bss segment */
+	la t0, _bss_start
+	la t1, _bss_end
+1:
+	sw zero,0(t0)
+	addi t0, t0, 4
+	bltu t0, t1, 1b
   la   x2, stack
   j main
 

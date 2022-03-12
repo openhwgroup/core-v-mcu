@@ -43,7 +43,7 @@ ${AUTO_MD_DIR}/%.md : ${CSV_MIRROR_DIR}/%.csv
 				--reg-def-csv $<\
 				--reg-def-md $@
 
-${AUTO_MD_DIR}/pin-table.md: ../pin-table.csv
+${AUTO_MD_DIR}/pin-table.md: ../nexys-pin-table.csv
 			@mkdir -p ${AUTO_MD_DIR}
 			@python3 ../util/ioscript.py\
 				--soc-defines ../rtl/includes/pulp_soc_defines.svh\

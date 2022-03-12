@@ -46,10 +46,11 @@ module soc_domain
 
 
 
-    input logic ref_clk_i,
-    input logic sclk_in,
-    input logic test_clk_i,
-    input logic rstn_glob_i,
+    input  logic ref_clk_i,
+    input  logic sclk_in,
+    output logic slow_clk_o,  // for emulation generation of refclk
+    input  logic test_clk_i,
+    input  logic rstn_glob_i,
 
     input  logic                               dft_test_mode_i,
     input  logic                               dft_cg_enable_i,
@@ -429,6 +430,7 @@ module soc_domain
   soc_clk_rst_gen i_clk_rst_gen (
       .ref_clk_i    (ref_clk_i),
       .sclk_in      (sclk_in),
+      .slow_clk_o   (slow_clk_o),
       .test_clk_i   (test_clk_i),
       .sel_fll_clk_i(s_sel_fll_clk),
 

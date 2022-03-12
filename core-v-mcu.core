@@ -108,7 +108,7 @@ filesets:
     - pulp-platform.org::tech_cells_xilinx
     files:
     - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - emulation/xilinx/rtl/fpga_clk_gen.sv
+
     - emulation/xilinx/rtl/fpga_interleaved_ram.sv
     - emulation/xilinx/rtl/fpga_private_ram.sv
     - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
@@ -122,10 +122,19 @@ filesets:
     - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
 
-  xilinx-ips:
+  nexys-ips:
     files:
     - emulation/xilinx/ips/xilinx_clk_mngr.tcl
-    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    file_type: tclSource
+
+  genesys2-ips:
+    files:
+    - emulation/core-v-mcu-genesys2/ips/xilinx_clk_mngr.tcl
+    file_type: tclSource
+
+  xilinx-ips:
+    files:
+#    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
     - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
     - emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
@@ -172,6 +181,7 @@ filesets:
   nexys-rtl:
     files:
     - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+    - emulation/xilinx/rtl/fpga_clk_gen.sv
     file_type: systemVerilogSource
 
   nexys-xdc:
@@ -179,11 +189,22 @@ filesets:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
 
-  nexys-cfg:
+  xilinx-tcl:
     files:
-    - emulation/core-v-mcu-nexys/tcl/common.tcl
-    - emulation/core-v-mcu-nexys/tcl/flatten.tcl
+    - emulation/xilinx/tcl/common.tcl
+    - emulation/xilinx/tcl/flatten.tcl
     file_type: tclSource
+
+  genesys2-rtl:
+    files:
+    - emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v
+    - emulation/core-v-mcu-genesys2/rtl/fpga_clk_gen.sv
+    file_type: systemVerilogSource
+
+  genesys2-xdc:
+    files:
+    - emulation/core-v-mcu-genesys2/constraints/core-v-mcu-pin-assignment.xdc
+    file_type: xdc
 
   # Scripts for hooks
   pre_build_scripts:
@@ -311,13 +332,33 @@ targets:
     parameters:
     - PULP_FPGA_EMUL=true
     filesets_append:
+    - nexys-ips
     - xilinx-ips
+    - xilinx-tcl
     - emulation-rtl
     - nexys-rtl
-    - nexys-cfg
     - nexys-xdc
     - rom_init
     tools:
       vivado:
         part: xc7a100tcsg324-1
     toplevel: core_v_mcu_nexys
+
+  genesys2:
+    <<: *default_target
+    default_tool: vivado
+    description: Digilent Nexys-A7-100T Board
+    parameters:
+    - PULP_FPGA_EMUL=true
+    filesets_append:
+    - genesys2-ips
+    - xilinx-ips
+    - xilinx-tcl
+    - emulation-rtl
+    - genesys2-rtl
+    - genesys2-xdc
+    - rom_init
+    tools:
+      vivado:
+        part: xc7k325tffg900-2
+    toplevel: core_v_mcu_genesys2
