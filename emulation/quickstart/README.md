@@ -1,10 +1,12 @@
 # CORE-V-MCU Quick Start Guide
 The purpose of this Quick Start Guide (QSG) is to get you up and running quickly with the CORE-V-MCU on one of the various supported platforms.
-After working through this document you should have a [cli_test](https://github.com/QuickLogic-Corp/core-v-mcu-cli-test)
+After working through this document you should have a [cli_test](https://github.com/openhwgroup/core-v-mcu-cli-test)
 running on the CORE-V-MCU on either an FPGA based emulation platform or in simulation using Verilator.
 The emulation platform supports a simple "CLI monitor" interface over a console terminal and debug within the Eclipse IDE using OpenOCD over JTAG with the Digilent HS2 pmod adapter.
 
+<!---
 **Coming soon**: this QSG uses precompiled binaries available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
+--->
 
 The following assumes you are running on a Linux platform and has been tested under Ubuntu 20.04.
 
@@ -134,4 +136,4 @@ Below is a few examples of commands available with cli_test:
 ```
 
 ## Eclipse IDE
-TODO
+Details on using the Eclipse IDE with the CORE-V MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
