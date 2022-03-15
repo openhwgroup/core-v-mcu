@@ -9,6 +9,10 @@
 > In case you should be interested to join the project please feel free to open
 > an issue, or involve yourself in any open issues/discussions.
 
+## Quick Start Guide
+
+The fastest way to get up and running with the CORE-V MCU is with pre-built bit streams for the Digilent Nexys A7 board. Check out the [Quick Start Guide](https://github.com/MikeOpenHWGroup/core-v-mcu/blob/qsg/emulation/quickstart/README.md).
+
 ## Getting Started
 
 Install the required Python tools:
