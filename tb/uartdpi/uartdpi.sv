@@ -128,10 +128,12 @@ module uartdpi
                if (rxcyccount == CYCLES_PER_SYMBOL) begin
                   rxactive = 0;
                   if (rx) begin
-                     uartdpi_write(obj, rxsymbol);
+                     //uartdpi_write(obj, rxsymbol);
+                     $write("%c", rxsymbol);
                   end
                end
             end
+            $fflush;
          end
       end // else: !if(rst)
    end

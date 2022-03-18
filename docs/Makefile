@@ -20,8 +20,8 @@ all:    doc pdf
 
 clean:
 				rm -rf ${AUTO_MD_DIR}
-				rm index.pdf
-				rm doc-src/all.md
+				rm -rf index.pdf
+				rm -rf doc-src/all.md
 
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
