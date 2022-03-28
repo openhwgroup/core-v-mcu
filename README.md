@@ -9,6 +9,10 @@
 > In case you should be interested to join the project please feel free to open
 > an issue, or involve yourself in any open issues/discussions.
 
+## Quick Start Guide
+
+The fastest way to get up and running with the CORE-V MCU is with pre-built bit streams for the Digilent Nexys A7 board. Check out the [Quick Start Guide](https://github.com/openhwgroup/core-v-mcu/tree/master/emulation/quickstart/README.md).
+
 ## Getting Started
 
 Install the required Python tools:
@@ -34,8 +38,11 @@ lint:           run Verilator lint check
 docs:           generate documentation
 sw:             generate C header files (in ./sw)
 nexys-emul:     generate bitstream for Nexys-A7-100T emulation)
+genesys2-emul:  generate bitstream for Genesys2 FPGA board
 buildsim:       build for Questa sim
 sim:            run Questa sim
+downloadn:      Download bitstream to Nexys board
+downloadg:      Download bitstream to Genesys2 board
 ```
 
 ## Building an FPGA Image
@@ -49,9 +56,9 @@ Make sure you have the latest Xilinx board-parts installed.
 Current image is [core_v_nexys_200122.bit](http://core-v-mcu.s3-website-eu-west-1.amazonaws.com/core_v_mcu_nexys_200122.bit)
 
 
-Currently unsupported:
+To target Genesys2 board:
 ```
-$ make genesys2
+$ make genesys2-emul
 ```
 Extra note for building on ubuntu - Vivado tools from Xilinx may require a larger swap size that the system default.
 The swap size can be increased by searching for "increase swapfile in ubuntu" and add your release.
