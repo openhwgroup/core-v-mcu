@@ -51,16 +51,19 @@ all-vivado:	clean-vivado build-vivado sim-vivado
 
 clean-vivado:
 	rm -rf build
-	rm -rf xelab.* vivado-sim.log
+	rm -f  xelab.* vivado-sim.log
+	rm -f  sim.log
+	rm -f  build-vivado.log
+	rm -f  sim-vivado.log
 
 .PHONY: build-vivado
 build-vivado:
-	fusesoc --cores-root . run --target=sim --tool=xsim --setup \
-		--build openhwgroup.org:systems:core-v-mcu | tee vivado-sim.log
+	fusesoc --verbose --cores-root . run --target=sim --tool=xsim --setup \
+		--build openhwgroup.org:systems:core-v-mcu | tee build-vivado.log
 
 .PHONY:sim-vivado
 sim-vivado:
-	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-xsim; make run) 2>&1 | tee sim.log
+	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-xsim; make run) 2>&1 | tee sim-vivado.log
 
 .PHONY: model-lib
 model-lib:

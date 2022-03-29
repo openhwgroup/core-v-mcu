@@ -257,6 +257,7 @@ targets:
       xsim:
         xelab_options:
         - --define XSIM
+        - --define VERILATOR
         - --incr
         - -dup_entity_as_module
         - -relax
