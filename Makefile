@@ -40,6 +40,10 @@ help:
 			@echo "sim-vivado:     run Vivado simulation (xsim)"
 			@echo "clean-vivado:   remove generated build files from Vivado build and/or sim"
 			@echo "all-vivado:     clean-, build-, sim-vivado (in that order)"
+			@echo "clean-xcelium:  delete all files generated for Xcelium simulation"
+			@echo "build-xcelium:  build for Xcelium simulation"
+			@echo "sim-xcelium:    run Xcelium simulation"
+			@echo "all-xcelium:    clean-, build-, sim-xcelium (in that order)"
 			@echo "clean:          remove generated doc and sw files"
 
 all:	${IOSCRIPT_OUT} docs sw
@@ -49,6 +53,11 @@ src:	${IOSCRIPT_OUT}
 clean:
 	(cd docs; make clean)
 	(cd sw; make clean)
+	rm -f tb/uartdpi.so
+
+.PHONY:pseudo-uart
+pseudo-uart:
+	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
 
 all-vivado:	clean-vivado build-vivado sim-vivado
 
@@ -79,14 +88,34 @@ sim:
 	(cd build/openhwgroup.org_systems_core-v-mcu_0/sim-modelsim; make run-gui) 2>&1 | tee sim.log
 
 .PHONY:buildsim
-buildsim:
-	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+buildsim: pseudo-uart
 	fusesoc --cores-root . run --no-export --target=sim --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
 
+###############################################################################
+# XCELIUM targets
+#
+# buildsim-xcelium is kept for backward compatibility
 .PHONY:buildsim-xcelium
-buildsim-xcelium:
-	(cd tb/uartdpi; cc -shared -Bsymbolic -fPIC -o uartdpi.so -lutil uartdpi.c)
+buildsim-xcelium: pseudo-uart
 	fusesoc --cores-root . run --no-export --target=sim --setup --build --tool=xcelium openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+
+.PHONY: clean-xcelium
+clean-xcelium: clean
+	rm -rf build
+
+.PHONY: build-xcelium
+build-xcelium: pseudo-uart
+	fusesoc --cores-root . run --no-export --target=sim --setup --build --tool=xcelium openhwgroup.org:systems:core-v-mcu 2>&1 | tee buildsim.log
+
+.PHONY: sim-xcelium
+sim-xcelium: build-xcelium
+	cd build/openhwgroup.org_systems_core-v-mcu_0/sim-xcelium && \
+	make run
+
+.PHONY: all-xcelium
+all-xcelium: clean-xcelium build-xcelium sim-xcelium
+
+###############################################################################
 
 .PHONEY: nexys-emul
 nexys-emul:

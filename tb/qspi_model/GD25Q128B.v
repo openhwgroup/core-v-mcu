@@ -177,7 +177,7 @@ memory_access  #(.initfile(initfile) ) mem_access(address, suspend_add, suspend_
 task InitMemory_fom_file;
     begin 
       	    $readmemh(initfile, mem_access.content); 
-      	    $display("%t : NOTE : InitMemory_fom_file Load End",$realtime); 
+      	    $display("\n%m @ %t : NOTE : InitMemory_fom_file Load End",$realtime); 
     end
 endtask 
 `endif
@@ -263,9 +263,9 @@ module memory_access (    add_mem, suspend_add, suspend_enable, suspend_pp, susp
       end
 
       `ifdef INITIAL_DATA
-      	    $display("%t : NOTE : Load memory with Initial content",$realtime); 
+      	    $display("\n%m @ %t : NOTE : Load memory with Initial content",$realtime); 
       	    $readmemh(initfile, content); 
-      	    $display("%t : NOTE : Initial Load End",$realtime); 
+      	    $display("\n%m @ %t : NOTE : Initial Load End",$realtime); 
       `endif
         
       for(i = 0; i <= (`OTP_SIZE-1); i = i + 1)  
@@ -626,7 +626,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             t_S_fall = $realtime; 
             if ((t_S_fall - t_S_rise) < `TSHSL)
             begin
-               $display("%t : ERROR : tSHSL condition violated",$realtime); 
+               $display("\n%m @ %t : ERROR : tSHSL condition violated",$realtime); 
             end 
          end
       end 
@@ -647,14 +647,14 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             t_S_fall = $realtime;
             if ( ($realtime - t_C_rise) < `TCHSL)
                 begin
-                $display("%t : ERROR :tCHSL condition violated",$realtime); 
+                $display("\n%m @ %t : ERROR :tCHSL condition violated",$realtime); 
             if (c ==1'b1)
                 begin
                 @(c);
                 @(c);
                 if (($realtime - t_S_fall) < `TSLCH)
                       begin 
-                      $display("%t : ERROR :tSLCH condition violated",$realtime);  
+                      $display("\n%m @ %t : ERROR :tSLCH condition violated",$realtime);  
                       end
                 end 
                 end
@@ -663,7 +663,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
                 @(c);
                 if (($realtime - t_S_fall) < `TSLCH)
                     begin 
-                    $display("%t : ERROR :tSLCH condition violated",$realtime);  
+                    $display("\n%m @ %t : ERROR :tSLCH condition violated",$realtime);  
                     end
                 end 
                 end
@@ -686,7 +686,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             t_S_rise = $realtime;
             if ( ($realtime - t_C_rise) < `TCHSH)
                 begin
-                $display("%t : ERROR :tCHSH condition violated",$realtime); 
+                $display("\n%m @ %t : ERROR :tCHSH condition violated",$realtime); 
                 end 
             if (c == 1'b1)
                 begin
@@ -694,7 +694,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
                 @(c);
                 if ( ($realtime - t_S_rise) < `TSHCH )
                     begin
-                    $display("%t : ERROR :tSHCH condition violated",$realtime);
+                    $display("\n%m @ %t : ERROR :tSHCH condition violated",$realtime);
                     end
                 end
             else if (c == 1'b0)
@@ -702,7 +702,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
                 @(c);
                 if ( ($realtime - t_S_rise) < `TSHCH )
                     begin
-                    $display("%t : ERROR :tSHCH condition violated",$realtime);
+                    $display("\n%m @ %t : ERROR :tSHCH condition violated",$realtime);
                     end
                 end 
           end
@@ -725,13 +725,13 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             t_H_fall = $realtime ;
             if (( (t_H_fall - t_C_rise) < `TCHHL) && !QE)
             begin
-               $display("%t : ERROR : tCHHL condition violated",$realtime); 
+               $display("\n%m @ %t : ERROR : tCHHL condition violated",$realtime); 
             end 
          
             @(posedge c);
             if (( ($realtime - t_H_fall) < `THLCH) && !QE)
             begin
-               $display("%t : ERROR : tHLCH condition violated",$realtime);
+               $display("\n%m @ %t : ERROR : tHLCH condition violated",$realtime);
             end
          end
          end
@@ -747,12 +747,12 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             t_H_rise = $realtime ;
             if (( (t_H_rise - t_C_rise) < `TCHHH) && !QE)
             begin
-               $display("%t : ERROR : tCHHH condition violated",$realtime); 
+               $display("\n%m @ %t : ERROR : tCHHH condition violated",$realtime); 
             end 
             @(posedge c);
             if (( ($realtime - t_H_rise) < `THHCH) && !QE)
             begin
-               $display("%t : ERROR : tHHCH condition violated",$realtime);
+               $display("\n%m @ %t : ERROR : tHHCH condition violated",$realtime);
             end
          end
          end
@@ -776,7 +776,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
          begin
             if ( ($realtime - t_C_rise) < `TCHDX)
             begin
-               $display("%t : ERROR : tCHDX condition violated",$realtime); 
+               $display("\n%m @ %t : ERROR : tCHDX condition violated",$realtime); 
             end 
          end
          else if (c == 1'b0)
@@ -784,7 +784,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             @(c);
             if ( ($realtime - t_D_change) < `TDVCH) 
             begin
-               $display("%t : ERROR : tDVCH condition violated",$realtime);
+               $display("\n%m @ %t : ERROR : tDVCH condition violated",$realtime);
             end
          end 
       end
@@ -818,7 +818,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
                     begin
                     if ((s == 1'b0) && (hold == 1'b1)) 
                          begin
-                         if ($time != 0) $display("%t : ERROR : tCH condition violated",$realtime); 
+                         if ($time != 0) $display("\n%m @ %t : ERROR : tCH condition violated",$realtime); 
                          end 
                     end 
                  end
@@ -847,7 +847,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
                      begin
                      if ((s == 1'b0) && (hold == 1'b1)) 
                          begin
-                         if ($time != 0) $display("%t : ERROR : tCL condition violated",$realtime); 
+                         if ($time != 0) $display("\n%m @ %t : ERROR : tCL condition violated",$realtime); 
                         end 
                      end 
                   end
@@ -869,7 +869,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             begin
                if ((high_time + low_time) < `TR)
                begin
-                  if ($time !=0) $display("%t : ERROR : Clock frequency condition violated for READ instruction: fR>80MHz",$realtime); 
+                  if ($time !=0) $display("\n%m @ %t : ERROR : Clock frequency condition violated for READ instruction: fR>80MHz",$realtime); 
                   flag_80M <=1'b1;
                end 
                else
@@ -882,7 +882,7 @@ module acdc_check (c, d, s, hold, write_op, read_op,read_op_80,oen,thold_readqua
             begin
                if ((high_time + low_time) < `TC)
                begin
-                  if ($time !=0) $display("%t : ERROR : Clock frequency condition violated: fC>120MHz",$realtime);                   
+                  if ($time !=0) $display("\n%m @ %t : ERROR : Clock frequency condition violated: fC>120MHz",$realtime);                   
                   flag_120M <=1'b1;
                end 
                else
@@ -1487,7 +1487,7 @@ module internal_logic ( c, d,      w, s, hold, data_to_read, q,        data_to_w
          if (c == 1'b0)
          begin
             hold_cond <= `TRUE;
-            if ($time != 0) $display("%t:  NOTE: COMMUNICATION PAUSED",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE: COMMUNICATION PAUSED",$realtime); 
          end
          else
          begin
@@ -1495,7 +1495,7 @@ module internal_logic ( c, d,      w, s, hold, data_to_read, q,        data_to_w
             if (c == 1'b0)
             begin
                hold_cond <= `TRUE;
-               if ($time != 0) $display("%t:  NOTE: COMMUNICATION PAUSED",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE: COMMUNICATION PAUSED",$realtime); 
             end 
          end 
       end
@@ -1504,7 +1504,7 @@ module internal_logic ( c, d,      w, s, hold, data_to_read, q,        data_to_w
          if (c == 1'b0)
          begin
             hold_cond <= `FALSE;
-            if ($time != 0) $display("%t:  NOTE: COMMUNICATION (RE)STARTED",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE: COMMUNICATION (RE)STARTED",$realtime); 
          end
          else
          begin
@@ -1512,7 +1512,7 @@ module internal_logic ( c, d,      w, s, hold, data_to_read, q,        data_to_w
             if (c == 1'b0)
             begin
                hold_cond <= `FALSE;
-               if ($time != 0) $display("%t:  NOTE: COMMUNICATION (RE)STARTED",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE: COMMUNICATION (RE)STARTED",$realtime); 
             end 
          end 
       end
@@ -1899,11 +1899,11 @@ always
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                 begin
@@ -1935,11 +1935,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle",$realtime); 
                end
                else
                begin
@@ -1951,11 +1951,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle",$realtime); 
                end
                else
                begin
@@ -1967,7 +1967,7 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else
                begin
@@ -1980,7 +1980,7 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else
                begin
@@ -1994,11 +1994,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2011,11 +2011,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else               
                begin
@@ -2028,11 +2028,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2046,11 +2046,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                 begin
@@ -2063,11 +2063,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else 
                begin
@@ -2080,11 +2080,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else 
                begin
@@ -2096,11 +2096,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else if (QE)
                begin
@@ -2119,11 +2119,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                 else if (QE)
                begin
@@ -2141,11 +2141,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                 else if (QE)
                begin
@@ -2164,11 +2164,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr && (~suspend_enable))
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                 else if  (QE)
                begin
@@ -2186,11 +2186,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2205,11 +2205,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2222,11 +2222,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else if (QE)
                begin
@@ -2237,7 +2237,7 @@ end
                 begin
                   quadpgm <= `FALSE ;
                   write_op <= `FALSE ; 
-                  if ($time != 0) $display("%t:  ERROR : This Opcode need to set QE first. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode need to set QE first. Cycle",$realtime); 
                end 
             end
              
@@ -2245,11 +2245,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2263,11 +2263,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2280,11 +2280,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2298,11 +2298,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2315,11 +2315,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2332,11 +2332,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr || suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime); 
                end
                else
                begin
@@ -2349,11 +2349,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
                else
                begin
@@ -2366,11 +2366,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
                else
                begin
@@ -2383,11 +2383,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
                else
                begin
@@ -2400,7 +2400,7 @@ end
             begin
                if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
 		else
                begin   
@@ -2413,11 +2413,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (only_rdsr)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
                else 
                begin
@@ -2430,11 +2430,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (cer || wrsr || (!only_rdsr))  
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
               else
               begin
@@ -2474,11 +2474,11 @@ end
             begin
                if ( dpd_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during deep power down cycle. Cycle",$realtime); 
                end
                else if (~suspend_enable)
                begin
-                  if ($time != 0) $display("%t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
+                  if ($time != 0) $display("\n%m @ %t:  ERROR : This Opcode is not decoded during a Prog. Cycle ",$realtime);
                end
                else
                begin
@@ -2517,7 +2517,7 @@ end
             end   
             else
             begin
-               if ($time != 0) $display("%t:  ERROR : False instruction (%x), please retry ",$realtime,data_latch); 
+               if ($time != 0) $display("\n%m @ %t:  ERROR : False instruction (%x), please retry ",$realtime,data_latch); 
             end 
          end 
          //---------------------------------------------------------------------
@@ -3213,7 +3213,7 @@ end
             q_bis <=  #`TSHQZ 1'bx; 
             wp_bis <= #`TSHQZ 1'bx ;
             hold_bis <= #`TSHQZ 1'bx ;
-            if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
          end
          else if ((suspend_pp || suspend_quadpgm  ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
          begin
@@ -3238,7 +3238,7 @@ end
             q_bis <=  #`TSHQZ 1'bx;
             wp_bis <= #`TSHQZ 1'bx ;
             hold_bis <= #`TSHQZ 1'bx ;
-            if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
          end
          else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
          begin
@@ -3263,7 +3263,7 @@ end
             q_bis <=  #`TSHQZ 1'bx;
             wp_bis <= #`TSHQZ 1'bx ;
             hold_bis <= #`TSHQZ 1'bx ; 
-            if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
          end
          else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
          begin
@@ -3288,7 +3288,7 @@ end
             q_bis <=  #`TSHQZ 1'bx;
             wp_bis <= #`TSHQZ 1'bx ;
             hold_bis <= #`TSHQZ 1'bx ; 
-            if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
          end
          else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
          begin
@@ -3380,7 +3380,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;  
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
             begin
@@ -3406,7 +3406,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;   
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
@@ -3432,7 +3432,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ; 
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
             begin
@@ -3457,7 +3457,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ; 
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
          end
          else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
          begin
@@ -3552,7 +3552,7 @@ end
                    q_bis <=  #`TSHQZ 1'bx;
                    wp_bis <= #`TSHQZ 1'bx ;
                    hold_bis <= #`TSHQZ 1'bx ;  
-                   if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                   if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
                    end
             
                 else if (suspend_add[9:8] !== adress_2[1:0])
@@ -3578,7 +3578,7 @@ end
                    q_bis <=  #`TSHQZ 1'bx;
                    wp_bis <= #`TSHQZ 1'bx ;
                    hold_bis <= #`TSHQZ 1'bx ;   
-                   if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                   if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
                end
             else 
               begin
@@ -3665,7 +3665,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm  ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))	
             begin
@@ -3695,7 +3695,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
@@ -3725,7 +3725,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber32 && (suspend_add[23:15] !== ({adress_1[7:0],adress_2[7]}) ) )
             begin
@@ -3755,7 +3755,7 @@ end
                 q_bis <=  #`TSHQZ 1'bx;
                 wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ; 
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
            end
          else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
          begin
@@ -3892,7 +3892,7 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm  ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
             begin
@@ -3924,7 +3924,7 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
@@ -3956,7 +3956,7 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
             begin
@@ -3987,7 +3987,7 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
             begin
@@ -4114,7 +4114,7 @@ end
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4143,13 +4143,13 @@ end
             	d_bis <= #`TSHQZ 1'bx ;
             	wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4175,13 +4175,13 @@ end
             	d_bis <= #`TSHQZ 1'bx ;
             	wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4206,13 +4206,13 @@ end
             	d_bis <= #`TSHQZ 1'bx ;
             	wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4237,13 +4237,13 @@ end
             	d_bis <= #`TSHQZ 1'bx ;
             	wp_bis <= #`TSHQZ 1'bx ;
                 hold_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4265,7 +4265,7 @@ end
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     q_bis <= #`TCLQV 1'bx ; 
                     d_bis <= #`TCLQV 1'bx ; 
 	        end
@@ -4669,7 +4669,7 @@ end
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4699,13 +4699,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm  ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4732,13 +4732,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4765,13 +4765,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4797,13 +4797,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4827,7 +4827,7 @@ end
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4941,7 +4941,7 @@ end
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -4971,13 +4971,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_pp || suspend_quadpgm ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:8] !== adress_2)))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -5004,13 +5004,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
             else if ((suspend_ser ) && ((suspend_add[23:16] !== adress_1[7:0]) || (suspend_add[15:12] !== adress_2[7:4])))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -5037,13 +5037,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
            else  if (suspend_ber32 && (suspend_add[23:15] !== {adress_1[7:0],adress_2[7]}) )
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -5070,13 +5070,13 @@ end
             	wp_bis <=  #`TSHQZ 1'bx; 
             	q_bis <=  #`TSHQZ 1'bx; 
             	d_bis <= #`TSHQZ 1'bx ;
-                if ($time != 0) $display("%t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Read error because data is operated(program/erase) now!",$realtime); 
             end
            else  if (suspend_ber64 && (suspend_add[23:16] !== adress_1[7:0]))
             begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -5100,7 +5100,7 @@ end
              begin
                 if(flag_120M)
 	        begin
-                    $display("%t Warning: This read command at High frequence! \n",$realtime);
+                    $display("\n%m @ %t Warning: This read command at High frequence! \n",$realtime);
                     hold_bis <= #`TCLQV 1'bx ; 
                     wp_bis <= #`TCLQV 1'bx ; 
                     q_bis <= #`TCLQV 1'bx ; 
@@ -5179,7 +5179,7 @@ end
 	            )
 	       )
             begin
-                if ($time != 0) $display("%t: NOTE : Continue Read Mode Reset.",$realtime);
+                if ($time != 0) $display("\n%m @ %t: NOTE : Continue Read Mode Reset.",$realtime);
 		crm_bit = 8'h00;
                 reset_crmr <= 1'b1;
                	inhib_crmr <= `TRUE ; 
@@ -5222,7 +5222,7 @@ end
          if (wren && (!only_rdsr) && select_ok)
          begin
             inhib_wren <= `TRUE ; 
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          end
       end
       
@@ -5252,7 +5252,7 @@ end
          if (wrdi && (!only_rdsr) && select_ok)
          begin
             inhib_wrdi <= `TRUE ; 
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          end
       end
   
@@ -5270,7 +5270,7 @@ always @(select_ok)
       begin
          if (!select_ok) 
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             wrsr <= `FALSE;
          end 
       end 
@@ -5280,7 +5280,7 @@ always @(select_ok)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                wrsr_enable <= `FALSE ; 
                inhib_wrsr <= `TRUE ; 
             end
@@ -5288,12 +5288,12 @@ always @(select_ok)
             begin
              if(!wrsr_protect)
               begin
-               if ($time != 0) $display("%t:  NOTE : wrsr cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : wrsr cycle has begun",$realtime); 
                wrsr_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ;
                #`TW ;
-               if ($time != 0) $display("%t:  NOTE : wrsr cycle is finished",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : wrsr cycle is finished",$realtime); 
                wrsr_enable <= `FALSE ; 
                inhib_wrsr <= `TRUE ; 
                wip <= 1'b0 ; 
@@ -5301,7 +5301,7 @@ always @(select_ok)
               end
              else
                begin
-               if ($time != 0) $display("%t:  NOTE : this wrsr op protected,wrsr operation is inhibted",$realtime);
+               if ($time != 0) $display("\n%m @ %t:  NOTE : this wrsr op protected,wrsr operation is inhibted",$realtime);
                wrsr <= `FALSE;
                end
             end
@@ -5339,7 +5339,7 @@ always @(posedge c_int)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                cer_enable <= `FALSE ; 
                inhib_cer <= `TRUE ; 
             end
@@ -5348,7 +5348,7 @@ always @(posedge c_int)
               #2;
               if(!bpbit)
               begin
-               if ($time != 0) $display("%t:  NOTE : Chip erase cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Chip erase cycle has begun",$realtime); 
                cer_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ;
@@ -5358,7 +5358,7 @@ always @(posedge c_int)
                   end
                if ((!suspend_enable) && (!resume_enable))
                begin
-               if ($time != 0) $display("%t:  NOTE : Chip erase cycle is finished",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Chip erase cycle is finished",$realtime); 
                cer_enable <= `FALSE ;
                inhib_cer <= `TRUE ;  
                wip <= 1'b0 ; 
@@ -5367,7 +5367,7 @@ always @(posedge c_int)
             end
             else
             begin 
-            if ($time != 0) $display("%t:  NOTE : Chip is protected,no erase occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : Chip is protected,no erase occur",$realtime); 
             inhib_cer <= `TRUE ;  
             end
          end  
@@ -5379,7 +5379,7 @@ always @(posedge c_int)
    begin
       if (cer && (!only_rdsr) && select_ok)
       begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_cer <= `TRUE ; 
       end
    end
@@ -5397,7 +5397,7 @@ always @(posedge c_int)
       begin
          if ((!select_ok) && (!resume_enable) && (!suspend_enable))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ber32 <= `TRUE ; 
              
          end 
@@ -5408,7 +5408,7 @@ always @(posedge c_int)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                ber32_enable_ctl <= `FALSE ; 
                inhib_ber32 <= `TRUE ; 
                
@@ -5419,7 +5419,7 @@ always @(posedge c_int)
               if(!bpbit)
               begin
                ber32_time <= $realtime;
-               if ($time != 0) $display("%t:  NOTE : Block erase cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle has begun",$realtime); 
                ber32_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ;
@@ -5429,7 +5429,7 @@ always @(posedge c_int)
                   end
                if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
                begin
-               if ($time != 0) $display("%t:  NOTE : Block erase cycle is finished",$realtime); 	
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle is finished",$realtime); 	
                ber32_enable_ctl <= `FALSE ; 
                inhib_ber32 <= `TRUE ; 
                
@@ -5439,7 +5439,7 @@ always @(posedge c_int)
               end
              else
                begin
-              if ($time != 0) $display("%t:  NOTE : this block protected,ber32 operation is inhibted",$realtime);
+              if ($time != 0) $display("\n%m @ %t:  NOTE : this block protected,ber32 operation is inhibted",$realtime);
                inhib_ber32 <= `TRUE ;
                end
             end
@@ -5453,7 +5453,7 @@ always @(posedge c_int)
       begin
          if (byte_cpt == 4 && select_ok)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ber32 <= `TRUE ;
             
          end
@@ -5473,7 +5473,7 @@ always @(posedge c_int)
       begin
          if ((!select_ok) && (!resume_enable) && (!suspend_enable))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ber64 <= `TRUE ; 
              
          end 
@@ -5484,7 +5484,7 @@ always @(posedge c_int)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                ber64_enable_ctl <= `FALSE ; 
                inhib_ber64 <= `TRUE ; 
                
@@ -5495,7 +5495,7 @@ always @(posedge c_int)
               if(!bpbit)
               begin
                ber64_time <= $realtime;
-               if ($time != 0) $display("%t:  NOTE : Block erase cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle has begun",$realtime); 
                ber64_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ;
@@ -5505,7 +5505,7 @@ always @(posedge c_int)
                   end
          	if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
                begin
-               if ($time != 0) $display("%t:  NOTE : Block erase cycle is finished",$realtime); 	
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle is finished",$realtime); 	
                ber64_enable_ctl <= `FALSE ; 
                inhib_ber64 <= `TRUE ; 
                
@@ -5515,7 +5515,7 @@ always @(posedge c_int)
               end
              else
              begin
-                if ($time != 0) $display("%t:  NOTE : this block is protected, ber64 operation is inhibted",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  NOTE : this block is protected, ber64 operation is inhibted",$realtime); 
                 inhib_ber64 <= `TRUE ; 
              end
 
@@ -5530,7 +5530,7 @@ always @(posedge c_int)
       begin
          if (byte_cpt == 4 && select_ok)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ber64 <= `TRUE ;
             
          end
@@ -5552,7 +5552,7 @@ always @(posedge c_int)
       begin
          if ((!select_ok) && (!resume_enable) && (!suspend_enable))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ser <= `TRUE ; 
          end 
       end 
@@ -5562,7 +5562,7 @@ always @(posedge c_int)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                ser_enable_ctl <= `FALSE ; 
                inhib_ser <= `TRUE ; 
             end
@@ -5572,7 +5572,7 @@ always @(posedge c_int)
               if(!bpbit)
                begin
                ser_time <= $realtime;
-               if ($time != 0) $display("%t:  NOTE : Sector erase cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Sector erase cycle has begun",$realtime); 
                ser_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ; 
@@ -5582,7 +5582,7 @@ always @(posedge c_int)
                   end
                if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
                begin
-               if ($time != 0) $display("%t:  NOTE : Sector erase cycle is finished",$realtime);
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Sector erase cycle is finished",$realtime);
                ser_enable_ctl <= `FALSE ; 
                inhib_ser <= `TRUE ; 
                wip <= 1'b0 ; 
@@ -5591,7 +5591,7 @@ always @(posedge c_int)
                end
              else
                begin
-               if ($time != 0) $display("%t:  NOTE : this sectore is protected, sector erase is inhibted",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : this sectore is protected, sector erase is inhibted",$realtime); 
                inhib_ser <= `TRUE ; 
                end
             end 
@@ -5605,7 +5605,7 @@ always @(posedge c_int)
       begin
          if (byte_cpt == 4 && select_ok)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_ser <= `TRUE ; 
          end
       end
@@ -5625,7 +5625,7 @@ always @(posedge c_int)
       begin
          if ((!select_ok) && (!resume_enable) && (!suspend_enable))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_otpers <= `TRUE ; 
          end 
       end 
@@ -5635,7 +5635,7 @@ always @(posedge c_int)
          begin
             if ((status_register[1]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
                otpers_enable_ctl <= `FALSE ; 
                inhib_otpers <= `TRUE ; 
             end
@@ -5645,7 +5645,7 @@ always @(posedge c_int)
               if(!bpbit)
                begin
                otperss_time <= $realtime;
-               if ($time != 0) $display("%t:  NOTE : OTP Sector erase cycle has begun",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : OTP Sector erase cycle has begun",$realtime); 
                otpers_enable <= `TRUE ; 
                reset_wel <= 1'b0 ;
                wip <= 1'b1 ; 
@@ -5655,7 +5655,7 @@ always @(posedge c_int)
                   end
                if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
                begin
-               if ($time != 0) $display("%t:  NOTE : Otp Sector erase cycle is finished",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Sector erase cycle is finished",$realtime); 
                otpers_enable_ctl <= `FALSE ; 
                inhib_otpers <= `TRUE ; 
                wip <= 1'b0 ; 
@@ -5664,7 +5664,7 @@ always @(posedge c_int)
                end
              else
                begin
-               if ($time != 0) $display("%t:  NOTE : this otp sectore is protected, sector erase is inhibted",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  NOTE : this otp sectore is protected, sector erase is inhibted",$realtime); 
                inhib_otpers <= `TRUE ; 
                end
             end 
@@ -5678,7 +5678,7 @@ always @(posedge c_int)
       begin
          if (byte_cpt == 4 && select_ok)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_otpers <= `TRUE ; 
          end
       end
@@ -5694,7 +5694,7 @@ always @(posedge c_int)
          add_pp_enable <= `TRUE ; 
          if ((status_register[1]) == 1'b0)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
             pp_enable <= `FALSE ; 
             inhib_pp <= `TRUE ; 
          end
@@ -5716,7 +5716,7 @@ always @(posedge c_int)
          begin
             if ((!resume_enable) && (!suspend_enable))
             begin
-                if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             	inhib_pp <= `TRUE ; 
             end
          end 
@@ -5731,13 +5731,13 @@ always @(posedge c_int)
            	if ((pp) && (!resume_enable))
         	begin
             	pps_time = $realtime;
-            	if ($time != 0) $display("%t:  NOTE : Page program cycle is started",$realtime);
+            	if ($time != 0) $display("\n%m @ %t:  NOTE : Page program cycle is started",$realtime);
             	reset_wel <= 1'b0 ;
             	wip <= 1'b1 ; 
            	 #`TPP; 
            	if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
            	  begin
-            	  if ($time != 0) $display("%t:  NOTE : Page program cycle is finished",$realtime);
+            	  if ($time != 0) $display("\n%m @ %t:  NOTE : Page program cycle is finished",$realtime);
             	  pp_enable <= `TRUE ; 
             	  inhib_pp <= `TRUE ; 
             	  wip <= 1'b0 ; 
@@ -5747,7 +5747,7 @@ always @(posedge c_int)
             end
            else
            begin
-            if ($time != 0) $display("%t:  NOTE : this page is protected, no pgm occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : this page is protected, no pgm occur",$realtime); 
             inhib_pp <= `TRUE ;
             end
          end
@@ -5757,14 +5757,14 @@ always @(posedge c_int)
         #2;
         if(!bpbit)
         begin
-         if ($time != 0) $display("%t:  NOTE : Page program cycle is started",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : Page program cycle is started",$realtime); 
          pps_time = $realtime;
          reset_wel <= 1'b0 ;
          wip <= 1'b1 ;
          #`TPP; 
            if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
            begin
-           if ($time != 0) $display("%t:  NOTE : Page program cycle is finished",$realtime);
+           if ($time != 0) $display("\n%m @ %t:  NOTE : Page program cycle is finished",$realtime);
            pp_enable <= `TRUE ; 
            wip <= 1'b0 ; 
            inhib_pp <= `TRUE ; 
@@ -5773,13 +5773,13 @@ always @(posedge c_int)
         end
         else
           begin
-          if ($time != 0) $display("%t:  NOTE : this page is protected, no pgm occur",$realtime); 
+          if ($time != 0) $display("\n%m @ %t:  NOTE : this page is protected, no pgm occur",$realtime); 
           inhib_pp <= `TRUE ;
           end
      end 
      if ((byte_cpt > 5) && pp && (!only_rdsr) && (!byte_ok) && (!resume_enable) && (!suspend_enable))
      begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_pp <= `TRUE ; 
          pp_enable <= `FALSE ; 
       end           
@@ -5796,7 +5796,7 @@ always @(posedge c_int)
          add_pp_enable <= `TRUE ; 
          if ((status_register[1]) == 1'b0)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
             quadpgm_enable <= `FALSE ; 
             inhib_quadpgm <= `TRUE ; 
          end
@@ -5818,7 +5818,7 @@ always @(posedge c_int)
          begin
             if ((!resume_enable) && (!suspend_enable))
             begin
-                if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+                if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             	inhib_quadpgm <= `TRUE ; 
             end
          end 
@@ -5833,13 +5833,13 @@ always @(posedge c_int)
            	if ((quadpgm) && (!resume_enable))
         	begin
             	quadpgms_time = $realtime;
-            	if ($time != 0) $display("%t:  NOTE : quad Page program cycle is started",$realtime); 
+            	if ($time != 0) $display("\n%m @ %t:  NOTE : quad Page program cycle is started",$realtime); 
             	reset_wel <= 1'b0 ;
             	wip <= 1'b1 ; 
            	 #`TPP; 
            	if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
            	begin
-            	if ($time != 0) $display("%t:  NOTE : quad Page program cycle is finished",$realtime); 
+            	if ($time != 0) $display("\n%m @ %t:  NOTE : quad Page program cycle is finished",$realtime); 
             	quadpgm_enable <= `TRUE ; 
             	inhib_quadpgm <= `TRUE ; 
             	wip <= 1'b0 ; 
@@ -5849,7 +5849,7 @@ always @(posedge c_int)
            end
         else
            begin
-            if ($time != 0) $display("%t:  NOTE : this page is protected, no quad pgm occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : this page is protected, no quad pgm occur",$realtime); 
             inhib_quadpgm <= `TRUE ;
             end
          end
@@ -5859,14 +5859,14 @@ always @(posedge c_int)
         #2;
               if(!bpbit)
          begin
-         if ($time != 0) $display("%t:  NOTE : quad Page program cycle is started",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : quad Page program cycle is started",$realtime); 
          quadpgms_time = $realtime;
          reset_wel <= 1'b0 ;
          wip <= 1'b1 ;
          #`TPP; 
          if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
          begin
-         if ($time != 0) $display("%t:  NOTE : quad Page program cycle is finished",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : quad Page program cycle is finished",$realtime); 
          quadpgm_enable <= `TRUE ; 
          wip <= 1'b0 ; 
          inhib_quadpgm <= `TRUE ; 
@@ -5875,13 +5875,13 @@ always @(posedge c_int)
         end
        else
            begin
-            if ($time != 0) $display("%t:  NOTE : this quad page is protected, no pgm occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : this quad page is protected, no pgm occur",$realtime); 
             inhib_quadpgm <= `TRUE ;
             end
       end 
       if ((byte_cpt > 5) && quadpgm && (!only_rdsr) && (!byte_ok) && (!resume_enable) && (!suspend_enable))
       begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_quadpgm <= `TRUE ; 
          quadpgm_enable <= `FALSE ; 
       end           
@@ -5897,7 +5897,7 @@ always @(posedge c_int)
          add_pp_enable <= `TRUE ; 
          if ((status_register[1]) == 1'b0)
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because WEL is low",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because WEL is low",$realtime); 
             otppgm_enable <= `FALSE ; 
             inhib_otppgm <= `TRUE ; 
          end
@@ -5919,7 +5919,7 @@ always @(posedge c_int)
          begin
             if ((!resume_enable) && (!suspend_enable))
             begin
-            	if ($time != 0) $display("%t:  WARNING : Instruction canceled because the chip is deselected",$realtime); 
+            	if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because the chip is deselected",$realtime); 
             	inhib_otppgm <= `TRUE ; 
             end
          end 
@@ -5934,13 +5934,13 @@ always @(posedge c_int)
            	if ((otppgm) && (!resume_enable))
         	begin
             	otppgms_time = $realtime;
-            	if ($time != 0) $display("%t:  NOTE : Otp Page program cycle is started",$realtime); 
+            	if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Page program cycle is started",$realtime); 
             	reset_wel <= 1'b0 ;
             	wip <= 1'b1 ; 
            	 #`TPP; 
            	if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))
            	begin
-            	if ($time != 0) $display("%t:  NOTE : Otp Page program cycle is finished",$realtime); 
+            	if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Page program cycle is finished",$realtime); 
             	otppgm_enable <= `TRUE ; 
             	inhib_otppgm <= `TRUE ; 
             	wip <= 1'b0 ; 
@@ -5950,7 +5950,7 @@ always @(posedge c_int)
            end
         else
            begin
-            if ($time != 0) $display("%t:  NOTE : this otp page is protected, no pgm occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : this otp page is protected, no pgm occur",$realtime); 
             inhib_otppgm <= `TRUE ;
             end
          end
@@ -5960,14 +5960,14 @@ always @(posedge c_int)
         #2;
               if(!bpbit)
          begin
-         if ($time != 0) $display("%t:  NOTE : Otp Page program cycle is started",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Page program cycle is started",$realtime); 
          otppgms_time = $realtime;
          reset_wel <= 1'b0 ;
          wip <= 1'b1 ;
          #`TPP; 
          if ((!suspend_enable) && (!resume_enable) && (!suspend_flag))	
          begin
-         if ($time != 0) $display("%t:  NOTE : Otp Page program cycle is finished",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Page program cycle is finished",$realtime); 
          otppgm_enable <= `TRUE ; 
          wip <= 1'b0 ; 
          inhib_otppgm <= `TRUE ; 
@@ -5976,13 +5976,13 @@ always @(posedge c_int)
         end
        else
            begin
-            if ($time != 0) $display("%t:  NOTE : this otp page is protected, no pgm occur",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : this otp page is protected, no pgm occur",$realtime); 
             inhib_otppgm <= `TRUE ;
             end
       end 
       if ((byte_cpt > 5) && otppgm && (!only_rdsr) && (!byte_ok) && (!resume_enable) && (!suspend_enable))
       begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_otppgm <= `TRUE ; 
          otppgm_enable <= `FALSE ; 
       end           
@@ -6002,7 +6002,7 @@ always @(posedge c_int)
          begin
             if ((status_register[0]) == 1'b0)
             begin
-               if ($time != 0) $display("%t:  WARNING : Instruction canceled because State is Idle",$realtime); 
+               if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because State is Idle",$realtime); 
                suspend_enable <= `FALSE ; 
                inhib_suspend <= `TRUE ; 
             end
@@ -6010,7 +6010,7 @@ always @(posedge c_int)
             begin
                if ($time != 0) 
 		begin
-		$display("%t:  NOTE : Erase/Program suspend cycle has begun",$realtime); 
+		$display("\n%m @ %t:  NOTE : Erase/Program suspend cycle has begun",$realtime); 
 		end
                wip <= #`TSUS 1'b0 ;
                suspend_enable <= #`TSUS `TRUE ; 
@@ -6026,7 +6026,7 @@ always @(posedge c_int)
    begin
       if (suspend && (only_suspend) && select_ok)
       begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_suspend <= `TRUE ; 
          suspend_enable <= `FALSE ; 
          suspend_pp <= `FALSE;
@@ -6066,7 +6066,7 @@ always @(posedge c_int)
    begin
       if (resume && (!only_suspend) && select_ok)
       begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
          inhib_resume <= `TRUE ; 
          resume_enable <= `FALSE;
          ser <= `FALSE;
@@ -6084,12 +6084,12 @@ always @(ers_pgm_resume_event)
   begin:ers_pgm_resume_process
       if (pp)
      	begin
-       	 	if ($time != 0) $display("%t:  NOTE : Page program cycle is resumed!",$realtime); 
+       	 	if ($time != 0) $display("\n%m @ %t:  NOTE : Page program cycle is resumed!",$realtime); 
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		pps_time=$realtime;
       		#(`TPP-pps_time_add); 
-        	if ($time != 0) $display("%t:  NOTE : after resumed Page program cycle is finished",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed Page program cycle is finished",$realtime); 
         	pp_enable <= `TRUE ; 
         	wip <= 1'b0 ; 
         	inhib_pp <= `TRUE ; 
@@ -6099,12 +6099,12 @@ always @(ers_pgm_resume_event)
      if (quadpgm)
      	begin
         	
-       	 	if ($time != 0) $display("%t:  NOTE : quad Page program cycle is resumed",$realtime); 
+       	 	if ($time != 0) $display("\n%m @ %t:  NOTE : quad Page program cycle is resumed",$realtime); 
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		quadpgms_time = $realtime; 
         	#(`TPP-quadpgms_time_add); 
-        	if ($time != 0) $display("%t:  NOTE : after resumed quad page program cycle is finished",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed quad page program cycle is finished",$realtime); 
         	quadpgm_enable <= `TRUE ; 
         	wip <= 1'b0 ; 
         	inhib_quadpgm <= `TRUE ; 
@@ -6116,12 +6116,12 @@ always @(ers_pgm_resume_event)
      if (otppgm)
      	begin
         	
-       	 	if ($time != 0) $display("%t:  NOTE : Otp Page program cycle is resumed",$realtime); 
+       	 	if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Page program cycle is resumed",$realtime); 
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		otppgms_time = $realtime; 
         	#(`TPP-otppgms_time_add); 
-        	if ($time != 0) $display("%t:  NOTE : after resumed otp page program cycle is finished",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed otp page program cycle is finished",$realtime); 
         	otppgm_enable <= `TRUE ; 
         	wip <= 1'b0 ; 
         	inhib_otppgm <= `TRUE ; 
@@ -6132,13 +6132,13 @@ always @(ers_pgm_resume_event)
      if (otpers)
      	begin
         	
-        	if ($time != 0) $display("%t:  NOTE : Otp Sector erase cycle has resumed",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : Otp Sector erase cycle has resumed",$realtime); 
         	otpers_enable <= `TRUE ;
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		otperss_time = $realtime; 
         	#(`TSE*`Tbase-otperss_time_add) 
-        	if ($time != 0) $display("%t:  NOTE : after resumed otp Sector erase cycle is finished",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed otp Sector erase cycle is finished",$realtime); 
         	otpers_enable_ctl <= `FALSE ;        	 
         	inhib_otpers <= `TRUE ;
         	
@@ -6150,13 +6150,13 @@ always @(ers_pgm_resume_event)
      
      	if (ser)
      	begin
-        	if ($time != 0) $display("%t:  NOTE : Sector erase cycle has resumed",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : Sector erase cycle has resumed",$realtime); 
         	ser_enable <= `TRUE ;
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		ser_time = $realtime;
         	#(`TSE*`Tbase-ser_time_add) 
-        	if ($time != 0) $display("%t:  NOTE : after resumed Sector erase cycle is finished",$realtime);
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed Sector erase cycle is finished",$realtime);
         	ser_enable_ctl <= `FALSE ;        	 
         	inhib_ser <= `TRUE ;
         	
@@ -6167,13 +6167,13 @@ always @(ers_pgm_resume_event)
     	if (ber32)
     	begin
        	 	
-        	if ($time != 0) $display("%t:  NOTE : Block erase cycle has resumed",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle has resumed",$realtime); 
         	ber32_enable <= `TRUE ; 
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		ber32_time = $realtime;
         	#(`TBE1*`Tbase-ber32_time_add)
-        	if ($time != 0) $display("%t:  NOTE : after resumed Block erase cycle is finished_32k",$realtime); 	
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed Block erase cycle is finished_32k",$realtime); 	
         	ber32_enable_ctl <= `FALSE ; 
         	inhib_ber32 <= `TRUE ; 
         	
@@ -6185,13 +6185,13 @@ always @(ers_pgm_resume_event)
     	if (ber64)
     	begin
        	 	
-        	if ($time != 0) $display("%t:  NOTE : Block erase cycle has resumed",$realtime); 
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : Block erase cycle has resumed",$realtime); 
         	ber64_enable <= `TRUE ; 
         	reset_wel <= 1'b0 ;
         	wip <= 1'b1 ; 
 		ber64_time = $realtime;
         	#(`TBE2*`Tbase-ber64_time_add)
-        	if ($time != 0) $display("%t:  NOTE : after resumed Block erase cycle is finished_64k",$realtime); 	
+        	if ($time != 0) $display("\n%m @ %t:  NOTE : after resumed Block erase cycle is finished_64k",$realtime); 	
         	ber64_enable_ctl <= `FALSE ; 
         	inhib_ber64 <= `TRUE ; 
         	
@@ -6230,7 +6230,7 @@ always @(ers_pgm_resume_event)
       if (dpd && (!select_ok) && (!only_suspend) && ((byte_cpt==0 && cpt==7) || (byte_cpt==1 && cpt==0)) && byte_ok)
       begin
 	  dpd_enable <= `TRUE ;
-	  if ($time != 0) $display("%t:  NOTE: DEEP POWER DOWN START:COMMUNICATION PAUSED",$realtime); 
+	  if ($time != 0) $display("\n%m @ %t:  NOTE: DEEP POWER DOWN START:COMMUNICATION PAUSED",$realtime); 
       end
       if (rfdp && (!select_ok) && (!only_suspend)  )
       begin
@@ -6245,7 +6245,7 @@ always @(ers_pgm_resume_event)
       begin
       if (dpd_enable)
          begin
-         if ($time != 0) $display("%t:  NOTE : The chip is releasing from DEEP POWER DOWN",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  NOTE : The chip is releasing from DEEP POWER DOWN",$realtime); 
          inhib_rfdp <= `FALSE; 
          inhib_dpd <= `FALSE; 
          #`TRES1;
@@ -6265,14 +6265,14 @@ always @(ers_pgm_resume_event)
 
  if ((((byte_cpt == 1) && (cpt > 0)) || (byte_cpt == 2) || (byte_cpt == 3) || ((byte_cpt == 4) && ((cpt < 7) || (!byte_ok)))) && rfdp && (!only_rdsr) && (!select_ok))
       begin
-         if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+         if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
       end
 
       else if ((((byte_cpt == 4) && (cpt == 7) && byte_ok) || (byte_cpt > 4)) && rfdp && (!only_rdsr) && (!select_ok))
            begin
                  if (dpd_enable)
                      begin
-                     if ($time != 0) $display("%t:  NOTE : The Chip is releasing from DEEP POWER DOWN",$realtime); 
+                     if ($time != 0) $display("\n%m @ %t:  NOTE : The Chip is releasing from DEEP POWER DOWN",$realtime); 
                      inhib_rfdpid <= `FALSE ; 
                      inhib_dpd <=  `FALSE ;
                      #`TRES2;
@@ -6340,7 +6340,7 @@ end
          
          if (((byte_cpt == 0) || (byte_cpt == 1) || (byte_cpt == 2) || ((byte_cpt == 3) && (cpt != 7))) && mid && (!select_ok))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_mid <= `TRUE ; 
             bit_id <= 1'b0; 
          end 
@@ -6418,7 +6418,7 @@ end
          
          if (((byte_cpt == 0) && (cpt != 7)) && cpid && (!select_ok))
          begin
-            if ($time != 0) $display("%t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  WARNING : Instruction canceled because False Instruction.",$realtime); 
             inhib_cpid <= `TRUE ; 
             bit_id <= 1'b0; 
          end 
@@ -6935,7 +6935,7 @@ assign  bpbit = ( pp | quadpgm | ser | ber32 | ber64) & bpbit_spi | bpbit_otp | 
            3'b010  : 
                begin	
                wrsr <= `FALSE;
-               if ($time != 0) $display("%t:  NOTE : this wrsr op protected,wrsr operation is inhibted",$realtime);
+               if ($time != 0) $display("\n%m @ %t:  NOTE : this wrsr op protected,wrsr operation is inhibted",$realtime);
                end
            3'b011  : inhib_wrsr <= `FALSE;     
            default : inhib_wrsr <= `FALSE; 
@@ -7039,12 +7039,12 @@ assign  bpbit = ( pp | quadpgm | ser | ber32 | ber64) & bpbit_spi | bpbit_otp | 
       begin
          if (pp || quadpgm || otppgm || otpers  || cer || ber32 || ber64 || ser || wrsr)
          begin
-            if ($time != 0) $display("%t:  NOTE : Read Status Register instruction will be valid",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : Read Status Register instruction will be valid",$realtime); 
             only_rdsr <= `TRUE ; 
          end
          if ((pp || quadpgm || otppgm || otpers  || ber32 || ber64 || ser))
          begin
-            if ($time != 0) $display("%t:  NOTE : Erase/Program suspend instruction will be valid",$realtime); 
+            if ($time != 0) $display("\n%m @ %t:  NOTE : Erase/Program suspend instruction will be valid",$realtime); 
             only_suspend <= `TRUE ;         
          end 
       end 
