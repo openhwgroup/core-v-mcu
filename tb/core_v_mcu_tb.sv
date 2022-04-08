@@ -10,6 +10,11 @@
 
 `include "../includes/pulp_soc_defines.svh"
 
+// Use pseudo-terminal by default
+`ifndef USE_PTY
+   `define USE_PTY 1
+`endif
+
 module core_v_mcu_tb;
    localparam IO_REF_CLK = 5;
    localparam IO_RESETN = 6;
@@ -80,7 +85,8 @@ module core_v_mcu_tb;
 
    uartdpi #(.BAUD(115200 * 40),    //SW thinks the peripheral clk is 5MHZ, but per clock is running at 200 MHz in simulation, so 5 * 40 = 200
 	     .FREQ(BAUD_CLK_FREQ),
-	     .NAME("uart0"))
+	     .NAME("uart0"),
+	     .USEPTY(`USE_PTY))
    uart_0 (
 	   .clk(uart_clk),
 	   .rst (~resetn),
@@ -89,7 +95,8 @@ module core_v_mcu_tb;
 	   );
    uartdpi #(.BAUD(115200 * 2),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
 	     .FREQ(BAUD_CLK_FREQ),
-     	     .NAME("uart1"))
+     	     .NAME("uart1"),
+	     .USEPTY(`USE_PTY))
    uart_1 (
 	   .clk(uart_clk),
 	   .rst (~resetn),
@@ -229,9 +236,12 @@ module core_v_mcu_tb;
     );
 
 
-//    initial begin: finish
-//        #(2000000ns) $finish();
-//    end
+    initial begin: finish
+        #(40000000ns);
+        $write("\n%m @ %0t: Testbench timeout.  Exiting...\n", $time);
+        $finish();
+    end
+
 
     initial begin:  sys_reset
         $display("asserting reset");

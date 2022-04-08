@@ -5,6 +5,7 @@ __pycache__/
 *.swp
 *.log
 *.jou
+*.so
 install/
 build/
 ./ips
