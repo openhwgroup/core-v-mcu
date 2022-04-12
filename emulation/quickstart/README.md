@@ -78,21 +78,6 @@ The Ashling Opella-LD is designed to connect to your PC via the USB Port. Please
 - Connect Ashling Opella-LD to the bottom 6-pins of the JB connector. A 6- pin gender changer or flying leads can be used for this. Please make sure to match Vref of the Opella-LD and the JB connector. 
 
 Note: The connector used and the pinout can change based on the FPGA design.
- 
- 
- | Opella-LD pin        | Function           | Nexys A7 JB pin  |
-| ------------- |:-------------:| -----:|
-| 1 TMS      | JTAG Test Mode Select (TMSC in cJTAG modeor SWDIO in ARM SWD mode) | 7 |
-| 2 TDI      | JTAG Test Data In      |   8 |
-| 3 TDO | JTAG Test Data Out (SWO in ARM SWD mode)      |   9 |
-| 4 CLK | JTAG/SWDCLK/cJTAG CLocK      |   10 |
-| 5 GND | Ground      |   11 |
-| 6 VREF | Target reference voltage used by the Opella-LD to sense target voltage (0.9v to 5.0v) and adjust probe voltages accordingly. TGT LED (YELLOW) is on when voltage detected      |  12 |
-| 7 nTRST | Active low JTAG TAP ReSeT. Can be controlledvia	OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |	
-| 8 nSRST | Active low System ReSeT. Can be controlled via OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |
-
-
-
 
 ### Nexys A7 - Digilent HS2 Connection
 ![image](NexysA7_annotated.png)
@@ -179,6 +164,18 @@ Below is a few examples of commands available with cli_test:
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 ```
+### Ashling Opella-LD Target Interface to Nexys A7 JB Connector
+
+| Opella-LD pin        | Function           | Nexys A7 JB pin  |
+| ------------- |:-------------:| -----:|
+| 1 TMS      | JTAG Test Mode Select (TMSC in cJTAG modeor SWDIO in ARM SWD mode) | 7 |
+| 2 TDI      | JTAG Test Data In      |   8 |
+| 3 TDO | JTAG Test Data Out (SWO in ARM SWD mode)      |   9 |
+| 4 CLK | JTAG/SWDCLK/cJTAG CLocK      |   10 |
+| 5 GND | Ground      |   11 |
+| 6 VREF | Target reference voltage used by the Opella-LD to sense target voltage (0.9v to 5.0v) and adjust probe voltages accordingly. TGT LED (YELLOW) is on when voltage detected      |  12 |
+| 7 nTRST | Active low JTAG TAP ReSeT. Can be controlledvia	OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |	
+| 8 nSRST | Active low System ReSeT. Can be controlled via OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |
 
 ## Eclipse IDE
 Details on using the Eclipse IDE with the CORE-V MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
