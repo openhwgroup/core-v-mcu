@@ -72,7 +72,7 @@ The Ashling Opella-LD is designed to connect to your PC via the USB Port. Please
         Opella-LD\ Opella-LD_Linux_Rules_File\ [60-ashling.rules](https://www.ashling.com/wp-content/uploads/Opella-LD.zip) which identifies Opella-LD device (by Ashling’s USB product ID and Vendor ID).
 - The rules file must then be copied into the rules directory (requires root permission) e.g.: $ sudo cp ./60-ashling.rules /etc/udev/rules.d
 
-![Ashling Opella-LD-NexysA7 connection](https://user-images.githubusercontent.com/69203453/162749946-c25ddfd3-cc90-4267-be7c-6fa13031c4e7.png)
+![Ashling Opella-LD-NexysA7 connection](NexysA7_Ashling_Opella-LD.png)
 
 
 - Connect Ashling Opella-LD to the bottom 6-pins of the JB connector. A 6- pin gender changer or flying leads can be used for this. Please make sure to match Vref of the Opella-LD and the JB connector. 
