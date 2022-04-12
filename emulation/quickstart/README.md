@@ -2,7 +2,7 @@
 The purpose of this Quick Start Guide (QSG) is to get you up and running quickly with the CORE-V-MCU on one of the various supported platforms.
 After working through this document you should have a [cli_test](https://github.com/openhwgroup/core-v-mcu-cli-test)
 running on the CORE-V-MCU on either an FPGA based emulation platform or in simulation using Verilator.
-The emulation platform supports a simple "CLI monitor" interface over a console terminal and debug within the Eclipse IDE using OpenOCD over JTAG with the Digilent HS2 pmod adapter.
+The emulation platform supports a simple "CLI monitor" interface over a console terminal and debug within the Eclipse IDE using OpenOCD over JTAG with the Digilent HS2 pmod adapter or the Ashling Opella-LD.
 
 <!---
 **Coming soon**: this QSG uses precompiled binaries available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
@@ -40,7 +40,8 @@ The open-source Eclipse IDE supports CORE-V-MCU.
 ## Hardware Requirements:
 - Digilent [Nexys A7-100T](https://digilent.com/shop/nexys-a7-fpga-trainer-board-recommended-for-ece-curriculum/) evaulation board.
 - USB to MicroUSB cable (typically supplied with the Nexys board).
-- [JTAG-HS2](https://digilent.com/shop/jtag-hs2-programming-cable) Pmod.
+- [Digilent JTAG-H2](https://digilent.com/shop/jtag-hs2-programming-cable) Pmod.
+- [Ashling Opella-LD](https://www.ashling.com/support-opella-ld/) (if not using Digilent HS2)
 - [6-pin Header Gender Changer](https://digilent.com/shop/6-pin-header-gender-changer-5-pack).
 - USB drive.
 
@@ -52,7 +53,36 @@ Optional hardware includes:
 
 Throughout this section we will refer to the circled letters on the figure below:
 
+### Nexys A7 - Ashling Opella-LD Connection
+
+#### Connecting the Opella-LD to your PC and Target
+The Ashling Opella-LD is designed to connect to your PC via the USB Port. Please note the following recommended target connection sequence
+1. Ensure your target is powered off.
+2. Connect Opella-LD to your PC using the USB cable and ensure Opella-LD’s PWR LED is on.
+3. Connect Opella-LD to your target’s debug connector.
+4. Power up your target.
+
+#### For Windows users
+- You will get a New USB hardware found message from Windows and will be prompted to install the appropriate USB drivers. The Ashling Opella-LD driver is located         in: Opella-LD\Opella-LD_Windows_Driver\ [Ashling Opella-LD Driver](https://www.ashling.com/wp-content/uploads/Opella-LD.zip).
+- Point the Windows Hardware Installation Wizard to your download directory so that it can locate the necessary drivers and complete the installation. Windows           only needs to perform this operation the first time you connect your Opella-LD to the PC.
+    
+#### For Linux users
+- To ensure the current $USER has access to the Opella-LD device we recommend using the Linux utility udev.
+- Create a udev rules file to uniquely identify the Opella- LD device and set permissions as required by owner/ groups. An example udev file is provided:
+        Opella-LD\ Opella-LD_Linux_Rules_File\ [60-ashling.rules](https://www.ashling.com/wp-content/uploads/Opella-LD.zip) which identifies Opella-LD device (by Ashling’s USB product ID and Vendor ID).
+- The rules file must then be copied into the rules directory (requires root permission) e.g.: $ sudo cp ./60-ashling.rules /etc/udev/rules.d
+
+![Ashling Opella-LD-NexysA7 connection](NexysA7_Ashling_Opella-LD.png)
+
+
+- Connect Ashling Opella-LD to the bottom 6-pins of the JB connector. A 6- pin gender changer or flying leads can be used for this. Please make sure to match Vref of the Opella-LD and the JB connector. 
+
+Note: The connector used and the pinout can change based on the FPGA design.
+
+### Nexys A7 - Digilent HS2 Connection
 ![image](NexysA7_annotated.png)
+
+
 
 Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
 1. Load the FPGA with a bitmap of the CORE-V-MCU.
@@ -134,6 +164,18 @@ Below is a few examples of commands available with cli_test:
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 ```
+### Ashling Opella-LD Target Interface to Nexys A7 JB Connector
+
+| Opella-LD pin        | Function           | Nexys A7 JB pin  |
+| ------------- |:-------------:| -----:|
+| 1 TMS      | JTAG Test Mode Select (TMSC in cJTAG modeor SWDIO in ARM SWD mode) | 7 |
+| 2 TDI      | JTAG Test Data In      |   8 |
+| 3 TDO | JTAG Test Data Out (SWO in ARM SWD mode)      |   9 |
+| 4 CLK | JTAG/SWDCLK/cJTAG CLocK      |   10 |
+| 5 GND | Ground      |   11 |
+| 6 VREF | Target reference voltage used by the Opella-LD to sense target voltage (0.9v to 5.0v) and adjust probe voltages accordingly. TGT LED (YELLOW) is on when voltage detected      |  12 |
+| 7 nTRST | Active low JTAG TAP ReSeT. Can be controlledvia	OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |	
+| 8 nSRST | Active low System ReSeT. Can be controlled via OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |
 
 ## Eclipse IDE
 The Eclipse IDE can be used to compile C programs for the CORE-V-MCU, load them into the CORE-V-MCU memory via JTAG and also provides a complete interactive debug/development environment.
