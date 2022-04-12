@@ -178,4 +178,11 @@ Below is a few examples of commands available with cli_test:
 | 8 nSRST | Active low System ReSeT. Can be controlled via OpenOCD	software.	See http://openocd.org/doc/html/Reset- Configuration.html      |   No connect |
 
 ## Eclipse IDE
-Details on using the Eclipse IDE with the CORE-V MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
+The Eclipse IDE can be used to compile C programs for the CORE-V-MCU, load them into the CORE-V-MCU memory via JTAG and also provides a complete interactive debug/development environment.
+Eclipse interacts with and controls the CORE-V-MCU via a JTAG port which on the Nexys-A7 is connected to header "JB", indicated by (**C**) on the figure above.
+Connect your JTAG-HS2 pmod as shown.
+The JTAG-HS2 pmod is not keyed, so check that the pmod is connected to the bottom row of the header and that VDD on the pmod matches VDD on the board.
+
+**Note:** the JTAG port is not enabled unless SW0 (**E**) is in the "up" position.
+
+Detailed instructions for using the Eclipse IDE with the CORE-V-MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
