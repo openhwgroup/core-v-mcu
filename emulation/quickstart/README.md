@@ -24,10 +24,40 @@ The content of this QSG has been tested using **Minicom**.
 
 Installation is trivial:
 ```
-$ apt install minicom
+$ sudo apt install minicom
 ```
 Minicom setup instructions can be found [here](https://help.ubuntu.com/community/Minicom).
 The remainder of this document assumes you have attached Minicom to /dev/ttyUSB1 on your machine.
+
+#### wls2 users
+
+For Windows Linux Subsystem 2 (`wls2`) users, you need to run a few things before connecting USB devices to your wls2 distribution.
+The instructions are provided [here](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
+
+Once you execute in Windows PowerShell
+
+```
+$ usbipd wsl list
+```
+you will see something like:
+
+```
+C:\WINDOWS\system32>usbipd wsl list
+BUSID  VID:PID    DEVICE                                                        STATE
+2-1    30fa:0400  USB Input Device                                              Not attached
+2-2    0408:5347  HP HD Camera, HP IR Camera                                    Not attached
+2-4    0403:6010  USB Serial Converter A, USB Serial Converter B                Not attached
+2-7    06cb:00f0  Synaptics FS7604 Touch Fingerprint Sensor with PurePrint(TM)  Not attached
+2-10   8087:0026  Intel(R) Wireless Bluetooth(R)                                Not attached
+```
+In our example, Windows sees the Nexys A7-100T UART as **USB Serial Converter A, USB Serial Converter B**. Thus, when we refer to /dev/ttyUSB1,
+we assume that when connecting the USB device to wls2 with the command, 
+
+```
+$ usbipd wsl attach --busid 2-4
+```
+You see the device attached in wls2 referred to as /dev/ttyUSB1. From now on, the wls2 users can use the same Linux procedures.
+
 
 ### Xilinx Vivado
 Vivado is required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
@@ -110,6 +140,11 @@ Once this is done, getting the FPGA loaded with the bitmap is straightforward:
 - Power on the Nexys board.
 
 In a few moments the FPGA will enter a loop printing "A2 BOOTME" on the terminal.  Proceed to Step 2.
+
+#### Putty
+
+If you want to see the  "A2 BOOTME" string on Putty, connect it with Serial option, "COMX", where X is the number your Windows Device Manager refers to the Nexsys USB, and set as BaudRate 115200.
+
 
 ### Step 1, Option 2: Use Vivado to Push the BitMap to the Nexys A7:
 This option requires installation the free-to-use WebTalk version of Vivado.
