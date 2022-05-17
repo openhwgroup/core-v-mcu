@@ -24,15 +24,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct {
-  char ptyname[64];
-  int master;
-  int slave;
-  char tmp_read;
-} uartdpi_t;
+#include "uartdpi.h"
 
 void* uartdpi_create(const char *name) {
-  uartdpi_t *obj = malloc(sizeof(uartdpi_t));
+  uartdpi_t *obj = (uartdpi_t *)malloc(sizeof(uartdpi_t));
 
   struct termios tty;
   cfmakeraw(&tty);

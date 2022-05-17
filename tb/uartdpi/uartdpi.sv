@@ -98,7 +98,7 @@ module uartdpi
    reg [7:0] rxsymbol;
    
    always_ff @(negedge clk) begin
-      rxcyccount = rxcyccount + 1;
+      rxcyccount <= rxcyccount + 1;
       
       if (rst) begin
 	 rxsymbol <= 0;
@@ -130,7 +130,7 @@ module uartdpi
                end
             end else begin
                if (rxcyccount == CYCLES_PER_SYMBOL) begin
-                  rxactive = 0;
+                  rxactive <= 0;
                   if (rx) begin
                      if (USEPTY) begin
                         uartdpi_write(obj, rxsymbol);

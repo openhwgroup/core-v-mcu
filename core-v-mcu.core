@@ -177,6 +177,17 @@ filesets:
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
+  tb-cpp:
+    files:
+    - tb/core_v_mcu_tb.cpp
+    file_type: cppSource
+
+  testharness:
+    files:
+    - tb/uartdpi/uartdpi.sv: { file_type: systemVerilogSource }
+    - tb/uartdpi/uartdpi.c: { file_type: cppSource }
+    - tb/uartdpi/uartdpi.h: { file_type: cppSource, is_include_file: true }
+    - tb/core_v_mcu_testharness.sv: { file_type: systemVerilogSource }
 
   nexys-rtl:
     files:
@@ -302,7 +313,8 @@ targets:
     - mem_init_verilator
     - rtl-simulation
     - not_emulation-rtl
-    toplevel: [core_v_mcu]
+    - testharness
+    toplevel: [core_v_mcu_testharness]
     hooks:
       pre_build: [pre_build_scripts]
     tools:
@@ -311,7 +323,9 @@ targets:
         verilator_options:
         - -Wno-fatal
         - --trace
-        - --CFLAGS -DVL_TIME_CONTEXT
+        - --trace-fst
+        - '-CFLAGS "-DVL_TIME_CONTEXT -std=c++11 -Wall -g -fpermissive"'
+        - '-LDFLAGS "-pthread -lutil -lelf"'
 
   lint:
     <<: *default_target
