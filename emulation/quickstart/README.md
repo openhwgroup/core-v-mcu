@@ -166,6 +166,20 @@ Use the supplied python script to download the "cli_test" program to the MCU:
 ```
 $ python3 serialPort.py /dev/ttyUSB1 cli_test.srec
 ```
+In case of errors like:
+
+```
+Traceback (most recent call last):
+  File "serialPort.py", line 1, in <module>
+    import serial
+```
+
+please try:
+
+```
+$ sudo apt install python3-serial
+```
+
 This takes a little while... Then:
 ```
 $ minicom usb1
