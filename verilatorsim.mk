@@ -43,8 +43,8 @@ MODEL_LIB ?= ./obj_dir/Vcore_v_mcu_testharness__ALL.a
 
 CPP := gcc
 CXX := g++
-CPPFLAGS := -I$(VINCDIR) -I$(VINCDIR_DPI) -I$(VINCDIR_GTKWAVE) -I./obj_dir -I../../../tb/uartdpi/ -DVL_TIME_CONTEXT
-CXXFLAGS := -O0 -g3
+CPPFLAGS := -I$(VINCDIR) -I$(VINCDIR_DPI) -I./obj_dir -I../../../tb/uartdpi/ -DVL_TIME_CONTEXT -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow
+CXXFLAGS := -std=c++11 -Wall -g -fpermissive  -std=gnu++14 -O0 -g3
 LDFLAGS := -lz -pthread -lutil -lelf
 
 CF_STYLE := "{BasedOnStyle: GNU, \
@@ -58,7 +58,7 @@ all: mem_init core_v_mcu_tb.exe
 
 core_v_mcu_tb.exe: $(OBJS) verilated.o verilated_dpi.o verilated_fst_c.o uartdpi.o $(MODEL_LIB)
 	echo $(VBINDIR)
-	$(CXX) $(LDFLAGS) -o $@ $^
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 verilated.o: $(VERILATED_SRC) $(VERILATED_DEPS) $(MODEL_LIB)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $(VERILATED_SRC)
