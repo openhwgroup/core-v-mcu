@@ -50,8 +50,9 @@ localparam IO_UART1_TX = 10;
     .io_oe_o(io_oe_o)
   );
 
- uartdpi #(.BAUD(115200),    //SW thinks the peripheral clk is 5MHZ, but per clock is running at 200 MHz in simulation, so 5 * 40 = 200
-     .FREQ('d125_000),
+ uartdpi #(.BAUD('d115200),
+      // Frequency shouldn't matter since we are sending with the same clock.
+     .FREQ(44*'d115200),
      .NAME("uart0")
  ) uart_0 (
    .clk_i(ref_clk_i),
@@ -60,9 +61,10 @@ localparam IO_UART1_TX = 10;
    .rx_i(io_out[IO_UART0_RX])
    );
 
- uartdpi #(.BAUD(115200),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
-     .FREQ('d125_000),
-         .NAME("uart1")
+ uartdpi #(.BAUD('d115200),
+     // Frequency shouldn't matter since we are sending with the same clock.
+     .FREQ(44*'d115200),
+     .NAME("uart1")
  ) uart_1 (
    .clk_i(ref_clk_i),
    .rst_ni (rstn_i),

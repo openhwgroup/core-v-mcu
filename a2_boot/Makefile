@@ -19,15 +19,19 @@ CC      = riscv32-corev-elf-gcc
 OBJCOPY = riscv32-corev-elf-objcopy
 OBJDUMP = riscv32-corev-elf-objdump
 
+VERILATOR =
+
 CFLAGS   = -Os -g -msmall-data-limit=8 \
            -mno-save-restore -fmessage-length=0 \
            -march=rv32imc \
            -fsigned-char -ffunction-sections -fdata-sections
-CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude
+CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude ${VERILATOR}
 ASFLAGS  = $(CFLAGS) -DLANGUAGE_ASSEMBLY
 LDFLAGS  = -msmall-data-limit=8 -mno-save-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T core-v-mcu2-rom.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -Wl,-Map,"A2_boot.map" --specs=nosys.specs -o "A2_boot.elf"
 
 BOOTCODE = boot.mem
+
+
 
 all: $(BOOTCODE)
 

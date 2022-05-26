@@ -99,7 +99,7 @@ int main (int argc, char * argv[])
   }
 */
   dut->ref_clk_i      = 0;
-  dut->rstn_i         = 0;
+  dut->rstn_i         = 1;
   dut->jtag_tck_i     = 0;
   dut->jtag_tms_i     = 0;
   dut->jtag_trst_i    = 0;
@@ -113,6 +113,9 @@ int main (int argc, char * argv[])
 
   runCycles(20, dut, m_trace);
 
+  dut->rstn_i = 0;
+
+  runCycles(20, dut, m_trace);
 
   dut->rstn_i = 1;
   runCycles(1, dut, m_trace);
