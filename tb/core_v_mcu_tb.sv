@@ -85,23 +85,21 @@ module core_v_mcu_tb;
 
    uartdpi #(.BAUD(115200 * 40),    //SW thinks the peripheral clk is 5MHZ, but per clock is running at 200 MHz in simulation, so 5 * 40 = 200
 	     .FREQ(BAUD_CLK_FREQ),
-	     .NAME("uart0"),
-	     .USEPTY(`USE_PTY))
-   uart_0 (
-	   .clk(uart_clk),
-	   .rst (~resetn),
-	   .tx(io_in_i[IO_UART0_TX]),
-	   .rx(io_out_o[IO_UART0_RX])
+             .NAME("uart0")
+   ) uart_0 (
+	   .clk_i(uart_clk),
+	   .rst_ni(~resetn),
+	   .tx_o(io_in_i[IO_UART0_TX]),
+	   .rx_i(io_out_o[IO_UART0_RX])
 	   );
    uartdpi #(.BAUD(115200 * 2),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
 	     .FREQ(BAUD_CLK_FREQ),
-     	     .NAME("uart1"),
-	     .USEPTY(`USE_PTY))
-   uart_1 (
-	   .clk(uart_clk),
-	   .rst (~resetn),
-	   .tx(io_in_i[IO_UART1_TX]),
-	   .rx(io_out_o[IO_UART1_RX])
+             .NAME("uart1")
+   ) uart_1 (
+	   .clk_i(uart_clk),
+	   .rst_ni (~resetn),
+	   .tx_o(io_in_i[IO_UART1_TX]),
+	   .rx_i(io_out_o[IO_UART1_RX])
 	   );
 
 

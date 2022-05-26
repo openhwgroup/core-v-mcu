@@ -277,6 +277,7 @@ targets:
         vlog_options:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
+        - -define MODELSIM
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
       xcelium:
