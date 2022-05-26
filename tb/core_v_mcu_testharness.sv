@@ -4,11 +4,6 @@
 
 `include "pulp_soc_defines.svh"
 
-// Use pseudo-terminal by default
-`ifndef USE_PTY
-   `define USE_PTY 1
-`endif
-
 module core_v_mcu_testharness #(
     parameter USE_FPU  = 0,
     parameter USE_HWPE = 0
@@ -57,24 +52,22 @@ localparam IO_UART1_TX = 10;
 
  uartdpi #(.BAUD(115200),    //SW thinks the peripheral clk is 5MHZ, but per clock is running at 200 MHz in simulation, so 5 * 40 = 200
      .FREQ('d125_000),
-     .NAME("uart0"),
-     .USEPTY(`USE_PTY))
- uart_0 (
-   .clk(ref_clk_i),
-   .rst (rstn_i),
-   .tx(io_in[IO_UART0_TX]),
-   .rx(io_out[IO_UART0_RX])
+     .NAME("uart0")
+ ) uart_0 (
+   .clk_i(ref_clk_i),
+   .rst_ni (rstn_i),
+   .tx_o(io_in[IO_UART0_TX]),
+   .rx_i(io_out[IO_UART0_RX])
    );
 
  uartdpi #(.BAUD(115200),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
      .FREQ('d125_000),
-         .NAME("uart1"),
-     .USEPTY(`USE_PTY))
- uart_1 (
-   .clk(ref_clk_i),
-   .rst (rstn_i),
-   .tx(io_in[IO_UART1_TX]),
-   .rx(io_out[IO_UART1_RX])
+         .NAME("uart1")
+ ) uart_1 (
+   .clk_i(ref_clk_i),
+   .rst_ni (rstn_i),
+   .tx_o(io_in[IO_UART1_TX]),
+   .rx_i(io_out[IO_UART1_RX])
    );
 
 

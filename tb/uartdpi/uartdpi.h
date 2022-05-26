@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef _UARTDPI_H_
-#define _UARTDPI_H_
+#ifndef OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_
+#define OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,19 +11,20 @@ extern "C" {
 
 #include <stdio.h>
 
-typedef struct {
+struct uartdpi_ctx {
   char ptyname[64];
-  int master;
-  int slave;
+  int host;
+  int device;
   char tmp_read;
-} uartdpi_t;
+  FILE *log_file;
+};
 
-void* uartdpi_create(const char *name);
-int uartdpi_can_read(void* obj);
-char uartdpi_read(void* obj);
-void uartdpi_write(void* obj, char c);
-
+void *uartdpi_create(const char *name, const char *log_file_path);
+void uartdpi_close(void *ctx_void);
+int uartdpi_can_read(void *ctx_void);
+char uartdpi_read(void *ctx_void);
+void uartdpi_write(void *ctx_void, char c);
 #ifdef __cplusplus
 }
 #endif
-#endif  // _UARTDPI_H_
+#endif  // OPENTITAN_HW_DV_DPI_UARTDPI_UARTDPI_H_

@@ -48,6 +48,7 @@ int main (int argc, char * argv[])
   bool use_openocd;
   bool run_all = false;
   int i,j, exit_val;
+  svScope scope;
 
   Verilated::commandArgs(argc, argv);
 
@@ -59,6 +60,10 @@ int main (int argc, char * argv[])
   VerilatedFstC *m_trace = new VerilatedFstC;
   dut->trace (m_trace, 99);
   m_trace->open ("waveform.vcd");
+
+  VerilatedContext* contex = dut->contextp();
+
+  contex->scopesDump();
 
   arg_openocd = getCmdOption(argc, argv, "+openOCD=");
   use_openocd = false;
@@ -72,8 +77,6 @@ int main (int argc, char * argv[])
   firmware = getCmdOption(argc, argv, "+firmware=");
   if(firmware.empty()){
     std::cout<<"[TESTBENCH]: No firmware  specified"<<std::endl;
-    if(use_openocd==false)
-      exit(EXIT_FAILURE);
   } else {
     std::cout<<"[TESTBENCH]: loading firmware  "<<firmware<<std::endl;
   }
@@ -87,21 +90,22 @@ int main (int argc, char * argv[])
     max_sim_time = stoi(arg_max_sim_time);
     std::cout<<"[TESTBENCH]: Max Times is  "<<max_sim_time<<std::endl;
   }
-
-  svSetScope(svGetScopeFromName("TOP.testharness"));
-  svScope scope = svGetScope();
+/*
+  svSetScope(svGetScopeFromName("TOP.core_v_mcu_testharness"));
+  scope = svGetScope();
   if (!scope) {
     std::cout<<"Warning: svGetScope failed"<< std::endl;
     exit(EXIT_FAILURE);
   }
-
+*/
   dut->ref_clk_i      = 0;
   dut->rstn_i         = 0;
   dut->jtag_tck_i     = 0;
   dut->jtag_tms_i     = 0;
   dut->jtag_trst_i    = 0;
   dut->jtag_tdi_i     = 0;
-  dut->bootsel_i      = 0;
+  dut->bootsel_i      = 1;
+  dut->stm_i          = 0;
 
   dut->eval();
   m_trace->dump(sim_time);
@@ -126,11 +130,9 @@ int main (int argc, char * argv[])
   if(run_all==false) {
     runCycles(max_sim_time, dut, m_trace);
   } else {
-    /*
-    while(dut->exit_valid_o!=1) {
+    while(1) {
       runCycles(500, dut, m_trace);
     }
-    */
   }
 /*
   if(dut->exit_valid_o==1) {

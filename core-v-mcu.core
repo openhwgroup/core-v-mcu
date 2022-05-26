@@ -159,7 +159,7 @@ filesets:
 
   mem_init_verilator:
     files:
-    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
     - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
     - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
@@ -311,7 +311,6 @@ targets:
     - verilator-waiver
     - mem_init_verilator
     - rtl-simulation
-    - not_emulation-rtl
     - testharness
     toplevel: [core_v_mcu_testharness]
     hooks:
@@ -320,6 +319,7 @@ targets:
       verilator:
         mode: cc
         verilator_options:
+        - --waiver-output waiver_output_verilog.log
         - -Wno-fatal
         - --trace
         - --trace-fst

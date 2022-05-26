@@ -17,6 +17,7 @@
 
 CC      = riscv32-corev-elf-gcc
 OBJCOPY = riscv32-corev-elf-objcopy
+OBJDUMP = riscv32-corev-elf-objdump
 
 CFLAGS   = -Os -g -msmall-data-limit=8 \
            -mno-save-restore -fmessage-length=0 \
@@ -25,7 +26,6 @@ CFLAGS   = -Os -g -msmall-data-limit=8 \
 CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude
 ASFLAGS  = $(CFLAGS) -DLANGUAGE_ASSEMBLY
 LDFLAGS  = -msmall-data-limit=8 -mno-save-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T core-v-mcu2-rom.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -Wl,-Map,"A2_boot.map" --specs=nosys.specs -o "A2_boot.elf"
-
 
 BOOTCODE = boot.mem
 
@@ -37,6 +37,8 @@ $(BOOTCODE): A2_Boot.srec
 A2_Boot.srec: A2_boot.elf
 	$(OBJCOPY) -O srec -j .text -j .data A2_boot.elf A2_Boot.srec
 
+A2_boot.dump: A2_boot.elf
+	$(OBJDUMP) -xD $^ > $@
 
 A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o uartProtocol.o hal_apb_i2cs.o crt0.o
 	$(CC) $(LDFLAGS) crt0.o I2CProtocol.o uartProtocol.o crc.o dbg.o hal_apb_i2cs.o main.o spi.o uart.o  -lc -lm -lgcc
@@ -45,3 +47,4 @@ A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o uartProtocol.o hal_ap
 .PHONY: clean
 clean:
 	$(RM) *.o
+	$(RM) *.dump
