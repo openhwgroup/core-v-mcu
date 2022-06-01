@@ -102,7 +102,7 @@ The resulting header files are located in ./sw
 
 ## Running Verilator
 
-Follow the [Verilator](./Verilator.md) guide to simulate the core-v-mcu with Verilator.
+Follow the [Verilator](./VERILATOR.md) guide to simulate the core-v-mcu with Verilator.
 
 ## Experimental fuseSoC Support
 
