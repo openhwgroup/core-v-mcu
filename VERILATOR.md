@@ -1,0 +1,102 @@
+# Simulating CORE-V-MCU with Verilator
+
+## Preparing the system
+
+The first thing to do is to generate the headers by running them in the top folder
+
+```
+make sw
+```
+
+Then, we need to generate a special BootRom whose code is simplified to skip the loading of the binary
+from the external FLASH or UART memory. This is done to make the boot procedure faster.
+
+To do so, make sure your core-v GCC compiler is in your PATH variable
+
+```
+export PATH=/home/yourusername/corev-gcc/bin:${PATH}
+```
+
+then,
+
+```
+cd a2_boot
+make all CUSTOM_CFLAGS=-DVERILATOR
+```
+
+Do not commit the new ROM, as this is only meant to simplify the Verilator simulation, and it
+will be supported neither by the FPGA, nor the ASIC targets.
+
+
+## Building the Verilator library
+
+To build the Verilator library which creates the core-v-mcu model run:
+
+```
+fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
+```
+
+This creates the `obj_dir/Vcore_v_mcu_testharness__ALL.a` library used by the testbench.
+
+
+Then, compile the Verilator testbench:
+
+```
+cd ./build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/
+make -f  ../../../verilatorsim.mk
+```
+
+## Simulating the Verilator Model
+
+Launch the simulation as:
+
+```
+./core_v_mcu_tb.exe +dump_vcd=1 +max_sim_time=70000
+```
+
+(dump_vcd=0 if you do not want to generate the VCD and/or omit the max_sim_time string if you want to launch the simulation without timing bounds)
+
+The BootRom uses the `UART1` peripheral to print debug messages, if everything goes well, you will see:
+
+
+```
+[TESTBENCH]: No firmware  specified
+[TESTBENCH]: Max Times is  70000
+[TESTBENCH]: Generating waveform.vcd
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0
+
+UART: Created /dev/pts/2 for uart0. Connect to it with any terminal program, e.g.
+$ screen /dev/pts/2
+UART: Additionally writing all UART output to 'uart0.log'.
+
+UART: Created /dev/pts/3 for uart1. Connect to it with any terminal program, e.g.
+$ screen /dev/pts/3
+UART: Additionally writing all UART output to 'uart1.log'.
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0
+TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0
+Reset Released
+
+```
+
+To see the UART's output, just do:
+
+```
+cat uart1.log
+```
+
+you should see:
+
+```
+Jun  1 2022  11:18:18
+A2 Bootloader Bootsel=1 rr=01
+Jumping to 0x1C000880
+```
+
+If you like, you can do `$ screen /dev/pts/3` to see the UART1's output live, but be quick, otherwise, you may miss the output.
+
+
+
+

@@ -30,12 +30,14 @@ std::string getCmdOption(int argc, char* argv[], const std::string& option)
      return cmd;
 }
 
-void runCycles(unsigned int ncycles, Vcore_v_mcu_testharness *dut, VerilatedFstC *m_trace){
+void runCycles(unsigned int ncycles, Vcore_v_mcu_testharness *dut, VerilatedFstC *m_trace, bool generate_vcd){
   for(unsigned int i = 0; i < ncycles; i++) {
     dut->ref_clk_i ^= 1;
     dut->eval();
-    m_trace->dump(sim_time);
-    sim_time++;
+    if(generate_vcd) {
+      m_trace->dump(sim_time);
+      sim_time++;
+    }
   }
 }
 
@@ -43,36 +45,16 @@ int main (int argc, char * argv[])
 {
 
   unsigned int SRAM_SIZE;
-  std::string firmware, arg_max_sim_time, arg_openocd;
+  std::string firmware, arg_max_sim_time, arg_dump_vcd;
   unsigned int max_sim_time;
-  bool use_openocd;
+  bool generate_vcd;
   bool run_all = false;
   int i,j, exit_val;
-  svScope scope;
 
   Verilated::commandArgs(argc, argv);
 
   // Instantiate the model
   Vcore_v_mcu_testharness *dut = new Vcore_v_mcu_testharness;
-
-  // Open VCD
-  Verilated::traceEverOn (true);
-  VerilatedFstC *m_trace = new VerilatedFstC;
-  dut->trace (m_trace, 99);
-  m_trace->open ("waveform.vcd");
-
-  VerilatedContext* contex = dut->contextp();
-
-  contex->scopesDump();
-
-  arg_openocd = getCmdOption(argc, argv, "+openOCD=");
-  use_openocd = false;
-  if(arg_openocd.empty()){
-    std::cout<<"[TESTBENCH]: No OpenOCD is used"<<std::endl;
-  } else {
-    std::cout<<"[TESTBENCH]: OpenOCD is used"<<std::endl;
-    use_openocd = true;
-  }
 
   firmware = getCmdOption(argc, argv, "+firmware=");
   if(firmware.empty()){
@@ -90,14 +72,28 @@ int main (int argc, char * argv[])
     max_sim_time = stoi(arg_max_sim_time);
     std::cout<<"[TESTBENCH]: Max Times is  "<<max_sim_time<<std::endl;
   }
-/*
-  svSetScope(svGetScopeFromName("TOP.core_v_mcu_testharness"));
-  scope = svGetScope();
-  if (!scope) {
-    std::cout<<"Warning: svGetScope failed"<< std::endl;
-    exit(EXIT_FAILURE);
+
+  arg_dump_vcd = getCmdOption(argc, argv, "+dump_vcd=");
+  generate_vcd = false;
+  if(arg_dump_vcd.empty()){
+    std::cout<<"[TESTBENCH]: No waveform generated"<<std::endl;
+  } else {
+    generate_vcd = arg_dump_vcd.compare("1") == 0;
+    if(generate_vcd) {
+      std::cout<<"[TESTBENCH]: Generating waveform.vcd"<<std::endl;
+    } else {
+      std::cout<<"[TESTBENCH]: No waveform generated: dump_vcd is "<<arg_dump_vcd<<std::endl;
+    }
   }
-*/
+
+  // Open VCD
+  Verilated::traceEverOn (true);
+  VerilatedFstC *m_trace = new VerilatedFstC;
+  if(generate_vcd) {
+    dut->trace (m_trace, 99);
+    m_trace->open ("waveform.vcd");
+  }
+
   dut->ref_clk_i      = 0;
   dut->rstn_i         = 1;
   dut->jtag_tck_i     = 0;
@@ -108,41 +104,29 @@ int main (int argc, char * argv[])
   dut->stm_i          = 0;
 
   dut->eval();
-  m_trace->dump(sim_time);
+  if(generate_vcd) {
+    m_trace->dump(sim_time);
+  }
   sim_time++;
 
-  runCycles(20, dut, m_trace);
+  runCycles(20, dut, m_trace, generate_vcd);
 
   dut->rstn_i = 0;
 
-  runCycles(20, dut, m_trace);
+  runCycles(20, dut, m_trace, generate_vcd);
 
   dut->rstn_i = 1;
-  runCycles(1, dut, m_trace);
+  runCycles(1, dut, m_trace, generate_vcd);
   std::cout<<"Reset Released"<< std::endl;
 
-  if(use_openocd==false) {
-    //dut->tb_loadHEX(firmware.c_str());
-
-    runCycles(1, dut, m_trace);
-    std::cout<<"Memory Loaded"<< std::endl;
-  } else {
-    std::cout<<"Waiting for GDB"<< std::endl;
-  }
-
   if(run_all==false) {
-    runCycles(max_sim_time, dut, m_trace);
+    runCycles(max_sim_time, dut, m_trace, generate_vcd);
   } else {
     while(1) {
-      runCycles(500, dut, m_trace);
+      runCycles(500, dut, m_trace, generate_vcd);
     }
   }
-/*
-  if(dut->exit_valid_o==1) {
-    std::cout<<"Program Finished with value "<<dut->exit_value_o<<std::endl;
-    exit_val = EXIT_SUCCESS;
-  } else exit_val = EXIT_FAILURE;
-*/
+
   exit_val = EXIT_SUCCESS;
   m_trace->close();
   delete dut;

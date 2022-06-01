@@ -100,6 +100,10 @@ The test bench used by the simulation is 'core_v_mcu_tb.sv'
 
 The resulting header files are located in ./sw
 
+## Running Verilator
+
+Follow the [Verilator](./Verilator.md) guide to simulate the core-v-mcu with Verilator.
+
 ## Experimental fuseSoC Support
 
 Run Verilator lint target:
