@@ -46,12 +46,12 @@ cd ./build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/
 make -f  ../../../verilatorsim.mk
 ```
 
-## Simulating the Verilator Model
+## Simulating the CLI test with the Verilator Model
 
 Launch the simulation as:
 
 ```
-./core_v_mcu_tb.exe +dump_vcd=1 +max_sim_time=70000
+./core_v_mcu_tb.exe +dump_vcd=1 +max_sim_time=10000000
 ```
 
 (dump_vcd=0 if you do not want to generate the VCD and/or omit the max_sim_time string if you want to launch the simulation without timing bounds)
@@ -61,7 +61,7 @@ The BootRom uses the `UART1` peripheral to print debug messages, if everything g
 
 ```
 [TESTBENCH]: No firmware  specified
-[TESTBENCH]: Max Times is  70000
+[TESTBENCH]: Max Times is  10000000
 [TESTBENCH]: Generating waveform.vcd
 TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0
 TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0
@@ -97,6 +97,17 @@ Jumping to 0x1C000880
 
 If you like, you can do `$ screen /dev/pts/3` to see the UART1's output live, but be quick, otherwise, you may miss the output.
 
+The CLI application uses the `UART0` peripheral to print menu.
 
+After long-time (please be patient), you will see from the UART0 (`cat uart0.log`):
 
+```
+#*******************
+Command Line Interface
+Jan 13 2022 15:05:08
+App SW Version: cli_test v0.2 - NoInt
 
+#*******************
+[0] >
+:
+```
