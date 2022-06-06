@@ -21,7 +21,8 @@ then,
 
 ```
 cd a2_boot
-make all CUSTOM_CFLAGS=-DVERILATOR
+make clean
+make all CUSTOM_CFLAGS=-DVERILATOR BOOTCODE=verilatorBoot.mem
 ```
 
 Do not commit the new ROM, as this is only meant to simplify the Verilator simulation, and it
@@ -33,18 +34,12 @@ will be supported neither by the FPGA, nor the ASIC targets.
 To build the Verilator library which creates the core-v-mcu model run:
 
 ```
-fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
+make model-lib-sim
 ```
 
-This creates the `obj_dir/Vcore_v_mcu_testharness__ALL.a` library used by the testbench.
+This creates the `obj_dir/Vcore_v_mcu_testharness__ALL.a` library used by the testbench,
+and compiles the Verilator testbench.
 
-
-Then, compile the Verilator testbench:
-
-```
-cd ./build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/
-make -f  ../../../verilatorsim.mk
-```
 
 ## Simulating the CLI test with the Verilator Model
 

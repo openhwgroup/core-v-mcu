@@ -29,14 +29,14 @@ CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude ${CUSTOM_CFLAGS}
 ASFLAGS  = $(CFLAGS) -DLANGUAGE_ASSEMBLY
 LDFLAGS  = -msmall-data-limit=8 -mno-save-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T core-v-mcu2-rom.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -Wl,-Map,"A2_boot.map" --specs=nosys.specs -o "A2_boot.elf"
 
-BOOTCODE = boot.mem
+BOOTCODE ?= boot.mem
 
 
 
 all: $(BOOTCODE)
 
 $(BOOTCODE): A2_Boot.srec
-	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ../tb/mem_init_files/boot.mem
+	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ../tb/mem_init_files/$(BOOTCODE)
 
 A2_Boot.srec: A2_boot.elf
 	$(OBJCOPY) -O srec -j .text -j .data A2_boot.elf A2_Boot.srec

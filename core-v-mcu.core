@@ -159,7 +159,19 @@ filesets:
 
   mem_init_verilator:
     files:
-    - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
+    file_type: user
+
+  mem_init_verilator_tb:
+    files:
+    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
     - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
     - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
@@ -257,6 +269,7 @@ targets:
     - not_emulation-rtl
     - target_lint? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
+    - target_model-lib-sim? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -311,6 +324,30 @@ targets:
     - pre_build_scripts
     - verilator-waiver
     - mem_init_verilator
+    - rtl-simulation
+    - not_emulation-rtl
+    toplevel: [core_v_mcu]
+    hooks:
+      pre_build: [pre_build_scripts]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+        - -Wno-fatal
+        - --trace
+        - --CFLAGS -DVL_TIME_CONTEXT
+
+
+  model-lib-sim:
+    <<: *default_target
+    default_tool: verilator
+    parameters:
+    - VERILATOR=true
+    - USE_BW=true
+    filesets_append:
+    - pre_build_scripts
+    - verilator-waiver
+    - mem_init_verilator_tb
     - rtl-simulation
     - testharness
     toplevel: [core_v_mcu_testharness]
