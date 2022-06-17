@@ -235,3 +235,46 @@ The JTAG-HS2 pmod is not keyed, so check that the pmod is connected to the botto
 **Note:** the JTAG port is not enabled unless SW0 (**E**) is in the "up" position.
 
 Detailed instructions for using the Eclipse IDE with the CORE-V-MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
+
+## NOR flash
+
+The [`core-v-mcu-cli_test`](https://github.com/openhwgroup/core-v-mcu-cli-test) suite can be used to program a NOR flash connected to the JXADC header.
+
+Additional HW requirement
+- USB2TTL adapter
+- 3 jumper wires
+
+The boot loader uses it to print a message and the SPI image is downloaded over that UART.
+
+How-to:
+- connect the USB2TTL to the PC
+- connect USB2TTL.GND to JB.5
+- connect USB2TTL.TX to JB.3
+- connect USB2TTL.RX to JB.2
+- connect the JTAG cable
+- powerup the Nexys board
+- download the `cli_test` program to the MCU as described above
+- identify the ttyUSB port which is used to drive the USB2TTL - let's assume it is `/dev/ttyUSB0`
+- python spi_load /dev/ttyUSB0
+- start the `cli_test` program via he SDK
+- on the `cli_test` terminal
+    - `[0] > qspi`
+    - `[1] qspi > init 0`
+    - `[1] qspi > program 0 Default/cli.bin 0x0`
+    (note that the name and path of your program could differ from Default/cli.bin)
+    - you should see something like
+        ```
+        lQSPIMIdNum = 0x00
+        Loading file:  = Default/cli.bin
+        addr = 0x00000000
+        Expecting 00019710 bytes
+        Erasing. . .done
+        1024/104208
+        ...
+        103424/104208
+        Received Bytes 0x00019710
+        ```
+- swith SW1 towards the inside of the board
+- press the `CPU reset` button
+
+The MCU should now read the program from the flash.
