@@ -189,6 +189,13 @@ Detailed instructions for using the Eclipse IDE with the CORE-V-MCU can be found
 
 ## NOR flash
 
+### Using the bootloader
+
+The A2 bootloader is capable of collecting an executable file in Srecord format via UART0 and storing it into flash. A [python script](https://github.com/openhwgroup/core-v-mcu-cli-test/cli_test/serialPort.py) (also available [here](https://github.com/openhwgroup/core-v-mcu-demo/demo/serialPort.py)) can transfer the `srec` file from the host PC to the MCU.
+No specific HW or SW configuration is needed other than the normal microUSB connected to J6.
+
+### Using CLI test
+
 The [`core-v-mcu-cli_test`](https://github.com/openhwgroup/core-v-mcu-cli-test) suite can be used to program a NOR flash connected to the JXADC header.
 
 Additional HW requirement
