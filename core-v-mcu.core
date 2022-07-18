@@ -161,12 +161,12 @@ filesets:
     files:
     - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
-    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
-    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
-    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
-    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
-    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
-    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
 
   mem_init_verilator_tb:
