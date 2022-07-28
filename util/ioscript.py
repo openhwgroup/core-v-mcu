@@ -50,7 +50,7 @@ outputArgs.add_argument("--reg-def-svh", help="register definition Verilog heade
 outputArgs.add_argument("--reg-def-md", help="register definition markdown file (md)")
 outputArgs.add_argument("--pin-table-md", help="pin table markdown file (md)")
 args = parser.parse_args()
-
+print (args)
 #
 # Global variables
 #
@@ -155,6 +155,7 @@ if args.soc_defines != None:
                     soc_defines[line[1]] = ''
                 if len(line) > 2:
                     soc_defines[line[1]] = line[2]
+
     pulp_defines.close()
 
 ####################################################################################

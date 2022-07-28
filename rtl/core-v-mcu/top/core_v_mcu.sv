@@ -21,7 +21,6 @@ module core_v_mcu #(
     input                                jtag_tms_i,
     input                                jtag_trst_i,
     input                                ref_clk_i,
-    output                               slow_clk_o,
     input                                rstn_i,
     input                                bootsel_i,
     input                                stm_i,
@@ -53,7 +52,6 @@ module core_v_mcu #(
 
 
 
-  //  logic                                   s_ref_clk;
   logic                                   s_clk_in;  // clock in from pad
   logic                                   s_rstn;
   logic                                   s_pad_rstn;
@@ -73,16 +71,6 @@ module core_v_mcu #(
   //
 
   logic                                   s_test_clk;
-  //  logic                                   s_slow_clk;
-
-  //  logic                                   s_sel_fll_clk;
-
-  //  logic [         11:0]                   s_pm_cfg_data;
-  //  logic                                   s_pm_cfg_req;
-  //  logic                                   s_pm_cfg_ack;
-
-  //  logic                                   s_cluster_busy;
-
   logic                                   s_soc_tck;
   logic                                   s_soc_trstn;
   logic                                   s_soc_tms;
@@ -104,110 +92,10 @@ module core_v_mcu #(
   logic [`N_FPGAIO-1:0]                   s_fpgaio_in;
   logic [`N_FPGAIO-1:0]                   s_fpgaio_oe;
 
-  logic                                   s_efpga_clk;
-
-  /* -----\/----- EXCLUDED -----\/-----
-  logic                                   s_fpga_clk_1_i;
-  logic                                   s_fpga_clk_2_i;
-  logic                                   s_fpga_clk_3_i;
-  logic                                   s_fpga_clk_4_i;
-  logic                                   s_fpga_clk_5_i;
-
- -----/\----- EXCLUDED -----/\----- */
-  /* -----\/----- EXCLUDED -----\/-----
-  logic                                   s_rf_tx_clk;
-  logic                                   s_rf_tx_oeb;
-  logic                                   s_rf_tx_enb;
-  logic                                   s_rf_tx_mode;
-  logic                                   s_rf_tx_vsel;
-  logic                                   s_rf_tx_data;
-  logic                                   s_rf_rx_clk;
-  logic                                   s_rf_rx_enb;
-  logic                                   s_rf_rx_data;
-
-  logic                                   s_uart_tx;
-  logic                                   s_uart_rx;
-
-  logic                                   s_i2c0_scl_out;
-  logic                                   s_i2c0_scl_in;
-  logic                                   s_i2c0_scl_oe;
-  logic                                   s_i2c0_sda_out;
-  logic                                   s_i2c0_sda_in;
-  logic                                   s_i2c0_sda_oe;
-  logic                                   s_i2c1_scl_out;
-  logic                                   s_i2c1_scl_in;
-  logic                                   s_i2c1_scl_oe;
-  logic                                   s_i2c1_sda_out;
-  logic                                   s_i2c1_sda_in;
-  logic                                   s_i2c1_sda_oe;
-  logic                                   s_i2s_sd0_in;
-  logic                                   s_i2s_sd1_in;
-  logic                                   s_i2s_sck_in;
-  logic                                   s_i2s_ws_in;
-  logic                                   s_i2s_sck0_out;
-  logic                                   s_i2s_ws0_out;
-  logic [          1:0]                   s_i2s_mode0_out;
-  logic                                   s_i2s_sck1_out;
-  logic                                   s_i2s_ws1_out;
-  logic [          1:0]                   s_i2s_mode1_out;
-  logic                                   s_i2s_slave_sck_oe;
-  logic                                   s_i2s_slave_ws_oe;
-  logic                                   s_spi_master0_csn0;
-  logic                                   s_spi_master0_csn1;
-  logic                                   s_spi_master0_sck;
-  logic                                   s_spi_master0_sdi0;
-  logic                                   s_spi_master0_sdi1;
-  logic                                   s_spi_master0_sdi2;
-  logic                                   s_spi_master0_sdi3;
-  logic                                   s_spi_master0_sdo0;
-  logic                                   s_spi_master0_sdo1;
-  logic                                   s_spi_master0_sdo2;
-  logic                                   s_spi_master0_sdo3;
-  logic                                   s_spi_master0_oen0;
-  logic                                   s_spi_master0_oen1;
-  logic                                   s_spi_master0_oen2;
-  logic                                   s_spi_master0_oen3;
-
-  logic                                   s_spi_master1_csn0;
-  logic                                   s_spi_master1_csn1;
-  logic                                   s_spi_master1_sck;
-  logic                                   s_spi_master1_sdi;
-  logic                                   s_spi_master1_sdo;
-  logic [          1:0]                   s_spi_master1_mode;
-
-  logic                                   s_sdio_clk;
-  logic                                   s_sdio_cmdi;
-  logic                                   s_sdio_cmdo;
-  logic                                   s_sdio_cmd_oen;
-  logic [          3:0]                   s_sdio_datai;
-  logic [          3:0]                   s_sdio_datao;
-  logic [          3:0]                   s_sdio_data_oen;
-
-
-  logic                                   s_cam_pclk;
-  logic [          7:0]                   s_cam_data;
-  logic                                   s_cam_hsync;
-  logic                                   s_cam_vsync;
-
- -----/\----- EXCLUDED -----/\----- */
-  //  logic                                   s_jtag_shift_dr;
-  //  logic                                   s_jtag_update_dr;
-  //  logic                                   s_jtag_capture_dr;
-
-  //  logic                                   s_axireg_sel;
-  //  logic                                   s_axireg_tdi;
-  //  logic                                   s_axireg_tdo;
-
-  //  logic [          7:0]                   s_soc_jtag_regi;
-  //  logic [          7:0]                   s_soc_jtag_rego;
-
   logic                                   s_rstn_por;
 
-  //  logic                                   s_dma_pe_irq_ack;
-  //  logic                                   s_dma_pe_irq_valid;
-
   logic [    `N_IO-1:0][`NBIT_PADMUX-1:0] s_pad_mux_soc;
-  //  logic [       `N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg_soc;
+
   logic [          1:0]                   s_selected_pad_mode;
 
   logic [          5:0]                   efpga_test_M;
@@ -224,53 +112,15 @@ module core_v_mcu #(
   logic [          3:0]                   efpga_test_FB_SPE_IN;
   logic                                   efpga_test_MLATCH;
 
-  logic [   `N_SPI-1:0]                   s_spi_clk;
-  logic [   `N_SPI-1:0][             3:0] s_spi_csn;
-  logic [   `N_SPI-1:0][             3:0] s_spi_oen;
-  logic [   `N_SPI-1:0][             3:0] s_spi_sdo;
-  logic [   `N_SPI-1:0][             3:0] s_spi_sdi;
-
-  logic [   `N_I2C-1:0]                   s_i2c_scl_in;
-  logic [   `N_I2C-1:0]                   s_i2c_scl_out;
-  logic [   `N_I2C-1:0]                   s_i2c_scl_oe;
-  logic [   `N_I2C-1:0]                   s_i2c_sda_in;
-  logic [   `N_I2C-1:0]                   s_i2c_sda_out;
-  logic [   `N_I2C-1:0]                   s_i2c_sda_oe;
-
-
-  //
-  // SOC TO CLUSTER DOMAINS SIGNALS
-  //
-  // PULPissimo doens't have a cluster so we ignore them
-
-  //  logic                                   s_dma_pe_evt_ack;
-  //  logic                                   s_dma_pe_evt_valid;
-  //  logic                                   s_dma_pe_int_ack;
-  //  logic                                   s_dma_pe_int_valid;
-  //  logic                                   s_pf_evt_ack;
-  //  logic                                   s_pf_evt_valid;
-
-
-
-  //
-  // OTHER PAD FRAME SIGNALS
-  //
   logic                                   s_bootsel;
   //
   // SAFE DOMAIN
   //
   safe_domain i_safe_domain (
-
-      //      .ref_clk_i  (ref_clk_i),
-      //      .slow_clk_o (s_ref_clk),
-      //      .efpga_clk_o(s_efpga_clk),
-      //      .bootsel_i  (bootsel_i),
       .rst_ni(rstn_i),
       .rst_no(s_rstn_por),
 
       // PAD control signals
-      //      .pad_cfg_o      (s_pad_cfg),
-      //      .pad_cfg_i      (s_pad_cfg_soc),
       .pad_mux_i   (s_pad_mux_soc),
       // IO signals
       .io_out_o    (s_io_out),
@@ -311,18 +161,11 @@ module core_v_mcu #(
   assign io_out_o[32:29] = stm_i ? testio_o[3:0] : s_io_out[32:29];  //  efpga_test_fcb_pif_do_l_o;
   assign io_out_o[36:33] = stm_i ? testio_o[7:4] : s_io_out[36:33];  //  efpga_test_fcb_pif_do_h_o;
   assign io_out_o[42:39] = stm_i ? testio_o[11:8] : s_io_out[42:39];  // efpga_test_FB_SPE_OUT_o;
-  //assign io_out_o[37] = stm_i ? testio_o[12] : s_io_out[37]; // efpga_test_fcb_pif_do_l_en_o;
-  //assign io_out_o[38] = stm_i ? testio_o[13] : s_io_out[38]; // efpga_test_fcb_pif_do_h_en_o;
   assign io_out_o[21] = stm_i ? testio_o[14] : s_io_out[21];  // efpga_fcb_pif_vldo_o;
-  //assign io_out_o[22] = stm_i ? testio_o[15] : s_io_out[22]; // efpga_fcb_pif_vldo_en_o;
-
   assign io_oe_o[32:29] = stm_i ? {4{testio_o[12]}} : s_io_oe[32:29];  //  efpga_test_fcb_pif_do_l_o;
   assign io_oe_o[36:33] = stm_i ? {4{testio_o[13]}} : s_io_oe[36:33];  //  efpga_test_fcb_pif_do_h_o;
   assign io_oe_o[42:39] = stm_i ? 1 : s_io_oe[42:39];  // efpga_test_FB_SPE_OUT_o;
-  //assign io_oe_o[37] = stm_i ? 1 : s_io_oe[37];  // efpga_test_fcb_pif_do_l_en_o;
-  //assign io_oe_o[38] = stm_i ? 1 : s_io_oe[38];  // efpga_test_fcb_pif_do_h_en_o;
   assign io_oe_o[21] = stm_i ? testio_o[15] : s_io_oe[21];  // efpga_fcb_pif_vldo_o;
-  //assign io_oe_o[22] = stm_i ? 1 : s_io_oe[22];  // efpga_fcb_pif_vldo_en_o;
 
   assign s_io_in[`N_IO-1:0] = stm_i ? 0 : io_in_i[`N_IO-1:0];
 
@@ -346,10 +189,8 @@ module core_v_mcu #(
       .BUFFER_WIDTH      (BUFFER_WIDTH),
       .EVNT_WIDTH        (EVENT_WIDTH)
   ) i_soc_domain (
-      .ref_clk_i(ref_clk_i),
-      .slow_clk_o(slow_clk_o),
-      .sclk_in(io_in_i[5]),  // only used in fpga emulation for FLL
-      .test_clk_i(s_test_clk),
+      .ref_clk_i  (ref_clk_i),
+      .test_clk_i (s_test_clk),
       .rstn_glob_i(s_rstn_por),
 
       .dft_test_mode_i(s_test_mode),
@@ -376,14 +217,6 @@ module core_v_mcu #(
       .fpgaio_in_i (s_fpgaio_in),
       .fpgaio_oe_o (s_fpgaio_oe),
 
-      //    .selected_mode_i   ('0),
-      //      .dma_pe_evt_ack_o  (s_dma_pe_evt_ack),
-      //      .dma_pe_evt_valid_i(s_dma_pe_evt_valid),
-      //      .dma_pe_irq_ack_o  (s_dma_pe_irq_ack),
-      //      .dma_pe_irq_valid_i(s_dma_pe_irq_valid),
-      //      .pf_evt_ack_o      (s_pf_evt_ack),
-      //      .pf_evt_valid_i    (s_pf_evt_valid),
-
       //eFPGA TEST MODE
       .testio_i(testio_i),
       .testio_o(testio_o)
@@ -393,11 +226,5 @@ module core_v_mcu #(
   assign s_test_mode     = '0;
   assign s_dft_cg_enable = '0;
   assign s_test_clk      = '0;
-
-
-  //  assign s_dma_pe_evt_valid = '0;
-  //  assign s_dma_pe_irq_valid = '0;
-  //  assign s_pf_evt_valid     = '0;
-  //  assign s_cluster_busy     = '0;
 
 endmodule

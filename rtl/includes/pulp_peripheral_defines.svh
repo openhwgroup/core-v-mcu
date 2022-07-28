@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-`define BUILD_DATE 32'h20220128
-`define BUILD_TIME 32'h00161459
+`define BUILD_DATE 32'h20220728
+`define BUILD_TIME 32'h00054000
 
 //  PER_ID definitions
 `define PER_ID_UART      0
@@ -91,7 +91,7 @@
 `define IOINDEX_JTAG_TDO_O            2
 `define IOINDEX_JTAG_TMS_I            3
 `define IOINDEX_JTAG_TRST_I           4
-`define IOINDEX_SYSCLK_P_I            5
+`define IOINDEX_REF_CLK_I             5
 `define IOINDEX_RSTN_I                6
 `define IOINDEX_STM_I                 44
 `define IOINDEX_BOOTSEL_I             45

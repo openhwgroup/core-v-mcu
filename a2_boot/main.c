@@ -212,12 +212,7 @@ int main(void)
 	char tstring[8] = {0};
     volatile SocCtrl_t* psoc = (SocCtrl_t*)SOC_CTRL_START_ADDR;
 
-	//TODO: FLL clock settings need to be taken care in the actual chip.
-	//TODO: 5000000 to be changed to #define PERIPHERAL_CLOCK_FREQ_IN_HZ
 
-	//Set soc clock, peripheral clock and cluster clock in reset and bypass mode.
-    for (i=0;i<3;i++)
-        setFLLInResetAndBypass(i);
 	resetreason = psoc->reset_reason;
 	bootsel = psoc->bootsel & 0x1;
 
