@@ -24,8 +24,8 @@
 
 
 module lint2axi_wrap #(
-    parameter int unsigned AXI_ID_WIDTH,
-    parameter int unsigned AXI_USER_WIDTH
+    parameter int unsigned AXI_ID_WIDTH   = 1,
+    parameter int unsigned AXI_USER_WIDTH = 32
 ) (
     input logic clk_i,
     input logic rst_ni,

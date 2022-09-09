@@ -42,7 +42,7 @@ module axi_xbar #(
   input  mst_resp_t [Cfg.NoMstPorts-1:0]                             mst_ports_resp_i,
   input  rule_t     [Cfg.NoAddrRules-1:0]                            addr_map_i,
   input  logic      [Cfg.NoSlvPorts-1:0]                             en_default_mst_port_i,
-  input  logic      [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts)-1:0] default_mst_port_i
+  input  logic      [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts+1)-1:0] default_mst_port_i
 );
 
   typedef logic [Cfg.AxiAddrWidth-1:0]           addr_t;
@@ -61,7 +61,8 @@ module axi_xbar #(
   slv_resp_t [Cfg.NoMstPorts-1:0][Cfg.NoSlvPorts-1:0] mst_resps;
 
   for (genvar i = 0; i < Cfg.NoSlvPorts; i++) begin : gen_slv_port_demux
-    logic [$clog2(Cfg.NoMstPorts)-1:0] dec_aw,        dec_ar;
+    logic [$clog2(Cfg.NoMstPorts+1)-1:0] dec_aw,        dec_ar;
+
     mst_port_idx_t                     slv_aw_select, slv_ar_select;
     logic                              dec_aw_valid,  dec_aw_error;
     logic                              dec_ar_valid,  dec_ar_error;
@@ -250,7 +251,7 @@ module axi_xbar_intf #(
   AXI_BUS.Master                                                  mst_ports [Cfg.NoMstPorts-1:0],
   input  rule_t [Cfg.NoAddrRules-1:0]                             addr_map_i,
   input  logic  [Cfg.NoSlvPorts-1:0]                              en_default_mst_port_i,
-  input  logic  [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts)-1:0]  default_mst_port_i
+  input  logic  [Cfg.NoSlvPorts-1:0][$clog2(Cfg.NoMstPorts+1)-1:0]  default_mst_port_i
 );
 
   localparam int unsigned AxiIdWidthMstPorts = Cfg.AxiIdWidthSlvPorts + $clog2(Cfg.NoSlvPorts);

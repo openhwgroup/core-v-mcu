@@ -20,7 +20,8 @@
 module uartdpi
   #(parameter BAUD = 'x,
     parameter FREQ = 'x,
-    parameter string NAME = "uart0")
+    parameter string NAME = "uart0",
+    parameter USEPTY = 1)
    (
     input      clk,
     input      rst,
@@ -30,8 +31,11 @@ module uartdpi
     );
 
    localparam CYCLES_PER_SYMBOL = FREQ/BAUD;
-   initial $display("%s Baud = %d freq = %d ccps = %d",NAME,
-		    BAUD,FREQ,CYCLES_PER_SYMBOL);
+   initial begin
+     $display("%m @ %0t: %s Baud = %d freq = %d ccps = %d",
+              $time, NAME, BAUD, FREQ, CYCLES_PER_SYMBOL);
+     $display("%m @ %0t: Pseudo UART is %s", $time, USEPTY ? "enabled" : "disabled");
+   end
    
    import "DPI-C" function
      chandle uartdpi_create(input string name);
@@ -128,10 +132,16 @@ module uartdpi
                if (rxcyccount == CYCLES_PER_SYMBOL) begin
                   rxactive = 0;
                   if (rx) begin
-                     uartdpi_write(obj, rxsymbol);
+                     if (USEPTY) begin
+                        uartdpi_write(obj, rxsymbol);
+                     end
+                     else begin
+                        $write("%c", rxsymbol);
+                     end
                   end
                end
             end
+            $fflush;
          end
       end // else: !if(rst)
    end

@@ -83,7 +83,7 @@ void udma_flash_readid(uint32_t l2addr) {
 		pqspim_regs->rx_size = 4;
 		pqspim_regs->rx_cfg_b.en = 1;
 
-		pqspim_regs->cmd_saddr = auccmd;
+		pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 		pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 		pqspim_regs->cmd_cfg_b.en = 1;
 
@@ -105,7 +105,7 @@ uint32_t udma_flash_reset_enable(uint8_t qspim_id, uint8_t cs)
 	*pcmd++ = kSPIm_SendCmd | (0x70066); // reset enable command
 	*pcmd++ = kSPIm_EOT  | 1; // generate event
 
-	pqspim_regs->cmd_saddr = auccmd;
+	pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 	pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 	pqspim_regs->cmd_cfg_b.en = 1;
 
@@ -129,7 +129,7 @@ uint32_t udma_flash_reset_memory(uint8_t qspim_id, uint8_t cs)
 
 	*pcmd++ = kSPIm_EOT  | 1; // generate event
 
-	pqspim_regs->cmd_saddr = auccmd;
+	pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 	pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 	pqspim_regs->cmd_cfg_b.en = 1;
 
@@ -157,7 +157,7 @@ void udma_flash_read(uint32_t flash_addr,uint32_t l2addr,uint16_t read_len ) {
 		pqspim_regs->rx_size = read_len;
 		pqspim_regs->rx_cfg_b.en = 1;
 
-		pqspim_regs->cmd_saddr = auccmd;
+		pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 		pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 		pqspim_regs->cmd_cfg_b.en = 1;
 
@@ -187,7 +187,7 @@ void udma_flash_write(uint32_t flash_addr, uint32_t l2addr,uint16_t write_len ) 
 		pqspim_regs->tx_cfg_b.datasize = 2;
 		pqspim_regs->tx_cfg_b.en = 1;
 
-		pqspim_regs->cmd_saddr = auccmd;
+		pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 		pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 		pqspim_regs->cmd_cfg_b.en = 1;
 
@@ -210,12 +210,12 @@ void udma_qspim_write (uint8_t qspim_id, uint8_t cs, uint16_t write_len, uint8_t
 		*pcmd++ = kSPIm_EOT | 1; // generate event
 
 
-		pqspim_regs->tx_saddr = write_data;
+		pqspim_regs->tx_saddr = (uint32_t)write_data;
 		pqspim_regs->tx_size = write_len-1;
 		pqspim_regs->tx_cfg_b.datasize = 2;
 		pqspim_regs->tx_cfg_b.en = 1;
 
-		pqspim_regs->cmd_saddr = auccmd;
+		pqspim_regs->cmd_saddr = (uint32_t)auccmd;
 		pqspim_regs->cmd_size = (uint32_t)(pcmd - auccmd)*4;
 		pqspim_regs->cmd_cfg_b.en = 1;
 

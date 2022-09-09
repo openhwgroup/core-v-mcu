@@ -7,11 +7,11 @@
 // this License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 
 module fc_subsystem #(
-    parameter USE_FPU             = 1,
-    parameter USE_HWPE            = 1,
+    parameter USE_FPU             = 0,
+    parameter USE_HWPE            = 0,
     parameter N_EXT_PERF_COUNTERS = 1,
     parameter EVENT_ID_WIDTH      = 8,
     parameter PER_ID_WIDTH        = 32,
@@ -153,8 +153,11 @@ module fc_subsystem #(
 
 
   cv32e40p_core #(
-      .FPU(`USE_FPU),
-      .PULP_XPULP(1)
+      .FPU(0),
+      .NUM_MHPMCOUNTERS(1),
+      .PULP_CLUSTER(0),
+      .PULP_XPULP(0),
+      .PULP_ZFINX(0)
   ) lFC_CORE (
       .clk_i              (clk_i),
       .rst_ni             (rst_ni),
@@ -164,7 +167,7 @@ module fc_subsystem #(
       .mtvec_addr_i       ('0),
       .dm_halt_addr_i     (32'h1A110800),
       .hart_id_i          (hart_id),
-      .dm_exception_addr_i('0),
+      .dm_exception_addr_i(32'h1a11080c),
 
       // Instruction Memory Interface
       .instr_addr_o  (core_instr_addr),
@@ -186,13 +189,13 @@ module fc_subsystem #(
       // apu-interconnect
       // handshake signals
       .apu_req_o     (apu_req),
-      .apu_gnt_i     (apu_gnt),
+      .apu_gnt_i     (1'b0),  //(apu_gnt),
       .apu_operands_o(apu_operands),
       .apu_op_o      (apu_op),
       .apu_flags_o   (apu_flags),
-      .apu_rvalid_i  (apu_rvalid),
-      .apu_result_i  (apu_rdata),
-      .apu_flags_i   (apu_rflags),
+      .apu_rvalid_i  (1'b0),  // (apu_rvalid),
+      .apu_result_i  (32'b0),  //(apu_rdata),
+      .apu_flags_i   ('0),  //(apu_rflags),
 
 
       .irq_i    (r_int),
@@ -207,7 +210,7 @@ module fc_subsystem #(
       .core_sleep_o     ()
   );
   assign supervisor_mode_o = 1'b1;
-
+  /*
   cv32e40p_fp_wrapper fp_wrapper_i (
       .clk_i         (clk_i),
       .rst_ni        (rst_ni),
@@ -220,5 +223,5 @@ module fc_subsystem #(
       .apu_rdata_o   (apu_rdata),
       .apu_rflags_o  (apu_rflags)
   );
-
+*/
 endmodule

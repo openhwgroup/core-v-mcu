@@ -30,7 +30,7 @@
 `define REG_INTACK 12'H040
 
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 module apb_gpiov2 #(
     parameter APB_ADDR_WIDTH = 12
 ) (

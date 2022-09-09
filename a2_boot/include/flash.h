@@ -26,52 +26,51 @@
 
 
 typedef struct {
-  uint32_t start;
-  uint32_t ptr;
-  uint32_t size;
-  uint32_t blocks;
+	uint32_t start;
+	uint32_t ptr;
+	uint32_t size;
+	uint32_t blocks;
 } flash_v2_mem_area_t;
 
 typedef struct {
-  uint32_t nextDesc;
-  uint32_t nbAreas;
-  uint32_t entry;
-  uint32_t bootaddr;
+	uint32_t nextDesc;
+	uint32_t nbAreas;
+	uint32_t entry;
+	uint32_t bootaddr;
 } flash_v2_header_t;
 
 typedef struct {
-  uint32_t chipID;
-  uint32_t nbBinaries;
-  uint32_t ptrBinaries[6];
+	uint32_t chipID;
+	uint32_t nbBinaries;
+	uint32_t ptrBinaries[6];
 } flash_v3_header_t;
 
 typedef struct {
-  uint32_t checksum;
-  uint32_t nbAreas;
-  uint32_t entry;
-  uint32_t bootaddr;
-  flash_v2_mem_area_t memArea[16];
+	uint32_t checksum;
+	uint32_t nbAreas;
+	uint32_t entry;
+	uint32_t bootaddr;
+	flash_v2_mem_area_t memArea[16];
 } binary_v3_desc_t;
 
 typedef struct {
-  flash_v2_header_t header;
-  flash_v2_mem_area_t area;
+	flash_v2_header_t header;
+	flash_v2_mem_area_t area;
 } flash_v2_header_single_t;
 
 
 typedef struct {
-  unsigned char flashBuffer[FLASH_BLOCK_SIZE];
-  unsigned int udma_buffer[256];
-  int spi_flash_id;
-  int step;
-  flash_v2_header_t header;
-  flash_v2_mem_area_t memArea[MAX_NB_AREA];
-  char udma_uart_tx_buffer[1];
-  unsigned char stack[BOOT_STACK_SIZE];
-  int hyperflash;
-  int blockSize;
-  int qpi;
-
+	unsigned char flashBuffer[FLASH_BLOCK_SIZE];
+	unsigned int udma_buffer[256];
+	int spi_flash_id;
+	int step;
+	flash_v2_header_t header;
+	flash_v2_mem_area_t memArea[MAX_NB_AREA];
+	char udma_uart_tx_buffer[1];
+	unsigned char stack[BOOT_STACK_SIZE];
+	int hyperflash;
+	int blockSize;
+	int qpi;
 } boot_code_t;
 
 
