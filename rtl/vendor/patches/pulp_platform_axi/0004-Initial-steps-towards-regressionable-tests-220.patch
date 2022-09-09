@@ -1,0 +1,47 @@
+From 17aa1ec96aa2384c8098df03b73af687dc779eea Mon Sep 17 00:00:00 2001
+From: Mike Thompson <mike@openhwgroup.org>
+Date: Tue, 29 Mar 2022 10:50:22 -0400
+Subject: [PATCH] Initial steps towards regressionable tests (#220)
+
+* Initial steps towards regressionable tests
+
+Signed-off-by: Mike Thompson <mike@openhwgroup.org>
+
+* Initial steps towards regressionable tests
+
+Signed-off-by: Mike Thompson <mike@openhwgroup.org>
+
+* Respond to gmartin feedback: Pseudo UART enabled by default
+
+Signed-off-by: Mike Thompson <mike@openhwgroup.org>
+
+* Add XSIM compile-time guard
+
+Signed-off-by: Mike Thompson <mike@openhwgroup.org>
+---
+ src/axi_burst_splitter.sv | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/axi_burst_splitter.sv b/src/axi_burst_splitter.sv
+index a455847..039d024 100644
+--- a/src/axi_burst_splitter.sv
++++ b/src/axi_burst_splitter.sv
+@@ -316,6 +316,7 @@ module axi_burst_splitter #(
+   // Assumptions and assertions
+   // --------------------------------------------------
+   `ifndef VERILATOR
++  `ifndef XSIM
+   // pragma translate_off
+   default disable iff (!rst_ni);
+   // Inputs
+@@ -336,6 +337,7 @@ module axi_burst_splitter #(
+     else $fatal(1, "AR burst longer than a single beat emitted!");
+   // pragma translate_on
+   `endif
++  `endif
+ 
+ endmodule
+ 
+-- 
+2.32.0 (Apple Git-132)
+

@@ -36,27 +36,27 @@ filesets:
     - openhwgroup.org:ip:logint_dc_fifo_xbar
     - openhwgroup.org:ip:l2_tcdm_hybrid_interco
     - quicklogic.com:ip:efpga
-    - openhwgroup.org:ip:generic_fll
+#    - openhwgroup.org:ip:generic_fll
     - openhwgroup.org:ip:tcdm_interconnect
     - openhwgroup.org:ip:cv32e40p
     files:
     - rtl/includes/periph_bus_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/pulp_peripheral_defines.svh: {is_include_file: true, include_path: rtl/includes}
-    - rtl/includes/pulp_soc_defines.sv: {is_include_file: true, include_path: rtl/includes}
+    - rtl/includes/pulp_soc_defines.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/includes/soc_mem_map.svh: {is_include_file: true, include_path: rtl/includes}
     - rtl/core-v-mcu/include/tcdm_macros.svh: {is_include_file: true, include_path: rtl/core-v-mcu/include/}
     - rtl/core-v-mcu/soc/pkg_soc_interconnect.sv
-    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
+#    - rtl/core-v-mcu/soc/axi64_2_lint32_wrap.sv
     - rtl/core-v-mcu/soc/lint_2_axi_wrap.sv
     - rtl/core-v-mcu/soc/contiguous_crossbar.sv
     - rtl/core-v-mcu/soc/interleaved_crossbar.sv
     - rtl/core-v-mcu/soc/tcdm_demux.sv
     - rtl/core-v-mcu/soc/boot_rom.sv
-    - rtl/core-v-mcu/soc/a2_bootrom.sv
     - rtl/core-v-mcu/soc/l2_ram_multi_bank.sv
     - rtl/core-v-mcu/soc/lint_jtag_wrap.sv
     - rtl/core-v-mcu/soc/periph_bus_wrap.sv
     - rtl/core-v-mcu/soc/soc_clk_rst_gen.sv
+    - rtl/core-v-mcu/soc/clk_and_control.sv
     - rtl/core-v-mcu/soc/soc_event_arbiter.sv
     - rtl/core-v-mcu/soc/soc_event_generator.sv
     - rtl/core-v-mcu/soc/soc_event_queue.sv
@@ -90,12 +90,54 @@ filesets:
 
   rtl-simulation:
     files:
-    - rtl/simulation/clk_gen.sv
+    - rtl/simulation/pPLL02F.sv
     - rtl/simulation/core_v_mcu_sim_ram.sv
     - rtl/simulation/sram512x64.v
     - rtl/simulation/top.sv
     - rtl/simulation/top1_wrapper.sv
+    - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
+
+  not_emulation-rtl:
+    files:
+    - rtl/core-v-mcu/soc/clk_gen.sv
+    file_type: systemVerilogSource
+
+  emulation-rtl:
+    depend:
+    - pulp-platform.org::tech_cells_xilinx
+    files:
+    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
+
+    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
+    - emulation/xilinx/rtl/fpga_private_ram.sv
+    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
+    - emulation/xilinx/rtl/pad_functional_xilinx.sv
+    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
+    - emulation/xilinx/rtl/sram512x64.v
+    - emulation/xilinx/rtl/DW02_mac.sv
+    - rtl/simulation/pPLL02F.sv
+    - rtl/simulation/top.sv
+    - rtl/simulation/top1_wrapper.sv
+    - rtl/simulation/a2_bootrom.sv
+    file_type: systemVerilogSource
+
+  nexys-ips:
+    files:
+    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
+    file_type: tclSource
+
+  genesys2-ips:
+    files:
+    - emulation/core-v-mcu-genesys2/ips/xilinx_clk_mngr.tcl
+    file_type: tclSource
+
+  xilinx-ips:
+    files:
+#    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
+    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
+    - emulation/xilinx/ips/xilinx_private_ram.tcl
+    file_type: tclSource
 
   rom_init:
     files:
@@ -135,35 +177,11 @@ filesets:
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
-  emulation-rtl:
-    depend:
-    - pulp-platform.org::tech_cells_xilinx
-    files:
-    - emulation/xilinx/rtl/cv32e40p_clock_gate.sv
-    - emulation/xilinx/rtl/fpga_clk_gen.sv
-    - emulation/xilinx/rtl/fpga_interleaved_ram.sv
-    - emulation/xilinx/rtl/fpga_private_ram.sv
-    - emulation/xilinx/rtl/fpga_slow_clk_gen.sv
-    - emulation/xilinx/rtl/pad_functional_xilinx.sv
-    - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
-    - emulation/xilinx/rtl/sram512x64.v
-    - emulation/xilinx/rtl/DW02_mac.sv
-    - rtl/simulation/top.sv
-    - rtl/simulation/top1_wrapper.sv
-
-    file_type: systemVerilogSource
-
-  xilinx-ips:
-    files:
-    - emulation/xilinx/ips/xilinx_clk_mngr.tcl
-    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
-    - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
-    - emulation/xilinx/ips/xilinx_private_ram.tcl
-    file_type: tclSource
 
   nexys-rtl:
     files:
     - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
+    - emulation/xilinx/rtl/fpga_clk_gen.sv
     file_type: systemVerilogSource
 
   nexys-xdc:
@@ -171,11 +189,22 @@ filesets:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
 
-  nexys-cfg:
+  xilinx-tcl:
     files:
-    - emulation/core-v-mcu-nexys/tcl/common.tcl
-    - emulation/core-v-mcu-nexys/tcl/flatten.tcl
+    - emulation/xilinx/tcl/common.tcl
+    - emulation/xilinx/tcl/flatten.tcl
     file_type: tclSource
+
+  genesys2-rtl:
+    files:
+    - emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v
+    - emulation/core-v-mcu-genesys2/rtl/fpga_clk_gen.sv
+    file_type: systemVerilogSource
+
+  genesys2-xdc:
+    files:
+    - emulation/core-v-mcu-genesys2/constraints/core-v-mcu-pin-assignment.xdc
+    file_type: xdc
 
   # Scripts for hooks
   pre_build_scripts:
@@ -215,6 +244,7 @@ targets:
   default: &default_target
     filesets:
     - files_rtl_generic
+    - not_emulation-rtl
     - target_lint? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
@@ -223,6 +253,7 @@ targets:
     <<: *default_target
     default_tool: modelsim
     filesets_append:
+    - not_emulation-rtl
     - rtl-simulation
     - mem_init_modelsim
     - rtl-behavioral
@@ -238,6 +269,23 @@ targets:
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
+      xcelium:
+        xrun_options:
+        - -64bit
+        - -timescale 1ns/1ps
+        - -disable_sem2009
+        xmsim_options:
+        - -sv_lib ../../../tb/uartdpi/uartdpi.so
+      xsim:
+        xelab_options:
+        - --define XSIM
+        - --incr
+        - -dup_entity_as_module
+        - -relax
+        - --O0
+        - -v 0
+        - -timescale 1ns/1ps
+        xsim_options:
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
@@ -253,6 +301,7 @@ targets:
     - verilator-waiver
     - mem_init_verilator
     - rtl-simulation
+    - not_emulation-rtl
     toplevel: [core_v_mcu]
     hooks:
       pre_build: [pre_build_scripts]
@@ -270,6 +319,7 @@ targets:
     toplevel: [core_v_mcu]
     filesets_append:
     - rtl-simulation
+    - not_emulation-rtl
     tools:
       verilator:
         mode: lint-only
@@ -283,13 +333,33 @@ targets:
     parameters:
     - PULP_FPGA_EMUL=true
     filesets_append:
+    - nexys-ips
     - xilinx-ips
+    - xilinx-tcl
     - emulation-rtl
     - nexys-rtl
-    - nexys-cfg
     - nexys-xdc
     - rom_init
     tools:
       vivado:
         part: xc7a100tcsg324-1
     toplevel: core_v_mcu_nexys
+
+  genesys2:
+    <<: *default_target
+    default_tool: vivado
+    description: Digilent Nexys-A7-100T Board
+    parameters:
+    - PULP_FPGA_EMUL=true
+    filesets_append:
+    - genesys2-ips
+    - xilinx-ips
+    - xilinx-tcl
+    - emulation-rtl
+    - genesys2-rtl
+    - genesys2-xdc
+    - rom_init
+    tools:
+      vivado:
+        part: xc7k325tffg900-2
+    toplevel: core_v_mcu_genesys2

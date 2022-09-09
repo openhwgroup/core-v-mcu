@@ -9,12 +9,12 @@
 // specific language governing permissions and limitations under the License.
 
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 
 module soc_clk_rst_gen (
     input  logic        ref_clk_i,
     input               sclk_in,
-    //    input               emul_clk,
+    output              slow_clk_o,
     input  logic        test_clk_i,
     input  logic        rstn_glob_i,
     input  logic        test_mode_i,
@@ -22,7 +22,7 @@ module soc_clk_rst_gen (
     input  logic        shift_enable_i,
     input  logic        soc_fll_slave_req_i,
     input  logic        soc_fll_slave_wrn_i,
-    input  logic [ 1:0] soc_fll_slave_add_i,
+    input  logic [ 4:0] soc_fll_slave_add_i,
     input  logic [31:0] soc_fll_slave_data_i,
     output logic        soc_fll_slave_ack_o,
     output logic [31:0] soc_fll_slave_r_data_o,
@@ -30,7 +30,7 @@ module soc_clk_rst_gen (
 
     input  logic        per_fll_slave_req_i,
     input  logic        per_fll_slave_wrn_i,
-    input  logic [ 1:0] per_fll_slave_add_i,
+    input  logic [ 4:0] per_fll_slave_add_i,
     input  logic [31:0] per_fll_slave_data_i,
     output logic        per_fll_slave_ack_o,
     output logic [31:0] per_fll_slave_r_data_o,
@@ -38,7 +38,7 @@ module soc_clk_rst_gen (
 
     input  logic        cluster_fll_slave_req_i,
     input  logic        cluster_fll_slave_wrn_i,
-    input  logic [ 1:0] cluster_fll_slave_add_i,
+    input  logic [ 4:0] cluster_fll_slave_add_i,
     input  logic [31:0] cluster_fll_slave_data_i,
     output logic        cluster_fll_slave_ack_o,
     output logic [31:0] cluster_fll_slave_r_data_o,
@@ -65,28 +65,6 @@ module soc_clk_rst_gen (
   logic s_rstn_soc_sync;
   logic s_rstn_cluster_sync;
 
-  //synopsys translate_off
-`ifndef SYNTHESIS
-  freq_meter #(
-      .FLL_NAME  ("SOC_FLL"),
-      .MAX_SAMPLE(4096)
-  ) SOC_METER (
-      .clk(s_clk_fll_soc)
-  );
-  freq_meter #(
-      .FLL_NAME  ("PER_FLL"),
-      .MAX_SAMPLE(4096)
-  ) PER_METER (
-      .clk(s_clk_fll_per)
-  );
-  freq_meter #(
-      .FLL_NAME  ("CLUSTER_FLL"),
-      .MAX_SAMPLE(4096)
-  ) CLUSTER_METER (
-      .clk(s_clk_fll_cluster)
-  );
-`endif
-  //synopsys translate_on
 
   clk_gen clk_gen_i (
       .ref_clk_i(ref_clk_i),
@@ -119,30 +97,10 @@ module soc_clk_rst_gen (
       .cluster_cfg_r_data_o(cluster_fll_slave_r_data_o),
       .cluster_cfg_wrn_i(cluster_fll_slave_wrn_i)
   );
-  /*
-  pulp_clock_mux2 clk_mux_fll_soc_i (
-      .clk0_i   (s_clk_fll_soc),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_soc)
-  );
-
-  pulp_clock_mux2 clk_mux_fll_per_i (
-      .clk0_i   (s_clk_fll_per),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_per)
-  );
-
-  pulp_clock_mux2 clk_mux_fll_cluster_i (
-      .clk0_i   (s_clk_fll_cluster),
-      .clk1_i   (ref_clk_i),
-      .clk_sel_i(sel_fll_clk_i),
-      .clk_o    (s_clk_cluster)
-  );
- */
   assign s_clk_soc     = s_clk_fll_soc;
   assign s_clk_cluster = s_clk_fll_cluster;  //emul_clk;
+  assign slow_clk_o    = s_clk_fll_cluster;
+
   assign s_clk_per     = s_clk_fll_per;
 
   assign s_rstn_soc    = rstn_glob_i;

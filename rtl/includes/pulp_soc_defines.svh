@@ -1,5 +1,5 @@
 /*
- * pulp_soc_defines.sv
+ * pulp_soc_defines.svh
  *
  * Copyright (C) 2013-2018 ETH Zurich, University of Bologna.
  *
@@ -140,7 +140,7 @@
 // At this time fixed by padframe
 // Please keep in same order as the generation in udma_subsystem
 `define N_UART    	2
-`define N_QSPIM    	1
+`define N_QSPIM    	2
 `define N_SPI     	`N_QSPIM		// ToDo: Compatibility
 `define N_I2CM    	2
 `define N_I2C     	`N_I2CM		// ToDo: Compatibility
@@ -148,12 +148,12 @@
 `define N_I2S	      `N_I2SC		// ToDo: Cpmpatibility
 `define N_CSI2    	0
 `define N_HYPER   	0
-`define N_SDIO    	0
+`define N_SDIO    	1
 `define N_CAM     	1
 `define N_JTAG    	0
 `define N_MRAM    	0
 `define N_FILTER  	1
-`define N_FPGA    	1
+`define N_FPGA    	0
 `define N_EXT_PER   0			// ToDo: Only set to one if PULP_TRAINING -- do we still need?
 
 

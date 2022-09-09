@@ -590,7 +590,7 @@ if args.pad_control_sv != None:
         pad_control_sv.write("// CONDITIONS OF ANY KIND, either express or implied. See the License for the\n")
         pad_control_sv.write("// specific language governing permissions and limitations under the License.\n")
         pad_control_sv.write("\n")
-        pad_control_sv.write("`include \"pulp_soc_defines.sv\"\n")
+        pad_control_sv.write("`include \"pulp_soc_defines.svh\"\n")
         pad_control_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         pad_control_sv.write("\n")
         pad_control_sv.write("module pad_control(\n")
@@ -781,7 +781,7 @@ if args.pad_frame_sv != None:
         pad_frame_sv.write("// CONDITIONS OF ANY KIND, either express or implied. See the License for the\n")
         pad_frame_sv.write("// specific language governing permissions and limitations under the License.\n")
         pad_frame_sv.write("\n")
-        pad_frame_sv.write("`include \"pulp_soc_defines.sv\"\n")
+        pad_frame_sv.write("`include \"pulp_soc_defines.svh\"\n")
         pad_frame_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         pad_frame_sv.write("\n")
 
@@ -854,7 +854,7 @@ if args.core_v_mcu_gf22fdx_sv != None:
         gf22fdx_sv.write("`define DRV_SIG   .NDIN(1'b0), .NDOUT(), .DRV(2'b10), .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
         gf22fdx_sv.write("`define DRV_SIG_I .NDIN(1'b0), .NDOUT(),              .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .BIAS(BIAS_S), .RETC(RETC_S)\n")
         gf22fdx_sv.write("\n")
-        gf22fdx_sv.write("`include \"pulp_soc_defines.sv\"\n")
+        gf22fdx_sv.write("`include \"pulp_soc_defines.svh\"\n")
         gf22fdx_sv.write("\n")
 
         gf22fdx_sv.write("module core_v_mcu_gf22fdx(\n")
@@ -869,26 +869,94 @@ if args.core_v_mcu_gf22fdx_sv != None:
         gf22fdx_sv.write("  wire [`N_IO-1:0] s_io_in;\n")
         gf22fdx_sv.write("  wire [`N_IO-1:0][`NBIT_PADCFG-1:0] s_pad_cfg;\n")
 
-        gf22fdx_sv.write("  // connect io\n")
-        for ionum in range(N_IO):
-            gf22fdx_sv.write("  IN22FDX_GPIO18_10M30P_IO_%s i_pad_%d (.TRIEN(~s_io_oe[%d]), .DATA(s_io_out[%d]), .RXEN(~s_io_out[%d]), .Y(s_io_in[%d]), .PAD(io[%d]), .PDEN(~s_pad_cfg[%d][0]), .PUEN(~s_pad_cfg[%d][1]), `DRV_SIG );\n" %\
-                ("H", ionum, ionum, ionum, ionum, ionum, ionum, ionum, ionum))
+        gf22fdx_sv.write("  wire PWROK_S, IOPWROK_S, BIAS_S, RETC_S;\n")
+        gf22fdx_sv.write("  wire [%d-1:0] t_ndout;\n" % N_IO)
+#        gf22fdx_sv.write("  assign PWROK_S = 1'b1;\n")
+#        gf22fdx_sv.write("  assign IOPWROK_S = 1'b1;\n")
+#        gf22fdx_sv.write("  assign BIAS_S = 1'b1;\n")
+        gf22fdx_sv.write("  assign RETC_S = 1'b1;\n")
+
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 gf22fdx_sv.write("       wire s_%s;\n" % sysionames[ionum][:-2])
+
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_PWRDET_H powdet1 (\n")
+        gf22fdx_sv.write("     .PWROKOUT(PWROK_S), .IOPWROKOUT(IOPWROK_S), .RETCIN(RETC_S), .RETCOUT(), .BIAS(BIAS_S));\n")
+
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_H efpga_vdd1 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V efpga_vdd2 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_H efpga_vdd3 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V efpga_vdd4 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_H std_vdd1 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V std_vdd2 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_H std_vdd3 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V std_vdd4 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V plld_vdd4 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_VDDC_V plla_vdd4 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_NMOSBGBIAS_H nb1 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+        gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_PMOSBGBIAS_H pb1_vdd4 (\n")
+        gf22fdx_sv.write("     .PWROK(PWROK_S), .IOPWROK(IOPWROK_S), .RETC(RETC_S), .BIAS(BIAS_S));\n")
+
+        gf22fdx_sv.write("  // connect io\n")
+        direction = "H"
+        for ionum in range(N_IO):
+            if (ionum > N_IO/2) : direction = "V"
+            if sysionames[ionum] != -1:
+                if sysio[sysionames[ionum][:-2]] == 'output':
+                    gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_IO_%s i_pad_%d (\n" % (direction, ionum))
+                    gf22fdx_sv.write("     .TRIEN(1'b0),\n     .DATA(s_%s),\n" % (sysionames[ionum][:-2]) )
+                    gf22fdx_sv.write("     .RXEN(1'b0),\n      .Y(),\n")
+                    gf22fdx_sv.write("     .PAD(io[%d]),\n      .PDEN(1'b0),\n     .PUEN(1'b0),\n" % ionum)
+                    gf22fdx_sv.write("     .NDIN(1'b0),\n     .NDOUT(),\n     .DRV(2'b10),\n    ")
+                    gf22fdx_sv.write("     .PWROK(PWROK_S),\n     .IOPWROK(IOPWROK_S),\n    ")
+                    gf22fdx_sv.write("     .BIAS(BIAS_S),\n     .RETC(RETC_S));\n")
+                elif sysio[sysionames[ionum][:-2]] == 'input':
+                    gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_IO_%s i_pad_%d (\n" % (direction, ionum))
+                    gf22fdx_sv.write("     .TRIEN(1'b1),\n     .DATA(1'b0),\n" )
+                    gf22fdx_sv.write("     .RXEN(1'b1),\n      .Y(s_io_in[%d]),\n" % ionum)
+                    gf22fdx_sv.write("     .PAD(io[%d]),\n      .PDEN(1'b1),\n     .PUEN(1'b0),\n" % ionum)
+                    gf22fdx_sv.write("     .NDIN(1'b0),\n     .NDOUT(),\n     .DRV(2'b00),\n    ")
+                    gf22fdx_sv.write("     .PWROK(PWROK_S),\n     .IOPWROK(IOPWROK_S),\n    ")
+                    gf22fdx_sv.write("     .BIAS(BIAS_S),\n     .RETC(RETC_S));\n")
+                else:  ## snoop
+                    gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_IO_%s i_pad_%d (\n" % (direction, ionum))
+                    gf22fdx_sv.write("     .TRIEN(~s_io_oe[%d]),\n     .DATA(s_io_out[%d]),\n" % (ionum, ionum) )
+                    gf22fdx_sv.write("     .RXEN(s_pad_cfg[%d][2]),\n      .Y(s_io_in[%d]),\n" % (ionum,ionum))
+                    gf22fdx_sv.write("     .PAD(io[%d]),\n      .PDEN(~s_pad_cfg[%d][0]),\n     .PUEN(~s_pad_cfg[%d][1]),\n" % (ionum, ionum, ionum))
+                    gf22fdx_sv.write("     .NDIN(1'b0),\n     .NDOUT(),\n     .DRV(~s_pad_cfg[%d][4:3]),\n    " % ionum)
+                    gf22fdx_sv.write("     .PWROK(PWROK_S),\n     .IOPWROK(IOPWROK_S),\n    ")
+                    gf22fdx_sv.write("     .BIAS(BIAS_S),\n     .RETC(RETC_S));\n")
+            else:
+                gf22fdx_sv.write("  IN22FDX_GPIO18_10M3S20PS_IO_%s i_pad_%d (\n" % (direction, ionum))
+                gf22fdx_sv.write("     .TRIEN(~s_io_oe[%d]),\n     .DATA(s_io_out[%d]),\n" % (ionum, ionum) )
+                gf22fdx_sv.write("     .RXEN(s_pad_cfg[%d][2]),\n      .Y(s_io_in[%d]),\n" % (ionum,ionum))
+                gf22fdx_sv.write("     .PAD(io[%d]),\n      .PDEN(~s_pad_cfg[%d][0]),\n     .PUEN(~s_pad_cfg[%d][1]),\n" % (ionum, ionum, ionum))
+                gf22fdx_sv.write("     .NDIN(1'b0),\n     .NDOUT(),\n     .DRV(~s_pad_cfg[%d][4:3]),\n    " % ionum)
+                gf22fdx_sv.write("     .PWROK(PWROK_S),\n     .IOPWROK(IOPWROK_S),\n    ")
+                gf22fdx_sv.write("     .BIAS(BIAS_S),\n     .RETC(RETC_S));\n")
+
+        for ionum in range(N_IO):
+            if sysionames[ionum] != -1:
                 if sysio[sysionames[ionum][:-2]] == 'input':
                     gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
                 elif sysio[sysionames[ionum][:-2]] == 'snoop':
                     gf22fdx_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
 
-        gf22fdx_sv.write("\n")
         gf22fdx_sv.write("  core_v_mcu i_core_v_mcu (\n")
         for ionum in range (N_IO) :
             if sysionames[ionum] != -1:
-                if sysionames[ionum] == "ref_clk_i" :
-                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
-                else :
-                    gf22fdx_sv.write("    .%s(s_io_in[%d]),\n" % (sysionames[ionum], ionum))
+                gf22fdx_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
         gf22fdx_sv.write("    .io_out_o(s_io_out),\n")
         gf22fdx_sv.write("    .io_oe_o(s_io_oe),\n")
         gf22fdx_sv.write("    .io_in_i(s_io_in),\n")
@@ -922,15 +990,19 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("// specific language governing permissions and limitations under the License.\n")
         x_sv.write("//-----------------------------------------------------------------------------\n")
         x_sv.write("\n")
-        x_sv.write("`include \"pulp_soc_defines.sv\"\n")
+        x_sv.write("`include \"pulp_soc_defines.svh\"\n")
         x_sv.write("`include \"pulp_peripheral_defines.svh\"\n")
         x_sv.write("\n")
         x_sv.write("module %s\n" % (args.emulation_toplevel))
         x_sv.write("  (\n")
-        x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io\n")
+        x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io,\n")
+        x_sv.write("    input wire  sysclk_p,\n")
+        x_sv.write("    input wire  sysclk_n,\n")
+        x_sv.write("    input wire  ref_clk\n")
         x_sv.write("  );\n")
         x_sv.write("\n")
         x_sv.write("  wire private_net;\n")
+        x_sv.write("  wire s_slow_clk;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_out;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_oe;\n")
         x_sv.write("  wire [`N_IO-1:0]  s_io_in;\n")
@@ -943,10 +1015,16 @@ if args.xilinx_core_v_mcu_sv != None:
         ionum_start = 0
         ionum_end = -1
         for ionum in range(N_IO):
-            if sysionames[ionum] != "ref_clk_i" and  sysionames[ionum] != "jtag_tck_i" and sysionames[ionum] != "jtag_tdo_o" :
+            if (sysionames[ionum] != "ref_clk_i" and
+                sysionames[ionum] != "jtag_tck_i" and
+                sysionames[ionum] != "jtag_tdo_o" and
+                sysionames[ionum] != "sysclk_p_i") :
                 if sysionames[ionum] == "bootsel_i" or sysionames[ionum] == "stm_i" :
                     x_sv.write("  pad_functional_pd i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
                         (ionum, ionum, ionum, ionum, ionum, ionum))
+                elif sysionames[ionum] == "rstn_i" :
+                    x_sv.write("  IBUF rstn_buf (\n")
+                    x_sv.write("    .I(xilinx_io[%d]), .O(s_io_in[%d]));\n" % (ionum,ionum))
                 else :
                     x_sv.write("  pad_functional_pu i_pad_%d   (.OEN(~s_io_oe[%d]), .I(s_io_out[%d]), .O(s_io_in[%d]), .PAD(xilinx_io[%d]), .PEN(~s_pad_cfg[%d][0]));\n" %\
                         (ionum, ionum, ionum, ionum, ionum, ionum))
@@ -960,21 +1038,40 @@ if args.xilinx_core_v_mcu_sv != None:
                     x_sv.write("    .IOSTANDARD(\"LVCMOS33\"),\n")
                     x_sv.write("    .IBUF_LOW_PWR(\"FALSE\")\n")
                     x_sv.write("  ) i_sysclk_iobuf (\n")
-                    x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("ref_clk_i"))
+                    x_sv.write("    .I(ref_clk),\n")
                     x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("ref_clk_i"))
                     x_sv.write("  );\n\n")
                     x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
                     x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
-                    x_sv.write("    .ref_clk_i(s_io_in[%d]),\n" % sysionames.index("ref_clk_i"))
-                    x_sv.write("    .mhz4(),\n")
-                    x_sv.write("    .slow_clk_o(private_net)\n")
+                    x_sv.write("    .clk_i(s_slow_clk),\n")
+                    x_sv.write("    .ref_clk_o(private_net)\n")
+                    x_sv.write("    );\n")
+                if sysionames[ionum] == "sysclk_p_i":
+                    x_sv.write("  // Input clock buffer\n")
+                    x_sv.write("  IBUFDS #(\n")
+                    x_sv.write("    .IOSTANDARD(\"LVDS\"),\n")
+                    x_sv.write("    .IBUF_LOW_PWR(\"FALSE\")\n")
+                    x_sv.write("  ) i_sysclk_iobuf (\n")
+                    x_sv.write("    .I(sysclk_p),\n")
+                    x_sv.write("    .IB(sysclk_n),\n")
+                    x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("sysclk_p_i"))
+                    x_sv.write("  );\n\n")
+                    x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
+                    x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
+                    x_sv.write("    .clk_i(s_slow_clk),\n")
+                    x_sv.write("    .ref_clk_o(private_net)\n")
                     x_sv.write("    );\n")
                 if sysionames[ionum] == "jtag_tck_i":
                     x_sv.write("  //JTAG TCK clock buffer (dedicated route is false in constraints)\n")
-                    x_sv.write("  IBUF i_tck_iobuf (\n")
+                    x_sv.write("  IBUF  i_tck_ibuf (\n")
                     x_sv.write("    .I(xilinx_io[%d]),\n" % sysionames.index("jtag_tck_i"))
+                    x_sv.write("    .O(s_tck)\n")
+                    x_sv.write("  );\n\n")
+                    x_sv.write("  BUFG i_tck_buf (\n")
+                    x_sv.write("    .I(s_tck),\n")
                     x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("jtag_tck_i"))
                     x_sv.write("  );\n\n")
+
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 if sysio[sysionames[ionum][:-2]] == 'input':
@@ -984,11 +1081,11 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("  core_v_mcu i_core_v_mcu (\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
-                if sysionames[ionum] == "ref_clk_i" :
-                    x_sv.write("    .%s(private_net),\n" % sysionames[ionum])
+                if sysionames[ionum] == "ref_clk_i" or sysionames[ionum] == "sysclk_p_i" :
+                    x_sv.write("    .ref_clk_i(private_net),\n")
                 else :
                     x_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
-
+        x_sv.write("    .slow_clk_o(s_slow_clk),\n")
         x_sv.write("    .io_out_o(s_io_out),\n")
         x_sv.write("    .io_oe_o(s_io_oe),\n")
         x_sv.write("    .io_in_i(s_io_in),\n")
@@ -1003,15 +1100,24 @@ if args.xilinx_core_v_mcu_sv != None:
 ######################################################################
 if args.input_xdc != None:
     with open(args.input_xdc, 'r') as input_xdc:
-        with open(args.output_xdc, 'w') as output_xdc:
+        with open(args.output_xdc, 'w+') as output_xdc:
+            output_xdc.write("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {s_tck}]\n")
             for line in input_xdc:
                 elements = line.split()
+                if len(elements) >= 10 :
+                    if elements[10] == "sysclk_p" or elements[10] == "sysclk_n" :
+                        elements[0] = elements[0][1:]
+                        output_xdc.write(' '.join(elements) + "\n")
+                        continue
                 if len(elements) > 1 and elements[0] == "#set_property" and elements[10] in xilinx_names:
-                    elements[10] = "xilinx_io[" + str(xilinx_names.index(elements[10])) + "]"
+                    if elements[10] == "CLK100MHZ" :
+                        elements[10] = "ref_clk"
+                    else :
+                        elements[10] = "xilinx_io[" + str(xilinx_names.index(elements[10])) + "]"
                     elements[0] = elements[0][1:]
                     output_xdc.write(' '.join(elements) + "\n")
                 elif len(elements) > 1 and elements[0] == "#create_clock" and elements[11] in xilinx_names:
-                    elements[11] = "xilinx_io[" + str(xilinx_names.index(elements[11])) + "]"
+                    if elements[11] == "CLK100MHZ" : elements[11] = "ref_clk"
                     elements[0] = elements[0][1:]
                     output_xdc.write(' '.join(elements) + "\n")
                 else:

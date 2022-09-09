@@ -7,168 +7,172 @@
 	  "type": "sysio",
 	  "direction": "snoop"
 	},
+	{ "name": "sysclk_p",
+	  "type": "sysio",
+	  "direction": "input"
+	},
 	{ "name": "ref_clk",
-		"type": "sysio",
-		"direction": "input"
+	  "type": "sysio",
+	  "direction": "input"
 	},
 	{ "name": "rstn",
-		"type": "sysio",
-		"direction": "input"
+	  "type": "sysio",
+	  "direction": "input"
 	},
-	{ "name": "jtag_tck",
-		"type": "sysio",
-		"direction": "input"
+    { "name": "jtag_tck",
+	  "type": "sysio",
+	  "direction": "input"
 	},
 	{ "name": "jtag_tdi",
-		"type": "sysio",
-		"direction": "input"
+	  "type": "sysio",
+	  "direction": "input"
 	},
 	{ "name": "jtag_tdo",
-		"type": "sysio",
-		"direction": "output"
+	  "type": "sysio",
+	  "direction": "output"
 	},
 	{ "name": "jtag_tms",
-		"type": "sysio",
-		"direction": "input"
+	  "type": "sysio",
+	  "direction": "input"
 	},
 	{ "name": "jtag_trst",
-		"type": "sysio",
-		"direction": "input"
+	  "type": "sysio",
+	  "direction": "input"
 	},
 	{ "name": "uart",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-			"tx" : "output",
-			"rx" : "input"
-		},
-		"udma_tx": ["tx_uart" ],
-		"udma_rx": ["rx_uart" ]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+		  "tx" : "output",
+		  "rx" : "input"
+	  },
+	  "udma_tx": ["tx_uart" ],
+	  "udma_rx": ["rx_uart" ]
 	},
 	{ "name": "qspim",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-			"clk"	: "output",
-			"csn0"	: "output",
-			"csn1"	: "output",
-			"csn2"	: "output",
-			"csn3"	: "output",
-			"data0"	: "bidir",
-			"data1"	: "bidir",
-			"data2"	: "bidir",
-			"data3"	: "bidir"
-		},
-		"udma_tx": ["tx_qspim", "cmd_qspim"],
-		"udma_rx": ["rx_qspim" ]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+		  "clk"	: "output",
+		  "csn0"	: "output",
+		  "csn1"	: "output",
+		  "csn2"	: "output",
+		  "csn3"	: "output",
+		  "data0"	: "bidir",
+		  "data1"	: "bidir",
+		  "data2"	: "bidir",
+		  "data3"	: "bidir"
+	  },
+	  "udma_tx": ["tx_qspim", "cmd_qspim"],
+	  "udma_rx": ["rx_qspim" ]
 	},
-  { "name": "i2cm",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-			"scl"	: "bidir",
-			"sda"	: "bidir"
-		},
-		"udma_tx": ["tx_i2cm" ],
-		"udma_rx": ["rx_i2cm" ]
+    { "name": "i2cm",
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+		  "scl"	: "bidir",
+		  "sda"	: "bidir"
+	  },
+	  "udma_tx": ["tx_i2cm" ],
+	  "udma_rx": ["rx_i2cm" ]
 	},
 	{ "name": "i2sc",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-			"sck"	: "bidir",
-			"ws"	: "bidir",
-			"sd0"	: "input",
-			"sd1"	: "input"
-		},
-		"udma_tx": ["tx_i2sc" ],
-		"udma_rx": ["rx_i2sc" ]
+	  "usable":	false,
+	  "type":		"udma",
+	  "ports": {
+		  "sck"	: "bidir",
+		  "ws"	: "bidir",
+		  "sd0"	: "input",
+		  "sd1"	: "input"
+	  },
+	  "udma_tx": ["tx_i2sc" ],
+	  "udma_rx": ["rx_i2sc" ]
 	},
 	{ "name": "csi2",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_csi2" ],
-		"udma_rx": ["rx_csi2" ]
+	  "usable":	false,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_csi2" ],
+	  "udma_rx": ["rx_csi2" ]
 	},
 	{ "name": "hyper",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_hyper" ],
-		"udma_rx": ["rx_hyper" ]
+	  "usable":	false,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_hyper" ],
+	  "udma_rx": ["rx_hyper" ]
 	},
 	{ "name": "sdio",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-			"clk"	: "output",
-			"cmd"	: "bidir",
-			"data0"	: "bidir",
-			"data1"	: "bidir",
-			"data2"	: "bidir",
-			"data3"	: "bidir"
-		},
-		"udma_tx": ["tx_hyper" ],
-		"udma_rx": ["rx_hyper" ]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+		  "clk"	: "output",
+		  "cmd"	: "bidir",
+		  "data0"	: "bidir",
+		  "data1"	: "bidir",
+		  "data2"	: "bidir",
+		  "data3"	: "bidir"
+	  },
+	  "udma_tx": ["tx_hyper" ],
+	  "udma_rx": ["rx_hyper" ]
 	},
 	{ "name": "cam",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-			"clk"	: "input",
-			"vsync"	: "input",
-			"hsync"	: "input",
-			"data0"	: "input",
-			"data1"	: "input",
-			"data2"	: "input",
-			"data3"	: "input",
-			"data4"	: "input",
-			"data5"	: "input",
-			"data6"	: "input",
-			"data7"	: "input"
-		},
-		"udma_rx": ["cam" ]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+		  "clk"	: "input",
+		  "vsync"	: "input",
+		  "hsync"	: "input",
+		  "data0"	: "input",
+		  "data1"	: "input",
+		  "data2"	: "input",
+		  "data3"	: "input",
+		  "data4"	: "input",
+		  "data5"	: "input",
+		  "data6"	: "input",
+		  "data7"	: "input"
+	  },
+	  "udma_rx": ["cam" ]
 	},
 	{ "name": "jtag",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_jtag" ],
-		"udma_rx": ["rx_jtag" ]
+	  "usable":	false,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_jtag" ],
+	  "udma_rx": ["rx_jtag" ]
 	},
 	{ "name": "mram",
-		"usable":	false,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_mram" ],
-		"udma_rx": ["rx_mram" ]
+	  "usable":	false,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_mram" ],
+	  "udma_rx": ["rx_mram" ]
 	},
 	{ "name": "filter",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-		},
-		"comment": "udma channels for filter handled externally"
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "comment": "udma channels for filter handled externally"
 	},
 	{ "name": "fpga",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_fpga"],
-		"udma_rx": ["rx_fpga"]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_fpga"],
+	  "udma_rx": ["rx_fpga"]
 	},
 	{ "name": "ext_per",
-		"usable":	true,
-		"type":		"udma",
-		"ports": {
-		},
-		"udma_tx": ["tx_ext_per"],
-		"udma_rx": ["rx_ext_per"]
+	  "usable":	true,
+	  "type":		"udma",
+	  "ports": {
+	  },
+	  "udma_tx": ["tx_ext_per"],
+	  "udma_rx": ["rx_ext_per"]
 	}
 ]

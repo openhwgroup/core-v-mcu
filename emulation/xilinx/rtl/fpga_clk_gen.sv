@@ -22,7 +22,7 @@
 
 module clk_gen (
                      input logic         ref_clk_i,
-                input logic emul_clk_i,
+                input logic [1:0] emul_clk_i,
                      input logic         rstn_glob_i,
                      input logic         test_mode_i,
                      input logic         shift_enable_i,
@@ -32,21 +32,21 @@ module clk_gen (
                      output logic        soc_cfg_lock_o,
                      input logic         soc_cfg_req_i,
                      output logic        soc_cfg_ack_o,
-                     input logic [1:0]   soc_cfg_add_i,
+                     input logic [4:0]   soc_cfg_add_i,
                      input logic [31:0]  soc_cfg_data_i,
                      output logic [31:0] soc_cfg_r_data_o,
                      input logic         soc_cfg_wrn_i,
                      output logic        per_cfg_lock_o,
                      input logic         per_cfg_req_i,
                      output logic        per_cfg_ack_o,
-                     input logic [1:0]   per_cfg_add_i,
+                     input logic [4:0]   per_cfg_add_i,
                      input logic [31:0]  per_cfg_data_i,
                      output logic [31:0] per_cfg_r_data_o,
                      input logic         per_cfg_wrn_i,
                      output logic        cluster_cfg_lock_o,
                      input logic         cluster_cfg_req_i,
                      output logic        cluster_cfg_ack_o,
-                     input logic [1:0]   cluster_cfg_add_i,
+                     input logic [4:0]   cluster_cfg_add_i,
                      input logic [31:0]  cluster_cfg_data_i,
                      output logic [31:0] cluster_cfg_r_data_o,
                      input logic         cluster_cfg_wrn_i
@@ -57,7 +57,7 @@ module clk_gen (
   xilinx_clk_mngr i_clk_manager
     (
      .resetn(rstn_glob_i),
-     .clk_in1(emul_clk_i),
+     .clk_in1(emul_clk_i[0]),
      .clk_out1(soc_clk_o),
      .clk_out2(per_clk_o),
      .clk_out3(cluster_clk_o),
@@ -66,6 +66,7 @@ module clk_gen (
 
   assign soc_cfg_lock_o = s_locked;
   assign per_cfg_lock_o = s_locked;
+  assign cluster_cfg_lock_o = s_locked;
 
   // assign soc_cfg_ack_o = 1'b1; //Always acknowledge without doing anything for now
   // assign per_cfg_ack_o = 1'b1;

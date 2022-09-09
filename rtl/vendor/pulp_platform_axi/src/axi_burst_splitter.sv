@@ -316,6 +316,7 @@ module axi_burst_splitter #(
   // Assumptions and assertions
   // --------------------------------------------------
   `ifndef VERILATOR
+  `ifndef XSIM
   // pragma translate_off
   default disable iff (!rst_ni);
   // Inputs
@@ -335,6 +336,7 @@ module axi_burst_splitter #(
   assert property (@(posedge clk_i) mst_req_o.ar_valid |-> mst_req_o.ar.len == '0)
     else $fatal(1, "AR burst longer than a single beat emitted!");
   // pragma translate_on
+  `endif
   `endif
 
 endmodule

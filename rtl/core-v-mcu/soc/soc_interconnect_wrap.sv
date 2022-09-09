@@ -21,7 +21,7 @@
 // specific language governing permissions and limitations under the License.
 //-----------------------------------------------------------------------------
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "soc_mem_map.svh"
 `include "tcdm_macros.svh"
 `include "axi/assign.svh"
@@ -51,10 +51,7 @@ module soc_interconnect_wrap
     XBAR_TCDM_BUS.Slave tcdm_udma_tx,  //TX Channel for the uDMA
     XBAR_TCDM_BUS.Slave tcdm_udma_rx,  //RX Channel for the uDMA
     XBAR_TCDM_BUS.Slave      tcdm_debug, //Debug access port from either the legacy or the riscv-debug unit
-    XBAR_TCDM_BUS.Slave tcdm_hwpe[NR_HWPE_PORTS],  //Hardware Processing Element ports
     XBAR_TCDM_BUS.Slave tcdm_efpga[`N_EFPGA_TCDM_PORTS-1:0],  // EFPGA ports
-    AXI_BUS.Slave axi_master_plug,  // Normally used for cluster -> SoC communication
-    AXI_BUS.Master axi_slave_plug,  // Normally used for SoC -> cluster communication
     APB_BUS.Master apb_peripheral_bus,  // Connects to all the SoC Peripherals
     XBAR_TCDM_BUS.Master tcdm_efpga_apbt1,
     XBAR_TCDM_BUS.Master     l2_interleaved_slaves[NR_L2_PORTS], // Connects to the interleaved memory banks
@@ -66,32 +63,6 @@ module soc_interconnect_wrap
   localparam ADDR_WIDTH = 32;
   localparam DATA_WIDTH = 32;
 
-
-  //////////////////////////////////////////////////////////////
-  // 64-bit AXI to TCDM Bridge (Cluster to SoC communication) //
-  //////////////////////////////////////////////////////////////
-  XBAR_TCDM_BUS axi_bridge_2_interconnect[pkg_soc_interconnect::NR_CLUSTER_2_SOC_TCDM_MASTER_PORTS](); //We need 4
-  //32-bit TCDM
-  //ports to
-  //achieve full
-  //bandwidth
-  //with one
-  //64-bit AXI
-  //port
-
-  axi64_2_lint32_wrap #(
-      .AXI_USER_WIDTH(AXI_USER_WIDTH),
-      .AXI_ID_WIDTH  (AXI_IN_ID_WIDTH)
-  ) i_axi64_to_lint32 (
-      .clk_i,
-      .rst_ni,
-      .test_en_i,
-      .axi_master (axi_master_plug),
-      .tcdm_slaves(axi_bridge_2_interconnect)
-  );
-
-
-
   ////////////////////////////////////////
   // Address Rules for the interconnect //
   ////////////////////////////////////////
@@ -100,7 +71,7 @@ module soc_interconnect_wrap
   localparam addr_map_rule_t [NR_RULES_L2_DEMUX-1:0] L2_DEMUX_RULES = '{
       '{ idx: 1 , start_addr: `SOC_MEM_MAP_PRIVATE_BANK0_START_ADDR , end_addr: `SOC_MEM_MAP_PRIVATE_BANK1_END_ADDR} , //Both , bank0 and bank1 are in the  same address block
   '{ idx: 1 , start_addr: `SOC_MEM_MAP_BOOT_ROM_START_ADDR      , end_addr: `SOC_MEM_MAP_BOOT_ROM_END_ADDR}      ,
-        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}, 
+        '{ idx: 1 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR},
         '{ idx: 2 , start_addr: `SOC_MEM_MAP_TCDM_START_ADDR          , end_addr: `SOC_MEM_MAP_TCDM_END_ADDR }
   };
 
@@ -117,10 +88,10 @@ module soc_interconnect_wrap
         '{ idx: 3 , start_addr: `EFPGA_ASYNC_APB_START_ADDR      , end_addr: `EFPGA_ASYNC_APB_END_ADDR}
   };
 
-  localparam NR_RULES_AXI_CROSSBAR = 2;
+  localparam NR_RULES_AXI_CROSSBAR = 1;
   localparam addr_map_rule_t [NR_RULES_AXI_CROSSBAR-1:0] AXI_CROSSBAR_RULES = '{
-      '{ idx: 0, start_addr: `SOC_MEM_MAP_AXI_PLUG_START_ADDR,    end_addr: `SOC_MEM_MAP_AXI_PLUG_END_ADDR},
-       '{ idx: 1, start_addr: `SOC_MEM_MAP_PERIPHERALS_START_ADDR, end_addr: `SOC_MEM_MAP_PERIPHERALS_END_ADDR}
+  //      '{ idx: 0, start_addr: `SOC_MEM_MAP_AXI_PLUG_START_ADDR,    end_addr: `SOC_MEM_MAP_AXI_PLUG_END_ADDR},
+  '{ idx: 0, start_addr: `SOC_MEM_MAP_PERIPHERALS_START_ADDR, end_addr: `SOC_MEM_MAP_PERIPHERALS_END_ADDR}
   };
 
   //For legacy reasons, the fc_data port can alias the address prefix 0x000 to 0x1c0. E.g. an access to 0x00001234 is
@@ -169,16 +140,6 @@ module soc_interconnect_wrap
   `TCDM_ASSIGN_INTF(master_ports[7], tcdm_efpga[2])
   `TCDM_ASSIGN_INTF(master_ports[8], tcdm_efpga[3])
 
-  //Assign the 4 master ports from the AXI plug to the interface array
-
-  //Synopsys 2019.3 has a bug; It doesn't handle expressions for array indices on the left-hand side of assignments.
-  // Using a macro instead of a package parameter is an ugly but necessary workaround.
-  // E.g. assign a[param+i] = b[i] doesn't work, but assign a[i] = b[i-param] does.
-  `define NR_SOC_TCDM_MASTER_PORTS 9  // 5 orig + 4xeFPGA
-  for (genvar i = 0; i < 4; i++) begin
-    `TCDM_ASSIGN_INTF(master_ports[`NR_SOC_TCDM_MASTER_PORTS+i], axi_bridge_2_interconnect[i])
-  end
-
   XBAR_TCDM_BUS contiguous_slaves[4] ();
   `TCDM_ASSIGN_INTF(l2_private_slaves[0], contiguous_slaves[0])
   `TCDM_ASSIGN_INTF(l2_private_slaves[1], contiguous_slaves[1])
@@ -190,9 +151,8 @@ module soc_interconnect_wrap
       .AXI_DATA_WIDTH(32),
       .AXI_ID_WIDTH  (pkg_soc_interconnect::AXI_ID_OUT_WIDTH),
       .AXI_USER_WIDTH(AXI_USER_WIDTH)
-  ) axi_slaves[2] ();
-  `AXI_ASSIGN(axi_slave_plug, axi_slaves[0])
-  `AXI_ASSIGN(axi_to_axi_lite_bridge, axi_slaves[1])
+  ) axi_slaves[1] ();
+  `AXI_ASSIGN(axi_to_axi_lite_bridge, axi_slaves[0])
 
   //Interconnect instantiation
   soc_interconnect #(
@@ -207,7 +167,7 @@ module soc_interconnect_wrap
       // programm instructions and 1 for programm stack )
       // efpga async apb port
       .NR_ADDR_RULES_SLAVE_PORTS_CONTIG(NR_RULES_CONTIG_CROSSBAR),
-      .NR_AXI_SLAVE_PORTS(2),  // 1 for AXI to cluster, 1 for SoC peripherals (converted to APB)
+      .NR_AXI_SLAVE_PORTS(1),  // 1 for AXI to cluster, 1 for SoC peripherals (converted to APB)
       .NR_ADDR_RULES_AXI_SLAVE_PORTS(NR_RULES_AXI_CROSSBAR),
       .AXI_MASTER_ID_WIDTH(1),  //Doesn't need to be changed. All axi masters in the current
       //interconnect come from a TCDM protocol converter and thus do not have and AXI ID.
@@ -218,7 +178,6 @@ module soc_interconnect_wrap
       .rst_ni,
       .test_en_i,
       .master_ports(master_ports),
-      .master_ports_interleaved_only(tcdm_hwpe),
       .addr_space_l2_demux(L2_DEMUX_RULES),
       .addr_space_interleaved(INTERLEAVED_ADDR_SPACE),
       .interleaved_slaves(l2_interleaved_slaves),

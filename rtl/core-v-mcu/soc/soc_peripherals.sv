@@ -8,7 +8,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-`include "pulp_soc_defines.sv"
+`include "pulp_soc_defines.svh"
 `include "pulp_peripheral_defines.svh"
 `include "periph_bus_defines.svh"
 
@@ -24,6 +24,7 @@ module soc_peripherals #(
     input  logic                 periph_clk_i,
     input  logic                 fpga_clk_in,
     input  logic                 rst_ni,
+    input  logic                 rstpin_ni,
     input  logic                 ref_clk_i,
     input  logic                 dmactive_i,
     input  logic                 sel_fll_clk_i,
@@ -281,7 +282,7 @@ module soc_peripherals #(
       .HCLK   (clk_i),
       .HRESETn(apb_reset),
 
-      .PADDR  (s_fll_bus.paddr),
+      .PADDR  (s_fll_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_fll_bus.pwdata),
       .PWRITE (s_fll_bus.pwrite),
       .PSEL   (s_fll_bus.psel),
@@ -292,7 +293,7 @@ module soc_peripherals #(
 
       .fll1_req   (soc_fll_master.req),
       .fll1_wrn   (soc_fll_master.wrn),
-      .fll1_add   (soc_fll_master.add[1:0]),
+      .fll1_add   (soc_fll_master.add[4:0]),
       .fll1_data  (soc_fll_master.data),
       .fll1_ack   (soc_fll_master.ack),
       .fll1_r_data(soc_fll_master.r_data),
@@ -300,7 +301,7 @@ module soc_peripherals #(
 
       .fll2_req   (per_fll_master.req),
       .fll2_wrn   (per_fll_master.wrn),
-      .fll2_add   (per_fll_master.add[1:0]),
+      .fll2_add   (per_fll_master.add[4:0]),
       .fll2_data  (per_fll_master.data),
       .fll2_ack   (per_fll_master.ack),
       .fll2_r_data(per_fll_master.r_data),
@@ -308,7 +309,7 @@ module soc_peripherals #(
 
       .fll3_req   (cluster_fll_master.req),
       .fll3_wrn   (cluster_fll_master.wrn),
-      .fll3_add   (cluster_fll_master.add[1:0]),
+      .fll3_add   (cluster_fll_master.add[4:0]),
       .fll3_data  (cluster_fll_master.data),
       .fll3_ack   (cluster_fll_master.ack),
       .fll3_r_data(cluster_fll_master.r_data),
@@ -332,7 +333,7 @@ module soc_peripherals #(
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
-      .PADDR  (s_gpio_bus.paddr),
+      .PADDR  (s_gpio_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_gpio_bus.pwdata),
       .PWRITE (s_gpio_bus.pwrite),
       .PSEL   (s_gpio_bus.psel),
@@ -388,7 +389,7 @@ module soc_peripherals #(
       .efpga_clk_i (periph_clk_i),  // FIXME if udma stays
       .sys_resetn_i(apb_reset),
 
-      .udma_apb_paddr  (s_udma_bus.paddr),
+      .udma_apb_paddr  (s_udma_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .udma_apb_pwdata (s_udma_bus.pwdata),
       .udma_apb_pwrite (s_udma_bus.pwrite),
       .udma_apb_psel   (s_udma_bus.psel),
@@ -436,8 +437,9 @@ module soc_peripherals #(
   ) i_apb_soc_ctrl (
       .HCLK   (clk_i),
       .HRESETn(rst_ni),
-
-      .PADDR  (s_soc_ctrl_bus.paddr),
+      .rstpin_ni(rstpin_ni),
+      .ref_clk_i(ref_clk_i),
+      .PADDR  (s_soc_ctrl_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_ctrl_bus.pwdata),
       .PWRITE (s_soc_ctrl_bus.pwrite),
       .PSEL   (s_soc_ctrl_bus.psel),
@@ -475,7 +477,6 @@ module soc_peripherals #(
 
       .fc_fetchen_o    (fc_fetchen_o),
       .stoptimer_i     (stoptimer_i),
-      .ref_clk_rising  (s_ref_rise_event),
       .wd_expired_o    (wd_expired_o),
       .rto_o           (s_rto),
       .start_rto_i     (s_start_rto),
@@ -492,7 +493,7 @@ module soc_peripherals #(
 
       .dft_cg_enable_i(dft_cg_enable_i),
 
-      .PADDR  (s_adv_timer_bus.paddr),
+      .PADDR  (s_adv_timer_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_adv_timer_bus.pwdata),
       .PWRITE (s_adv_timer_bus.pwrite),
       .PSEL   (s_adv_timer_bus.psel),
@@ -535,7 +536,7 @@ module soc_peripherals #(
       .HCLK   (clk_i),
       .HRESETn(apb_reset),
 
-      .PADDR  (s_soc_evnt_gen_bus.paddr),
+      .PADDR  (s_soc_evnt_gen_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_evnt_gen_bus.pwdata),
       .PWRITE (s_soc_evnt_gen_bus.pwrite),
       .PSEL   (s_soc_evnt_gen_bus.psel),
@@ -575,7 +576,7 @@ module soc_peripherals #(
   ) i_apb_timer_unit (
       .HCLK       (clk_i),
       .HRESETn    (rst_ni),
-      .PADDR      (s_apb_timer_bus.paddr),
+      .PADDR      (s_apb_timer_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA     (s_apb_timer_bus.pwdata),
       .PWRITE     (s_apb_timer_bus.pwrite),
       .PSEL       (s_apb_timer_bus.psel),
@@ -656,10 +657,12 @@ module soc_peripherals #(
   // ╚═╝  ╚═╝╚═╝     ╚═════╝                                   //
   ///////////////////////////////////////////////////////////////
 
-  apb_i2cs i_apb_i2cs (
+  apb_i2cs #(
+      .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
+  ) i_apb_i2cs (
       .apb_pclk_i   (clk_i),
       .apb_presetn_i(apb_reset),
-      .apb_paddr_i  (s_apb_i2cs_bus.paddr[11:0]),
+      .apb_paddr_i  (s_apb_i2cs_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
       .apb_pwrite_i (s_apb_i2cs_bus.pwrite),
       .apb_psel_i   (s_apb_i2cs_bus.psel),
@@ -673,6 +676,8 @@ module soc_peripherals #(
       .i2c_sda_oe(apbio_oe_o[`N_GPIO+17]),
       .i2c_interrupt_o(apbio_out_o[`N_GPIO+18])
   );
-  assign apbio_oe_o[`N_GPIO+18] = 1'b1;
+  assign apbio_oe_o[`N_GPIO+16]  = 1'b0;  // scl is input only for i2c slave
+  assign apbio_out_o[`N_GPIO+16] = 1'b0;
+  assign apbio_oe_o[`N_GPIO+18]  = 1'b1;
 
 endmodule

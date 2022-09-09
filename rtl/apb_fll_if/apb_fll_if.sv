@@ -26,21 +26,21 @@ module apb_fll_if
 
     output logic                      fll1_req,
     output logic                      fll1_wrn,
-    output logic                [1:0] fll1_add,
+    output logic                [4:0] fll1_add,
     output logic               [31:0] fll1_data,
     input  logic                      fll1_ack,
     input  logic               [31:0] fll1_r_data,
     input  logic                      fll1_lock,
     output logic                      fll2_req,
     output logic                      fll2_wrn,
-    output logic                [1:0] fll2_add,
+    output logic                [4:0] fll2_add,
     output logic               [31:0] fll2_data,
     input  logic                      fll2_ack,
     input  logic               [31:0] fll2_r_data,
     input  logic                      fll2_lock,
     output logic                      fll3_req,
     output logic                      fll3_wrn,
-    output logic                [1:0] fll3_add,
+    output logic                [4:0] fll3_add,
     output logic               [31:0] fll3_data,
     input  logic                      fll3_ack,
     input  logic               [31:0] fll3_r_data,
@@ -78,12 +78,15 @@ module apb_fll_if
     logic        fll2_valid;
     logic        fll3_valid;
 
-    enum logic [2:0] { IDLE, CVP1_PHASE1, CVP1_PHASE2, CVP2_PHASE1, CVP2_PHASE2, CVP3_PHASE1, CVP3_PHASE2} state,state_next;
+    enum logic [3:0] { IDLE, CVP1_PHASE1, CVP1_PHASE2, CVP2_PHASE1, CVP2_PHASE2, CVP3_PHASE1, CVP3_PHASE2, READ, WRITE, WAIT} state,state_next;
 
     always_ff @(posedge HCLK, negedge HRESETn)
     begin
         if (!HRESETn)
-        begin
+          begin
+            fll1_valid <= 0;
+            fll2_valid <= 0;
+            fll3_valid <= 0;
             fll1_ack_sync0  <= 1'b0;
             fll1_ack_sync   <= 1'b0;
             fll2_ack_sync0  <= 1'b0;
@@ -97,247 +100,91 @@ module apb_fll_if
             fll3_lock_sync0 <= 1'b0;
             fll3_lock_sync  <= 1'b0;
             state           <= IDLE;
+            write_ready <= 0;
+            read_ready <= 0;
         end
         else
         begin
-            fll1_ack_sync0  <= fll1_ack;
-            fll1_ack_sync   <= fll1_ack_sync0;
-            fll2_ack_sync0  <= fll2_ack;
-            fll2_ack_sync   <= fll2_ack_sync0;
-            fll3_ack_sync0  <= fll3_ack;
-            fll3_ack_sync   <= fll3_ack_sync0;
-            fll1_lock_sync0 <= fll1_lock;
-            fll1_lock_sync  <= fll1_lock_sync0;
-            fll2_lock_sync0 <= fll2_lock;
-            fll2_lock_sync  <= fll2_lock_sync0;
-            fll3_lock_sync0 <= fll3_lock;
-            fll3_lock_sync  <= fll3_lock_sync0;
-            state           <= state_next;
-        end
-    end
+            fll1_ack_sync0  <= fll1_ack & !PREADY & PENABLE;
+            fll1_ack_sync   <= fll1_ack_sync0 &  !PREADY & PENABLE ;
+            fll2_ack_sync0  <= fll2_ack &  !PREADY & PENABLE;
+            fll2_ack_sync   <= fll2_ack_sync0 &  !PREADY & PENABLE;
+            fll3_ack_sync0  <= fll3_ack &  !PREADY & PENABLE;
+            fll3_ack_sync   <= fll3_ack_sync0 &  !PREADY & PENABLE;
+            fll1_lock_sync0 <= fll1_lock &  !PREADY & PENABLE;
+            fll1_lock_sync  <= fll1_lock_sync0 &  !PREADY & PENABLE;
+            fll2_lock_sync0 <= fll2_lock &  !PREADY & PENABLE;
+            fll2_lock_sync  <= fll2_lock_sync0 &  !PREADY & PENABLE;
+            fll3_lock_sync0 <= fll3_lock &  !PREADY & PENABLE;
+            fll3_lock_sync  <= fll3_lock_sync0 &  !PREADY & PENABLE;
+//            state           <= state_next;
+            case (state)
+              IDLE: begin
+                fll1_valid <= 0;
+                fll2_valid <= 0;
+                fll3_valid <= 0;
+                write_ready <= 0;
+                read_ready <= 0;
 
-    always_comb
-    begin
-        state_next    = IDLE;
-        rvalid        = 1'b0;
-        fll1_req      = 1'b0;
-        fll2_req      = 1'b0;
-        fll3_req      = 1'b0;
-        fll1_valid    = 1'b0;
-        fll2_valid    = 1'b0;
-        fll3_valid    = 1'b0;
+                if (PSEL & PENABLE)
+                  if (PWRITE) state <= WRITE;
+                  else state <= READ;
+              end
+              WRITE: begin
+                case (PADDR[APB_ADDR_WIDTH-1:5])
+                  0: fll1_valid <= 1;
+                  1: fll2_valid <= 1;
+                  2: fll3_valid <= 1;
+                endcase // case (PADDR[3:2])
+                if (fll1_ack_sync | fll2_ack_sync | fll3_ack_sync) begin
+                  write_ready <= 1;
+                  state <= WAIT;
+                end
+              end // case: WRITE
+              READ: begin
+                case (PADDR[APB_ADDR_WIDTH-1:5])
+                  0: begin
+                    fll1_valid <= 1;
+                    read_data <= fll1_r_data;
+                  end
+                  1: begin
+                    fll2_valid <= 1;
+                    read_data <= fll2_r_data;
+                  end
+                  2: begin
+                    fll3_valid <= 1;
+                    read_data <= fll3_r_data;
+                  end
+                endcase // case (PADDR[3:2])
+                if (fll1_ack_sync | fll2_ack_sync | fll3_ack_sync) begin
+                  read_ready <= 1;
+                  state <= WAIT;
+                end
+              end // case: READ
+              WAIT:
+              if (PENABLE == 0)
+                state <= IDLE;
+              endcase
 
-        case(state)
-        IDLE:
-        begin
-            if (fll2_rd_access || fll2_wr_access)
-            begin
-                fll2_valid = 1'b1;
-                state_next = CVP2_PHASE1;
-            end
-            else if (fll1_rd_access || fll1_wr_access)
-            begin
-                fll1_valid = 1'b1;
-                state_next = CVP1_PHASE1;
-            end
-            else if (fll3_rd_access || fll3_wr_access)
-            begin
-                fll3_valid = 1'b1;
-                state_next = CVP3_PHASE1;
-            end
-        end
+            end // else: !if(!HRESETn)
+    end // always_ff @ (posedge HCLK, negedge HRESETn)
 
-        CVP1_PHASE1:
-        begin
-            if (fll1_ack_sync)
-            begin
-                fll1_req   = 1'b0;
-                fll1_valid = 1'b0;
-                state_next = CVP1_PHASE2;
-                rvalid = 1'b1;
-            end
-            else
-            begin
-                fll1_req   = 1'b1;
-                fll1_valid = 1'b1;
-                state_next = CVP1_PHASE1;
-            end
-        end
+  assign fll1_req = fll1_valid;
+  assign fll2_req = fll2_valid;
+  assign fll3_req = fll3_valid;
 
-        CVP1_PHASE2:
-        begin
-            if (!fll1_ack_sync)
-                state_next = IDLE;
-            else
-                state_next = CVP1_PHASE2;
-        end
+  assign fll1_wrn   =  ~PWRITE;
+  assign fll1_add   = fll1_valid ? PADDR[4:0] : '0;
+  assign fll1_data  = fll1_valid ? PWDATA     : '0;
 
-        CVP2_PHASE1:
-        begin
-            if (fll2_ack_sync)
-            begin
-                fll2_req   = 1'b0;
-                fll2_valid = 1'b0;
-                state_next = CVP2_PHASE2;
-                rvalid     = 1'b1;
-            end
-            else
-            begin
-                fll2_req   = 1'b1;
-                fll2_valid = 1'b1;
-                state_next = CVP2_PHASE1;
-            end
-        end
+  assign fll2_wrn   =  ~PWRITE;
+  assign fll2_add   = fll2_valid ? PADDR[4:0] : '0;
+  assign fll2_data  = fll2_valid ? PWDATA     : '0;
 
-        CVP2_PHASE2:
-        begin
-            if (!fll2_ack_sync)
-                state_next = IDLE;
-            else
-                state_next = CVP2_PHASE2;
-        end
+  assign fll3_wrn   =  ~PWRITE;
+  assign fll3_add   = fll3_valid ? PADDR[4:0] : '0;
+  assign fll3_data  = fll3_valid ? PWDATA     : '0;
 
-        CVP3_PHASE1:
-        begin
-            if (fll3_ack_sync)
-            begin
-                fll3_req   = 1'b0;
-                fll3_valid = 1'b0;
-                state_next = CVP3_PHASE2;
-                rvalid     = 1'b1;
-            end
-            else
-            begin
-                fll3_req   = 1'b1;
-                fll3_valid = 1'b1;
-                state_next = CVP3_PHASE1;
-            end
-        end
-
-        CVP3_PHASE2:
-        begin
-            if (!fll3_ack_sync)
-                state_next = IDLE;
-            else
-                state_next = CVP3_PHASE2;
-        end
-        endcase
-    end
-
-    // write logic
-    always_comb
-    begin
-      // default assignments
-      fll1_wr_access = 1'b0;
-      fll2_wr_access = 1'b0;
-      fll3_wr_access = 1'b0;
-
-      write_ready    = 1'b0;
-
-      if (PSEL && PENABLE && PWRITE) begin
-        unique case (PADDR[5:2])
-          // Direct access to FLL1
-          4'b0000,
-          4'b0001,
-          4'b0010,
-          4'b0011: begin
-            fll1_wr_access = 1'b1;
-            write_ready    = rvalid;
-          end
-
-          // Direct access to FLL2
-          4'b0100,
-          4'b0101,
-          4'b0110,
-          4'b0111: begin
-            fll2_wr_access = 1'b1;
-            write_ready    = rvalid;
-          end
-
-          // Direct access to FLL3
-          4'b1000,
-          4'b1001,
-          4'b1010,
-          4'b1011: begin
-            fll3_wr_access = 1'b1;
-            write_ready    = rvalid;
-          end
-
-          // There are no additional registers to write
-          default: begin
-            write_ready = 1'b1;
-          end
-        endcase
-      end
-    end
-
-    // read logic
-    always_comb
-    begin
-      // default assignments
-      fll1_rd_access = 1'b0;
-      fll2_rd_access = 1'b0;
-      fll3_rd_access = 1'b0;
-      read_ready     = 1'b0;
-      read_data      = '0;
-
-      if (PSEL && PENABLE && (~PWRITE)) begin
-        unique case (PADDR[5:2])
-          // Direct FLL access to FLL1
-          4'b0000,
-          4'b0001,
-          4'b0010,
-          4'b0011: begin
-            fll1_rd_access = 1'b1;
-            read_data      = fll1_r_data;
-            read_ready     = rvalid;
-          end
-
-          // Direct FLL access to FLL2
-          4'b0100,
-          4'b0101,
-          4'b0110,
-          4'b0111: begin
-            fll2_rd_access = 1'b1;
-            read_data      = fll2_r_data;
-            read_ready     = rvalid;
-          end
-
-          // Direct FLL access to FLL3
-          4'b1000,
-          4'b1001,
-          4'b1010,
-          4'b1011: begin
-            fll3_rd_access = 1'b1;
-            read_data      = fll3_r_data;
-            read_ready     = rvalid;
-          end
-
-          4'b1111: begin
-            read_data[2:0] = {fll3_lock_sync, fll2_lock_sync, fll1_lock_sync};
-            read_ready     = 1'b1;
-          end
-
-          // There are no additional registers to read
-          default: begin
-            read_ready = 1'b1;
-          end
-        endcase
-      end
-    end
-
-
-    assign fll1_wrn   = fll1_valid ? ~PWRITE    : 1'b1;
-    assign fll1_add   = fll1_valid ? PADDR[3:2] : '0;
-    assign fll1_data  = fll1_valid ? PWDATA     : '0;
-
-    assign fll2_wrn   = fll2_valid ? ~PWRITE    : 1'b1;
-    assign fll2_add   = fll2_valid ? PADDR[3:2] : '0;
-    assign fll2_data  = fll2_valid ? PWDATA     : '0;
-
-    assign fll3_wrn   = fll3_valid ? ~PWRITE    : 1'b1;
-    assign fll3_add   = fll3_valid ? PADDR[3:2] : '0;
-    assign fll3_data  = fll3_valid ? PWDATA     : '0;
 
     assign PREADY     = PWRITE ? write_ready : read_ready;
     assign PRDATA     = read_data;

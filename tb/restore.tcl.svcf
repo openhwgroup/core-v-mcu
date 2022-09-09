@@ -1,0 +1,106 @@
+# SimVision Command Script (Wed Dec 22 06:33:39 AM PST 2021)
+#
+# Version 20.09.s011
+#
+# You can restore this configuration with:
+#
+#      xrun -q -f edalize_main.f -64bit +nctimescale+1fs/1fs -xmsimargs -sv_lib ../../../tb/uartdpi/uartdpi.so -top core_v_mcu_tb -access rwc -input /n/design3/projects/ASIC/arnold2/gmartin/synth/core-v-mcu-soc-gf22fdx/core-v-mcu/build/openhwgroup.org_systems_core-v-mcu_0/sim-xcelium/restore.tcl
+#
+
+
+#
+# Simulator
+#
+database require simulator -hints {
+	simulator "xrun -q -f edalize_main.f -64bit +nctimescale+1fs/1fs -xmsimargs {-sv_lib ../../../tb/uartdpi/uartdpi.so} -top core_v_mcu_tb -gui -access rwc -input restore.tcl"
+}
+#
+# Groups
+#
+catch {group new -name Data -overlay 0}
+catch {group new -name Instruction -overlay 0}
+group using Data
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_req_o}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_wdata_o[31:0]}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_rvalid_i}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_addr_o[31:0]}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_rdata_i[31:0]}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.data_we_o}]} ]
+group using Instruction
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.instr_req_o}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.instr_rdata_i[31:0]}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.instr_addr_o[31:0]}]} ] \
+    [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.fc_subsystem_i.lFC_CORE.instr_rvalid_i}]} ]
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+33}] != ""} {
+    window geometry "Design Browser 1" 730x500+261+33
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen}]} ]
+browser set \
+    -signalsort name
+browser yview see [subst  {simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen}]} ]
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1010x600+863+58}] != ""} {
+    window geometry "Waveform 1" 1010x600+863+58
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar visibility partial
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units fs \
+    -valuewidth 75
+waveform baseline set -time 0
+
+set id [waveform add -signals [subst  {
+	{simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen.rstn_glob_i}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen.clk_soc_o}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen.clk_per_o}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{simulator::[format {core_v_mcu_tb.core_v_mcu_i.i_soc_domain.i_clk_rst_gen.clk_cluster_o}]}
+	} ]]
+
+set groupId0 [waveform add -groups Data]
+
+
+set groupId0 [waveform add -groups Instruction]
+
+
+waveform xview limits 0 2000fs
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x250+261+564
+

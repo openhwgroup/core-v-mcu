@@ -23,14 +23,13 @@
 
 module fpga_slow_clk_gen
   #(
-    parameter CLK_DIV_VALUE = 256 //The xilinx_slow_clk_mngr is supposed to
-                                  //generate an 8.3886MHz clock. We need to divide it
-                                  //by 256 to arrive to a 32.768kHz clock
+    parameter CLK_DIV_VALUE = 32 // input clock of 8 Mhz / 32 = 250 Khz
+                                 // for 10Mhz emulation = 40x ratio CPU to ref
     )
-  (input logic ref_clk_i,
-   input logic 	rst_ni,
-   output logic mhz4, 
-   output logic slow_clk_o
+  (
+   input logic  clk_i,
+   input logic  rst_ni,
+   output logic ref_clk_o
    );
 
 
@@ -38,52 +37,29 @@ module fpga_slow_clk_gen
   localparam COUNTER_WIDTH = $clog2(CLK_DIV_VALUE);
 
 
-  //Create clock divider using BUFGCE cells as the PLL/MMCM cannot generate clocks
-  //slower than 4.69 MHz and we need 32.768kHz
-
-  logic [COUNTER_WIDTH-1:0] clk_counter_d, clk_counter_q;
-  logic                     clock_gate_en;
-
-  logic                     intermmediate_clock;
-
-  xilinx_slow_clk_mngr i_slow_clk_mngr
-    (
-     .resetn(rst_ni),
-     .clk_in1(ref_clk_i),
-     .clk_out1(intermmediate_clock)
-     );
+  logic [COUNTER_WIDTH-1:0] clk_counter;
+  logic                     clkout;
 
 
+  assign ref_clk_o = (CLK_DIV_VALUE == 1) ? clk_i : clkout;
 
-  always_comb begin
-    if (clk_counter_q == CLK_DIV_VALUE-1) begin
-      clk_counter_d = '0;
-      clock_gate_en = 1'b1;
-    end else begin
-      clk_counter_d = clk_counter_q + 1;
-      clock_gate_en = 1'b0;
-    end
-  end
-
-  always_ff @(posedge intermmediate_clock, negedge rst_ni) begin
+  always_ff @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
-      clk_counter_q <= '0;
+      clk_counter <= '0;
+      clkout = 1'b0;
     end else begin
-      clk_counter_q <= clk_counter_d;
+      clk_counter <= clk_counter + 1;
+      case (CLK_DIV_VALUE)
+        0,1,2:clkout <= 0;
+        default: begin
+          if (clk_counter == ((CLK_DIV_VALUE-1) >> 1)) clkout <= 1;
+          if (clk_counter == (CLK_DIV_VALUE - 1)) begin
+            clkout <= ~clkout;
+            clk_counter <= 0;
+          end
+        end
+      endcase // case (CLK_DIV_VALUE)
     end
   end
-
-   BUFG i_4mhz (
-		.I(clk_counter_d[0]),
-		.O(mhz4)
-		);
-   
-
-  BUFG i_clock_gate
-    (
-      .I(clk_counter_d[7]),
- //     .CE(clock_gate_en),
-      .O(slow_clk_o)
-     );
 
 endmodule : fpga_slow_clk_gen
