@@ -12,7 +12,7 @@ build/
 ./ips
 gmon.out
 modelsim.ini
-lint.log
+*.log
 sw/inc/
 sw/csv-mirror/
 emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
