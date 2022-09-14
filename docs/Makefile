@@ -18,7 +18,7 @@ INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
 
 all:    doc pdf
 
-auto:    ${MD_FILES} doc pdf
+check:    ${MD_FILES} doc
 
 clean:
 				rm -rf ${AUTO_MD_DIR}/
@@ -27,12 +27,12 @@ clean:
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
 
-doc:
+doc: ${MD_FILES}
 				rm -f doc-src/all.md
 				rm -rf _build
 				make -f make-sphinx.mk html
 
-pdf:
+pdf: ${MD_FILES}
 				rm -f doc-src/all.md
 				for f in `egrep doc-src\|auto-docs index.rst`; do cat "$$f" >> doc-src/all.md; echo "\n\n" >> doc-src/all.md;done
 				(cd doc-src; pandoc -t latex -o ../index.pdf all.md)
