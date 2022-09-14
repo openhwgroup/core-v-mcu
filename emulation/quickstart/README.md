@@ -24,10 +24,40 @@ The content of this QSG has been tested using **Minicom**.
 
 Installation is trivial:
 ```
-$ apt install minicom
+$ sudo apt install minicom
 ```
 Minicom setup instructions can be found [here](https://help.ubuntu.com/community/Minicom).
 The remainder of this document assumes you have attached Minicom to /dev/ttyUSB1 on your machine.
+
+#### wls2 users
+
+For Windows Linux Subsystem 2 (`wls2`) users, you need to run a few things before connecting USB devices to your wls2 distribution.
+The instructions are provided [here](https://docs.microsoft.com/en-us/windows/wsl/connect-usb).
+
+Once you execute in Windows PowerShell
+
+```
+$ usbipd wsl list
+```
+you will see something like:
+
+```
+C:\WINDOWS\system32>usbipd wsl list
+BUSID  VID:PID    DEVICE                                                        STATE
+2-1    30fa:0400  USB Input Device                                              Not attached
+2-2    0408:5347  HP HD Camera, HP IR Camera                                    Not attached
+2-4    0403:6010  USB Serial Converter A, USB Serial Converter B                Not attached
+2-7    06cb:00f0  Synaptics FS7604 Touch Fingerprint Sensor with PurePrint(TM)  Not attached
+2-10   8087:0026  Intel(R) Wireless Bluetooth(R)                                Not attached
+```
+In our example, Windows sees the Nexys A7-100T UART as **USB Serial Converter A, USB Serial Converter B**. Thus, when we refer to /dev/ttyUSB1,
+we assume that when connecting the USB device to wls2 with the command, 
+
+```
+$ usbipd wsl attach --busid 2-4
+```
+You see the device attached in wls2 referred to as /dev/ttyUSB1. From now on, the wls2 users can use the same Linux procedures.
+
 
 ### Xilinx Vivado
 Vivado is required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
@@ -111,6 +141,11 @@ Once this is done, getting the FPGA loaded with the bitmap is straightforward:
 
 In a few moments the FPGA will enter a loop printing "A2 BOOTME" on the terminal.  Proceed to Step 2.
 
+#### Putty
+
+If you want to see the  "A2 BOOTME" string on Putty, connect it with Serial option, "COMX", where X is the number your Windows Device Manager refers to the Nexsys USB, and set as BaudRate 115200.
+
+
 ### Step 1, Option 2: Use Vivado to Push the BitMap to the Nexys A7:
 This option requires installation the free-to-use WebTalk version of Vivado.
 In this option, the "shared UART/JTAG USB port" on the upper left-hand side of the Board (**B**) is used for pushing _bitmap_ files to the FPGA.
@@ -131,6 +166,20 @@ Use the supplied python script to download the "cli_test" program to the MCU:
 ```
 $ python3 serialPort.py /dev/ttyUSB1 cli_test.srec
 ```
+In case of errors like:
+
+```
+Traceback (most recent call last):
+  File "serialPort.py", line 1, in <module>
+    import serial
+```
+
+please try:
+
+```
+$ sudo apt install python3-serial
+```
+
 This takes a little while... Then:
 ```
 $ minicom usb1
@@ -186,3 +235,46 @@ The JTAG-HS2 pmod is not keyed, so check that the pmod is connected to the botto
 **Note:** the JTAG port is not enabled unless SW0 (**E**) is in the "up" position.
 
 Detailed instructions for using the Eclipse IDE with the CORE-V-MCU can be found in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test) repository.
+
+## NOR flash
+
+The [`core-v-mcu-cli_test`](https://github.com/openhwgroup/core-v-mcu-cli-test) suite can be used to program a NOR flash connected to the JXADC header.
+
+Additional HW requirement
+- USB2TTL adapter
+- 3 jumper wires
+
+The boot loader uses it to print a message and the SPI image is downloaded over that UART.
+
+How-to:
+- connect the USB2TTL to the PC
+- connect USB2TTL.GND to JB.5
+- connect USB2TTL.TX to JB.3
+- connect USB2TTL.RX to JB.2
+- connect the JTAG cable
+- powerup the Nexys board
+- download the `cli_test` program to the MCU as described above
+- identify the ttyUSB port which is used to drive the USB2TTL - let's assume it is `/dev/ttyUSB0`
+- python spi_load /dev/ttyUSB0
+- start the `cli_test` program via he SDK
+- on the `cli_test` terminal
+    - `[0] > qspi`
+    - `[1] qspi > init 0`
+    - `[1] qspi > program 0 Default/cli.bin 0x0`
+    (note that the name and path of your program could differ from Default/cli.bin)
+    - you should see something like
+        ```
+        lQSPIMIdNum = 0x00
+        Loading file:  = Default/cli.bin
+        addr = 0x00000000
+        Expecting 00019710 bytes
+        Erasing. . .done
+        1024/104208
+        ...
+        103424/104208
+        Received Bytes 0x00019710
+        ```
+- swith SW1 towards the inside of the board
+- press the `CPU reset` button
+
+The MCU should now read the program from the flash.
