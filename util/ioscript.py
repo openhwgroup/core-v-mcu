@@ -997,9 +997,10 @@ if args.xilinx_core_v_mcu_sv != None:
         x_sv.write("module %s\n" % (args.emulation_toplevel))
         x_sv.write("  (\n")
         x_sv.write("    inout wire [`N_IO-1:0]  xilinx_io,\n")
-        x_sv.write("    input wire  sysclk_p,\n")
-        x_sv.write("    input wire  sysclk_n,\n")
-        x_sv.write("    input wire  ref_clk\n")
+        if args.emulation_toplevel == 'core_v_mcu_genesys2' :
+            x_sv.write("    input wire  sysclk_p, sysclk_n\n")
+        else:
+            x_sv.write("    input wire  ref_clk\n")
         x_sv.write("  );\n")
         x_sv.write("\n")
         x_sv.write("  wire private_net;\n")
@@ -1040,13 +1041,14 @@ if args.xilinx_core_v_mcu_sv != None:
                     x_sv.write("    .IBUF_LOW_PWR(\"FALSE\")\n")
                     x_sv.write("  ) i_sysclk_iobuf (\n")
                     x_sv.write("    .I(ref_clk),\n")
-                    x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("ref_clk_i"))
+                    #x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("ref_clk_i"))
+                    x_sv.write("    .O(s_ref_clk)\n")
                     x_sv.write("  );\n\n")
-                    x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
-                    x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
-                    x_sv.write("    .clk_i(s_slow_clk),\n")
-                    x_sv.write("    .ref_clk_o(private_net)\n")
-                    x_sv.write("    );\n")
+                    #x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
+                    #x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
+                    #x_sv.write("    .clk_i(s_slow_clk),\n")
+                    #x_sv.write("    .ref_clk_o(private_net)\n")
+                    #x_sv.write("    );\n")
                 if sysionames[ionum] == "sysclk_p_i":
                     x_sv.write("  // Input clock buffer\n")
                     x_sv.write("  IBUFDS #(\n")
@@ -1055,13 +1057,13 @@ if args.xilinx_core_v_mcu_sv != None:
                     x_sv.write("  ) i_sysclk_iobuf (\n")
                     x_sv.write("    .I(sysclk_p),\n")
                     x_sv.write("    .IB(sysclk_n),\n")
-                    x_sv.write("    .O(s_io_in[%d])\n" % sysionames.index("sysclk_p_i"))
+                    x_sv.write("    .O(s_ref_clk)\n")
                     x_sv.write("  );\n\n")
-                    x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
-                    x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
-                    x_sv.write("    .clk_i(s_slow_clk),\n")
-                    x_sv.write("    .ref_clk_o(private_net)\n")
-                    x_sv.write("    );\n")
+                    #x_sv.write("  fpga_slow_clk_gen i_slow_clk_gen (\n")
+                    #x_sv.write("    .rst_ni(s_io_in[%d]),\n" % sysionames.index("rstn_i"))
+                    #x_sv.write("    .clk_i(s_slow_clk),\n")
+                    #x_sv.write("    .ref_clk_o(private_net)\n")
+                    #x_sv.write("    );\n")
                 if sysionames[ionum] == "jtag_tck_i":
                     x_sv.write("  //JTAG TCK clock buffer (dedicated route is false in constraints)\n")
                     x_sv.write("  IBUF  i_tck_ibuf (\n")
@@ -1076,17 +1078,19 @@ if args.xilinx_core_v_mcu_sv != None:
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 if sysio[sysionames[ionum][:-2]] == 'input':
-                    x_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
+                    if not (sysionames[ionum][:-2] == "ref_clk" or  sysionames[ionum][:-2] == "sysclk_p"):
+                        x_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
                 elif sysio[sysionames[ionum][:-2]] == 'snoop':
                     x_sv.write("      assign s_%s = s_io_in[%d];\n" % (sysionames[ionum][:-2], ionum))
         x_sv.write("  core_v_mcu i_core_v_mcu (\n")
         for ionum in range(N_IO):
             if sysionames[ionum] != -1:
                 if sysionames[ionum] == "ref_clk_i" or sysionames[ionum] == "sysclk_p_i" :
-                    x_sv.write("    .ref_clk_i(private_net),\n")
+                    #x_sv.write("    .ref_clk_i(private_net),\n")
+                    x_sv.write("    .ref_clk_i(s_ref_clk),\n")
                 else :
                     x_sv.write("    .%s(s_%s),\n" % (sysionames[ionum], sysionames[ionum][:-2]))
-        x_sv.write("    .slow_clk_o(s_slow_clk),\n")
+        #x_sv.write("    .slow_clk_o(s_slow_clk),\n")
         x_sv.write("    .io_out_o(s_io_out),\n")
         x_sv.write("    .io_oe_o(s_io_oe),\n")
         x_sv.write("    .io_in_i(s_io_in),\n")
