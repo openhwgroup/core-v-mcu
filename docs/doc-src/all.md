@@ -295,6 +295,32 @@ with FPGA or ASIC implementations.
 
 The memory map of the **Debug** region of the Peripheral Domain is documented as part of the PULP debug system. With the `Overview <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md>`_, the `Debug Memory Map <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md#debug-memory-map>`_ gives the offsets within the Debug region of the various parts of the debug module.
 
+CSR Access Types:
+~~~~~~~~~~~~~~~~~
+
++-------------+---------------------------------------------------------------------+
+| Access Type | Description                                                         |
++=============+=====================================================================+
+| RW          | Read & Write                                                        |
++-------------+---------------------------------------------------------------------+
+| RO          | Read Only                                                           |
++-------------+---------------------------------------------------------------------+
+| RC          | Read & Clear after read                                             |
++-------------+---------------------------------------------------------------------+
+| WO          | Write Only                                                          |
++-------------+---------------------------------------------------------------------+
+| WC          | Write Clears (value ignored; always writes a 0)                     |
++-------------+---------------------------------------------------------------------+
+| WS          | Write Sets (value ignored; always writes a 1)                       |
++-------------+---------------------------------------------------------------------+
+| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged     |
++-------------+---------------------------------------------------------------------+
+| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
++-------------+---------------------------------------------------------------------+
+| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
++-------------+---------------------------------------------------------------------+
+
+
 
 
 # Interrupt Strategy
@@ -715,19 +741,6 @@ I/O function selection controls the select field of a mux that connects the I/O 
 | CFG        |  13:8 |    RW |       0x00 | Pad configuration (TBD) |
 | MUX        |   1:0 |    RW |       0x00 | Mux select      |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -866,19 +879,6 @@ EVENT_ERR register  and IRQ31 is presented to the CPU.
 | --------------------- |   --- |   --- |        --- | ------------------------- |
 | EVENT_ID   |   7:0 |    RO |            | ID of triggering event to be read by interrupt handler |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -966,19 +966,6 @@ Memory address: TIMER_START_ADDDR(0x1A10B000)
 | --------------------- |   --- |   --- |        --- | ------------------------- |
 | TIMER_RESET_HI |   0:0 |    WS |        0x0 |                 |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -1121,19 +1108,6 @@ Levels based int
 | RESERVED   |  31:8 |    RW |            | Enable interrupt for GPIO[gpio_num] |
 | gpio_num   |   7:0 |    RW |            | Input value reported by GPIO[gpio_num] |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -1353,19 +1327,6 @@ Memory address: I2CS_START_ADDR(0x1A107000)
 | READ_FLAG_1_SPACE_AVAIL |   1:1 |    RW |            |                 |
 | READ_FLAG_EMPTY |   0:0 |    RW |            |                 |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -1946,20 +1907,6 @@ Simple dual port RAMS.
 ### M1_COEF[0x400] offset = 0x6000
 
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
-
 
 
 # UDMA_CTRL
@@ -2013,19 +1960,6 @@ The register definitions for each peripheral are specified in sections named UDM
 | PERIPH_RESET |  31:0 |    RW |        0x0 | Reset for peripherals; |
 |            |       |       |            | use core-v-mcu_config 'Peripheral clock enable masks' for bit positions |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -2131,19 +2065,6 @@ Basic UART driven by UDMA system
 | --------------------- |   --- |   --- |        --- | ------------------------- |
 | RX_DATA    |   7:0 |    RO |            | Receive data; reading clears RX_DATA_VALID |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -2233,19 +2154,6 @@ And because the UDMA handles data buffers and interrupts, it is important to und
 | --------------------- |   --- |   --- |        --- | ------------------------- |
 | RESET      |   0:0 |    RW |            | Reset I2C controller |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -2480,19 +2388,6 @@ And because the UDMA handles data buffers and interrupts, it is important to und
 |            |       |       |            | 0x01: STAT_CHECK (matched) |
 |            |       |       |            | 0x02: STAT_EOL (end of loop) |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -2650,19 +2545,6 @@ Memory address: UDMA_CH_ADDR_SDIO(`UDMA_CH_ADDR_SDIO)
 |            |       |       |            | 0x0: not ended  |
 |            |       |       |            | 0x1: ended      |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 
@@ -2769,19 +2651,6 @@ Memory address: UDMA_CH_ADDR_CAMERA(`UDMA_CH_ADDR_CAMERA)
 |            |       |       |            | 0x0: Active low |
 |            |       |       |            | 0x1: Active high |
 
-### Notes:
-
-| Access type | Description |
-| ----------- | ----------- |
-| RW          | Read & Write |
-| RO          | Read Only    |
-| RC          | Read & Clear after read |
-| WO          | Write Only |
-| WC          | Write Clears (value ignored; always writes a 0) |
-| WS          | Write Sets (value ignored; always writes a 1) |
-| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged |
-| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
-| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 
 
 

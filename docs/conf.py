@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'CORE-V MCU'
-copyright = '2020-present, OpenHW Group'
+copyright = '2022-present, OpenHW Group'
 author = 'OpenHW Group Contributors'
 
 
