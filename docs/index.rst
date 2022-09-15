@@ -31,7 +31,7 @@ CORE-V-MCU User Manual
     doc-src/high_level_architecture.md
     doc-src/device_characteristics.md
     doc-src/package_information.md
-    auto-docs/pin-table.md
+    doc-src/pin-table.md
     doc-src/cv32e40p_subsystem.md
     doc-src/startup.md
     doc-src/mmap.rst
@@ -51,26 +51,20 @@ CORE-V-MCU User Manual
 
 
 ..  toctree::
-    :caption: Core Controllers
+    :caption: Control and Status Registers
     :maxdepth: 1
     :glob:
 
 
-    auto-docs/apb_soc_ctrl_reg_defs.md
-    auto-docs/apb_event_cntrl_reg_defs.md
-    auto-docs/apb_timer_unit_reg_defs.md
-    auto-docs/apb_gpio_reg_defs.md
-    auto-docs/apb_i2cs_reg_defs.md
-    auto-docs/efpga_template_reg_defs.md
-    auto-docs/udma_ctrl_reg_defs.md
-
-..  toctree::
-    :caption: Peripheral Controllers
-    :maxdepth: 1
-    :glob:
-
-    auto-docs/udma_uart_reg_defs.md
-    auto-docs/udma_i2cm_reg_defs.md
-    auto-docs/udma_qspi_reg_defs.md
-    auto-docs/udma_sdio_reg_defs.md
-    auto-docs/udma_camera_reg_defs.md
+    doc-src/csr-docs/apb_soc_ctrl_reg_defs.md
+    doc-src/csr-docs/apb_event_cntrl_reg_defs.md
+    doc-src/csr-docs/apb_timer_unit_reg_defs.md
+    doc-src/csr-docs/apb_gpio_reg_defs.md
+    doc-src/csr-docs/apb_i2cs_reg_defs.md
+    doc-src/csr-docs/efpga_template_reg_defs.md
+    doc-src/csr-docs/udma_ctrl_reg_defs.md
+    doc-src/csr-docs/udma_uart_reg_defs.md
+    doc-src/csr-docs/udma_i2cm_reg_defs.md
+    doc-src/csr-docs/udma_qspi_reg_defs.md
+    doc-src/csr-docs/udma_sdio_reg_defs.md
+    doc-src/csr-docs/udma_camera_reg_defs.md
