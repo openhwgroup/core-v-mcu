@@ -23,7 +23,8 @@ check:    ${MD_FILES} doc
 clean:
 				rm -rf ${AUTO_MD_DIR}/
 				rm -rf index.pdf
-
+				rm -f doc-src/all.md
+				rm -rf _build
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
 

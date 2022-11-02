@@ -1,7 +1,2 @@
-# Device Characteristics
-## Pinout
-
-## IO State
-
-## Power Characteristics
+# Start-up
 

@@ -1,8 +1,8 @@
-# System Control Peripherals
+# I2C Slave
 
 ## Features
 
-## Pinout
+## Port-Map
 
 ## Theory of Operation
 

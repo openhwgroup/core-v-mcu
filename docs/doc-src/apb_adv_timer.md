@@ -1,8 +1,8 @@
-# System Control Peripherals
+# APB Advanced Timer
 
 ## Features
 
-## Pinout
+## Port-Map
 
 ## Theory of Operation
 

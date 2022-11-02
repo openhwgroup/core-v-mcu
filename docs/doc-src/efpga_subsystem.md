@@ -12,7 +12,7 @@
 #### Clocking
 
 ## SoC Interfaces
-### Configurable Input/Output Signals 
+### Configurable Input/Output Signals
 ### APB Interface
 ### TCDM Interface
 ### Interrupts 
@@ -21,6 +21,4 @@
 ### eFPGA Configuration Control
 
 ## eFPGA Subsystem Registers
-
-
 
