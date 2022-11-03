@@ -38,7 +38,7 @@ lint:           run Verilator lint check
 docs:           generate documentation
 sw:             generate C header files (in ./sw)
 nexys-emul:     generate bitstream for Nexys-A7-100T emulation)
-genesys2-emul:  generate bitstream for Genesys2 FPGA board
+genesys-emul:   generate bitstream for Genesys2 FPGA board
 buildsim:       build for Questa sim
 sim:            run Questa sim
 downloadn:      Download bitstream to Nexys board
@@ -58,7 +58,7 @@ Current image is [core_v_nexys_200122.bit](http://core-v-mcu.s3-website-eu-west-
 
 To target Genesys2 board:
 ```
-$ make genesys2-emul
+$ make genesys-emul
 ```
 Extra note for building on ubuntu - Vivado tools from Xilinx may require a larger swap size that the system default.
 The swap size can be increased by searching for "increase swapfile in ubuntu" and add your release.
