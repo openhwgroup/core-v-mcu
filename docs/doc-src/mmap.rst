@@ -57,3 +57,29 @@ with FPGA or ASIC implementations.
 +-----------------------------+---------------------------+---------------------------+
 
 The memory map of the **Debug** region of the Peripheral Domain is documented as part of the PULP debug system. With the `Overview <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md>`_, the `Debug Memory Map <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md#debug-memory-map>`_ gives the offsets within the Debug region of the various parts of the debug module.
+
+CSR Access Types:
+~~~~~~~~~~~~~~~~~
+
++-------------+---------------------------------------------------------------------+
+| Access Type | Description                                                         |
++=============+=====================================================================+
+| RW          | Read & Write                                                        |
++-------------+---------------------------------------------------------------------+
+| RO          | Read Only                                                           |
++-------------+---------------------------------------------------------------------+
+| RC          | Read & Clear after read                                             |
++-------------+---------------------------------------------------------------------+
+| WO          | Write Only                                                          |
++-------------+---------------------------------------------------------------------+
+| WC          | Write Clears (value ignored; always writes a 0)                     |
++-------------+---------------------------------------------------------------------+
+| WS          | Write Sets (value ignored; always writes a 1)                       |
++-------------+---------------------------------------------------------------------+
+| RW1S        | Read & on Write bits with 1 get set, bits with 0 left unchanged     |
++-------------+---------------------------------------------------------------------+
+| RW1C        | Read & on Write bits with 1 get cleared, bits with 0 left unchanged |
++-------------+---------------------------------------------------------------------+
+| RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
++-------------+---------------------------------------------------------------------+
+

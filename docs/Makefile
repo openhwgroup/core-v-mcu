@@ -1,4 +1,4 @@
-# Copyright 2021 OpenHW Group
+# Copyright 2022 OpenHW Group
 # Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -18,19 +18,22 @@ INSTALL_DIR:="../../core-v-mcu-cli-test/doc"
 
 all:    doc pdf
 
-clean:
-				rm -rf ${AUTO_MD_DIR}
-				rm -rf index.pdf
-				rm -rf doc-src/all.md
+check:    ${MD_FILES} doc
 
+clean:
+				rm -rf ${AUTO_MD_DIR}/
+				rm -rf index.pdf
+				rm -f doc-src/all.md
+				rm -rf _build
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}
 
-doc:    ${MD_FILES}
+doc: ${MD_FILES}
 				rm -f doc-src/all.md
+				rm -rf _build
 				make -f make-sphinx.mk html
 
-pdf:    ${MD_FILES}
+pdf: ${MD_FILES}
 				rm -f doc-src/all.md
 				for f in `egrep doc-src\|auto-docs index.rst`; do cat "$$f" >> doc-src/all.md; echo "\n\n" >> doc-src/all.md;done
 				(cd doc-src; pandoc -t latex -o ../index.pdf all.md)
