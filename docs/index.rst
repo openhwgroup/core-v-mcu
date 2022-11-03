@@ -23,9 +23,6 @@ CORE-V-MCU User Manual
     :maxdepth: 3
     :caption: Contents:
 
-
-
-    
     doc-src/overview.md
     doc-src/github.md
     doc-src/high_level_architecture.md
@@ -36,25 +33,35 @@ CORE-V-MCU User Manual
     doc-src/startup.md
     doc-src/mmap.rst
     doc-src/interrupts.md
-    doc-src/timers.md
-    doc-src/i2c.md
-    doc-src/system_control_peripherals.md
-    doc-src/logarithmic_interconnect.md
     doc-src/clock_domains.md
-    doc-src/efpga_subsystem.md
     doc-src/debug_approach.md
     doc-src/appendixA_terminology.md
-    
     doc-src/evaluation_kits.md
     doc-src/software_support.md
 
+
+..  toctree::
+    :caption: CORE-V-MCU IP Blocks
+    :maxdepth: 1
+    :glob:
+
+    doc-src/apb2apbcomp.md
+    doc-src/apb2per.md
+    doc-src/apb_fll_if.md
+    doc-src/apb_gpio.md
+    doc-src/apb_timer.md
+    doc-src/apb_adv_timer.md
+    doc-src/i2cs.md
+    doc-src/system_control_peripherals.md
+    doc-src/logarithmic_interconnect.md
+    doc-src/udma.md
+    doc-src/efpga_subsystem.md
 
 
 ..  toctree::
     :caption: Control and Status Registers
     :maxdepth: 1
     :glob:
-
 
     doc-src/csr-docs/apb_soc_ctrl_reg_defs.md
     doc-src/csr-docs/apb_event_cntrl_reg_defs.md
