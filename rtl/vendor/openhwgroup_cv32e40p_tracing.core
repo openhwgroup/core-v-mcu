@@ -82,5 +82,6 @@ targets:
     - target_sim? (files_tracer)
     - target_lint? (files_sim)
     - target_model-lib? (files_sim)
+    - target_model-lib-sim? (files_sim)
     - tool_vivado? (ff_regfile)
     - tool_verilator? (ff_regfile)

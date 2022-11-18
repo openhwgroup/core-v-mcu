@@ -78,9 +78,15 @@ sim-vivado:
 model-lib:
 	fusesoc --cores-root . run --target=model-lib --setup \
 		--build openhwgroup.org:systems:core-v-mcu | tee model-lib.log
-
 lint:
 	fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu 2>&1 | tee lint.log
+
+.PHONY: model-lib-sim
+model-lib-sim:
+	fusesoc --cores-root . run --target=model-lib-sim --setup \
+		--build openhwgroup.org:systems:core-v-mcu | tee model-lib-sim.log
+	cd ./build/openhwgroup.org_systems_core-v-mcu_0/model-lib-sim-verilator/ && $(MAKE) -f  ../../../verilatorsim.mk
+
 
 .PHONY:sim
 sim:

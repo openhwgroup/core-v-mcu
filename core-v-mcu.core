@@ -161,14 +161,25 @@ filesets:
     files:
     - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
     - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
-    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
-    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
-    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
-    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
-    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
-    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu_tb.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
 
+  mem_init_verilator_tb:
+    files:
+    - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
+    - tb/mem_init_files/cli_sim.txt: {copyto: mem_init/cli.txt}
+    - tb/mem_init_files/col0.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem'}
+    - tb/mem_init_files/col1.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem'}
+    - tb/mem_init_files/col2.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem'}
+    - tb/mem_init_files/col3.mem: {copyto: 'mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem'}
+    - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
+    - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu_testharness.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
+    file_type: user
 
   tb-rtl:
     files:
@@ -177,6 +188,17 @@ filesets:
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
 
+  tb-cpp:
+    files:
+    - tb/core_v_mcu_tb.cpp
+    file_type: cppSource
+
+  testharness:
+    files:
+    - tb/uartdpi/uartdpi.sv: {file_type: systemVerilogSource}
+    - tb/uartdpi/uartdpi.c: {file_type: cppSource}
+    - tb/uartdpi/uartdpi.h: {file_type: cppSource, is_include_file: true}
+    - tb/core_v_mcu_testharness.sv: {file_type: systemVerilogSource}
 
   nexys-rtl:
     files:
@@ -247,6 +269,7 @@ targets:
     - not_emulation-rtl
     - target_lint? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
+    - target_model-lib-sim? (rtl-behavioral)
     toplevel: [core_v_mcu]
 
   sim:
@@ -267,6 +290,7 @@ targets:
         vlog_options:
         - -override_timescale 1ns/1ps
         - -suppress vlog-2583
+        - -define MODELSIM
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"
       xcelium:
@@ -312,6 +336,33 @@ targets:
         - -Wno-fatal
         - --trace
         - --CFLAGS -DVL_TIME_CONTEXT
+
+
+  model-lib-sim:
+    <<: *default_target
+    default_tool: verilator
+    parameters:
+    - VERILATOR=true
+    - USE_BW=true
+    filesets_append:
+    - pre_build_scripts
+    - verilator-waiver
+    - mem_init_verilator_tb
+    - rtl-simulation
+    - testharness
+    toplevel: [core_v_mcu_testharness]
+    hooks:
+      pre_build: [pre_build_scripts]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+        - --waiver-output waiver_output_verilog.log
+        - -Wno-fatal
+        - --trace
+        - --trace-fst
+        - -CFLAGS "-DVL_TIME_CONTEXT -std=c++11 -Wall -g -fpermissive"
+        - -LDFLAGS "-pthread -lutil -lelf"
 
   lint:
     <<: *default_target

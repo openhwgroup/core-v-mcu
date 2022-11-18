@@ -17,26 +17,32 @@
 
 CC      = riscv32-corev-elf-gcc
 OBJCOPY = riscv32-corev-elf-objcopy
+OBJDUMP = riscv32-corev-elf-objdump
+
+CUSTOM_CFLAGS =
 
 CFLAGS   = -Os -g -msmall-data-limit=8 \
            -mno-save-restore -fmessage-length=0 \
            -march=rv32imc \
            -fsigned-char -ffunction-sections -fdata-sections
-CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude
+CPPFLAGS = -I$(CURDIR)/../sw/inc -Iinclude ${CUSTOM_CFLAGS}
 ASFLAGS  = $(CFLAGS) -DLANGUAGE_ASSEMBLY
 LDFLAGS  = -msmall-data-limit=8 -mno-save-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T core-v-mcu2-rom.ld -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections -Wl,-Map,"A2_boot.map" --specs=nosys.specs -o "A2_boot.elf"
 
+BOOTCODE ?= boot.mem
 
-BOOTCODE = boot.mem
+
 
 all: $(BOOTCODE)
 
 $(BOOTCODE): A2_Boot.srec
-	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ../tb/mem_init_files/boot.mem
+	python3 srec2verilog.py -i ./A2_Boot.srec -o ./a2_bootrom.sv -m ../tb/mem_init_files/$(BOOTCODE)
 
 A2_Boot.srec: A2_boot.elf
 	$(OBJCOPY) -O srec -j .text -j .data A2_boot.elf A2_Boot.srec
 
+A2_boot.dump: A2_boot.elf
+	$(OBJDUMP) -xD $^ > $@
 
 A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o uartProtocol.o hal_apb_i2cs.o crt0.o
 	$(CC) $(LDFLAGS) crt0.o I2CProtocol.o uartProtocol.o crc.o dbg.o hal_apb_i2cs.o main.o spi.o uart.o  -lc -lm -lgcc
@@ -45,3 +51,4 @@ A2_boot.elf: main.o crc.o dbg.o uart.o spi.o I2CProtocol.o uartProtocol.o hal_ap
 .PHONY: clean
 clean:
 	$(RM) *.o
+	$(RM) *.dump

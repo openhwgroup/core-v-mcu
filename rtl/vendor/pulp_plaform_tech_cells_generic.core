@@ -51,3 +51,4 @@ targets:
     - target_sim? (rtl_sim)
     - target_lint? (rtl_sim)
     - target_model-lib? (rtl_sim)
+    - target_model-lib-sim? (rtl_sim)

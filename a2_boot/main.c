@@ -243,7 +243,7 @@ int main(void)
     dbg_str("rr=");
     dbg_hex8(resetreason);
 #ifdef VERILATOR
-	dbg_str("\nJumping to address 0x1C000880");
+	dbg_str("\nJumping to 0x1C000880 ");
 	jump_to_address(0x1C000880);
 #endif
 

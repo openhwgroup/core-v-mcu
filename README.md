@@ -100,53 +100,15 @@ The test bench used by the simulation is 'core_v_mcu_tb.sv'
 
 The resulting header files are located in ./sw
 
-## Experimental fuseSoC Support
-
-Run Verilator lint target:
-
-```
-fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
-```
-
-To build Verilator as a library which can be linked into other tools (such as
-the debug server):
-
-```
-fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
-```
-
-The library will be in the `obj_dir` subdirectory of the work root.
-
-Once can sanity check the top-level using QuestaSim:
+One can sanity check the top-level using QuestaSim:
 
 ```
 fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:systems:core-v-mcu
 ```
 
-## Contributing: Pre-commit checks
+## Running Verilator
 
-If you are submitting a pull-request, it will be subject to pre-commit checks.  The two that most likely cause problems are the Verilator Lint check and the Verible format check.
-
-### Verilator model library
-
-The system will run
-```
-fusesoc --cores-root . run --target=model-lib --setup --build openhwgroup.org:systems:core-v-mcu
-```
-If your changes introduce any Verilator errors, you either need to fix these, or, if appropriate, add a rule to ignore them to `rtl/core-v-mcu/verilator.waiver`.
-
-This will create the Verilator library `Vcore_v_mcu_wrapper__ALL.a` in `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/obj_dir`.
-
-Note that when you use this library to build an application you will need to
-ensure that the directory `build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/mem_init` is either symbolically linked or copied to the directory where the application will run. The model will load ROM images from this directory.
-
-### Verilator lint check
-
-The system will run
-```
-fusesoc --cores-root . run --target=lint --setup --build openhwgroup.org:systems:core-v-mcu
-```
-If your changes introduce any more Verilator lint warnings, you either need to fix these, or, if appropriate, add a rule to ignore them to `rtl/core-v-mcu/verilator.waiver`.
+Follow the Section [here](./VERILATOR.md) to work with Verilator.
 
 ### Verible format check
 
@@ -161,6 +123,10 @@ Two important things to note.
 1.  If you do not have Verible installed (which is likely), then `util/format-verible` will silently do nothing.
 
 2.  You must install the correct version of Verible, currently v0.0-1051-gd4cd328.  GitHub has [prebuilt versions](https://github.com/google/verible/releases/tag/v0.0-1051-gd4cd328).  The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
+
+## Contributing: Pre-commit checks
+
+If you are submitting a pull-request, it will be subject to pre-commit checks.  The two that most likely cause problems are the Verilator Lint check and the Verible format check.
 
 ## References
 
