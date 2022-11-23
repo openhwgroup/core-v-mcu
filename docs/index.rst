@@ -51,10 +51,15 @@ CORE-V-MCU User Manual
     doc-src/apb_gpio.md
     doc-src/apb_timer.md
     doc-src/apb_adv_timer.md
+    doc-src/cam.md
+    doc-src/i2cm.md
     doc-src/i2cs.md
+    doc-src/sdio.md
     doc-src/system_control_peripherals.md
     doc-src/logarithmic_interconnect.md
+    doc-src/qspim.md
     doc-src/udma.md
+    doc-src/uart.md
     doc-src/efpga_subsystem.md
 
 
@@ -67,11 +72,11 @@ CORE-V-MCU User Manual
     doc-src/csr-docs/apb_event_cntrl_reg_defs.md
     doc-src/csr-docs/apb_timer_unit_reg_defs.md
     doc-src/csr-docs/apb_gpio_reg_defs.md
+    doc-src/csr-docs/udma_i2cm_reg_defs.md
     doc-src/csr-docs/apb_i2cs_reg_defs.md
     doc-src/csr-docs/efpga_template_reg_defs.md
     doc-src/csr-docs/udma_ctrl_reg_defs.md
     doc-src/csr-docs/udma_uart_reg_defs.md
-    doc-src/csr-docs/udma_i2cm_reg_defs.md
     doc-src/csr-docs/udma_qspi_reg_defs.md
     doc-src/csr-docs/udma_sdio_reg_defs.md
     doc-src/csr-docs/udma_camera_reg_defs.md
