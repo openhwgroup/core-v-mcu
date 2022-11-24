@@ -16,7 +16,7 @@ The interleaved memory is typically used for program data-store and micro-DMA da
 +-----------------------------------+--------------------+------------------+
 | **eFPGA Domain**                  | 0x1A30-0000         | 0x1A3F-FFFF       |
 +-----------------------------------+--------------------+------------------+
-| **Non-Interleaved Memory Bank 0** | 0x1C000000         | 0x1C007FFF       |
+| **Non-Interleaved Memory Bank 0** | 0x1C00-0000         | 0x1C00-7FFF       |
 +-----------------------------------+--------------------+------------------+
 | **Non-Interleaved Memory Bank 1** | 0x1C008000         | 0x1C00FFFF       |
 +-----------------------------------+--------------------+------------------+
