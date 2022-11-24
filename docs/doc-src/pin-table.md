@@ -5,7 +5,7 @@ This section is the pin assignments for the currently supported implementations.
 Table headings have the following meaning:
 
 * **IO**: a user I/O or XADC pin on the FPGA.
-* **SYSIO**: a hardwired function (e.g. ref_clk).
+* **SYSIO**: a hardwired function, i.e., not affected by I/O Mux Select, (e.g. ref_clk).
 * **sel=0..3**: the value of the I/O Mux Select; IO_CTRL[1:0] CSR (at offset 0x0400).
 
 The I/O Mux select can be used to select one or more of the following IP peripheral blocks to the specified I/O pins:
