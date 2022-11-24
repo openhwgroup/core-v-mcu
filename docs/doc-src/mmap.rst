@@ -18,7 +18,7 @@ The interleaved memory is typically used for program data-store and micro-DMA da
 +-----------------------------------+--------------------+------------------+
 | **Non-Interleaved Memory Bank 0** | 0x1C00-0000         | 0x1C00-7FFF       |
 +-----------------------------------+--------------------+------------------+
-| **Non-Interleaved Memory Bank 1** | 0x1C008000         | 0x1C00FFFF       |
+| **Non-Interleaved Memory Bank 1** | 0x1C00-8000         | 0x1C00-FFFF       |
 +-----------------------------------+--------------------+------------------+
 | **Interleaved Memory**            | 0x1C010000         | 0x1C07FFFF       |
 +-----------------------------------+--------------------+------------------+
