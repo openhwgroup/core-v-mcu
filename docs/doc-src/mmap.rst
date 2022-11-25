@@ -1,35 +1,32 @@
 Memory Map
 ^^^^^^^^^^
 
-This table reports the memory address map as described in
-`core-v-mcu/rtl/includes/soc_mem_map.svh <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/includes/soc_mem_map.svh>`_.
-The AXI plug is not reported as not implemented,
-thus it should be treated as empty memory map space.
+This table reports the "Top-Level" memory address map as seen by the core.
+The Peripheral and eFPGA domains are address ranges which support a set of memory mapped peripherals and the eFPGA resources respectively.
+As shown in the Block Diagram, there are two non-interleaved memory banks.
+Typically these memories are used for code-store and the stack, although there is no requirement for this.
+The interleaved memory is typically used for program data-store and micro-DMA data buffers.
 
++-----------------------------------+--------------------+------------------+
+| **Description**                   | **Address Start**  | **Address End**  |
++===================================+====================+==================+
+| **Boot ROM**                      | 0x1A00-0000         | 0x1A03-FFFF       |
++-----------------------------------+--------------------+------------------+
+| **Peripheral Domain**             | 0x1A10-0000         | 0x1A2F-FFFF       |
++-----------------------------------+--------------------+------------------+
+| **eFPGA Domain**                  | 0x1A30-0000         | 0x1A3F-FFFF       |
++-----------------------------------+--------------------+------------------+
+| **Non-Interleaved Memory Bank 0** | 0x1C00-0000         | 0x1C00-7FFF       |
++-----------------------------------+--------------------+------------------+
+| **Non-Interleaved Memory Bank 1** | 0x1C00-8000         | 0x1C00-FFFF       |
++-----------------------------------+--------------------+------------------+
+| **Interleaved Memory**            | 0x1C010000         | 0x1C07FFFF       |
++-----------------------------------+--------------------+------------------+
 
-+-----------------------------+---------------------------+---------------------------+
-| **Description**             | **Address Start**         | **Address End**           |
-+=============================+===========================+===========================+
-| **Boot ROM**                | 0x1A000000                | 0x1A03FFFF                |
-+-----------------------------+---------------------------+---------------------------+
-| **Peripheral Domain**       | 0x1A100000                | 0x1A2FFFFF                |
-+-----------------------------+---------------------------+---------------------------+
-| **eFPGA Domain**            | 0x1A300000                | 0x1A3FFFFF                |
-+-----------------------------+---------------------------+---------------------------+
-| **Memory Bank 0**           | 0x1C000000                | 0x1C007FFF                |
-+-----------------------------+---------------------------+---------------------------+
-| **Memory Bank 1**           | 0x1C008000                | 0x1C00FFFF                |
-+-----------------------------+---------------------------+---------------------------+
-| **Memory Bank Interleaved** | 0x1C010000                | 0x1C08FFFF                |
-+-----------------------------+---------------------------+---------------------------+
-
-The Peripheral Domain memory map is reported below as described in
-`core-v-mcu/rtl/includes/periph_bus_defines.svh <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/includes/periph_bus_defines.svh>`_.
-The Stdout emulator works only with RTL simulation and not
-with FPGA or ASIC implementations.
+Memory locations in the peripheral domain are used to access Control and Status Registers (CSRs) used to control the CORE-V-MCU IP blocks.
 
 +-----------------------------+---------------------------+---------------------------+
-| **Description**             | **Address Start**         | **Address End**           |
+| **CORE-V-MCU IP Block**     | **Address Start**         | **Address End**           |
 +=============================+===========================+===========================+
 | **Frequency-locked loop**   | 0x1A100000                | 0x1A100FFF                |
 +-----------------------------+---------------------------+---------------------------+
@@ -47,16 +44,17 @@ with FPGA or ASIC implementations.
 +-----------------------------+---------------------------+---------------------------+
 | **Timer**                   | 0x1A10B000                | 0x1A10BFFF                |
 +-----------------------------+---------------------------+---------------------------+
-| **Stdout emulator**         | 0x1A10F000                | 0x1A10FFFF                |
+| **stdout emulator**         | 0x1A10-F000                | 0x1A10-FFFF                |
 +-----------------------------+---------------------------+---------------------------+
-| **Debug**                   | 0x1A110000                | 0x1A11FFFF                |
+| **Debug**                   | 0x1A11-0000                | 0x1A11-FFFF                |
 +-----------------------------+---------------------------+---------------------------+
 | **eFPGA configuration**     | 0x1A200000                | 0x1A2F0000                |
 +-----------------------------+---------------------------+---------------------------+
 | **eFPGA HWCE**              | 0x1A300000                | 0x1A3F0000                |
 +-----------------------------+---------------------------+---------------------------+
 
-The memory map of the **Debug** region of the Peripheral Domain is documented as part of the PULP debug system. With the `Overview <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md>`_, the `Debug Memory Map <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md#debug-memory-map>`_ gives the offsets within the Debug region of the various parts of the debug module.
+Note that the stdout emulator works only with RTL simulation and not with FPGA or ASIC implementations.
+
 
 CSR Access Types:
 ~~~~~~~~~~~~~~~~~
@@ -83,3 +81,17 @@ CSR Access Types:
 | RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 +-------------+---------------------------------------------------------------------+
 
+Implementation Details
+~~~~~~~~~~~~~~~~~~~~~~
+The Top-level address map is defined in
+`core-v-mcu/rtl/includes/soc_mem_map.svh <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/includes/soc_mem_map.svh>`_.
+
+The Peripheral Domain memory map is reported below as described in
+`core-v-mcu/rtl/includes/periph_bus_defines.svh <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/includes/periph_bus_defines.svh>`_.
+
+The memory map of the **Debug** region of the Peripheral Domain is documented as part of the PULP debug system.
+With the
+`Overview <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md>`_,
+the
+`Debug Memory Map <https://github.com/pulp-platform/riscv-dbg/blob/master/doc/debug-system.md#debug-memory-map>`_
+gives the offsets within the Debug region of the various parts of the debug module.
