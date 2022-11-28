@@ -62,7 +62,7 @@ You see the device attached in wls2 referred to as /dev/ttyUSB1. From now on, th
 ### Xilinx Vivado
 Vivado is required if you plan to generate you own FPGA bitmaps or load them via the "shared UART/JTAG USB port" (see below).
 If you will be using the pre-built bitmaps and loading them from a USB drive then you will not need Vivado.
-The free-to-use Vivado WebPACK is sufficient for working with the Nexys A7 and can be downloaded from the Xilinx [here](https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html).
+The free-to-use Vivado WebPACK (v2021.1 or newer) is sufficient for working with the Nexys A7 and can be downloaded from the Xilinx [here](https://www.xilinx.com/products/design-tools/vivado/vivado-ml.html).
 
 ### Eclipse IDE
 The open-source Eclipse IDE supports CORE-V-MCU.

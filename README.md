@@ -11,7 +11,8 @@
 
 ## Quick Start Guide
 
-The fastest way to get up and running with the CORE-V MCU is with pre-built bit streams for the Digilent Nexys A7 board. Check out the [Quick Start Guide](https://github.com/openhwgroup/core-v-mcu/tree/master/emulation/quickstart/README.md).
+The fastest way to get up and running with the CORE-V MCU is with pre-built bit streams for the Digilent Nexys A7 board.
+Check out the [Quick Start Guide](https://github.com/openhwgroup/core-v-mcu/tree/master/emulation/quickstart/README.md).
 
 ## Getting Started
 
@@ -24,6 +25,8 @@ pip3 install --user -r python-requirements.txt
 Install fusesoc: https://fusesoc.readthedocs.io/en/stable/user/installation.html#ug-installation
 
 Install Verilator v4.100: https://verilator.org/guide/latest/install.html
+
+Install Xilinx Vivado: see the [Quick Start Guide](https://github.com/openhwgroup/core-v-mcu/tree/master/emulation/quickstart/README.md).
 
 ## Building
 
