@@ -3,11 +3,12 @@
 
 # CORE-V MCU
 
-> CORE-V MCU originated from PULPissimo \[[1](https://ieeexplore.ieee.org/abstract/document/8640145)\], \[[2](https://ieeexplore.ieee.org/document/9369856)\]. and is now a
-> stand-alone project within OpenHW Group independent from PULPIssimo.
->
-> In case you should be interested to join the project please feel free to open
-> an issue, or involve yourself in any open issues/discussions.
+CORE-V MCU originated from PULPissimo \[[1](https://ieeexplore.ieee.org/abstract/document/8640145)\], \[[2](https://ieeexplore.ieee.org/document/9369856)\],
+and is now a stand-alone project within OpenHW Group independent from PULPIssimo.
+
+In case you would be interested to join the project please feel free to open an issue, or involve yourself in any open issues/discussions.
+Contributions are always welcome!
+First time contributors should review the [Contributing](https://github.com/openhwgroup/core-v-mcu/tree/master/CONTRIBUTING.md) guide.
 
 ## Quick Start Guide
 
@@ -128,7 +129,8 @@ fusesoc --cores-root . run --target=sim --setup --build --run openhwgroup.org:sy
 
 ## Contributing: Pre-commit checks
 
-If you are submitting a pull-request, it will be subject to pre-commit checks.  The two that most likely cause problems are the Verilator Lint check and the Verible format check.
+If you are submitting a pull-request, it will be subject to pre-commit checks.
+The two that most likely cause problems are the Verilator Lint check and the Verible format check.
 
 ### Verilator model library
 
