@@ -1,17 +1,27 @@
 # SOC_CTRL
 
- Memory address: SOC_CTRL_START_ADDR (0x1A104000)
+Memory address: SOC_CTRL_START_ADDR (0x1A104000)
 
-This APB peripheral primarily controls I/O configuration and I/O function connection. 
+This APB peripheral primarily controls I/O configuration and I/O function connection.
 It also supports a few registers for miscellaneous functions.
 
+### IO_CTRL offset = 0x0400
 I/O control supports two functions:
 
 * I/O configuration
 * I/O function selection
 
-I/O configuration is a series of bits that control driver characteristics, such as drive strength and slew rate.
-I/O function selection controls the select field of a mux that connects the I/O to different signals in the device.
+I/O configuration (CFG) is a series of bits that may be used control I/O PAD characteristics, such as drive strength and slew rate.
+These driver control characteristics are implementation technology dependend and are TBD.
+I/O selection (MUX) controls the select field of a mux that connects the I/O to different signals in the device.
+
+Each port is individually addressable at offset + IO_PORT * 4.
+For example, the IO_CTRL CSR for IO_PORT 8 is at offset 0x0420.
+
+| Field      | Bits | Type | Default | Description               |
+| ---------- | ---- | ---- | ------- | ------------------------- |
+| CFG        | 13:8 |   RW | 0x00    | Pad configuration (TBD)   |
+| MUX        |  1:0 |   RW | 0x00    | Mux select                |
 
 
 ### INFO offset = 0x0000
@@ -150,11 +160,4 @@ I/O function selection controls the select field of a mux that connects the I/O 
 
 ### SOFT_RESET offset = 0x00FC
 
-
-### IO_CTRL[48] offset = 0x0400
-
-| Field      |  Bits |  Type |    Default | Description     |
-| --------------------- |   --- |   --- |        --- | ------------------------- |
-| CFG        |  13:8 |    RW |       0x00 | Pad configuration (TBD) |
-| MUX        |   1:0 |    RW |       0x00 | Mux select      |
 

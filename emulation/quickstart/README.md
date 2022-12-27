@@ -198,18 +198,20 @@ Below is a few examples of commands available with cli_test:
 [0] misc simul 1 0   # full misc command: runs the 'simul' test.
 ```
 
-### Understanding IO-muxing on CORE-V-MCU
+### IO-muxing example on CORE-V-MCU
+In this example we are going to toggle LED[0] on the Nexys-A7.
+The IO-mapping of the CORE-V-MCU to the Nexys A7 indicates that LED[0] is connected to IO_11 on the XC7A100T FPGA.
+By consulting the I/O Assignment Tables in the CORE-V-MCU User Manual we see that IO_11 can be connected to GPIO[4] by setting its IO_MUX to 2.
 
-| Nexys A7 Resource | XC7A100T IO | IONUM | MUX_SEL=0 | MUX_SEL=1 | MUX_SEL=2 | MUX_SEL=3 |
-|-------------------|-------------|-------|-----------|-----------|-----------|-----------|
-| LED[0]            | IO_11       | 11    | apbio_32  | apbio_47  | apbio_4   | fpgaio_4  |
+| Nexys A7 Resource | XC7A100T IO | IO_CTRL.MUX=0 | IO_CTRL.MUX=1 | IO_CTRL.MUX=2 | IO_CTRL.MUX=3 |
+|-------------------|-------------|---------------|---------------|---------------|---------------|
+| LED[0]            | IO_11       | pwm_ch0.0     | pwm_ch3.3     |  gpio_4       | efpgaio_4     |
 
-### Toggle LED[0] on the Nexys-A7 board using cli_test
+Given the above information the cli_test commands to toggle LED[0] are:
 ```
-[0] io setmux 11 2   # Set mux-select for IO 11 to 2 (apbio_4 now drives IO_11).
+[0] io setmux 11 2   # Set io_mux for IO_11 to 2 so that gpio_4 drives IO_11.
 [0] gpio mode 4 1    # Set 'mode' of GPIO 4 to 1.
-                     # Somehow, you are supposed to know that GPIO 4 is apbio_4.
-                     # Not sure what mode 1 is.
+                     # mode: 1 = output; 0 = input.
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 [0] gpio toggle 4    # Toggle state of GPIO 4.
 ```
