@@ -1,4 +1,4 @@
-# I2C Slave
+# UDMA CAMERA Interface
 
 ## Features
 

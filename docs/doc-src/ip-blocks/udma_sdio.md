@@ -1,4 +1,4 @@
-# I2C Master
+# UDMA SD Card Interface
 
 ## Features
 

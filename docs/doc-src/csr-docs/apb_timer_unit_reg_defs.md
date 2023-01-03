@@ -1,4 +1,4 @@
-# APB_TIMER_UNIT
+# APB_TIMER
 
 Memory address: TIMER_START_ADDDR(0x1A10B000)
 

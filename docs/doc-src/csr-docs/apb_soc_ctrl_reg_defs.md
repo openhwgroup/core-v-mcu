@@ -1,4 +1,4 @@
-# SOC_CTRL
+# APB SOC CTRL
 
 Memory address: SOC_CTRL_START_ADDR (0x1A104000)
 

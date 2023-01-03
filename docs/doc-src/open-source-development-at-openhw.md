@@ -1,11 +1,16 @@
-# Github
+# Open Source Development at the OpenHW Group
 
 We encourage people to get involved and contribute to this project.
 
-As with any activity, we have our ways-of-working that help keep entropy under control.
+You can get involved in multiple ways:
 
-Working with Git and Github can be quite a steep learning curve. Here is an
-attempt to collect general best-practices and recipes.
+- file an issue (either against the RTL or the documentation - we consider erors in both to be bugs!).
+- ask a question.
+- generate a pull-request.
+- propose a derivative project.
+
+As with any activity, we have our ways-of-working that help keep entropy under control.
+Specifically, we use git, GitHub and the [Eclipse development process](https://www.eclipse.org/projects/dev_process/).
 
 ## Git Development Workflow
 
@@ -48,11 +53,11 @@ Here is a brief description of the development workflow:
    ```
    git commit
    ```
-9. Push the changes to your Github fork.
+9. Push the changes to your GitHub fork.
    ```
    git push origin feature/add-new-cpu
    ```
-10. Open a pull request using the [Github
+10. Open a pull request using the [GitHub
     interface](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 11. Iterate on the pull request interface until all code quality checks are
     passed and the maintainer is happy with the contribution. You can simply
