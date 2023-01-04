@@ -50,15 +50,15 @@ module axi64_2_lint32_wrap #(
 
 
   axi64_2_lint32 #(
-      .AXI_ADDR_WIDTH   (AXI_ADDR_WIDTH),  //= 32,
-      .AXI_DATA_WIDTH   (AXI_DATA_WIDTH),  //= 64,
-      .AXI_STRB_WIDTH   (AXI_STRB_WIDTH),  //= 8,
-      .AXI_USER_WIDTH   (AXI_USER_WIDTH),  //= 6,
-      .AXI_ID_WIDTH     (AXI_ID_WIDTH),  //= 7,
-      .BUFF_DEPTH_SLICES(4),  //= 4,
+      .AXI_ADDR_WIDTH   (AXI_ADDR_WIDTH),   //= 32,
+      .AXI_DATA_WIDTH   (AXI_DATA_WIDTH),   //= 64,
+      .AXI_STRB_WIDTH   (AXI_STRB_WIDTH),   //= 8,
+      .AXI_USER_WIDTH   (AXI_USER_WIDTH),   //= 6,
+      .AXI_ID_WIDTH     (AXI_ID_WIDTH),     //= 7,
+      .BUFF_DEPTH_SLICES(4),                //= 4,
       .DATA_WIDTH       (TCDM_DATA_WIDTH),  //= 64,
-      .BE_WIDTH         (TCDM_BE_WIDTH),  //= DATA_WIDTH/8,
-      .ADDR_WIDTH       (TCDM_ADDR_WIDTH)  //= 10
+      .BE_WIDTH         (TCDM_BE_WIDTH),    //= DATA_WIDTH/8,
+      .ADDR_WIDTH       (TCDM_ADDR_WIDTH)   //= 10
   ) axi64_2_lint32_i (
       // AXI GLOBAL SIGNALS
       .clk        (clk_i),
@@ -126,8 +126,8 @@ module axi64_2_lint32_wrap #(
       // LINT Interface - Response
       .data_W_r_valid_i(tcdm_slaves_r_valid[1:0]),
       .data_W_r_rdata_i(tcdm_slaves_r_rdata[1:0]),
-      .data_W_r_opc_i  (tcdm_slaves_r_opc[1:0]),
-      .data_W_r_aux_i  ('0),  // We don't need this signal
+      .data_W_r_opc_i(tcdm_slaves_r_opc[1:0]),
+      .data_W_r_aux_i('0),  // We don't need this signal
 
       // LINT Interface - READ Request
       .data_R_req_o  (tcdm_slaves_req[3:2]),
@@ -141,8 +141,8 @@ module axi64_2_lint32_wrap #(
       // LINT Interface - Responseesponse
       .data_R_r_valid_i(tcdm_slaves_r_valid[3:2]),
       .data_R_r_rdata_i(tcdm_slaves_r_rdata[3:2]),
-      .data_R_r_opc_i  (tcdm_slaves_r_opc[3:2]),
-      .data_R_r_aux_i  ('0)  // We don't need this signal
+      .data_R_r_opc_i(tcdm_slaves_r_opc[3:2]),
+      .data_R_r_aux_i('0)  // We don't need this signal
   );
 
 endmodule

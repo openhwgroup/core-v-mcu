@@ -21,17 +21,17 @@ module soc_event_arbiter #(
 );
   localparam S = $clog2(EVNT_NUM);
   // internal pointers
-  reg  [EVNT_NUM-1:0] r_priority;  // one-hot priority vector
+  reg [EVNT_NUM-1:0] r_priority;  // one-hot priority vector
 
 
   // Outputs of combinational logic - real wires - declared as regs for use in a alway block
   // Better to change to wires and use generate statements in the future
 
-  reg  [EVNT_NUM-1:0] g          [  S:0];  // S levels of priority generate
-  reg  [EVNT_NUM-1:0] p          [S-1:0];  // S-1 levels of priority propagate
+  reg [EVNT_NUM-1:0] g[S:0];  // S levels of priority generate
+  reg [EVNT_NUM-1:0] p[S-1:0];  // S-1 levels of priority propagate
 
   // internal synonym wires of true outputs anyGrant and grant
-  wire                anyGnt;
+  wire anyGnt;
   wire [EVNT_NUM-1:0] gnt;
 
   assign anyGrant_o = anyGnt;

@@ -4,235 +4,241 @@
 //
 // `include "pulp_soc_defines.svh"
 module top (
-            output              m0_m0_clk_def,
-            output              m0_m1_clk_def,
-            output              m1_m0_clk_def,
-            output              m1_m1_clk_def,
-            output              m0_oper0_wclk_def, m0_oper0_rclk_def,
-            output              m0_oper1_wclk_def, m0_oper1_rclk_def,
-            output              m0_coef_wclk_def, m0_coef_rclk_def,
-            output              m1_oper0_wclk_def, m1_oper0_rclk_def,
-            output              m1_oper1_wclk_def, m1_oper1_rclk_def,
-            output              m1_coef_wclk_def, m1_coef_rclk_def,
-            output              lint_clk_def,
-            output              tcdm_clk_p0_def,
-            output              tcdm_clk_p1_def,
-            output              tcdm_clk_p2_def,
-            output              tcdm_clk_p3_def,
-            
-            
-            input [5:0]         CLK,
-            input [3:0]         RESET,
-            input               lint_REQ,
-                                lint_WEN,
+    output m0_m0_clk_def,
+    output m0_m1_clk_def,
+    output m1_m0_clk_def,
+    output m1_m1_clk_def,
+    output m0_oper0_wclk_def,
+    m0_oper0_rclk_def,
+    output m0_oper1_wclk_def,
+    m0_oper1_rclk_def,
+    output m0_coef_wclk_def,
+    m0_coef_rclk_def,
+    output m1_oper0_wclk_def,
+    m1_oper0_rclk_def,
+    output m1_oper1_wclk_def,
+    m1_oper1_rclk_def,
+    output m1_coef_wclk_def,
+    m1_coef_rclk_def,
+    output lint_clk_def,
+    output tcdm_clk_p0_def,
+    output tcdm_clk_p1_def,
+    output tcdm_clk_p2_def,
+    output tcdm_clk_p3_def,
 
-            input [19:0]        lint_ADDR, //PADDR,
-            input [31:0]        lint_WDATA, //PWDATA,
-            input [ 3:0]        lint_BE,
-            output logic        lint_VALID,
-                                lint_GNT, //PREADY, PSLVERR,
-            output logic [31:0] lint_RDATA, //PRDATA,
 
-            output              lint_clk,
+    input [5:0] CLK,
+    input [3:0] RESET,
+    input       lint_REQ,
+    lint_WEN,
 
-            output [79:0]       fpgaio_out,
-                                fpgaio_oe,
-            input [79:0]        fpgaio_in,
-            output [15:0]       events_o,
-            input [31:0]        control_in,
-            output [31:0]       status_out,
-            output [ 7:0]       version,
+    input        [19:0] lint_ADDR,   //PADDR,
+    input        [31:0] lint_WDATA,  //PWDATA,
+    input        [ 3:0] lint_BE,
+    output logic        lint_VALID,
+    lint_GNT,  //PREADY, PSLVERR,
+    output logic [31:0] lint_RDATA,  //PRDATA,
 
-            input [31:0]        m0_oper0_rdata,
-                                m0_oper1_rdata,
-                                m0_coef_rdata,
-            output [ 1:0]       m0_oper0_rmode,
-                                m0_oper0_wmode,
-                                m0_oper1_rmode,
-                                m0_oper1_wmode,
-            output logic        m0_oper0_wdsel,
-                                m0_oper0_we,
-                                m0_oper0_rclk,
-                                m0_oper0_wclk,
-            output logic        m0_oper1_wdsel,
-                                m0_oper1_we,
-                                m0_oper1_rclk,
-                                m0_oper1_wclk,
-            output logic [11:0] m0_oper0_waddr,
-                                m0_oper0_raddr,
-                                m0_oper1_waddr,
-                                m0_oper1_raddr,
-            output logic [11:0] m0_coef_raddr,
-                                m0_coef_waddr,
-            output logic [31:0] m0_oper0_wdata,
-                                m0_oper1_wdata,
-                                m0_coef_wdata,
-            output [ 1:0]       m0_coef_rmode,
-                                m0_coef_wmode,
-            output logic        m0_coef_wdsel,
-                                m0_coef_we,
-                                m0_coef_rclk,
-                                m0_coef_wclk,
-            output              m0_oper0_powerdn,
-                                m0_oper1_powerdn,
-                                m0_coef_powerdn,
+    output lint_clk,
 
-            output [31:0]       m0_m0_oper_in,
-                                m0_m0_coef_in,
-                                m0_m1_oper_in,
-                                m0_m1_coef_in,
-            input [31:0]        m0_m0_dataout,
-                                m0_m1_dataout,
-            output [ 5:0]       m0_m0_outsel,
-                                m0_m1_outsel,
-            output              m0_m0_tc,
-                                m0_m1_tc,
-            output logic        m0_m0_clk,
-                                m0_m1_clk,
-                                m0_m0_clken,
-                                m0_m1_clken,
-            output              m0_m0_osel,
-                                m0_m0_csel,
-                                m0_m1_osel,
-                                m0_m1_csel,
-            output [ 1:0]       m0_m0_mode,
-                                m0_m1_mode,
-            output              m0_m0_sat,
-                                m0_m0_clr,
-                                m0_m0_rnd,
-                                m0_m1_sat,
-                                m0_m1_clr,
-                                m0_m1_rnd,
-            output              m0_m0_reset,
-                                m0_m1_reset,
+    output [79:0] fpgaio_out,
+    fpgaio_oe,
+    input  [79:0] fpgaio_in,
+    output [15:0] events_o,
+    input  [31:0] control_in,
+    output [31:0] status_out,
+    output [ 7:0] version,
 
-            input [31:0]        m1_oper0_rdata,
-                                m1_oper1_rdata,
-                                m1_coef_rdata,
-            output [ 1:0]       m1_oper0_rmode,
-                                m1_oper0_wmode,
-                                m1_oper1_rmode,
-                                m1_oper1_wmode,
-            output logic        m1_oper0_wdsel,
-                                m1_oper0_we,
-                                m1_oper0_rclk,
-                                m1_oper0_wclk,
-            output logic        m1_oper1_wdsel,
-                                m1_oper1_we,
-                                m1_oper1_rclk,
-                                m1_oper1_wclk,
-            output logic [11:0] m1_oper0_waddr,
-                                m1_oper0_raddr,
-                                m1_oper1_waddr,
-                                m1_oper1_raddr,
-            output logic [11:0] m1_coef_raddr,
-                                m1_coef_waddr,
-            output logic [31:0] m1_oper0_wdata,
-                                m1_oper1_wdata,
-                                m1_coef_wdata,
-            output [ 1:0]       m1_coef_rmode,
-                                m1_coef_wmode,
-            output logic        m1_coef_wdsel,
-                                m1_coef_we,
-                                m1_coef_rclk,
-                                m1_coef_wclk,
-            output              m1_oper0_powerdn,
-                                m1_oper1_powerdn,
-                                m1_coef_powerdn,
+    input        [31:0] m0_oper0_rdata,
+    m0_oper1_rdata,
+    m0_coef_rdata,
+    output       [ 1:0] m0_oper0_rmode,
+    m0_oper0_wmode,
+    m0_oper1_rmode,
+    m0_oper1_wmode,
+    output logic        m0_oper0_wdsel,
+    m0_oper0_we,
+    m0_oper0_rclk,
+    m0_oper0_wclk,
+    output logic        m0_oper1_wdsel,
+    m0_oper1_we,
+    m0_oper1_rclk,
+    m0_oper1_wclk,
+    output logic [11:0] m0_oper0_waddr,
+    m0_oper0_raddr,
+    m0_oper1_waddr,
+    m0_oper1_raddr,
+    output logic [11:0] m0_coef_raddr,
+    m0_coef_waddr,
+    output logic [31:0] m0_oper0_wdata,
+    m0_oper1_wdata,
+    m0_coef_wdata,
+    output       [ 1:0] m0_coef_rmode,
+    m0_coef_wmode,
+    output logic        m0_coef_wdsel,
+    m0_coef_we,
+    m0_coef_rclk,
+    m0_coef_wclk,
+    output              m0_oper0_powerdn,
+    m0_oper1_powerdn,
+    m0_coef_powerdn,
 
-            output [31:0]       m1_m0_oper_in,
-                                m1_m0_coef_in,
-                                m1_m1_oper_in,
-                                m1_m1_coef_in,
-            input [31:0]        m1_m0_dataout,
-                                m1_m1_dataout,
-            output [ 5:0]       m1_m0_outsel,
-                                m1_m1_outsel,
-            output              m1_m0_tc,
-                                m1_m1_tc,
-            output logic        m1_m0_clk,
-                                m1_m1_clk,
-                                m1_m0_clken,
-                                m1_m1_clken,
-            output              m1_m0_osel,
-                                m1_m0_csel,
-                                m1_m1_osel,
-                                m1_m1_csel,
-            output [ 1:0]       m1_m0_mode,
-                                m1_m1_mode,
-            output              m1_m0_sat,
-                                m1_m0_clr,
-                                m1_m0_rnd,
-                                m1_m1_sat,
-                                m1_m1_clr,
-                                m1_m1_rnd,
-            output              m1_m0_reset,
-                                m1_m1_reset,
+    output       [31:0] m0_m0_oper_in,
+    m0_m0_coef_in,
+    m0_m1_oper_in,
+    m0_m1_coef_in,
+    input        [31:0] m0_m0_dataout,
+    m0_m1_dataout,
+    output       [ 5:0] m0_m0_outsel,
+    m0_m1_outsel,
+    output              m0_m0_tc,
+    m0_m1_tc,
+    output logic        m0_m0_clk,
+    m0_m1_clk,
+    m0_m0_clken,
+    m0_m1_clken,
+    output              m0_m0_osel,
+    m0_m0_csel,
+    m0_m1_osel,
+    m0_m1_csel,
+    output       [ 1:0] m0_m0_mode,
+    m0_m1_mode,
+    output              m0_m0_sat,
+    m0_m0_clr,
+    m0_m0_rnd,
+    m0_m1_sat,
+    m0_m1_clr,
+    m0_m1_rnd,
+    output              m0_m0_reset,
+    m0_m1_reset,
 
-            output logic [19:0] tcdm_addr_p0,
-                                tcdm_addr_p1,
-                                tcdm_addr_p2,
-                                tcdm_addr_p3,
-            input [31:0]        tcdm_rdata_p0,
-                                tcdm_rdata_p1,
-                                tcdm_rdata_p2,
-                                tcdm_rdata_p3,
-            input               tcdm_valid_p0,
-                                tcdm_valid_p1,
-                                tcdm_valid_p2,
-                                tcdm_valid_p3,
-            input               tcdm_gnt_p0,
-                                tcdm_gnt_p1,
-                                tcdm_gnt_p2,
-                                tcdm_gnt_p3,
-            input               tcdm_fmo_p0,
-                                tcdm_fmo_p1,
-                                tcdm_fmo_p2,
-                                tcdm_fmo_p3,
-            output logic [31:0] tcdm_wdata_p0,
-                                tcdm_wdata_p1,
-                                tcdm_wdata_p2,
-                                tcdm_wdata_p3,
-            output logic [ 3:0] tcdm_be_p0,
-                                tcdm_be_p1,
-                                tcdm_be_p2,
-                                tcdm_be_p3,
-            output logic        tcdm_wen_p0,
-                                tcdm_wen_p1,
-                                tcdm_wen_p2,
-                                tcdm_wen_p3,
-            output logic        tcdm_req_p0,
-                                tcdm_req_p1,
-                                tcdm_req_p2,
-                                tcdm_req_p3,
-            output              tcdm_clk_p0,
-                                tcdm_clk_p1,
-                                tcdm_clk_p2,
-                                tcdm_clk_p3
+    input        [31:0] m1_oper0_rdata,
+    m1_oper1_rdata,
+    m1_coef_rdata,
+    output       [ 1:0] m1_oper0_rmode,
+    m1_oper0_wmode,
+    m1_oper1_rmode,
+    m1_oper1_wmode,
+    output logic        m1_oper0_wdsel,
+    m1_oper0_we,
+    m1_oper0_rclk,
+    m1_oper0_wclk,
+    output logic        m1_oper1_wdsel,
+    m1_oper1_we,
+    m1_oper1_rclk,
+    m1_oper1_wclk,
+    output logic [11:0] m1_oper0_waddr,
+    m1_oper0_raddr,
+    m1_oper1_waddr,
+    m1_oper1_raddr,
+    output logic [11:0] m1_coef_raddr,
+    m1_coef_waddr,
+    output logic [31:0] m1_oper0_wdata,
+    m1_oper1_wdata,
+    m1_coef_wdata,
+    output       [ 1:0] m1_coef_rmode,
+    m1_coef_wmode,
+    output logic        m1_coef_wdsel,
+    m1_coef_we,
+    m1_coef_rclk,
+    m1_coef_wclk,
+    output              m1_oper0_powerdn,
+    m1_oper1_powerdn,
+    m1_coef_powerdn,
+
+    output       [31:0] m1_m0_oper_in,
+    m1_m0_coef_in,
+    m1_m1_oper_in,
+    m1_m1_coef_in,
+    input        [31:0] m1_m0_dataout,
+    m1_m1_dataout,
+    output       [ 5:0] m1_m0_outsel,
+    m1_m1_outsel,
+    output              m1_m0_tc,
+    m1_m1_tc,
+    output logic        m1_m0_clk,
+    m1_m1_clk,
+    m1_m0_clken,
+    m1_m1_clken,
+    output              m1_m0_osel,
+    m1_m0_csel,
+    m1_m1_osel,
+    m1_m1_csel,
+    output       [ 1:0] m1_m0_mode,
+    m1_m1_mode,
+    output              m1_m0_sat,
+    m1_m0_clr,
+    m1_m0_rnd,
+    m1_m1_sat,
+    m1_m1_clr,
+    m1_m1_rnd,
+    output              m1_m0_reset,
+    m1_m1_reset,
+
+    output logic [19:0] tcdm_addr_p0,
+    tcdm_addr_p1,
+    tcdm_addr_p2,
+    tcdm_addr_p3,
+    input        [31:0] tcdm_rdata_p0,
+    tcdm_rdata_p1,
+    tcdm_rdata_p2,
+    tcdm_rdata_p3,
+    input               tcdm_valid_p0,
+    tcdm_valid_p1,
+    tcdm_valid_p2,
+    tcdm_valid_p3,
+    input               tcdm_gnt_p0,
+    tcdm_gnt_p1,
+    tcdm_gnt_p2,
+    tcdm_gnt_p3,
+    input               tcdm_fmo_p0,
+    tcdm_fmo_p1,
+    tcdm_fmo_p2,
+    tcdm_fmo_p3,
+    output logic [31:0] tcdm_wdata_p0,
+    tcdm_wdata_p1,
+    tcdm_wdata_p2,
+    tcdm_wdata_p3,
+    output logic [ 3:0] tcdm_be_p0,
+    tcdm_be_p1,
+    tcdm_be_p2,
+    tcdm_be_p3,
+    output logic        tcdm_wen_p0,
+    tcdm_wen_p1,
+    tcdm_wen_p2,
+    tcdm_wen_p3,
+    output logic        tcdm_req_p0,
+    tcdm_req_p1,
+    tcdm_req_p2,
+    tcdm_req_p3,
+    output              tcdm_clk_p0,
+    tcdm_clk_p1,
+    tcdm_clk_p2,
+    tcdm_clk_p3
 );
 
-   assign m0_m0_clk_def= 1'b0;
-   assign m0_m1_clk_def= 1'b0;
-   assign m1_m0_clk_def= 1'b0;
-   assign m1_m1_clk_def= 1'b0;
-   assign m0_oper0_wclk_def= 1'b0; 
-   assign m0_oper0_rclk_def= 1'b0;
-   assign m0_oper1_wclk_def= 1'b0;
-   assign m0_oper1_rclk_def= 1'b0;
-   assign m0_coef_wclk_def= 1'b0;
-   assign m0_coef_rclk_def= 1'b0;
-   assign m1_oper0_wclk_def= 1'b0;
-   assign m1_oper0_rclk_def= 1'b0;
-   assign m1_oper1_wclk_def= 1'b0;
-   assign m1_oper1_rclk_def= 1'b0;
-   assign m1_coef_wclk_def= 1'b0; 
-   assign m1_coef_rclk_def= 1'b0;
-   assign lint_clk_def= 1'b0;
-   assign tcdm_clk_p0_def= 1'b0;
-   assign tcdm_clk_p1_def= 1'b0;
-   assign tcdm_clk_p2_def= 1'b0;
-   assign tcdm_clk_p3_def= 1'b0;
-            
+  assign m0_m0_clk_def = 1'b0;
+  assign m0_m1_clk_def = 1'b0;
+  assign m1_m0_clk_def = 1'b0;
+  assign m1_m1_clk_def = 1'b0;
+  assign m0_oper0_wclk_def = 1'b0;
+  assign m0_oper0_rclk_def = 1'b0;
+  assign m0_oper1_wclk_def = 1'b0;
+  assign m0_oper1_rclk_def = 1'b0;
+  assign m0_coef_wclk_def = 1'b0;
+  assign m0_coef_rclk_def = 1'b0;
+  assign m1_oper0_wclk_def = 1'b0;
+  assign m1_oper0_rclk_def = 1'b0;
+  assign m1_oper1_wclk_def = 1'b0;
+  assign m1_oper1_rclk_def = 1'b0;
+  assign m1_coef_wclk_def = 1'b0;
+  assign m1_coef_rclk_def = 1'b0;
+  assign lint_clk_def = 1'b0;
+  assign tcdm_clk_p0_def = 1'b0;
+  assign tcdm_clk_p1_def = 1'b0;
+  assign tcdm_clk_p2_def = 1'b0;
+  assign tcdm_clk_p3_def = 1'b0;
+
 
   logic [3:0] apb_fsm;
   logic [31:0] m0_m0_control, m0_m1_control, m1_m0_control, m1_m1_control;
@@ -559,9 +565,8 @@ module top (
               m0_oper0_we <= 1;
               if (p0_cnt < control_in[23:16]) p0_fsm <= 2;
               else p0_fsm <= 0;
-            end
-                 else // write
-                   if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
+            end else  // write
+            if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
             else p0_fsm <= 0;
           end
         end  // if (tcdm_valid_p0 == 1)
@@ -611,9 +616,8 @@ module top (
               m0_oper1_wdata <= tcdm_rdata_p1;
               if (p1_cnt < control_in[23:16]) p1_fsm <= 2;
               else p1_fsm <= 0;
-            end
-                 else // write
-                   if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
+            end else  // write
+            if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
             else p1_fsm <= 0;
           end
         end  // if (tcdm_valid_p1 == 1)
@@ -663,9 +667,8 @@ module top (
               m1_oper0_we <= 1;
               if (p2_cnt < control_in[23:16]) p2_fsm <= 2;
               else p2_fsm <= 0;
-            end
-                 else // write
-                   if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
+            end else  // write
+            if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
             else p2_fsm <= 0;
           end
         end  // if (tcdm_valid_p2 == 1)
@@ -714,9 +717,8 @@ module top (
               m1_oper1_we <= 1;
               if (p3_cnt < control_in[23:16]) p3_fsm <= 2;
               else p3_fsm <= 0;
-            end
-                 else // write
-                   if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
+            end else  // write
+            if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
             else p3_fsm <= 0;
           end
         end  // if (tcdm_valid_p3 == 1)

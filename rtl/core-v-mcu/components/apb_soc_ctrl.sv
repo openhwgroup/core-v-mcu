@@ -111,7 +111,8 @@ module apb_soc_ctrl #(
 
 
 );
-  localparam IDX_WIDTH = `LOG2(`N_IO);
+  localparam IDX_WIDTH =
+  `LOG2(`N_IO);
   localparam CONFIG = 12'h4??;
 
   logic [    IDX_WIDTH-1:0]                   r_io_pad;

@@ -21,7 +21,7 @@ module core_v_mcu_private_ram #(
       .CEN  (csn_i),
       .BEN  (~be_i),
       .WEN  (wen_i),
-      .A    (addr_i),  //Convert from byte to word addressing
+      .A    (addr_i),   //Convert from byte to word addressing
       .D    (wdata_i),
       .Q    (rdata_o)
   );
@@ -50,7 +50,7 @@ module core_v_mcu_interleaved_ram #(
       .CEN  (csn_i),
       .BEN  (~be_i),
       .WEN  (wen_i),
-      .A    (addr_i),  //Convert from byte to word addressing
+      .A    (addr_i),   //Convert from byte to word addressing
       .D    (wdata_i),
       .Q    (rdata_o)
   );

@@ -48,7 +48,7 @@ module lint2axi_wrap #(
       .BE_WIDTH        (BE_WIDTH),
       .USER_WIDTH      (AXI_USER_WIDTH),
       .AXI_ID_WIDTH    (AXI_ID_WIDTH),
-      .REGISTERED_GRANT("FALSE")  // "TRUE"|"FALSE"
+      .REGISTERED_GRANT("FALSE")          // "TRUE"|"FALSE"
   ) i_lint_2_axi (
       // Clock and Reset
       .clk_i,
@@ -66,8 +66,8 @@ module lint2axi_wrap #(
       .data_rvalid_o(master.r_valid),
       .data_rdata_o (master.r_rdata),
       .data_ropc_o  (master.r_opc),
-      .data_raux_o  (),  // We don't need this signal
-      .data_rID_o   (),  // We don't need this signal
+      .data_raux_o  (),                 // We don't need this signal
+      .data_rID_o   (),                 // We don't need this signal
       // ---------------------------------------------------------
       // AXI TARG Port Declarations ------------------------------
       // ---------------------------------------------------------

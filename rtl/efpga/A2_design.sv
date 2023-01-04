@@ -1,32 +1,32 @@
 //Version : AU 1.3.0.PreRelease Oct 15 2020
 
 module A2_design (
-    input [5:0]         CLK,
-    input [3:0]         RESET,
+    input [5:0] CLK,
+    input [3:0] RESET,
 
-    input [31:0]        m0_oper0_rdata,
-    input [31:0]        m0_m0_dataout,
-    input [31:0]        m0_coef_rdata,
-    input [31:0]        m0_m1_dataout,
-    input [31:0]        m0_oper1_rdata,
-    input [31:0]        m1_oper0_rdata,
-    input [31:0]        m1_m0_dataout,
-    input [31:0]        m1_coef_rdata,
-    input [31:0]        m1_m1_dataout,
-    input [31:0]        m1_oper1_rdata,
+    input [31:0] m0_oper0_rdata,
+    input [31:0] m0_m0_dataout,
+    input [31:0] m0_coef_rdata,
+    input [31:0] m0_m1_dataout,
+    input [31:0] m0_oper1_rdata,
+    input [31:0] m1_oper0_rdata,
+    input [31:0] m1_m0_dataout,
+    input [31:0] m1_coef_rdata,
+    input [31:0] m1_m1_dataout,
+    input [31:0] m1_oper1_rdata,
 
-    input [79:0]        fpgaio_in,
-    input [31:0]        lint_WDATA,
-    input [19:0]        lint_ADDR,
-    input               lint_REQ,
-    input               lint_WEN,
-    input [ 3:0]        lint_BE,
-    input [31:0]        control_in,
+    input [79:0] fpgaio_in,
+    input [31:0] lint_WDATA,
+    input [19:0] lint_ADDR,
+    input        lint_REQ,
+    input        lint_WEN,
+    input [ 3:0] lint_BE,
+    input [31:0] control_in,
 
-    input [31:0]        tcdm_rdata_p0,
-    input [31:0]        tcdm_rdata_p1,
-    input [31:0]        tcdm_rdata_p2,
-    input [31:0]        tcdm_rdata_p3,
+    input [31:0] tcdm_rdata_p0,
+    input [31:0] tcdm_rdata_p1,
+    input [31:0] tcdm_rdata_p2,
+    input [31:0] tcdm_rdata_p3,
 
     input               tcdm_valid_p0,
     input               tcdm_gnt_p0,
@@ -40,56 +40,56 @@ module A2_design (
     input               tcdm_valid_p3,
     input               tcdm_gnt_p3,
     input               tcdm_fmo_p3,
-    input logic [ 3:0]  FB_SPE_IN,
+    input  logic [ 3:0] FB_SPE_IN,
     output logic [ 3:0] FB_SPE_OUT,
-    inout logic        NB,
-    inout logic        PB,
-    input logic         MLATCH,
-    input logic         POR,
-    input logic         STM,
-    input logic [ 5:0]  M,
-    input logic [31:0]  fcb_bl_din,
+    inout  logic        NB,
+    inout  logic        PB,
+    input  logic        MLATCH,
+    input  logic        POR,
+    input  logic        STM,
+    input  logic [ 5:0] M,
+    input  logic [31:0] fcb_bl_din,
     output logic [31:0] fcb_bl_dout,
-    input logic [15:0]  fcb_bl_pwrgate,
-    input logic         fcb_blclk,
-    input logic         fcb_cload_din_sel,
-    input logic         fcb_din_int_l_only,
-    input logic         fcb_din_int_r_only,
-    input logic         fcb_din_slc_tb_int,
-    input logic         fcb_fb_iso_enb,
-    input logic [15:0]  fcb_iso_en,
-    input logic         fcb_pchg_b,
-    input logic [15:0]  fcb_pi_pwr,
+    input  logic [15:0] fcb_bl_pwrgate,
+    input  logic        fcb_blclk,
+    input  logic        fcb_cload_din_sel,
+    input  logic        fcb_din_int_l_only,
+    input  logic        fcb_din_int_r_only,
+    input  logic        fcb_din_slc_tb_int,
+    input  logic        fcb_fb_iso_enb,
+    input  logic [15:0] fcb_iso_en,
+    input  logic        fcb_pchg_b,
+    input  logic [15:0] fcb_pi_pwr,
     output logic        fcb_pif_en,
-    input logic [15:0]  fcb_prog,
-    input logic         fcb_prog_ifx,
-    input logic         fcb_pwr_gate,
-    input logic         fcb_re,
-    input logic [15:0]  fcb_vlp_clkdis,
-    input logic         fcb_vlp_clkdis_ifx,
-    input logic [15:0]  fcb_vlp_pwrdis,
-    input logic         fcb_vlp_pwrdis_ifx,
-    input logic [15:0]  fcb_vlp_srdis,
-    input logic         fcb_vlp_srdis_ifx,
-    input logic         fcb_we,
-    input logic         fcb_we_int,
-    input logic [ 2:0]  fcb_wl_cload_sel,
-    input logic [ 5:0]  fcb_wl_din,
-    input logic         fcb_wl_en,
-    input logic         fcb_wl_int_din_sel,
-    input logic [ 7:0]  fcb_wl_pwrgate,
-    input logic         fcb_wl_resetb,
-    input logic [15:0]  fcb_wl_sel,
-    input logic         fcb_wl_sel_tb_int,
-    input logic         fcb_wlclk,
+    input  logic [15:0] fcb_prog,
+    input  logic        fcb_prog_ifx,
+    input  logic        fcb_pwr_gate,
+    input  logic        fcb_re,
+    input  logic [15:0] fcb_vlp_clkdis,
+    input  logic        fcb_vlp_clkdis_ifx,
+    input  logic [15:0] fcb_vlp_pwrdis,
+    input  logic        fcb_vlp_pwrdis_ifx,
+    input  logic [15:0] fcb_vlp_srdis,
+    input  logic        fcb_vlp_srdis_ifx,
+    input  logic        fcb_we,
+    input  logic        fcb_we_int,
+    input  logic [ 2:0] fcb_wl_cload_sel,
+    input  logic [ 5:0] fcb_wl_din,
+    input  logic        fcb_wl_en,
+    input  logic        fcb_wl_int_din_sel,
+    input  logic [ 7:0] fcb_wl_pwrgate,
+    input  logic        fcb_wl_resetb,
+    input  logic [15:0] fcb_wl_sel,
+    input  logic        fcb_wl_sel_tb_int,
+    input  logic        fcb_wlclk,
 
-    input logic         fcb_fb_cfg_done,
-    output [31:0]       m0_m0_oper_in,
+    input  logic        fcb_fb_cfg_done,
+    output       [31:0] m0_m0_oper_in,
     output              m0_m0_osel,
-    output [31:0]       m0_m0_coef_in,
+    output       [31:0] m0_m0_coef_in,
     output              m0_m0_csel,
-    output [ 1:0]       m0_m0_mode,
-    output [ 5:0]       m0_m0_outsel,
+    output       [ 1:0] m0_m0_mode,
+    output       [ 5:0] m0_m0_outsel,
     output              m0_m0_clk,
     output              m0_m0_reset,
     output              m0_m0_clken,
@@ -98,418 +98,419 @@ module A2_design (
     output              m0_m0_rnd,
     output              m0_m0_tc,
 
-    output [31:0]       m0_m1_oper_in,
-    output              m0_m1_osel,
-    output [31:0]       m0_m1_coef_in,
-    output              m0_m1_csel,
-    output [ 1:0]       m0_m1_mode,
-    output [ 5:0]       m0_m1_outsel,
-    output              m0_m1_clk,
-    output              m0_m1_reset,
-    output              m0_m1_clken,
-    output              m0_m1_clr,
-    output              m0_m1_sat,
-    output              m0_m1_rnd,
-    output              m0_m1_tc,
+    output [31:0] m0_m1_oper_in,
+    output        m0_m1_osel,
+    output [31:0] m0_m1_coef_in,
+    output        m0_m1_csel,
+    output [ 1:0] m0_m1_mode,
+    output [ 5:0] m0_m1_outsel,
+    output        m0_m1_clk,
+    output        m0_m1_reset,
+    output        m0_m1_clken,
+    output        m0_m1_clr,
+    output        m0_m1_sat,
+    output        m0_m1_rnd,
+    output        m0_m1_tc,
 
-    output [31:0]       m1_m0_oper_in,
-    output              m1_m0_osel,
-    output [31:0]       m1_m0_coef_in,
-    output              m1_m0_csel,
-    output [ 1:0]       m1_m0_mode,
-    output [ 5:0]       m1_m0_outsel,
-    output              m1_m0_clk,
-    output              m1_m0_reset,
-    output              m1_m0_clken,
-    output              m1_m0_clr,
-    output              m1_m0_sat,
-    output              m1_m0_rnd,
-    output              m1_m0_tc,
+    output [31:0] m1_m0_oper_in,
+    output        m1_m0_osel,
+    output [31:0] m1_m0_coef_in,
+    output        m1_m0_csel,
+    output [ 1:0] m1_m0_mode,
+    output [ 5:0] m1_m0_outsel,
+    output        m1_m0_clk,
+    output        m1_m0_reset,
+    output        m1_m0_clken,
+    output        m1_m0_clr,
+    output        m1_m0_sat,
+    output        m1_m0_rnd,
+    output        m1_m0_tc,
 
-    output [31:0]       m1_m1_oper_in,
-    output              m1_m1_osel,
-    output [31:0]       m1_m1_coef_in,
-    output              m1_m1_csel,
-    output [ 1:0]       m1_m1_mode,
-    output [ 5:0]       m1_m1_outsel,
-    output              m1_m1_clk,
-    output              m1_m1_reset,
-    output              m1_m1_clken,
-    output              m1_m1_clr,
-    output              m1_m1_sat,
-    output              m1_m1_rnd,
-    output              m1_m1_tc,
+    output [31:0] m1_m1_oper_in,
+    output        m1_m1_osel,
+    output [31:0] m1_m1_coef_in,
+    output        m1_m1_csel,
+    output [ 1:0] m1_m1_mode,
+    output [ 5:0] m1_m1_outsel,
+    output        m1_m1_clk,
+    output        m1_m1_reset,
+    output        m1_m1_clken,
+    output        m1_m1_clr,
+    output        m1_m1_sat,
+    output        m1_m1_rnd,
+    output        m1_m1_tc,
 
-    output [31:0]       m0_oper0_wdata,
-    output [ 1:0]       m0_oper0_rmode,
-    output              m0_oper0_rclk,
-    output [11:0]       m0_oper0_raddr,
-    output [11:0]       m0_oper0_waddr,
-    output [ 1:0]       m0_oper0_wmode,
-    output              m0_oper0_wclk,
-    output              m0_oper0_we,
-    output              m0_oper0_wdsel,
-    output              m0_oper0_powerdn,
+    output [31:0] m0_oper0_wdata,
+    output [ 1:0] m0_oper0_rmode,
+    output        m0_oper0_rclk,
+    output [11:0] m0_oper0_raddr,
+    output [11:0] m0_oper0_waddr,
+    output [ 1:0] m0_oper0_wmode,
+    output        m0_oper0_wclk,
+    output        m0_oper0_we,
+    output        m0_oper0_wdsel,
+    output        m0_oper0_powerdn,
 
-    output [31:0]       m0_coef_wdata,
-    output [ 1:0]       m0_coef_rmode,
-    output              m0_coef_rclk,
-    output [11:0]       m0_coef_raddr,
-    output [11:0]       m0_coef_waddr,
+    output [31:0] m0_coef_wdata,
+    output [ 1:0] m0_coef_rmode,
+    output        m0_coef_rclk,
+    output [11:0] m0_coef_raddr,
+    output [11:0] m0_coef_waddr,
 
-    output [1:0]        m0_coef_wmode,
-    output              m0_coef_wclk,
-    output              m0_coef_we,
-    output              m0_coef_wdsel,
-    output              m0_coef_powerdn,
+    output [1:0] m0_coef_wmode,
+    output       m0_coef_wclk,
+    output       m0_coef_we,
+    output       m0_coef_wdsel,
+    output       m0_coef_powerdn,
 
-    output [31:0]       m0_oper1_wdata,
-    output [ 1:0]       m0_oper1_rmode,
-    output              m0_oper1_rclk,
-    output [11:0]       m0_oper1_raddr,
-    output [11:0]       m0_oper1_waddr,
-    output [ 1:0]       m0_oper1_wmode,
-    output              m0_oper1_wclk,
-    output              m0_oper1_we,
-    output              m0_oper1_wdsel,
-    output              m0_oper1_powerdn,
+    output [31:0] m0_oper1_wdata,
+    output [ 1:0] m0_oper1_rmode,
+    output        m0_oper1_rclk,
+    output [11:0] m0_oper1_raddr,
+    output [11:0] m0_oper1_waddr,
+    output [ 1:0] m0_oper1_wmode,
+    output        m0_oper1_wclk,
+    output        m0_oper1_we,
+    output        m0_oper1_wdsel,
+    output        m0_oper1_powerdn,
 
-    output [31:0]       m1_oper0_wdata,
-    output [ 1:0]       m1_oper0_rmode,
-    output              m1_oper0_rclk,
-    output [11:0]       m1_oper0_raddr,
-    output [11:0]       m1_oper0_waddr,
-    output [ 1:0]       m1_oper0_wmode,
-    output              m1_oper0_wclk,
-    output              m1_oper0_we,
-    output              m1_oper0_wdsel,
-    output              m1_oper0_powerdn,
+    output [31:0] m1_oper0_wdata,
+    output [ 1:0] m1_oper0_rmode,
+    output        m1_oper0_rclk,
+    output [11:0] m1_oper0_raddr,
+    output [11:0] m1_oper0_waddr,
+    output [ 1:0] m1_oper0_wmode,
+    output        m1_oper0_wclk,
+    output        m1_oper0_we,
+    output        m1_oper0_wdsel,
+    output        m1_oper0_powerdn,
 
-    output [31:0]       m1_coef_wdata,
-    output [ 1:0]       m1_coef_rmode,
-    output              m1_coef_rclk,
-    output [11:0]       m1_coef_raddr,
-    output [11:0]       m1_coef_waddr,
-    output [ 1:0]       m1_coef_wmode,
-    output              m1_coef_wclk,
-    output              m1_coef_we,
-    output              m1_coef_wdsel,
-    output              m1_coef_powerdn,
+    output [31:0] m1_coef_wdata,
+    output [ 1:0] m1_coef_rmode,
+    output        m1_coef_rclk,
+    output [11:0] m1_coef_raddr,
+    output [11:0] m1_coef_waddr,
+    output [ 1:0] m1_coef_wmode,
+    output        m1_coef_wclk,
+    output        m1_coef_we,
+    output        m1_coef_wdsel,
+    output        m1_coef_powerdn,
 
-    output [31:0]       m1_oper1_wdata,
-    output [ 1:0]       m1_oper1_rmode,
-    output              m1_oper1_rclk,
-    output [11:0]       m1_oper1_raddr,
-    output [11:0]       m1_oper1_waddr,
-    output [ 1:0]       m1_oper1_wmode,
-    output              m1_oper1_wclk,
-    output              m1_oper1_we,
-    output              m1_oper1_wdsel,
-    output              m1_oper1_powerdn,
+    output [31:0] m1_oper1_wdata,
+    output [ 1:0] m1_oper1_rmode,
+    output        m1_oper1_rclk,
+    output [11:0] m1_oper1_raddr,
+    output [11:0] m1_oper1_waddr,
+    output [ 1:0] m1_oper1_wmode,
+    output        m1_oper1_wclk,
+    output        m1_oper1_we,
+    output        m1_oper1_wdsel,
+    output        m1_oper1_powerdn,
 
-    output [79:0]       fpgaio_out,
-    output [79:0]       fpgaio_oe,
-    output [31:0]       lint_RDATA,
-    output              lint_clk,
-    output              lint_VALID,
-    output              lint_GNT,
+    output [79:0] fpgaio_out,
+    output [79:0] fpgaio_oe,
+    output [31:0] lint_RDATA,
+    output        lint_clk,
+    output        lint_VALID,
+    output        lint_GNT,
 
-    output [31:0]       tcdm_wdata_p0,
-    output [31:0]       tcdm_wdata_p1,
-    output [31:0]       tcdm_wdata_p2,
-    output [31:0]       tcdm_wdata_p3,
+    output [31:0] tcdm_wdata_p0,
+    output [31:0] tcdm_wdata_p1,
+    output [31:0] tcdm_wdata_p2,
+    output [31:0] tcdm_wdata_p3,
 
-    output [19:0]       tcdm_addr_p0,
-    output [19:0]       tcdm_addr_p1,
-    output [19:0]       tcdm_addr_p2,
-    output [19:0]       tcdm_addr_p3,
+    output [19:0] tcdm_addr_p0,
+    output [19:0] tcdm_addr_p1,
+    output [19:0] tcdm_addr_p2,
+    output [19:0] tcdm_addr_p3,
 
-    output              tcdm_wen_p0,
-                        tcdm_wen_p1,
-                        tcdm_wen_p2,
-                        tcdm_wen_p3,
-    output              tcdm_clk_p0,
-    output              tcdm_req_p0,
-    output [3:0]        tcdm_be_p0,
+    output       tcdm_wen_p0,
+    tcdm_wen_p1,
+    tcdm_wen_p2,
+    tcdm_wen_p3,
+    output       tcdm_clk_p0,
+    output       tcdm_req_p0,
+    output [3:0] tcdm_be_p0,
 
-    output              tcdm_clk_p1,
-    output              tcdm_req_p1,
-    output [3:0]        tcdm_be_p1,
+    output       tcdm_clk_p1,
+    output       tcdm_req_p1,
+    output [3:0] tcdm_be_p1,
 
-    output              tcdm_clk_p2,
-    output              tcdm_req_p2,
-    output [3:0]        tcdm_be_p2,
+    output       tcdm_clk_p2,
+    output       tcdm_req_p2,
+    output [3:0] tcdm_be_p2,
 
-    output              tcdm_clk_p3,
-    output              tcdm_req_p3,
-    output [ 3:0]       tcdm_be_p3,
-    output [15:0]       events_o,
-    output [31:0]       status_out,
-    output [ 7:0]       version,
-   inout VSSC,VDDC_FPGA                     
+    output        tcdm_clk_p3,
+    output        tcdm_req_p3,
+    output [ 3:0] tcdm_be_p3,
+    output [15:0] events_o,
+    output [31:0] status_out,
+    output [ 7:0] version,
+    inout         VSSC,
+    VDDC_FPGA
 );
 
 
-   // Gated clocks for SDC timing calculations
+  // Gated clocks for SDC timing calculations
 
-   wire  m0_m0_clk_int, m0_m0_clk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u1 (
-                       .clk0_i(m0_m0_clk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_m0_clk_def),
-                       .clk_o(m0_m0_clk)
-                       );
+  wire m0_m0_clk_int, m0_m0_clk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u1 (
+      .clk0_i(m0_m0_clk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_m0_clk_def),
+      .clk_o(m0_m0_clk)
+  );
 `else
-   assign m0_m0_clk = m0_m0_clk_def ? CLK[0] : m0_m0_clk_int;
+  assign m0_m0_clk = m0_m0_clk_def ? CLK[0] : m0_m0_clk_int;
 `endif
-   wire  m0_m1_clk_int, m0_m1_clk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u2 (
-                       .clk0_i(m0_m1_clk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_m1_clk_def),
-                       .clk_o(m0_m1_clk)
-                       );
+  wire m0_m1_clk_int, m0_m1_clk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u2 (
+      .clk0_i(m0_m1_clk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_m1_clk_def),
+      .clk_o(m0_m1_clk)
+  );
 `else
-   assign m0_m1_clk = m0_m1_clk_def ? CLK[0] : m0_m1_clk_int;
+  assign m0_m1_clk = m0_m1_clk_def ? CLK[0] : m0_m1_clk_int;
 `endif
-   
-   wire  m1_m0_clk_int, m1_m0_clk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u3 (
-                       .clk0_i(m1_m0_clk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m1_m0_clk_def),
-                       .clk_o(m1_m0_clk)
-                       );
+
+  wire m1_m0_clk_int, m1_m0_clk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u3 (
+      .clk0_i(m1_m0_clk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_m0_clk_def),
+      .clk_o(m1_m0_clk)
+  );
 `else
-   assign m1_m0_clk = m1_m0_clk_def ? CLK[0] : m1_m0_clk_int;
+  assign m1_m0_clk = m1_m0_clk_def ? CLK[0] : m1_m0_clk_int;
 `endif
-   
-   wire  m1_m1_clk_int, m1_m1_clk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u4 (
-                       .clk0_i(m1_m1_clk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m1_m1_clk_def),
-                       .clk_o(m1_m1_clk)
-                       );
+
+  wire m1_m1_clk_int, m1_m1_clk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u4 (
+      .clk0_i(m1_m1_clk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_m1_clk_def),
+      .clk_o(m1_m1_clk)
+  );
 `else
-   assign m1_m1_clk = m1_m1_clk_def ? CLK[0] : m1_m1_clk_int;
+  assign m1_m1_clk = m1_m1_clk_def ? CLK[0] : m1_m1_clk_int;
 `endif
-   
-   wire  m0_oper0_wclk_int, m0_oper0_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u5 (
-                       .clk0_i(m0_oper0_wclk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_oper0_wclk_def),
-                       .clk_o(m0_oper0_wclk)
-                       );
+
+  wire m0_oper0_wclk_int, m0_oper0_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u5 (
+      .clk0_i(m0_oper0_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_oper0_wclk_def),
+      .clk_o(m0_oper0_wclk)
+  );
 `else
-   assign m0_oper0_wclk = m0_oper0_wclk_def ? CLK[0] : m0_oper0_wclk_int;
+  assign m0_oper0_wclk = m0_oper0_wclk_def ? CLK[0] : m0_oper0_wclk_int;
 `endif
-   
-   wire  m0_oper0_rclk_int, m0_oper0_rclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u6 (
-                       .clk0_i(m0_oper0_rclk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_oper0_rclk_def),
-                       .clk_o(m0_oper0_rclk)
-                       );
+
+  wire m0_oper0_rclk_int, m0_oper0_rclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u6 (
+      .clk0_i(m0_oper0_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_oper0_rclk_def),
+      .clk_o(m0_oper0_rclk)
+  );
 `else
-   assign m0_oper0_rclk = m0_oper0_rclk_def ? CLK[0] : m0_oper0_rclk_int;
+  assign m0_oper0_rclk = m0_oper0_rclk_def ? CLK[0] : m0_oper0_rclk_int;
 `endif
-   
-   wire  m0_coef_wclk_int, m0_coef_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u7 (
-                       .clk0_i(m0_coef_wclk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_coef_wclk_def),
-                       .clk_o(m0_coef_wclk)
-                       );
+
+  wire m0_coef_wclk_int, m0_coef_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u7 (
+      .clk0_i(m0_coef_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_coef_wclk_def),
+      .clk_o(m0_coef_wclk)
+  );
 `else
-   assign m0_coef_wclk = m0_coef_wclk_def ? CLK[0] : m0_coef_wclk_int;
+  assign m0_coef_wclk = m0_coef_wclk_def ? CLK[0] : m0_coef_wclk_int;
 `endif
-   
-   wire  m0_coef_rclk_int, m0_coef_rclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u8 (
-                       .clk0_i(m0_coef_rclk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_coef_rclk_def),
-                       .clk_o(m0_coef_rclk)
-                       );
+
+  wire m0_coef_rclk_int, m0_coef_rclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u8 (
+      .clk0_i(m0_coef_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_coef_rclk_def),
+      .clk_o(m0_coef_rclk)
+  );
 `else
-   assign m0_coef_rclk = m0_coef_rclk_def ? CLK[0] : m0_coef_rclk_int;
+  assign m0_coef_rclk = m0_coef_rclk_def ? CLK[0] : m0_coef_rclk_int;
 `endif
-   
-   wire  m0_oper1_wclk_int, m0_oper1_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u9 (
-                       .clk0_i(m0_oper1_wclk_int),
-                       .clk1_i(CLK[0]),
-                       .clk_sel_i(m0_oper1_wclk_def),
-                       .clk_o(m0_oper1_wclk)
-                       );
+
+  wire m0_oper1_wclk_int, m0_oper1_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u9 (
+      .clk0_i(m0_oper1_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_oper1_wclk_def),
+      .clk_o(m0_oper1_wclk)
+  );
 `else
-   assign m0_oper1_wclk = m0_oper1_wclk_def ? CLK[0] : m0_oper1_wclk_int;
+  assign m0_oper1_wclk = m0_oper1_wclk_def ? CLK[0] : m0_oper1_wclk_int;
 `endif
-   
-   wire  m0_oper1_rclk_int, m0_oper1_rclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u10 (
-			.clk0_i(m0_oper1_rclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m0_oper1_rclk_def),
-			.clk_o(m0_oper1_rclk)
-			);
+
+  wire m0_oper1_rclk_int, m0_oper1_rclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u10 (
+      .clk0_i(m0_oper1_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m0_oper1_rclk_def),
+      .clk_o(m0_oper1_rclk)
+  );
 `else
-   assign m0_oper1_rclk = m0_oper1_rclk_def ? CLK[0] : m0_oper1_rclk_int;
+  assign m0_oper1_rclk = m0_oper1_rclk_def ? CLK[0] : m0_oper1_rclk_int;
 `endif
-   
-   wire  m1_oper0_wclk_int, m1_oper0_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u11 (
-			.clk0_i(m1_oper0_wclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_oper0_wclk_def),
-			.clk_o(m1_oper0_wclk)
-			);
+
+  wire m1_oper0_wclk_int, m1_oper0_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u11 (
+      .clk0_i(m1_oper0_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_oper0_wclk_def),
+      .clk_o(m1_oper0_wclk)
+  );
 `else
-   assign m1_oper0_wclk = m1_oper0_wclk_def ? CLK[0] : m1_oper0_wclk_int;
+  assign m1_oper0_wclk = m1_oper0_wclk_def ? CLK[0] : m1_oper0_wclk_int;
 `endif
-   
-   wire  m1_oper0_rclk_int, m1_oper0_rclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u12 (
-			.clk0_i(m1_oper0_rclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_oper0_rclk_def),
-			.clk_o(m1_oper0_rclk)
-			);
+
+  wire m1_oper0_rclk_int, m1_oper0_rclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u12 (
+      .clk0_i(m1_oper0_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_oper0_rclk_def),
+      .clk_o(m1_oper0_rclk)
+  );
 `else
-   assign m1_oper0_rclk = m1_oper0_rclk_def ? CLK[0] : m1_oper0_rclk_int;
+  assign m1_oper0_rclk = m1_oper0_rclk_def ? CLK[0] : m1_oper0_rclk_int;
 `endif
-   
-   wire  m1_coef_wclk_int, m1_coef_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u13 (
-			.clk0_i(m1_coef_wclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_coef_wclk_def),
-			.clk_o(m1_coef_wclk)
-			);
+
+  wire m1_coef_wclk_int, m1_coef_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u13 (
+      .clk0_i(m1_coef_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_coef_wclk_def),
+      .clk_o(m1_coef_wclk)
+  );
 `else
-   assign m1_coef_wclk = m1_coef_wclk_def ? CLK[0] : m1_coef_wclk_int;
+  assign m1_coef_wclk = m1_coef_wclk_def ? CLK[0] : m1_coef_wclk_int;
 `endif
-   
-   wire  m1_coef_rclk_int, m1_coef_rclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u14 (
-			.clk0_i(m1_coef_rclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_coef_rclk_def),
-			.clk_o(m1_coef_rclk)
-			);
+
+  wire m1_coef_rclk_int, m1_coef_rclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u14 (
+      .clk0_i(m1_coef_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_coef_rclk_def),
+      .clk_o(m1_coef_rclk)
+  );
 `else
-   assign m1_coef_rclk = m1_coef_rclk_def ? CLK[0] : m1_coef_rclk_int;
+  assign m1_coef_rclk = m1_coef_rclk_def ? CLK[0] : m1_coef_rclk_int;
 `endif
-   
-   wire  m1_oper1_wclk_int, m1_oper1_wclk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u15 (
-			.clk0_i(m1_oper1_wclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_oper1_wclk_def),
-			.clk_o(m1_oper1_wclk)
-			);
+
+  wire m1_oper1_wclk_int, m1_oper1_wclk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u15 (
+      .clk0_i(m1_oper1_wclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_oper1_wclk_def),
+      .clk_o(m1_oper1_wclk)
+  );
 `else
-   assign m1_oper1_wclk = m1_oper1_wclk_def ? CLK[0] : m1_oper1_wclk_int;
+  assign m1_oper1_wclk = m1_oper1_wclk_def ? CLK[0] : m1_oper1_wclk_int;
 `endif
-   
-   wire  m1_oper1_rclk_int, m1_oper1_rclk_def;
-   
-`ifndef FPGA 
-   pulp_clock_mux2 u16 (
-			.clk0_i(m1_oper1_rclk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(m1_oper1_rclk_def),
-			.clk_o(m1_oper1_rclk)
-			);
+
+  wire m1_oper1_rclk_int, m1_oper1_rclk_def;
+
+`ifndef FPGA
+  pulp_clock_mux2 u16 (
+      .clk0_i(m1_oper1_rclk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(m1_oper1_rclk_def),
+      .clk_o(m1_oper1_rclk)
+  );
 `else
-   assign m1_oper1_rclk = m1_oper1_rclk_def ? CLK[0] : m1_oper1_rclk_int;
+  assign m1_oper1_rclk = m1_oper1_rclk_def ? CLK[0] : m1_oper1_rclk_int;
 `endif
-   
-   wire  lint_clk_int, lint_clk_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u17 (
-			.clk0_i(lint_clk_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(lint_clk_def),
-			.clk_o(lint_clk)
-			);
+
+  wire lint_clk_int, lint_clk_def;
+`ifndef FPGA
+  pulp_clock_mux2 u17 (
+      .clk0_i(lint_clk_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(lint_clk_def),
+      .clk_o(lint_clk)
+  );
 `else
-   assign lint_clk = lint_clk_def ? CLK[0] : lint_clk_int;
+  assign lint_clk = lint_clk_def ? CLK[0] : lint_clk_int;
 `endif
-   
-   wire  tcdm_clk_p0_int, tcdm_clk_p0_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u18 (
-			.clk0_i(tcdm_clk_p0_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(tcdm_clk_p0_def),
-			.clk_o(tcdm_clk_p0)
-			);
+
+  wire tcdm_clk_p0_int, tcdm_clk_p0_def;
+`ifndef FPGA
+  pulp_clock_mux2 u18 (
+      .clk0_i(tcdm_clk_p0_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(tcdm_clk_p0_def),
+      .clk_o(tcdm_clk_p0)
+  );
 `else
-   assign tcdm_clk_p0 = tcdm_clk_p0_def ? CLK[0] : tcdm_clk_p0_int;
+  assign tcdm_clk_p0 = tcdm_clk_p0_def ? CLK[0] : tcdm_clk_p0_int;
 `endif
-   
-   wire  tcdm_clk_p1_int, tcdm_clk_p1_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u19 (
-			.clk0_i(tcdm_clk_p1_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(tcdm_clk_p1_def),
-			.clk_o(tcdm_clk_p1)
-			);
+
+  wire tcdm_clk_p1_int, tcdm_clk_p1_def;
+`ifndef FPGA
+  pulp_clock_mux2 u19 (
+      .clk0_i(tcdm_clk_p1_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(tcdm_clk_p1_def),
+      .clk_o(tcdm_clk_p1)
+  );
 `else
-   assign tcdm_clk_p1 = tcdm_clk_p1_def ? CLK[0] : tcdm_clk_p1_int;
+  assign tcdm_clk_p1 = tcdm_clk_p1_def ? CLK[0] : tcdm_clk_p1_int;
 `endif
-   
-   wire  tcdm_clk_p2_int, tcdm_clk_p2_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u20 (
-			.clk0_i(tcdm_clk_p2_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(tcdm_clk_p2_def),
-			.clk_o(tcdm_clk_p2)
-			);
+
+  wire tcdm_clk_p2_int, tcdm_clk_p2_def;
+`ifndef FPGA
+  pulp_clock_mux2 u20 (
+      .clk0_i(tcdm_clk_p2_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(tcdm_clk_p2_def),
+      .clk_o(tcdm_clk_p2)
+  );
 `else
-   assign tcdm_clk_p2 = tcdm_clk_p2_def ? CLK[0] : tcdm_clk_p2_int;
+  assign tcdm_clk_p2 = tcdm_clk_p2_def ? CLK[0] : tcdm_clk_p2_int;
 `endif
-   
-   wire  tcdm_clk_p3_int, tcdm_clk_p3_def;
-`ifndef FPGA 
-   pulp_clock_mux2 u21 (
-			.clk0_i(tcdm_clk_p3_int),
-			.clk1_i(CLK[0]),
-			.clk_sel_i(tcdm_clk_p3_def),
-			.clk_o(tcdm_clk_p3)
-			);
+
+  wire tcdm_clk_p3_int, tcdm_clk_p3_def;
+`ifndef FPGA
+  pulp_clock_mux2 u21 (
+      .clk0_i(tcdm_clk_p3_int),
+      .clk1_i(CLK[0]),
+      .clk_sel_i(tcdm_clk_p3_def),
+      .clk_o(tcdm_clk_p3)
+  );
 `else
-   assign tcdm_clk_p3 = tcdm_clk_p3_def ? CLK[0] : tcdm_clk_p3_int;
+  assign tcdm_clk_p3 = tcdm_clk_p3_def ? CLK[0] : tcdm_clk_p3_int;
 `endif
-   
-     
+
+
 
 
   //  ql737b_top A2 (
   QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 A2 (
-//       .vddz(VDDC_FPGA),
+      //       .vddz(VDDC_FPGA),
       .A2F_CLK0(CLK[0]),
       .A2F_CLK1(CLK[1]),
       .A2F_CLK2(CLK[2]),

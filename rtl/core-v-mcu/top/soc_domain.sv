@@ -88,7 +88,14 @@ module soc_domain
     input  logic        jtag_tms_i,
     input  logic        jtag_tdi_i,
     output logic        jtag_tdo_o,
-    inout AVDD,AVDD2,AVSS,VDDC,VSSC,VDDC_FPGA,NB,PB
+    inout               AVDD,
+    AVDD2,
+    AVSS,
+    VDDC,
+    VSSC,
+    VDDC_FPGA,
+    NB,
+    PB
 
     //    output logic [NB_CORES-1:0] cluster_dbg_irq_valid_o
     ///////////////////////////////////////////////////
@@ -150,10 +157,13 @@ module soc_domain
 
 
   localparam dm::hartinfo_t RI5CY_HARTINFO = '{
-       zero1:        '0,
-       nscratch:      2, // Debug module needs at least two scratch regs
-  zero0: '0, dataaccess: 1'b1,  // data registers are memory mapped in the debugger
-  datasize: dm::DataCount, dataaddr: dm::DataAddr};
+      zero1: '0,
+      nscratch: 2,  // Debug module needs at least two scratch regs
+      zero0: '0,
+      dataaccess: 1'b1,  // data registers are memory mapped in the debugger
+      datasize: dm::DataCount,
+      dataaddr: dm::DataAddr
+  };
 
   dm::hartinfo_t [                 NrHarts-1:0      ] hartinfo;
 
@@ -363,18 +373,23 @@ module soc_domain
       .cl_event_data_o(s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),
       .cl_event_ready_i(s_cl_event_ready),
-      .AVDD(AVDD),.AVDD2(AVDD2),.AVSS(AVSS),
-      .VDDC(VDDC),.VSSC(VSSC),
-      .NB(NB),.PB(PB), .VDDC_FPGA(VDDC_FPGA)
-                       
+      .AVDD(AVDD),
+      .AVDD2(AVDD2),
+      .AVSS(AVSS),
+      .VDDC(VDDC),
+      .VSSC(VSSC),
+      .NB(NB),
+      .PB(PB),
+      .VDDC_FPGA(VDDC_FPGA)
+
   );
 
 `ifndef PULP_FPGA_EMUL
   edge_propagator_rx ep_pf_evt_i (
-      .clk_i  (s_soc_clk),
-      .rstn_i (1'b0),  //s_rstn_cluster_sync_soc),
+      .clk_i(s_soc_clk),
+      .rstn_i(1'b0),  //s_rstn_cluster_sync_soc),
       .valid_o(s_pf_evt),
-      .ack_o  (pf_evt_ack_o),
+      .ack_o(pf_evt_ack_o),
       .valid_i(pf_evt_valid_i)
   );
 `endif
@@ -426,7 +441,7 @@ module soc_domain
       .IdcodeValue(`DMI_JTAG_IDCODE)
   ) i_dmi_jtag (
       .clk_i           (s_soc_clk),
-      .rst_ni          (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni          (rstn_glob_i),      //(s_soc_rstn),
       .testmode_i      (1'b0),
       .dmi_req_o       (jtag_dmi_req),
       .dmi_req_valid_o (jtag_req_valid),
@@ -434,7 +449,7 @@ module soc_domain
       .dmi_resp_i      (debug_resp),
       .dmi_resp_ready_o(jtag_resp_ready),
       .dmi_resp_valid_i(jtag_resp_valid),
-      .dmi_rst_no      (),  // not connected
+      .dmi_rst_no      (),                 // not connected
       .tck_i           (jtag_tck_i),
       .tms_i           (jtag_tms_i),
       .trst_ni         (jtag_trst_ni),
@@ -461,10 +476,10 @@ module soc_domain
       .SelectableHarts(SELECTABLE_HARTS)
   ) i_dm_top (
       .clk_i        (s_soc_clk),
-      .rst_ni       (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni       (rstn_glob_i),        //(s_soc_rstn),
       .testmode_i   (1'b0),
       .ndmreset_o   (s_periph_rst),
-      .dmactive_o   (s_dmactive),  // active debug session
+      .dmactive_o   (s_dmactive),         // active debug session
       .debug_req_o  (dm_debug_req),
       .unavailable_i(~SELECTABLE_HARTS),
       .hartinfo_i   (hartinfo),
@@ -485,7 +500,7 @@ module soc_domain
       .master_r_valid_i(s_lint_riscv_jtag_bus.r_valid),
       .master_r_rdata_i(s_lint_riscv_jtag_bus.r_rdata),
 
-      .dmi_rst_ni      (rstn_glob_i),  //(s_soc_rstn),
+      .dmi_rst_ni      (rstn_glob_i),      //(s_soc_rstn),
       .dmi_req_valid_i (jtag_req_valid),
       .dmi_req_ready_o (debug_req_ready),
       .dmi_req_i       (jtag_dmi_req),
