@@ -1,10 +1,12 @@
 //-----------------------------------------------------------------------------
-// Title :  CLK Gen for PULPissimo
+// Title : FPGA CLK Gen for Core-V-MCU
 // -----------------------------------------------------------------------------
-// File : sim_clk_gen.sv Author : Tim Saxe
-// Created : 2021-05-22
+// File : fpga_clk_gen.sv Author : Manuel Eggimann <meggimann@iis.ee.ethz.ch>
+// Created : 17.05.2019
 // -----------------------------------------------------------------------------
-// Description : Passes ref_clk thru
+// Description : Instantiates Xilinx clocking wizard IP to generate 2 output
+// clocks. Currently, the clock is not dynamicly reconfigurable and all
+// configuration requests are acknowledged without any effect.
 // -----------------------------------------------------------------------------
 // Copyright (C) 2021 QUickLogic Copyright and
 // related rights are licensed under the Solderpad Hardware License, Version
@@ -37,8 +39,8 @@ module apb_pll
  input logic                      PENABLE,
  output logic [31:0]              PRDATA,
  output logic                     PREADY,
- output logic                     PSLVERR
-
+ output logic                     PSLVERR,
+    inout AVDD,AVDD2,AVSS,VDDC,VSSC
 
 );
 

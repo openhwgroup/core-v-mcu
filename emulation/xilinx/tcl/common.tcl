@@ -10,6 +10,8 @@ if [info exists ::env(XILINX_BOARD)] {
 }
 set partNumber $::env(XILINX_PART)
 
+set_property verilog_define FPGA=true [current_fileset]
+
 # sets up Vivado messages in a more sensible way
 set_msg_config -id {[Synth 8-689]}          -new_severity "error";            # Port width mismatch: can mean no real connection
 set_msg_config -id {[Synth 8-3352]}         -new_severity "critical warning"

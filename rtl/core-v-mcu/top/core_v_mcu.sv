@@ -27,7 +27,8 @@ module core_v_mcu #(
     input  [`N_IO-1:0]                   io_in_i,
     output [`N_IO-1:0]                   io_out_o,
     output [`N_IO-1:0][`NBIT_PADCFG-1:0] pad_cfg_o,
-    output [`N_IO-1:0]                   io_oe_o
+    output [`N_IO-1:0]                   io_oe_o,
+    inout AVDD,AVDD2,AVSS,VDDC,VSSC,VDDC_FPGA,NB,PB
 );
 
   localparam AXI_ADDR_WIDTH = 32;
@@ -44,7 +45,6 @@ module core_v_mcu #(
 
   localparam CVP_ADDR_WIDTH = 32;
   localparam CVP_DATA_WIDTH = 32;
-
 
   //
   // OTHER PAD FRAME SIGNALS
@@ -219,7 +219,10 @@ module core_v_mcu #(
 
       //eFPGA TEST MODE
       .testio_i(testio_i),
-      .testio_o(testio_o)
+      .testio_o(testio_o),
+      .AVDD(AVDD),.AVDD2(AVDD2),.AVSS(AVSS),
+      .VDDC(VDDC),.VSSC(VSSC),
+      .NB(NB),.PB(PB), .VDDC_FPGA(VDDC_FPGA)
 
   );
 

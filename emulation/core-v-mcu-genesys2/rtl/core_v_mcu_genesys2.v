@@ -23,9 +23,7 @@
 module core_v_mcu_genesys2
   (
     inout wire [`N_IO-1:0]  xilinx_io,
-    input wire  sysclk_p,
-    input wire  sysclk_n,
-    input wire  ref_clk
+    input wire  sysclk_p, sysclk_n
   );
 
   wire private_net;
@@ -66,14 +64,9 @@ module core_v_mcu_genesys2
   ) i_sysclk_iobuf (
     .I(sysclk_p),
     .IB(sysclk_n),
-    .O(s_io_in[5])
+    .O(s_ref_clk)
   );
 
-  fpga_slow_clk_gen i_slow_clk_gen (
-    .rst_ni(s_io_in[6]),
-    .clk_i(s_slow_clk),
-    .ref_clk_o(private_net)
-    );
   IBUF rstn_buf (
     .I(xilinx_io[6]), .O(s_io_in[6]));
   pad_functional_pu i_pad_7   (.OEN(~s_io_oe[7]), .I(s_io_out[7]), .O(s_io_in[7]), .PAD(xilinx_io[7]), .PEN(~s_pad_cfg[7][0]));
@@ -121,7 +114,6 @@ module core_v_mcu_genesys2
       assign s_jtag_tdi = s_io_in[1];
       assign s_jtag_tms = s_io_in[3];
       assign s_jtag_trst = s_io_in[4];
-      assign s_sysclk_p = s_io_in[5];
       assign s_rstn = s_io_in[6];
       assign s_stm = s_io_in[44];
       assign s_bootsel = s_io_in[45];
@@ -131,11 +123,10 @@ module core_v_mcu_genesys2
     .jtag_tdo_o(s_jtag_tdo),
     .jtag_tms_i(s_jtag_tms),
     .jtag_trst_i(s_jtag_trst),
-    .ref_clk_i(private_net),
+    .ref_clk_i(s_ref_clk),
     .rstn_i(s_rstn),
     .stm_i(s_stm),
     .bootsel_i(s_bootsel),
-    .slow_clk_o(s_slow_clk),
     .io_out_o(s_io_out),
     .io_oe_o(s_io_oe),
     .io_in_i(s_io_in),

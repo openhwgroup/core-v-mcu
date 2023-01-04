@@ -87,7 +87,9 @@ module soc_domain
     input  logic        jtag_trst_ni,
     input  logic        jtag_tms_i,
     input  logic        jtag_tdi_i,
-    output logic        jtag_tdo_o
+    output logic        jtag_tdo_o,
+    inout AVDD,AVDD2,AVSS,VDDC,VSSC,VDDC_FPGA,NB,PB
+
     //    output logic [NB_CORES-1:0] cluster_dbg_irq_valid_o
     ///////////////////////////////////////////////////
 );
@@ -360,8 +362,11 @@ module soc_domain
       .testio_o(testio_o),
       .cl_event_data_o(s_cl_event_data),
       .cl_event_valid_o(s_cl_event_valid),
-      .cl_event_ready_i(s_cl_event_ready)
-
+      .cl_event_ready_i(s_cl_event_ready),
+      .AVDD(AVDD),.AVDD2(AVDD2),.AVSS(AVSS),
+      .VDDC(VDDC),.VSSC(VSSC),
+      .NB(NB),.PB(PB), .VDDC_FPGA(VDDC_FPGA)
+                       
   );
 
 `ifndef PULP_FPGA_EMUL

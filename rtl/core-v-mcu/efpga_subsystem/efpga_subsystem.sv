@@ -42,7 +42,9 @@ module efpga_subsystem #(
 
     //eFPGA TEST MODE
     output logic [15:0] testio_o,
-    input  logic [20:0] testio_i
+    input  logic [20:0] testio_i,
+   inout VSSC,VDDC_FPGA,NB,PB   
+
 );
 
   // FCB Test
@@ -469,7 +471,6 @@ module efpga_subsystem #(
   );
 
   eFPGA_wrapper eFPGA_wrapper (
-
       //Outputs
       .test_fb_spe_out(efpga_test_FB_SPE_OUT_o),
       .test_fb_spe_in(efpga_test_FB_SPE_IN_i),
@@ -598,7 +599,10 @@ module efpga_subsystem #(
       .tcdm_be_p0(tcdm_be_fpga[0]),
       .tcdm_be_p1(tcdm_be_fpga[1]),
       .tcdm_be_p2(tcdm_be_fpga[2]),
-      .tcdm_be_p3(tcdm_be_fpga[3])
+      .tcdm_be_p3(tcdm_be_fpga[3]),
+      .VSSC(VSSC),
+      .NB(NB),.PB(PB), .VDDC_FPGA(VDDC_FPGA)
+                                         
   );
 
 endmodule

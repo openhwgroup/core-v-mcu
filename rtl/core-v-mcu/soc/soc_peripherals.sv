@@ -85,8 +85,8 @@ module soc_peripherals #(
 
     output logic [EVNT_WIDTH-1:0] cl_event_data_o,
     output logic                  cl_event_valid_o,
-    input  logic                  cl_event_ready_i
-
+    input  logic                  cl_event_ready_i,
+   inout AVDD,AVDD2,AVSS,VDDC,VSSC,VDDC_FPGA,NB,PB
 );
 
 
@@ -301,7 +301,9 @@ module soc_peripherals #(
       .soc_clk_o(soc_clk_o),
       .periph_clk_o(s_periph_clk),
       .cluster_clk_o(s_fpga_clk),
-      .ref_clk_o(s_ref_clk)
+      .ref_clk_o(s_ref_clk),
+      .AVDD(AVDD),.AVDD2(AVDD2),.AVSS(AVSS),
+      .VDDC(VDDC),.VSSC(VSSC)
   );
 
   /*
@@ -674,7 +676,8 @@ module soc_peripherals #(
       .efpga_event_o(s_efpga_events),
       //eFPGA TEST MODE
       .testio_i(testio_i),
-      .testio_o(testio_o)
+      .testio_o(testio_o),
+      .NB(NB),.PB(PB), .VDDC_FPGA(VDDC_FPGA)
   );
 
   ///////////////////////////////////////////////////////////////

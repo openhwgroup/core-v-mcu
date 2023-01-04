@@ -177,7 +177,6 @@ filesets:
     files:
     - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
     - emulation/xilinx/rtl/fpga_clk_gen.sv
-#    - rtl/apb_fll_if/apb_pll.sv  #change to emulation/xilinx/rtl/apb_pll.sv
     file_type: systemVerilogSource
 
   nexys-xdc:
@@ -262,7 +261,7 @@ targets:
     tools:
       modelsim:
         vlog_options:
-        - -override_timescale 1ps/1ps
+        - -override_timescale 1ns/1ps
         - -suppress vlog-2583
         vsim_options:
         - -sv_lib ../../../tb/uartdpi/uartdpi -voptargs="-O1 +acc"

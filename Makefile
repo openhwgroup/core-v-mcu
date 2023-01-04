@@ -165,7 +165,6 @@ genesys-emul:
 				@echo "* setting up genesys2 specific files   *"
 				@echo "*                                   *"
 				@echo "*************************************"
-#
 				mkdir -p emulation/core-v-mcu-genesys2/rtl
 				python3 util/ioscript.py\
 					--soc-defines rtl/includes/pulp_soc_defines.svh\
@@ -174,9 +173,9 @@ genesys-emul:
 					--pin-table genesys2-pin-table.csv\
 					--perdef-json perdef.json\
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
+					--xilinx-core-v-mcu-sv emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v\
 					--emulation-toplevel core_v_mcu_genesys2\
 					--input-xdc emulation/core-v-mcu-genesys2/constraints/Genesys2-Master.xdc\
-					--xilinx-core-v-mcu-sv emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v\
 					--output-xdc emulation/core-v-mcu-genesys2/constraints/core-v-mcu-pin-assignment.xdc
 				util/format-verible
 				@echo "*************************************"

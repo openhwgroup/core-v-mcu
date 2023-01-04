@@ -36,7 +36,8 @@ module apb_pll # (
     input logic                      PENABLE,
     output logic [31:0]              PRDATA,
     output logic                     PREADY,
-    output logic                     PSLVERR
+    output logic                     PSLVERR,
+    inout AVDD,AVDD2,AVSS,VDDC,VSSC
     );
 
    logic                             PD; // PLL powerdown
@@ -186,11 +187,11 @@ module apb_pll # (
                  .CLK(),
                  .LOCK(LOCK),
                  
-                 .AVDD(1'b1),
-                 .AVDD2(1'b1),
-                 .AVSS(1'b0),
-                 .DVDD(1'b1),
-                 .DVSS(1'b1),
+                 .AVDD(AVDD),
+                 .AVDD2(AVDD2),
+                 .AVSS(AVSS),
+                 .DVDD(VDDC),
+                 .DVSS(VSSC),
                  
                  .FREF(ref_clk_i),
                  .DM(DM),
@@ -329,23 +330,27 @@ module clk_dmux
           selB <= 2'b00;
        else
           selB <= {selB[0],(~selA[1] & sel_i)};
-  end
-   
-   always_latch begin
-      if (clkinA_i == 1'b0)
-        enaA = selA[1];
-      clkoutA = enaA & clkinA_i;
-   end
-   
-   always_latch begin
-      if (clkinB_i == 1'b0)
-        enaB = selB[1];
-      clkoutB = enaB & clkinB_i;
-   end
+    end
+   pulp_clock_gating u1 (
+                         .clk_i(clkinA_i),
+                         .en_i(selA[1]),
+                         .test_en_i(1'b0),
+                         .clk_o(clkoutA)
+                         );
 
-   always_comb begin
-     clkout_o = clkoutA | clkoutB;
-   end
+   pulp_clock_gating u2 (
+                         .clk_i(clkinB_i),
+                         .en_i(selB[1]),
+                         .test_en_i(1'b0),
+                         .clk_o(clkoutB)
+                         );
+   pulp_clock_mux2 u3 (
+                       .clk0_i(clkoutA),
+                       .clk1_i(clkoutB),
+                       .clk_sel_i(selB[1]),
+                       .clk_o(clkout_o)
+                       );
+   
 
 endmodule // clk_mux
 
