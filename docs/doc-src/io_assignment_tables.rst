@@ -20,22 +20,25 @@
 
 I/O Assignment Tables
 =====================
+
 CORE-V-MCU Integration suggests that the MCU supports nine dedicated-function ports and a set of 48 user-selectable IO ports.
-Note that only 40 of the user-selectable IO ports are available to the user.
-Also, since the number of user-selectable IO ports is less than the total number of I/O signals supported by the CORE-V-MCU's internal peripheral functions,
-an internal IO-MUX is used to connect a subset of peripheral I/O to top-level CORE-V-MCU IO ports.
-Control of the IO-MUX is via the **IO_CTRL** CSRs starting at offset 0x0400.
+However, the number of user-selectable IO ports is less than the total number of I/O signals supported by the CORE-V-MCU's internal peripheral functions.
+An internal IO-MUX is used to connect a subset of peripheral I/O to top-level CORE-V-MCU IO ports.
 The peripheral functions selectable via the IO-MUX are:
 
 * **uart0..1**: I/O signals for one of two simple Universal Asynchronous Receiver/Transmitters.
 * **qspim0..1**: I/O signals for one of two Queued Serial Peripheral Interface masters.
 * **i2cm0..1**: I/O signals for one of two Inter-Integrated Circuit bus masters.
 * **i2cs**: I/O signals for the Inter-Integrated Circuit bus slave.
-* **gpio_0..31**: One of 32 general purpose I/O signals.
-* **pwm_chX.Y**: Outputs of four PWMs supported by the module.
+* **gpio_0..31**: One of 32 general purpose I/O signals driven by the GPIO module.
+* **pwm_chX.Y**: Outputs of four PWMs supported by the Advanced Timer module.
 * **fpgaio_0..31**: One of 32 general purpose I/O signals driven by the eFPGA.
 * **cam0**: Camera (cpi) interface.
 * **sdio**: SDIO Card.
+
+Per-port control of the IO-MUX is via the **IO_CTRL[0..47]** CSRs starting at offset 0x0400.
+**Note**: only 40 of the user-selectable IO ports are available to the user.
+These are IO_[7..43] and IO_[45..47].
 
 The table below provides the mapping between the above peripheral I/O and the 40 user-selectable IO ports of the CORE-V-MCU.
 Headings have the following meaning:
@@ -43,23 +46,10 @@ Headings have the following meaning:
 * **IO_PORT**: user-selectable top-level port of core-v-mcu.sv.
 * **IO_CTRL.MUX=0..3**: the value of the MUX field of the IO_CTRL CSR for the specified IO_PORT.
 
-
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
 | IO_PORT   | IO_CTRL.MUX=0 | IO_CTRL.MUX=1 | IO_CTRL.MUX=2 | IO_CTRL.MUX=3 | Note                                        |
 +===========+===============+===============+===============+===============+=============================================+
-| IO_0      |               |               |               |               | IO_0 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_1      |               |               |               |               | IO_1 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_2      |               |               |               |               | IO_2 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_3      |               |               |               |               | IO_3 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_4      |               |               |               |               | IO_4 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_5      |               |               |               |               | IO_5 not selectable                         |
-+-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_6      |               |               |               |               | IO_6 not selectable                         |
+| IO_0..6   | IO_0..6 are not selectable                                                                                  |
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
 | IO_7      | uart0_rx      |               | gpio_0        | efpgaio_0     | gpio_0 may also appear on IO_12 or IO_43    |
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
@@ -135,7 +125,7 @@ Headings have the following meaning:
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
 | IO_43     | i2cs_intr     | gpio_0        | pwm_ch3.2     | efpgaio_36    | gpio_0 may also appear on IO_7 or IO_12     |
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
-| IO_44     |               |               |               |               | IO_44 not selectable                        |
+| IO_44     | IO_44 not selectable                                                                                        |
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
 | IO_45     |               |               |               | efpgaio_37    |                                             |
 +-----------+---------------+---------------+---------------+---------------+---------------------------------------------+
