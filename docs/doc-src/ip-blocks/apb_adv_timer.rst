@@ -24,17 +24,19 @@ A typical use of the Advanced Timer is PWM generation.
 
 Features
 --------
-- multiple trigger input sources:
-   - output signal channels of all timers
-   - 32 GPIOs
-   - reference clock at 32kHz
-   - FLL clock
-- configurable input trigger modes
-- configurable prescaler for each timer
-- configurable counting mode for each timer
-- configurable channel threshold action for each timer
-- four configurable output events
-- configurable clock gating of each timer
+* multiple trigger input sources:
+
+   * output signal channels of all timers
+   * 32 GPIOs
+   * reference clock at 32kHz
+   * FLL clock
+
+* configurable input trigger modes
+* configurable prescaler for each timer
+* configurable counting mode for each timer
+* configurable channel threshold action for each timer
+* four configurable output events
+* configurable clock gating of each timer
 
 Theory of Operation
 -------------------
