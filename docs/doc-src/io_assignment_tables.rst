@@ -38,7 +38,7 @@ The peripheral functions selectable via the IO-MUX are:
 
 Per-port control of the IO-MUX is via the **IO_CTRL[0..47]** CSRs starting at offset 0x0400.
 **Note**: only 40 of the user-selectable IO ports are available to the user.
-These are IO_[7..43] and IO_[45..47].
+These are IO_7 to IO_43 and IO_45 to IO_47.
 
 The table below provides the mapping between the above peripheral I/O and the 40 user-selectable IO ports of the CORE-V-MCU.
 Headings have the following meaning:
