@@ -82,13 +82,13 @@ The CORE-V-MCU supports three subsystems
 
 Fabric Control Subsystem
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The Fabric Control (FC) subsystem is accesses the L2 TCDM Interconnect (the _fabric_) such that it sees all resources of the CORE-V-MCU in a single, flat memory space.
-The principle componet of the FC subsystem is the CV32E40P processor core.
+The Fabric Control (FC) subsystem accesses the L2 TCDM Interconnect (the *fabric*) such that it sees all resources of the CORE-V-MCU in a single, flat memory space.
+The sole component of the FC subsystem is the CV32E40P processor core.
 
 Micro-DMA Subsystem
 ~~~~~~~~~~~~~~~~~~~
 The micro-DMA (uDMA) manages data transfer to/from memory for a set of peripherals.
-Its connections to the L2 TCDM Interconnect provide low-latency access to the interleaved data memories.
+Its connections to the L2 TCDM Interconnect provide high-bandwidth, low-latency access to the interleaved data memories.
 Note that the uDMA cannot access the non-interleaved memories or the boot ROM.
 Peripherals supported by the uDMA are:
 
@@ -100,7 +100,7 @@ Peripherals supported by the uDMA are:
 
 Quicklogic Embedded FPGA
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The eFPGA also connects to the interleaved data memories via the L2 TCDM Interconnect.
+The eFPGA connects to the interleaved data memories via the L2 TCDM Interconnect.
 Note that there are four TCDM buses between the L2 TCDM Interconnect and the eFPGA allowing for eFPGA implementations to support high memory bandwidth requirements.
 
 Other Functional Units

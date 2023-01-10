@@ -60,48 +60,20 @@ CORE-V-MCU User Manual
 
 
 ..  toctree::
-    :caption: Subsystem CSRs:
-    :maxdepth: 1
-    :glob:
-
-    doc-src/csr-docs/udma_ctrl_reg_defs.md
-    doc-src/csr-docs/efpga_template_reg_defs.md
-
-
-..  toctree::
     :caption: CORE-V-MCU IP Blocks:
     :maxdepth: 1
     :glob:
 
-    doc-src/ip-blocks/apb_adv_timer.md
+    doc-src/ip-blocks/apb_adv_timer.rst
     doc-src/ip-blocks/apb_soc_ctrl.rst
-    doc-src/ip-blocks/apb_fll_if.md
-    doc-src/ip-blocks/apb_gpio.md
-    doc-src/ip-blocks/apb_timer.md
-    doc-src/ip-blocks/apb_i2cs.md
+    doc-src/ip-blocks/apb_fll_if.rst
+    doc-src/ip-blocks/apb_gpio.rst
+    doc-src/ip-blocks/apb_timer.rst
+    doc-src/ip-blocks/apb_i2cs.rst
     doc-src/ip-blocks/apb_event_cntrl.rst
-    doc-src/ip-blocks/udma_cam.md
-    doc-src/ip-blocks/udma_i2cm.md
-    doc-src/ip-blocks/udma_sdio.md
+    doc-src/ip-blocks/udma_cam.rst
+    doc-src/ip-blocks/udma_i2cm.rst
+    doc-src/ip-blocks/udma_sdio.rst
     doc-src/ip-blocks/udma_qspim.rst
-    doc-src/ip-blocks/udma_uart.md
-
-
-..  toctree::
-    :caption: IP Block CSRs:
-    :maxdepth: 1
-    :glob:
-
-    doc-src/csr-docs/apb_adv_timer_reg_defs.md
-    doc-src/csr-docs/apb_soc_ctrl_reg_defs.md
-    doc-src/csr-docs/apb_fll_if_reg_defs.md
-    doc-src/csr-docs/apb_gpio_reg_defs.md
-    doc-src/csr-docs/apb_timer_unit_reg_defs.md
-    doc-src/csr-docs/apb_i2cs_reg_defs.md
-    doc-src/csr-docs/apb_event_cntrl_reg_defs.md
-    doc-src/csr-docs/udma_camera_reg_defs.md
-    doc-src/csr-docs/udma_i2cm_reg_defs.md
-    doc-src/csr-docs/udma_sdio_reg_defs.md
-    doc-src/csr-docs/udma_qspi_reg_defs.md
-    doc-src/csr-docs/udma_uart_reg_defs.md
+    doc-src/ip-blocks/udma_uart.rst
 
