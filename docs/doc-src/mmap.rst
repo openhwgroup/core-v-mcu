@@ -1,5 +1,24 @@
+..
+   Copyright (c) 2023 OpenHW Group
+
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+.. Level 1
+   =======
+
+   Level 2
+   -------
+
+   Level 3
+   ~~~~~~~
+
+   Level 4
+   ^^^^^^^
+
+.. _memory_map:
+
 Memory Map
-^^^^^^^^^^
+==========
 
 This table reports the "Top-Level" memory address map as seen by the core.
 The Peripheral and eFPGA domains are address ranges which support a set of memory mapped peripherals and the eFPGA resources respectively.
@@ -57,7 +76,7 @@ Note that the stdout emulator works only with RTL simulation and not with FPGA o
 
 
 CSR Access Types:
-~~~~~~~~~~~~~~~~~
+-----------------
 
 +-------------+---------------------------------------------------------------------+
 | Access Type | Description                                                         |
@@ -82,7 +101,7 @@ CSR Access Types:
 +-------------+---------------------------------------------------------------------+
 
 Implementation Details
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 The Top-level address map is defined in
 `core-v-mcu/rtl/includes/soc_mem_map.svh <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/includes/soc_mem_map.svh>`_.
 

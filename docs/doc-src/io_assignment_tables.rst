@@ -2,7 +2,7 @@
    Copyright (c) 2023 OpenHW Group
    Copyright 2018 ETH Zurich and University of Bologna.
 
-   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 .. Level 1
    =======

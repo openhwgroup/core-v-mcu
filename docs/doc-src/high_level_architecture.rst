@@ -1,6 +1,6 @@
 ..
    Copyright (c) 2022 OpenHW Group
-   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 .. Level 1
    =======

@@ -2,7 +2,7 @@
    Copyright (c) 2023 OpenHW Group
    Copyright 2018 ETH Zurich and University of Bologna.
 
-   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 .. Level 1
    =======
@@ -44,7 +44,7 @@ In addition to the above, a small set of support peripherals is available to the
 * Simple Timers
 
 The UARTs, I2C masters, QSPI, SDIO and Camera periphals transfer data to and from on-chip memory via a micro-DMA unit.
-With the exception of the eFPGA, all of the above are open source artifacts, permissively licensed under Soldpad 2.0.
+With the exception of the eFPGA, all of the above are open source artifacts, permissively licensed under Soldpad 2.1.
 
 License
 -------
@@ -52,7 +52,7 @@ Copyright 2022, 2023 OpenHW Group.
 
 Copyright 2018 ETH Zurich and University of Bologna.
 
-Copyright and related rights are licensed under the Solderpad Hardware License, Version 2.0 or newer (the “License”);
+Copyright and related rights are licensed under the Solderpad Hardware License, Version 2.1 or newer (the “License”);
 you may not use CORE-V-MCU source files except in compliance with the License.
 You may obtain a copy of the License at http://solderpad.org/licenses.
 Unless required by applicable law or agreed to in writing, software, hardware and materials distributed under this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,6 +84,11 @@ In addition to the above, the CORE-V-MCU supports peripherals that adhere to one
 
 Who Should Read This Document
 -----------------------------
+The principle audience of this document are *users* of the CORE-V-MCU ASIC or FPGA implementations, primarily verification and/or software engineers.
+Although some aspects of the RTL implementation are discussed, this document is not a description of the micro-architecture of the CORE-V-MCU, nor does it describe in detail the structure of the RTL.
+
+CORE-V-MCU Configurations
+-------------------------
 The source repository for this document is https://github.com/openhwgroup/core-v-mcu.git.
 This repository contains the RTL model of the CORE-V-MCU, a simple simulation testbench, plus a set of Makefiles, FuseSoC core files and scripts to generate several physical implementations:
 
@@ -91,12 +96,6 @@ This repository contains the RTL model of the CORE-V-MCU, a simple simulation te
 - Digilent Nexys A7 with the Xilinx Artix-7 XC7A100T FPGA.
 - Digilent Genesys 2 with the Xilinx Kintex-7 XC7K325T FPGA.
 
-The principle audience of this document are *users* of the CORE-V-MCU ASIC or FPGA implementations, primarily software developers.
-
-This document is not a description of the micro-architecture of the CORE-V-MCU, nor does it describe in detail the structure of the RTL.
-
-Configuring CORE-V-MCU
-----------------------
 The open source nature of this project enables the user to port the CORE-V-MCU to almost any implementation technology and to alter is configuration.
 In fact, the repository is organizated to simplify the task of customizing an implementation.
 For example, a set of macros (tick defines) in ``rtl/includes/pulp_soc_defines.svh`` defines which micro-DRAM peripherals (and how many) are incorporated in the build.
