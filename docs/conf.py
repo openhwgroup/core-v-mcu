@@ -1,3 +1,7 @@
+# Copyright 2022 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -30,7 +34,6 @@ author = 'OpenHW Group Contributors'
 extensions = [
     'recommonmark',
     'sphinx_markdown_tables',
-#    'sphinx.ext.autosectionlabel',
 ]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -3,6 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
 recommonmark
-sphinx
+sphinx>=4.3.0
 sphinx_markdown_tables
-sphinx_rtd_theme
+sphinx_rtd_theme>=0.5.1
