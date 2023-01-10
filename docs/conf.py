@@ -30,6 +30,7 @@ author = 'OpenHW Group Contributors'
 extensions = [
     'recommonmark',
     'sphinx_markdown_tables',
+#    'sphinx.ext.autosectionlabel',
 ]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

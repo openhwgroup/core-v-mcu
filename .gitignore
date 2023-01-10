@@ -6,6 +6,8 @@ __pycache__/
 *.log
 *.jou
 *.so
+*.bit
+*.csv#
 install/
 build/
 ./ips
