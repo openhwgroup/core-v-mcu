@@ -34,7 +34,7 @@ Architecture
 ------------
 
 The Figure below is a high-level block diagram of the uDMA.
-The main components are the Tx channels, the Rx channels, the interface to the L2 TCDM Interconnect and the configuration interface (CFG IF).
+The main components are the Tx channels, the Rx channels, the interface to the TCDM Interconnect and the configuration interface (CFG IF).
 The Tx/Rx channels connect to a set of peripherals.
 Individual peripherals may have one or more Tx or Rx channels depending on the need.
 As an example, the I2C master will require one TX and one RX channel while the camera interface (CPI) needs only one Rx channel.
@@ -123,13 +123,11 @@ Once again this is not a limit in the current IO subsystem since S/P conversion 
 
    Micro-DMA Tx Channel Protocol
 
-   2.3 L2 memory interface
+TCDM Interface
+~~~~~~~~~~~~~~
 
-L2 TCDM Interface
-~~~~~~~~~~~~~~~~~
-
-The L2 TCDM Interface(L2if) arbitrates between the access requests originated from the Tx or Rx channels.
-Among with the arbitration the L2if generates the proper byte enables and puts the data to the proper lanes when accessing the L2 memories.
+The TCDM Interface arbitrates between the access requests originated from the Tx or Rx channels.
+Among with the arbitration the TCDM interface generates the proper byte enables and puts the data to the proper lanes when accessing the L2 memories.
 An incoming write request from the Rx channels is sent to the L2 only if there is no pending read request from the TX channels or if the priority is assigned to the RX channels.
 The priority is flipped from Tx to Rx or vice versa when there is a conflict between read or write requests.
 
