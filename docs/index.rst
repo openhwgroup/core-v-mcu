@@ -41,11 +41,11 @@ CORE-V-MCU User Manual
 
 
 ..  toctree::
-    :caption: CORE-V-MCU Bus Fabrics:
+    :caption: CORE-V-MCU Bus Interconnect:
     :maxdepth: 1
     :glob:
 
-    doc-src/l2_tcdm_interconnect.rst
+    doc-src/tcdm_interconnect.rst
     doc-src/apb_peripheral_interconnect.rst
 
 
@@ -54,7 +54,7 @@ CORE-V-MCU User Manual
     :maxdepth: 1
     :glob:
 
-    doc-src/fabric_control_subsystem.rst
+    doc-src/core_complex_subsystem.rst
     doc-src/udma_subsystem.rst
     doc-src/efpga_subsystem.rst
 

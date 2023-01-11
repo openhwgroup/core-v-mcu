@@ -3,10 +3,10 @@
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-.. _l2_tcdm_interconnect:
+.. _tcdm_interconnect:
 
-L2 TCDM Interconnect
-====================
+TCDM Interconnect
+=================
 
 
 

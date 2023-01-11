@@ -54,54 +54,54 @@ The DP memories are accessible by user-defined logic in the eFPGA and are not ac
 
 Internal Buses
 --------------
-The CORE-V-MCU has two internal bus fabrics.
+The CORE-V-MCU has two internal bus interconnect fabrics.
 
-L2 TCDM Interconnect
-~~~~~~~~~~~~~~~~~~~~
-The L2 TCDM Interconnect is a high performance, low latency memory bus interconnect.
+TCDM Interconnect
+~~~~~~~~~~~~~~~~~
+The TCDM Interconnect is a high performance, low latency memory bus interconnect.
 The core accesses memory (both instruction fetch and data load/stores) via this interconnect.
 The micro-DMA controller moves data to/from its peripherals into data memory using this bus.
 
 APB Peripheral Interconnect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many of the peripherals used by the CORE-V-MCU use the APB bus as the control-plane interface.
-This interconnect is a slave to the L2 TCDM Interconnect and provides the core with memory-mapped access to the CSRs of the APB peripherals.
+This interconnect is a slave to the TCDM Interconnect and provides the core with memory-mapped access to the CSRs of the APB peripherals.
 The APB peripherals are:
 
-- SoC_CTRL
-- GPIO
-- I2C Slave
-- Advance Timers (PWM)
-- Event Timers
-- Clock and Reset Generators
-- Debug Module
+* SoC_CTRL
+* GPIO
+* I2C Slave
+* Advance Timers (PWM)
+* Event Timers
+* Clock and Reset Generators
+* Debug Module
 
 Subsystems
 ----------
 The CORE-V-MCU supports three subsystems
 
-Fabric Control Subsystem
+Core Control Subsystem
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The Fabric Control (FC) subsystem accesses the L2 TCDM Interconnect (the *fabric*) such that it sees all resources of the CORE-V-MCU in a single, flat memory space.
-The sole component of the FC subsystem is the CV32E40P processor core.
+The core control subsystem accesses the TCDM Interconnect such that it sees all resources of the CORE-V-MCU in a single, flat memory space.
+The sole component of the core control subsystem is the CV32E40P processor core.
 
 Micro-DMA Subsystem
 ~~~~~~~~~~~~~~~~~~~
 The micro-DMA (uDMA) manages data transfer to/from memory for a set of peripherals.
-Its connections to the L2 TCDM Interconnect provide high-bandwidth, low-latency access to the interleaved data memories.
+Its connections to the TCDM Interconnect providing high-bandwidth, low-latency access to the interleaved data memories.
 Note that the uDMA cannot access the non-interleaved memories or the boot ROM.
 Peripherals supported by the uDMA are:
 
-- UART
-- I2C Master
-- QSPI
-- SDIO
-- Camera
+* UART
+* I2C Master
+* QSPI
+* SDIO
+* Camera
 
 Quicklogic Embedded FPGA
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The eFPGA connects to the interleaved data memories via the L2 TCDM Interconnect.
-Note that there are four TCDM buses between the L2 TCDM Interconnect and the eFPGA allowing for eFPGA implementations to support high memory bandwidth requirements.
+The eFPGA connects to the interleaved data memories via the TCDM Interconnect.
+Note that there are four TCDM buses between the TCDM Interconnect and the eFPGA allowing for eFPGA implementations to support high memory bandwidth requirements.
 
 Other Functional Units
 ----------------------
