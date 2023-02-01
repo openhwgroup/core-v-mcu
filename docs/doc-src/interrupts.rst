@@ -65,8 +65,8 @@ Following the coarse-grain Map of the platform-specific events is listed.
 Platform-Specific (Second Level) Interrupts Map
 -----------------------------------------------
 
-There are 160 events reserved for the peripheral-domain, 8 events that can be triggered in software by writing to the `REG_EVENT` of the event generator (see its description below),
-and 1 event coming from the rising edge of the reference clock, for a total of 169 events.
+There are 84 events reserved for the peripheral-domain, 8 events that can be triggered in software by writing to the `REG_EVENT` of the event generator (so called APB Software Events),
+and 1 event coming from the rising edge of the reference clock, for a total of 93 events mapped from 0 to 168 (with some lines reserved for future use).
 If one of them 'triggers', and if it is 'enabled' in the even generator (and specific peripheral), then the event CLINT Extenral Event triggers.
 
 
@@ -77,7 +77,13 @@ If one of them 'triggers', and if it is 'enabled' in the even generator (and spe
 `16-19`: I2C-0 Events
 `20-23`: I2C-1 Events
 `24-27`: SDIO Events
-
+`28-31`: Camera Events
+`32-35`: Filter Events
+`36-111`: RESERVED
+`112-127`: eFPGA Events
+`128-159`: GPIO Events
+`160-167`: APB Software Events
+`168`: Reference Clock Rise Event
 
 
 
