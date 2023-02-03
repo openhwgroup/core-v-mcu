@@ -19,6 +19,7 @@
 
 eFPGA SubSystem
 ===============
+This is the eFPGA subsystem from QuickLogic. Based on ArcticPro 2 architecture
 
 Subsystem Architecture
 ----------------------
