@@ -19,6 +19,7 @@
 
 eFPGA SubSystem
 ===============
+This is the eFPGA subsystem from Quicklogic. It is great!
 
 Subsystem Architecture
 ----------------------
