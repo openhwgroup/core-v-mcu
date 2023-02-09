@@ -21,14 +21,17 @@ eFPGA SubSystem
 ===============
 This is the eFPGA subsystem from QuickLogic. Based on ArcticPro 2 architecture
 
+
 Subsystem Architecture
 ----------------------
+The eFPGA block is an array of 32x32 SLC's (Super Logic Cells), each SLC is composed of 2 LUT5s and 4 LUT4s
 
 eFPGA Subsystem Components
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Functional Description
 ~~~~~~~~~~~~~~~~~~~~~~
+
 
 Logic Cell
 ^^^^^^^^^^
