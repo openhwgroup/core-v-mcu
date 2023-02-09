@@ -310,8 +310,9 @@ targets:
         mode: cc
         verilator_options:
         - -Wno-fatal
+        - -O3
         - --trace
-        - --CFLAGS -DVL_TIME_CONTEXT
+        - --CFLAGS -fPIC -DVL_TIME_CONTEXT
 
   lint:
     <<: *default_target
