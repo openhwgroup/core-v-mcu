@@ -19,9 +19,13 @@
 
 eFPGA SubSystem
 ===============
+This is the eFPGA subsystem from QuickLogic. 
+Based on ArcticPro 2 architecture Silicon-verified, production-proven eFPGA for MCU/SoC/custom ASIC applications - optimized for edge and endpoint AI processing, military and automotive.
+QuickLogic has been supplying eFPGA-based products for consumer, industrial and mission-critical applications for nearly three decades. Our eFPGA IP enables SoC designers the flexibility to easily program custom functions, hardware accelerators and security capability after an SoC has been manufactured.
 
 Subsystem Architecture
 ----------------------
+The eFPGA block is an array of 32x32 SLC's (Super Logic Cells), each SLC is composed of 2 LUT5s and 4 LUT4s
 
 eFPGA Subsystem Components
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -29,8 +33,10 @@ eFPGA Subsystem Components
 Functional Description
 ~~~~~~~~~~~~~~~~~~~~~~
 
+
 Logic Cell
 ^^^^^^^^^^
+The eFPGA block 
 
 Math Units
 ^^^^^^^^^^
