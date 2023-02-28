@@ -74,7 +74,7 @@ jobs:
     - name: Install requirements
       run: |
         pip install -r python-requirements.txt
-        pip install -r docs/requirements.txt
+        pip install --use-pep517 -r docs/requirements.txt
     - name: Generate doc and diff
       run: |
         make -C docs doc && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation."
