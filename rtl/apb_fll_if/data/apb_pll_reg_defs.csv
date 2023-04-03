@@ -1,0 +1,95 @@
+Module,APB_PLL,,,,,
+,Memory address: APB_START_ADDR(`APB_START_ADDR),,,,,
+,,,,,,
+,"The APB_PLL module instantiates the PLL and control registers to set the operation conditions of the PLL. It also controls 4 final divisors to generate the Soc Clock, the Peripheral Clock, The FPGA clock and the reference clock for the timer blocks",,,,,
+,and configuring selected I/O to generate interrupts.,,,,,
+,,,,,,
+,Interrupts,,,,,
+,,,,,,
+,Any GPIO can be configured for level type interrupts or edge triggered interrupts.,,,,,
+,Levels based int,,,,,
+,,,,,,
+Register,Offset/Field,MSB,LSB,Type,Default,Description
+0x00,PLL_CTL,,,,,PLL Control Register
+,lock,31,31,RO,,PLL lock status
+,pddp,25,25,RW,1,Post Divisor Power Down
+,,,,,,1: Post divider powered down 
+,,,,,,0: Normal operation
+,pd,24,24,RW,1,PLL Power Down 
+,,,,,,1: PLL Powered Down
+,,,,,,0: Normal Operation
+,mode,17,16,R/W,B’00,B’00: Integer mode
+,,,,,,B’01: Fractional Mode
+,,,,,,B’10: Spread Spectrum Mode
+,,,,,,B;11: Reserved
+,dm,13,8,R/W,1,Reference divider values 1-63
+,reset,1,1,R/W,1,PLL reset
+,bypass,0,0,R/W,1,PLL bypass
+0x04,PLL_DIV,,,,,PLL Divisor Register
+,dn,26,16,R/W,10,Feedback Divider Control Pins. Set the feedback divider factor from 16 to 2047
+,dp,2,0,R/W,4,Output Divider Control Pins. Set the post divider factor from 1 to 7
+0x08,PLL_FRAC,,,,,PLL Fractional mode seetings
+,frac,23,0,R/W,0x0,Fractional portion of DN
+0xC,PLL_SS1,,,,,PLL Spread Spectrum Frequency control
+,ssrate,10,0,R/W,0x0,Spread Spectrum Frequency Control
+0x10,PLL_SS2,,,,,PLL Spread Spectrum slope control
+,sslope,23,0,R/W,0x0,Spread Spectrum slope control
+0x14,SOC_DIV,,,,,SOC clock divider
+,s_div,9,0,R/W,0x0,additional divisor from PLL output clock
+0x18,PER_DIV,,,,,Peripheral  clock divider
+,p_div,9,0,R/W,0x0,additional divisor from PLL output clock
+0x1C,FPGA_DIV,,,,,FPGA clock divider
+,c_div,9,0,R/W,0x0,additional divisor from PLL output clock
+0x20,REF_DIV,,,,,Reference clock divider
+,REF_DIV,9,0,R/W,0x28,additional divisor from PLL output clock
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+0x38,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+0x3C,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+0x40,,,,,,
