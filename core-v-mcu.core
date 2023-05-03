@@ -285,7 +285,6 @@ targets:
         - --O0
         - -v 0
         - -timescale 1ns/1ps
-        xsim_options:
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
