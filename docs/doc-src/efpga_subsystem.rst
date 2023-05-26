@@ -56,9 +56,33 @@ SoC Interfaces
 
 Configurable Input/Output Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-APB Interface
+The example RTL file top.sv in the rtl/simulation folder is functional rtl design for verifying the eFPGA interfaces.
+L2 Interface
 ~~~~~~~~~~~~~
+The L2 interface to the eFPGA is a memory mapped interface that is allocated a 1Mbyte address space.
+It is asynchronous to the CPU and contains clock crossing registers to maintain data integrity.
+the following table contains the L2 Interface signals
+---------- ----------------- ---------------------------
+direction      Name            Description
+========== ================= =========================== 
+input       lint_REQ          Cycle request active high
+---------- ----------------- ---------------------------
+input       lint_WEN           Write = 1, Read = 0
+---------- ----------------- ---------------------------
+input       lint_ADDR[19:0]   Address 20-bits 
+---------- ----------------- ---------------------------
+input       lint_WDATA[31:0]  Write Data 32-bits
+---------- ----------------- ---------------------------
+input       lint_BE[3:0]      Byte enables 4-bits
+---------- ----------------- ---------------------------
+output      lint_VALID        Valid signal (ack)
+---------- ----------------- ---------------------------
+output      lint_GNT          Grant signal
+---------- ----------------- ---------------------------
+output      lint_RDATA[31:0]  Read Data 32-bits
+---------- ----------------- ---------------------------
+output      lint_clk          Clock back to CDC logic
+---------- ----------------- ---------------------------
 
 TCDM Interface
 ~~~~~~~~~~~~~~
