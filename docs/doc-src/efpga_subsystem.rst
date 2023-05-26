@@ -57,11 +57,13 @@ SoC Interfaces
 Configurable Input/Output Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The example RTL file top.sv in the rtl/simulation folder is functional rtl design for verifying the eFPGA interfaces.
+
 L2 Interface
 ~~~~~~~~~~~~~
 The L2 interface to the eFPGA is a memory mapped interface that is allocated a 1Mbyte address space.
 It is asynchronous to the CPU and contains clock crossing registers to maintain data integrity.
 the following table contains the L2 Interface signals
+
 ---------- ----------------- ---------------------------
 direction      Name            Description
 ========== ================= =========================== 
