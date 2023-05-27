@@ -64,9 +64,9 @@ The L2 interface to the eFPGA is a memory mapped interface that is allocated a 1
 It is asynchronous to the CPU and contains clock crossing registers to maintain data integrity.
 the following table contains the L2 Interface signals
 
-+-----------+-----------------+---------------------------+
++===========+=================+===========================+
 |direction  |    Name         |   Description.            |
-============+=================+===========================+ 
++===========+=================+===========================+
 |input      | lint_REQ        |  Cycle request active high|
 +----------=+-----------------+---------------------------+
 |input      | lint_WEN        |   Write = 1, Read = 0.    | 
