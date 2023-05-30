@@ -88,6 +88,9 @@ the following table contains the L2 Interface signals.
 
 TCDM Interface
 ~~~~~~~~~~~~~~
+Core-v-mcu provides 4 TCDM (Tightly Coupled Distributed memory) Each of the these interfaces has full access to the 512KB of SoC memory allowing
+the eFPGA to perform reads and writes to memory.  Each interface is connected through Clock Domain Crossing registers as the eFPGA is clocked by
+asynchronously from the SoC.  
 
 Interrupts
 ~~~~~~~~~~
