@@ -90,29 +90,30 @@ TCDM Interface
 ~~~~~~~~~~~~~~
 Core-v-mcu provides 4 TCDM (Tightly Coupled Distributed memory) Each of the these interfaces has full access to the 512KB of SoC memory allowing
 the eFPGA to perform reads and writes to memory.  Each interface is connected through Clock Domain Crossing registers as the eFPGA is clocked by
-asynchronously from the SoC.  
+asynchronously from the SoC.
+
 +-----------+----------------------+--------------------------------------------------+
-+ Direction |    Name              + Description +
+| Direction |    Name              | Description                                      |
 +===========+======================+==================================================+
-+ output    + tcdm_addr_p0[19:0]   + 20-bit address for TCDM +
+| output    | tcdm_addr_p0[19:0]   | 20-bit address for TCDM                          |
 +-----------+----------------------+--------------------------------------------------+
-+ input     + tcdm_rdata_p0[31:0]  + 32-bit Read data returned from TCDM +
+| input     | tcdm_rdata_p0[31:0]  | 32-bit Read data returned from TCDM              |
 +-----------+----------------------+--------------------------------------------------+
-+ input     + tcdm_valid_p0        + TCDM read data Valid +
+| input     | tcdm_valid_p0        | TCDM read data Valid                             |
 +-----------+----------------------+--------------------------------------------------+
-+ input     + tcdm_gnt_p0          + TCDM Grant indicating the cycle is in progress +
+| input     | tcdm_gnt_p0          | TCDM Grant indicating the cycle is in progress   |
 +-----------+----------------------+--------------------------------------------------+
-+ input     + tcdm_fmo_p0          + TCDM interface can accept only one more request +
+| input     | tcdm_fmo_p0          | TCDM interface can accept only one more request  |
 +-----------+----------------------+--------------------------------------------------+
-+ output    + tcdm_wdata_p0[31:0]  + 32-bit Data to write to TCDM +
+| output    | tcdm_wdata_p0[31:0]  | 32-bit Data to write to TCDM                     |
 +-----------+----------------------+--------------------------------------------------+
-+ output    + tcdm_be_p0[3:0]      + 4 byte enables for byte writes +
+| output    | tcdm_be_p0[3:0]      | 4 byte enables for byte writes                   |
 +-----------+----------------------+--------------------------------------------------+
-+ output    + tcdm_wen_p0          + Write enable active high +
+| output    | tcdm_wen_p0          | Write enable active high                         |
 +-----------+----------------------+--------------------------------------------------+
-+ output    + tcdm_req_p0          + TCDM cycle request +
+| output    | tcdm_req_p0          | TCDM cycle request                               |
 +-----------+----------------------+--------------------------------------------------+
-+ output    + tcdm_clk_p0          + TCDM clock from eFPGA to CDC logic +
+| output    | tcdm_clk_p0          | TCDM clock from eFPGA to CDC logic               |
 +-----------+----------------------+--------------------------------------------------+
 
 Interrupts
