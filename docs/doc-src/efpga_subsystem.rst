@@ -46,13 +46,14 @@ Block RAM
 
 Clocking
 ^^^^^^^^
-The eFPGA recieves 6 clocks from the SOC. 
-Clk0 is sourced by the PLL and the eFPGA divisor Circuit.
-CLK1 is sources by the PLL and the peripheral divisor Circuit.
-CLK2 is sourced by the RefClock divisor Circut.
-CLK3 is source by an IO pin. 
-CLK4 is sourced by an IO pin.
-CLK5 is sourced by an IO pin.
+
+-The eFPGA recieves 6 clocks from the SOC. 
+-Clk0 is sourced by the PLL and the eFPGA divisor Circuit.
+-CLK1 is sources by the PLL and the peripheral divisor Circuit.
+-CLK2 is sourced by the RefClock divisor Circut.
+-CLK3 is source by an IO pin. 
+-CLK4 is sourced by an IO pin.
+-CLK5 is sourced by an IO pin.
 
 
 SoC Interfaces
