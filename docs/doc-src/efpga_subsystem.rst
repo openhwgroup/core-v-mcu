@@ -44,11 +44,15 @@ Math Units
 Block RAM
 ^^^^^^^^^
 
-FIFO Controller
-^^^^^^^^^^^^^^^
-
 Clocking
 ^^^^^^^^
+The eFPGA recieves 6 clocks from the SOC. 
+Clk0 is sourced by the PLL and the eFPGA divisor Circuit.
+CLK1 is sources by the PLL and the peripheral divisor Circuit.
+CLK2 is sourced by the RefClock divisor Circut.
+CLK3 is source by an IO pin. 
+CLK4 is sourced by an IO pin.
+CLK5 is sourced by an IO pin.
 
 
 SoC Interfaces
@@ -57,12 +61,13 @@ SoC Interfaces
 Configurable Input/Output Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The example RTL file top.sv in the rtl/simulation folder is functional rtl design for verifying the eFPGA interfaces.
+It contain the mapping from the eFPGA to the SoC and IO.  The example design instantiates all the interfaces and has simple logic that allows for exercising the interfaces,  The various registers allow for control of all the resources and interfaces with simple state machines to demostrate the use of the resources. 
 
 L2 Interface
 ~~~~~~~~~~~~~
 The L2 interface to the eFPGA is a memory mapped interface that is allocated a 1Mbyte address space.
 It is asynchronous to the CPU and contains clock crossing registers to maintain data integrity.
-the following table contains the L2 Interface signals.
+the following table contains the L2 Interface signals.  Various control registers are accessible via the L2 interface to test other functions in the eFPGA.
 
 +------------+-----------------+---------------------------+
 | direction  |    Name         |   Description.            |
@@ -115,19 +120,6 @@ asynchronously from the SoC.
 +-----------+----------------------+--------------------------------------------------+
 | output    | tcdm_clk_p0          | TCDM clock from eFPGA to CDC logic               |
 +-----------+----------------------+--------------------------------------------------+
-
-Interrupts
-~~~~~~~~~~
-
-
-eFPGA Bitstream Loading
------------------------
-
-eFPGA Configuration Control
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-eFPGA Template
-~~~~~~~~~~~~~~
 
 
 eFPGA Subsystem Registers
@@ -196,6 +188,8 @@ TCDM_CTL_P3 offset = 0x0C
 +--------------+-------+------+------------+-------------------------------------------------------------+
 | tcdm_addr_p3 |  19:0 |   RW |        0x0 | Sets the address to be used on TCDM 3                       |
 +--------------+-------+------+------------+-------------------------------------------------------------+
+
+There are 4 control regsisters (1 for each of te multiplier units) the bits in these registers will configure the multipler operation.
 
 M0_M0_CONTROL offset = 0x10
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,6 +283,9 @@ M1_M1_CONTROL offset = 0x1C
 | m1_m1_outsel |   5:0 |   RW |        0x0 | Math Unit 1, Mutliplier 1 output select                                         |
 +--------------+-------+------+------------+---------------------------------------------------------------------------------+
 
+Two RAM control registers are provide to configure the RAMs (1 for each Math unit)
+
+
 M0_RAM_CONTROL offset = 0x20
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -296,22 +293,31 @@ M0_RAM_CONTROL offset = 0x20
 | Field          |  Bits | Type | Default    | Description                                   |
 +================+=======+======+============+===============================================+
 | m0_coef_wdsel  | 14:14 |   RW |        0x0 | Math Unit 0 coefficient RAM write data select |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper1_wdsel | 13:13 |   RW |        0x0 | Math Unit 0 Operand 0 RAM write data select   |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper0_wdsel | 12:12 |   RW |        0x0 | Math Unit 0 Operand 1 RAM write data select   |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_coef_wmode  | 11:10 |   RW |        0x0 | Math Unit 0 coefficient RAM write mode        |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_coef_rmode  |   9:8 |   RW |        0x0 | Math Unit 0 coefficient RAM read mode         |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper1_wmode |   7:6 |   RW |        0x0 | Math Unit 0 operand 0 RAM write mode          |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper1_rmode |   5:4 |   RW |        0x0 | Math Unit 0 operand 0 RAM read mode           |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper0_wmode |   3:2 |   RW |        0x0 | Math Unit 0 operand 1 RAM write mode          |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m0_oper0_rmode |   1:0 |   RW |        0x0 | Math Unit 0 operand 1 RAM read mode           |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 
 M1_RAM_CONTROL offset = 0x24
@@ -321,23 +327,36 @@ M1_RAM_CONTROL offset = 0x24
 | Field          |  Bits | Type | Default    | Description                                   |
 +================+=======+======+============+===============================================+
 | m1_coef_wdsel  | 14:14 |   RW |        0x0 | Math Unit 1 coefficient RAM write data select |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper1_wdsel | 13:13 |   RW |        0x0 | Math Unit 1 Operand 0 RAM write data select   |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper0_wdsel | 12:12 |   RW |        0x0 | Math Unit 1 Operand 1 RAM write data select   |
+|                |       |      |            | 0 = Fabric, 1 = Multipler output              |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_coef_wmode  | 11:10 |   RW |        0x0 | Math Unit 1 coefficient RAM write mode        |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_coef_rmode  |   9:8 |   RW |        0x0 | Math Unit 1 coefficient RAM read mode         |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper1_wmode |   7:6 |   RW |        0x0 | Math Unit 1 operand 0 RAM write mode          |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper1_rmode |   5:4 |   RW |        0x0 | Math Unit 1 operand 0 RAM read mode           |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper0_wmode |   3:2 |   RW |        0x0 | Math Unit 1 operand 1 RAM write mode          |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
 | m1_oper0_rmode |   1:0 |   RW |        0x0 | Math Unit 1 operand 1 RAM read mode           |
+|                |       |      |            | 00 = 32-bit, 01 = 16=bit 10 = 8=bit           |
 +----------------+-------+------+------------+-----------------------------------------------+
+
+
+Four clock enable registers that are write only and clear to zero, when written to a '1' and single 
+clockenable will be generated to the specified multiplier.
 
 M0_M0_CLKEN offset = 0x30
 ~~~~~~~~~~~~~~~~~~~~~~~~~
