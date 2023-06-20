@@ -40,6 +40,15 @@ The eFPGA block
 
 Math Units
 ^^^^^^^^^^
+The EFPGA has 2 Math units attached. Each math unit has 3 block RAMS (4KBytes) and 2 Multipliers.
+Each Block RAM has one read port and one write port with independant clocks. Each Port can be independenly configured as 8-bit, 16-bit or 32-bit by the configuration on the appropriate rmode, or wmode inputs.
+The Write data can also be selected to be from the fabric or the output of the Associated Multiplier.
+
+
+.. figure:: ../images/A2_MATH_UNIT.png
+   :name: MATH Unit Diagram
+   :align: center
+   :alt: 
 
 Block RAM
 ^^^^^^^^^
