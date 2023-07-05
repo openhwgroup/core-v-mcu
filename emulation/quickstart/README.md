@@ -113,7 +113,6 @@ Note: The connector used and the pinout can change based on the FPGA design.
 ![image](NexysA7_annotated.png)
 
 
-
 Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
 1. Load the FPGA with a bitmap of the CORE-V-MCU.
 2. Download the cli_test program into memory.
