@@ -25,18 +25,14 @@ The Core-v-mcu  has three major clock domains that are all derived from the inpu
 - Periph clock is used for the UDMA peripherals to generate the various clocks required for the peripherals
 - FPGA clock is used as the primary clock to the eFPGA.
 
-The Input reference clock is assumed to be 10 MHz.  It feeds a Verisilicon PLL which creates the primary high speed clock. 
-
-The High speed clock drives three independent divisors that are used to generate the the three domains.
-
-Additionally, an addition divisor is provided to reduce the frequency of the Reference clock to the various timer resources.
+The Input reference clock is assumed to be 10 MHz.  It feeds a Verisilicon PLL which creates the primary high speed clock.  The High speed clock drives three independent divisors that are used to generate the the three domains. Additionally, an additional divisor is provided to reduce the frequency of the reference clock to the various timer resources.
 
 The following is a Block diagram of the Clock Domains
 
-.. figure:: ../images/clock_domain.pdf
+.. figure:: ../images/clock_domain.png
    :name: Clock Domain Diagram
    :align: center
-   :alt: 
+   :alt:
 
 PLL Description
 ~~~~~~~~~~~~~~~
