@@ -113,7 +113,6 @@ Note: The connector used and the pinout can change based on the FPGA design.
 ![image](NexysA7_annotated.png)
 
 
-
 Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
 1. Load the FPGA with a bitmap of the CORE-V-MCU.
 2. Download the cli_test program into memory.
@@ -240,18 +239,24 @@ Detailed instructions for using the Eclipse IDE with the CORE-V-MCU can be found
 
 ## NOR flash
 
-### Using the bootloader
+CORE-V-MCU can boot a program from a NOR flash connected to the JXADC header.
+The A2 bootloader (A2 Boot) is capable of reading an executable file in Srecord format via UART0, storing it into on-chip memory and jumping to the starting address.
+However, A2 Boot is not able to program the flash itself.
+What follows is a two-step process that uses [`core-v-mcu-cli_test`](https://github.com/openhwgroup/core-v-mcu-cli-test) to program a bootable flash.
 
-The A2 bootloader is capable of collecting an executable file in Srecord format via UART0 and storing it into flash. A [python script](https://github.com/openhwgroup/core-v-mcu-cli-test/cli_test/serialPort.py) (also available [here](https://github.com/openhwgroup/core-v-mcu-demo/demo/serialPort.py)) can transfer the `srec` file from the host PC to the MCU.
+### Step 1: Use A2 Boot to download and launch CLI_TEST
+
+A [python script](https://github.com/openhwgroup/core-v-mcu-cli-test/cli_test/serialPort.py)
+(also available [here](https://github.com/openhwgroup/core-v-mcu-demo/demo/serialPort.py))
+can transfer the `srec` file from the host PC to the MCU.
 No specific HW or SW configuration is needed other than the normal microUSB connected to J6.
 
-### Using CLI test
-
-The [`core-v-mcu-cli_test`](https://github.com/openhwgroup/core-v-mcu-cli-test) suite can be used to program a NOR flash connected to the JXADC header.
+### Step2: Use CLI_Test to program the Flash
 
 Additional HW requirement
 - USB2TTL adapter
 - 3 jumper wires
+- NOR Flash (see `Optional hardware`, above).
 
 The boot loader uses it to print a message and the SPI image is downloaded over that UART.
 

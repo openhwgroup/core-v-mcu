@@ -1,12 +1,6 @@
 CAPI=2:
-
-# Copyright 2021 OpenHW Group
-# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
-# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-
 name: openhwgroup.org:systems:core-v-mcu
 description: CORE-V MCU Top.
-
 filesets:
   files_rtl_generic:
     depend:
@@ -82,12 +76,10 @@ filesets:
     - rtl/core-v-mcu/top/soc_domain.sv
     - rtl/core-v-mcu/top/core_v_mcu.sv
     file_type: systemVerilogSource
-
   rtl-behavioral:
     files:
     - rtl/core-v-mcu/components/freq_meter.sv
     file_type: systemVerilogSource
-
   rtl-simulation:
     files:
     - rtl/simulation/pPLL02F.sv
@@ -97,12 +89,10 @@ filesets:
     - rtl/simulation/top1_wrapper.sv
     - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
-
   not_emulation-rtl:
     files:
     - rtl/core-v-mcu/soc/clk_gen.sv
     file_type: systemVerilogSource
-
   emulation-rtl:
     depend:
     - pulp-platform.org::tech_cells_xilinx
@@ -121,30 +111,24 @@ filesets:
     - rtl/simulation/top1_wrapper.sv
     - rtl/simulation/a2_bootrom.sv
     file_type: systemVerilogSource
-
   nexys-ips:
     files:
     - emulation/xilinx/ips/xilinx_clk_mngr.tcl
     file_type: tclSource
-
   genesys2-ips:
     files:
     - emulation/core-v-mcu-genesys2/ips/xilinx_clk_mngr.tcl
     file_type: tclSource
-
   xilinx-ips:
     files:
 #    - emulation/xilinx/ips/xilinx_slow_clk_mngr.tcl
     - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
     - emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
-
   rom_init:
     files:
     - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
     file_type: mem
-
-
   mem_init_modelsim:
     files:
     - tb/mem_init_files/boot.mem: {copyto: mem_init/boot.mem}
@@ -156,7 +140,6 @@ filesets:
     - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
     - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/core_v_mcu_tb.core_v_mcu_i.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
-
   mem_init_verilator:
     files:
     - tb/mem_init_files/verilatorBoot.mem: {copyto: mem_init/boot.mem}
@@ -168,55 +151,43 @@ filesets:
     - tb/mem_init_files/privateBank0.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem}
     - tb/mem_init_files/privateBank1.mem: {copyto: mem_init/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem}
     file_type: user
-
-
   tb-rtl:
     files:
     - tb/core_v_mcu_tb.sv
     - tb/uartdpi/uartdpi.sv
     - tb/qspi_model/GD25Q128B.v
     file_type: systemVerilogSource
-
-
   nexys-rtl:
     files:
     - emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v
     - emulation/xilinx/rtl/fpga_clk_gen.sv
     file_type: systemVerilogSource
-
   nexys-xdc:
     files:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
-
   xilinx-tcl:
     files:
     - emulation/xilinx/tcl/common.tcl
     - emulation/xilinx/tcl/flatten.tcl
     file_type: tclSource
-
   genesys2-rtl:
     files:
     - emulation/core-v-mcu-genesys2/rtl/core_v_mcu_genesys2.v
     - emulation/core-v-mcu-genesys2/rtl/fpga_clk_gen.sv
     file_type: systemVerilogSource
-
   genesys2-xdc:
     files:
     - emulation/core-v-mcu-genesys2/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
-
-  # Scripts for hooks
   pre_build_scripts:
     files:
     - rtl/core-v-mcu/scripts/vedit.sh
     file_type: user
-  # Waiver file, without which the model lib will not build.
   verilator-waiver:
     files:
     - rtl/core-v-mcu/verilator.waiver
     file_type: vlt
-
 parameters:
   PULP_FPGA_EMUL:
     datatype: bool
@@ -230,9 +201,6 @@ parameters:
     datatype: bool
     paramtype: vlogdefine
     default: true
-
-# A script to modify Verilator pre-build to generate a library, not an
-# executable.
 scripts:
   pre_build_scripts:
     cmd:
@@ -248,7 +216,6 @@ targets:
     - target_lint? (rtl-behavioral)
     - target_model-lib? (rtl-behavioral)
     toplevel: [core_v_mcu]
-
   sim:
     <<: *default_target
     default_tool: modelsim
@@ -285,7 +252,6 @@ targets:
         - --O0
         - -v 0
         - -timescale 1ns/1ps
-        xsim_options:
 
   # A target for a Verilator model as a library.  Note that we do not disable
   # UNOPTFLAT warnings, since these will affect performance, so we want to see
@@ -326,6 +292,7 @@ targets:
         mode: lint-only
         verilator_options:
         - -Wno-fatal
+        - --timing
 
   nexys-a7-100t:
     <<: *default_target
@@ -345,7 +312,6 @@ targets:
       vivado:
         part: xc7a100tcsg324-1
     toplevel: core_v_mcu_nexys
-
   genesys2:
     <<: *default_target
     default_tool: vivado

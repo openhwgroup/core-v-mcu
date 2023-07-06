@@ -16,7 +16,7 @@ jobs:
   format_verilog:
     name: Format Verilog Sources
     # This job runs on Linux (fixed ubuntu version)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -63,37 +63,39 @@ jobs:
   # Doc Up-to-Date #
   ##################
   # Check that the documentation is up-to-date.
-  doc-up-to-date:
-    name: Doc Up-to-Date
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install requirements
-      run: |
-        pip install -r python-requirements.txt
-        pip install -r docs/requirements.txt
-    - name: Generate doc and diff
-      run: |
-        make -C docs doc && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation."
+  # This check is depreciated as CORE-V-MCU no longer autogenerates its documentation.
+  #doc-up-to-date:
+  #  name: Doc Up-to-Date
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - uses: actions/setup-python@v2
+  #    with:
+  #      python-version: 3.9
+  #  - name: Install requirements
+  #    run: |
+  #      pip install -r python-requirements.txt
+  #      pip install -r docs/requirements.txt
+  #  - name: Generate doc and diff
+  #    run: |
+  #      make -C docs doc && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation."
 
   ####################
   # Format YML Files #
   ####################
-  yamlfmt:
-    name: YAML Sources
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install requirements
-      run: pip install -r python-requirements.txt
-    # Check the proper formatting of all Bender.yml
-    - name: Check YAML formatting
-      run: |
-        util/yml-format
-        util/git-diff.py --error-msg "::error ::Found differences, run util/yml-format before committing."
+  # This check is no longer relavent as the connection to submdules was deliberately severed.
+  #yamlfmt:
+  #  name: YAML Sources
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - uses: actions/setup-python@v2
+  #    with:
+  #      python-version: 3.9
+  #  - name: Install requirements
+  #    run: pip install -r python-requirements.txt
+  #  # Check the proper formatting of all Bender.yml
+  #  - name: Check YAML formatting
+  #    run: |
+  #      util/yml-format
+  #      util/git-diff.py --error-msg "::error ::Found differences, run util/yml-format before committing."
