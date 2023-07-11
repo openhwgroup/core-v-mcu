@@ -28,7 +28,7 @@ module fc_subsystem #(
     input logic [31:0] boot_addr_i,
     input logic        debug_req_i,
 
-    input  logic [31:0] events_i,  // interrupts to cpu
+    input  logic [31:0] events_i,           // interrupts to cpu
     output       [ 4:0] core_irq_ack_id_o,
     output              core_irq_ack_o,
 
@@ -189,13 +189,13 @@ module fc_subsystem #(
       // apu-interconnect
       // handshake signals
       .apu_req_o     (apu_req),
-      .apu_gnt_i     (1'b0),  //(apu_gnt),
+      .apu_gnt_i     (1'b0),          //(apu_gnt),
       .apu_operands_o(apu_operands),
       .apu_op_o      (apu_op),
       .apu_flags_o   (apu_flags),
-      .apu_rvalid_i  (1'b0),  // (apu_rvalid),
-      .apu_result_i  (32'b0),  //(apu_rdata),
-      .apu_flags_i   ('0),  //(apu_rflags),
+      .apu_rvalid_i  (1'b0),          // (apu_rvalid),
+      .apu_result_i  (32'b0),         //(apu_rdata),
+      .apu_flags_i   ('0),            //(apu_rflags),
 
 
       .irq_i    (r_int),

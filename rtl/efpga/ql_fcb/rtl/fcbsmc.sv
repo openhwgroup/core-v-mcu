@@ -26,56 +26,56 @@ module fcbsmc #(
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic       fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic       fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic       fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic       fcb_spim_ckout_in,  //SPI Master Loop Back Clock
-    input  logic       fcb_spi_mode_en_bo,  //1'b1 : SPI Master/Slave is Enable. 1'b0
-    input  logic       fmic_spi_master_en,  //1'b1: Enable SPI Master Mode, 1'b0: Ena
-    input  logic [7:0] frfu_spim_baud_rate,  //
-    input  logic       frfu_fsmc_sw2_spis,  //
-    input  logic       frfu_fsmc_rc_clk_dis_cfg,  //
-    input  logic       fcb_spim_miso,  //SPI Master MISO
-    input  logic [7:0] frfu_sfr_rd_data,  //SFR Read Data
-    input  logic       frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    input  logic [7:0] frfu_fsmc_spim_ckb_0,  //
-    input  logic [7:0] frfu_fsmc_spim_ckb_1,  //
-    input  logic [7:0] frfu_fsmc_spim_device_id,  //
-    input  logic       fpmu_pmu_busy,  //
-    input  logic       fclp_clp_busy,  // 05182017 // JC // CLP BUSY
-    input  logic       fcb_clp_mode_en_bo,  // 05182017 // JC // CLP MODE
-    input  logic       ffsr_fsr_busy,  //
-    input  logic       frfu_fsmc_checksum_status,  //CheckSum Status
-    input  logic       frfu_fsmc_checksum_enable,  //
-    input  logic [7:0] frfu_wrd_cnt_b0,  //
-    input  logic [7:0] frfu_wrd_cnt_b1,  //
-    input  logic [7:0] frfu_wrd_cnt_b2,  //
-    input  logic       frfu_fsmc_pending_pd_req,  //Pending Power Down Request
+    input  logic       fcb_sys_clk,                  //Main Clock for FCB except SPI Slave Int
+    input  logic       fcb_sys_rst_n,                //Main Reset for FCB except SPI Slave int
+    input  logic       fcb_sys_stm,                  //1'b1 : Put the module into Test Mode
+    input  logic       fcb_spim_ckout_in,            //SPI Master Loop Back Clock
+    input  logic       fcb_spi_mode_en_bo,           //1'b1 : SPI Master/Slave is Enable. 1'b0
+    input  logic       fmic_spi_master_en,           //1'b1: Enable SPI Master Mode, 1'b0: Ena
+    input  logic [7:0] frfu_spim_baud_rate,          //
+    input  logic       frfu_fsmc_sw2_spis,           //
+    input  logic       frfu_fsmc_rc_clk_dis_cfg,     //
+    input  logic       fcb_spim_miso,                //SPI Master MISO
+    input  logic [7:0] frfu_sfr_rd_data,             //SFR Read Data
+    input  logic       frfu_cwf_full,                //Full Flag of Cfg Write FIFO
+    input  logic [7:0] frfu_fsmc_spim_ckb_0,         //
+    input  logic [7:0] frfu_fsmc_spim_ckb_1,         //
+    input  logic [7:0] frfu_fsmc_spim_device_id,     //
+    input  logic       fpmu_pmu_busy,                //
+    input  logic       fclp_clp_busy,                // 05182017 // JC // CLP BUSY
+    input  logic       fcb_clp_mode_en_bo,           // 05182017 // JC // CLP MODE
+    input  logic       ffsr_fsr_busy,                //
+    input  logic       frfu_fsmc_checksum_status,    //CheckSum Status
+    input  logic       frfu_fsmc_checksum_enable,    //
+    input  logic [7:0] frfu_wrd_cnt_b0,              //
+    input  logic [7:0] frfu_wrd_cnt_b1,              //
+    input  logic [7:0] frfu_wrd_cnt_b2,              //
+    input  logic       frfu_fsmc_pending_pd_req,     //Pending Power Down Request
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic       fsmc_frfu_set_quad_pd,  //Set Whole Chip Power Down // JC // 05182017
+    output logic       fsmc_frfu_set_quad_pd,        //Set Whole Chip Power Down // JC // 05182017
     output logic       fsmc_fmic_clr_spi_master_en,  //Clear SPI_MASTER_EN and Switch the mode
-    output logic       fsmc_frfu_clr_rcclk_en,  //Clear RC clock
-    output logic       fsmc_frfu_set_pd,  //Set Whole Chip Power Down // JC // 05182017
-    output logic       fsmc_frfu_set_clp_pd,  //Set Whole Chip Power Down // JC // 05182017
-    output logic       fcb_spim_mosi,  //SPI Master MOSI
-    output logic       fcb_spim_mosi_en,  //SPI Master MOSI output enable
-    output logic       fcb_spim_cs_n,  //SPI Master Chip Select
-    output logic       fcb_spim_cs_n_en,  //SPI Master Chip Select enable
-    output logic       fcb_spim_ckout,  //SPI Master Clock Output
-    output logic       fcb_spim_ckout_en,  //SPI Master Clock Output Enable
-    output logic [6:0] fsmc_frfu_rd_addr,  //SFR Read Address
-    output logic [6:0] fsmc_frfu_wr_addr,  //SFR Write Address
-    output logic       fsmc_frfu_wr_en,  //SFR Write Enable
-    output logic       fsmc_frfu_rd_en,  //SFR Read Enable
-    output logic [7:0] fsmc_frfu_wr_data,  //SFR Write Data
-    output logic       fsmc_frfu_spim_on,  //SPI Master is ON
-    output logic [7:0] fsmc_frfu_cwf_wr_data,  //Write Data of Cfg Write FIFO
-    output logic       fsmc_frfu_cwf_wr_en,  //Write Enable to indicate the whole 32-B
-    output logic       fsmc_fmic_fsmc_busy,  //FSMC Busy
-    output logic       fsmc_fmic_seq_done,  //FSM
-    output logic       fsmc_frfu_set_fb_cfg_done  //Set FB Cfg Done Bit
+    output logic       fsmc_frfu_clr_rcclk_en,       //Clear RC clock
+    output logic       fsmc_frfu_set_pd,             //Set Whole Chip Power Down // JC // 05182017
+    output logic       fsmc_frfu_set_clp_pd,         //Set Whole Chip Power Down // JC // 05182017
+    output logic       fcb_spim_mosi,                //SPI Master MOSI
+    output logic       fcb_spim_mosi_en,             //SPI Master MOSI output enable
+    output logic       fcb_spim_cs_n,                //SPI Master Chip Select
+    output logic       fcb_spim_cs_n_en,             //SPI Master Chip Select enable
+    output logic       fcb_spim_ckout,               //SPI Master Clock Output
+    output logic       fcb_spim_ckout_en,            //SPI Master Clock Output Enable
+    output logic [6:0] fsmc_frfu_rd_addr,            //SFR Read Address
+    output logic [6:0] fsmc_frfu_wr_addr,            //SFR Write Address
+    output logic       fsmc_frfu_wr_en,              //SFR Write Enable
+    output logic       fsmc_frfu_rd_en,              //SFR Read Enable
+    output logic [7:0] fsmc_frfu_wr_data,            //SFR Write Data
+    output logic       fsmc_frfu_spim_on,            //SPI Master is ON
+    output logic [7:0] fsmc_frfu_cwf_wr_data,        //Write Data of Cfg Write FIFO
+    output logic       fsmc_frfu_cwf_wr_en,          //Write Enable to indicate the whole 32-B
+    output logic       fsmc_fmic_fsmc_busy,          //FSMC Busy
+    output logic       fsmc_fmic_seq_done,           //FSM
+    output logic       fsmc_frfu_set_fb_cfg_done     //Set FB Cfg Done Bit
 );
 
   //------------------------------------------------------------------------//

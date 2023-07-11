@@ -5,7 +5,7 @@
 
 module fcbpmu #(
     parameter [5:0] PAR_QLFCB_6BIT_125NS = 6'h0d,  // Default Assume 100MHz
-    parameter [5:0] PAR_QLFCB_6BIT_250NS = 6'h19  // Default Assume 100MHz
+    parameter [5:0] PAR_QLFCB_6BIT_250NS = 6'h19   // Default Assume 100MHz
 ) (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
@@ -1085,33 +1085,33 @@ module fcbpmu #(
     if (fcb_sys_rst_n == 1'b0) begin
       if ( fcb_fb_default_on_bo == 1'b1 ) // Default ON
 	begin
-        fcb_fb_iso_enb_cs 		<=#PAR_DLY 'b0;
-        fcb_iso_en_cs  		<=#PAR_DLY 16'hffff ;
-        fcb_pi_pwr_cs  		<=#PAR_DLY 16'hffff ;
-        fcb_vlp_clkdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_clkdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_vlp_srdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_srdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_vlp_pwrdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_pwrdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_pwr_gate_cs 		<=#PAR_DLY 'b0;
-        fcb_prog_ifx_cs 		<=#PAR_DLY 1'b1;
-        fcb_prog_cs 			<=#PAR_DLY 16'hffff ;
-        fcb_set_por_cs  		<=#PAR_DLY 'b0;
+        fcb_fb_iso_enb_cs   <=#PAR_DLY 'b0;
+        fcb_iso_en_cs    <=#PAR_DLY 16'hffff ;
+        fcb_pi_pwr_cs    <=#PAR_DLY 16'hffff ;
+        fcb_vlp_clkdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_clkdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_vlp_srdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_srdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_vlp_pwrdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_pwrdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_pwr_gate_cs   <=#PAR_DLY 'b0;
+        fcb_prog_ifx_cs   <=#PAR_DLY 1'b1;
+        fcb_prog_cs    <=#PAR_DLY 16'hffff ;
+        fcb_set_por_cs    <=#PAR_DLY 'b0;
       end else begin
-        fcb_fb_iso_enb_cs 		<=#PAR_DLY 'b0;
-        fcb_iso_en_cs  		<=#PAR_DLY 16'hffff ;
-        fcb_pi_pwr_cs  		<=#PAR_DLY 'b0 ;
-        fcb_vlp_clkdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_clkdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_vlp_srdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_srdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_vlp_pwrdis_cs  		<=#PAR_DLY 'b0;
-        fcb_vlp_pwrdis_ifx_cs  	<=#PAR_DLY 'b0;
-        fcb_pwr_gate_cs 		<=#PAR_DLY 1'b1;
-        fcb_prog_ifx_cs 		<=#PAR_DLY 'b0;
-        fcb_prog_cs 			<=#PAR_DLY 'b0 ;
-        fcb_set_por_cs  		<=#PAR_DLY 'b0;
+        fcb_fb_iso_enb_cs   <=#PAR_DLY 'b0;
+        fcb_iso_en_cs    <=#PAR_DLY 16'hffff ;
+        fcb_pi_pwr_cs    <=#PAR_DLY 'b0 ;
+        fcb_vlp_clkdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_clkdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_vlp_srdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_srdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_vlp_pwrdis_cs    <=#PAR_DLY 'b0;
+        fcb_vlp_pwrdis_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_pwr_gate_cs   <=#PAR_DLY 1'b1;
+        fcb_prog_ifx_cs   <=#PAR_DLY 'b0;
+        fcb_prog_cs    <=#PAR_DLY 'b0 ;
+        fcb_set_por_cs    <=#PAR_DLY 'b0;
       end
     end else begin
       fcb_fb_iso_enb_cs     <= #PAR_DLY fcb_fb_iso_enb_ns;
@@ -1297,53 +1297,53 @@ module fcbpmu #(
 
 
   always_comb begin
-    pmu_stm_ns			= pmu_stm_cs ;
-    pmu_return_stm_ns 		= pmu_return_stm_cs ;
-    pmu_stm_quad_ns		= pmu_stm_quad_cs ;
-    pmu_index_cnt_ns 		= pmu_index_cnt_cs ;
-    chip_level_vlp_en_ns 		= chip_level_vlp_en_cs ;
+    pmu_stm_ns   = pmu_stm_cs ;
+    pmu_return_stm_ns   = pmu_return_stm_cs ;
+    pmu_stm_quad_ns  = pmu_stm_quad_cs ;
+    pmu_index_cnt_ns   = pmu_index_cnt_cs ;
+    chip_level_vlp_en_ns   = chip_level_vlp_en_cs ;
 
-    set_fcb_iso_en  		= 'b0 ;
-    set_fcb_pi_pwr  		= 'b0 ;
-    set_fcb_vlp_clkdis  		= 'b0 ;
-    set_fcb_vlp_clkdis_ifx  	= 'b0 ;
-    set_fcb_vlp_srdis  		= 'b0 ;
-    set_fcb_vlp_srdis_ifx  	= 'b0 ;
-    set_fcb_vlp_pwrdis  		= 'b0 ;
-    set_fcb_vlp_pwrdis_ifx  	= 'b0 ;
-    set_fcb_set_por  		= 'b0 ;
-    set_fcb_fb_iso_enb 		= 'b0 ;
-    set_fcb_pwr_gate 		= 'b0 ;
-    set_fcb_prog_ifx 		= 'b0 ;
-    set_fcb_prog 			= 'b0 ;
-    clr_fcb_iso_en  		= 'b0 ;
-    clr_fcb_pi_pwr  		= 'b0 ;
-    clr_fcb_vlp_clkdis  		= 'b0 ;
-    clr_fcb_vlp_clkdis_ifx  	= 'b0 ;
-    clr_fcb_vlp_srdis  		= 'b0 ;
-    clr_fcb_vlp_srdis_ifx  	= 'b0 ;
-    clr_fcb_vlp_pwrdis  		= 'b0 ;
-    clr_fcb_vlp_pwrdis_ifx  	= 'b0 ;
-    clr_fcb_set_por  		= 'b0 ;
-    clr_fcb_fb_iso_enb 		= 'b0 ;
-    clr_fcb_pwr_gate 		= 'b0 ;
-    clr_fcb_prog_ifx 		= 'b0 ;
-    clr_fcb_prog 			= 'b0 ;
-    set_quad_status_0 		= 'b0 ;
-    set_quad_status_1 		= 'b0 ;
-    clr_quad_status_0 		= 'b0 ;
-    clr_quad_status_1 		= 'b0 ;
-    set_vlp_chip_pw_sta 		= 'b0 ;
-    set_pd_chip_pw_sta 		= 'b0 ;
-    set_idle_chip_pw_sta 		= 'b0 ;
+    set_fcb_iso_en    = 'b0 ;
+    set_fcb_pi_pwr    = 'b0 ;
+    set_fcb_vlp_clkdis    = 'b0 ;
+    set_fcb_vlp_clkdis_ifx   = 'b0 ;
+    set_fcb_vlp_srdis    = 'b0 ;
+    set_fcb_vlp_srdis_ifx   = 'b0 ;
+    set_fcb_vlp_pwrdis    = 'b0 ;
+    set_fcb_vlp_pwrdis_ifx   = 'b0 ;
+    set_fcb_set_por    = 'b0 ;
+    set_fcb_fb_iso_enb   = 'b0 ;
+    set_fcb_pwr_gate   = 'b0 ;
+    set_fcb_prog_ifx   = 'b0 ;
+    set_fcb_prog    = 'b0 ;
+    clr_fcb_iso_en    = 'b0 ;
+    clr_fcb_pi_pwr    = 'b0 ;
+    clr_fcb_vlp_clkdis    = 'b0 ;
+    clr_fcb_vlp_clkdis_ifx   = 'b0 ;
+    clr_fcb_vlp_srdis    = 'b0 ;
+    clr_fcb_vlp_srdis_ifx   = 'b0 ;
+    clr_fcb_vlp_pwrdis    = 'b0 ;
+    clr_fcb_vlp_pwrdis_ifx   = 'b0 ;
+    clr_fcb_set_por    = 'b0 ;
+    clr_fcb_fb_iso_enb   = 'b0 ;
+    clr_fcb_pwr_gate   = 'b0 ;
+    clr_fcb_prog_ifx   = 'b0 ;
+    clr_fcb_prog    = 'b0 ;
+    set_quad_status_0   = 'b0 ;
+    set_quad_status_1   = 'b0 ;
+    clr_quad_status_0   = 'b0 ;
+    clr_quad_status_1   = 'b0 ;
+    set_vlp_chip_pw_sta   = 'b0 ;
+    set_pd_chip_pw_sta   = 'b0 ;
+    set_idle_chip_pw_sta   = 'b0 ;
 
-    fpmu_frfu_clr_pmu_chip_cmd	= 1'b0 ;
-    fpmu_frfu_clr_quads 		= 1'b0 ;
-    fpmu_frfu_clr_cfg_done	= 1'b0 ;
-    pmu_timer_kickoff 		= 1'b0 ;
-    pmu_timer_ini_value 		= timer_125ns_value ;
+    fpmu_frfu_clr_pmu_chip_cmd = 1'b0 ;
+    fpmu_frfu_clr_quads   = 1'b0 ;
+    fpmu_frfu_clr_cfg_done = 1'b0 ;
+    pmu_timer_kickoff   = 1'b0 ;
+    pmu_timer_ini_value   = timer_125ns_value ;
 
-    pmu_clpd_ing_ns 		= pmu_clpd_ing_cs 	;
+    pmu_clpd_ing_ns   = pmu_clpd_ing_cs  ;
 
     case (pmu_stm_cs)
       MAIN_S00: begin
@@ -1937,10 +1937,10 @@ module fcbpmu #(
       //-- END Sequence 						--//
       //----------------------------------------------------------------//
       END_S00: begin
-        pmu_stm_ns 			= MAIN_S00;
-        fpmu_frfu_clr_pmu_chip_cmd	= 1'b1 ;
-        fpmu_frfu_clr_quads 		= 1'b1 ;
-        pmu_clpd_ing_ns 		= 1'b0 ;
+        pmu_stm_ns    = MAIN_S00;
+        fpmu_frfu_clr_pmu_chip_cmd = 1'b1 ;
+        fpmu_frfu_clr_quads   = 1'b1 ;
+        pmu_clpd_ing_ns   = 1'b0 ;
       end
 
       //----------------------------------------------------------------//

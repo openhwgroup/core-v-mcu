@@ -482,29 +482,29 @@ module efpga_subsystem #(
       .fcb_bl_dout(efpga2fcb_bl_dout),
       .fcb_bl_pwrgate(fcb2efpga_bl_pwrgate),  //done
 
-      .fcb_blclk         (fcb2efpga_blclk),  //done
-      .fcb_cload_din_sel (fcb2efpga_cload_din_sel),  //done
-      .fcb_din_int_l_only(fcb2efpga_din_int_l_only),  //done
-      .fcb_din_int_r_only(fcb2efpga_din_int_r_only),  //done
-      .fcb_din_slc_tb_int(fcb2efpga_din_slc_tb_int),  //done
+      .fcb_blclk         (fcb2efpga_blclk),              //done
+      .fcb_cload_din_sel (fcb2efpga_cload_din_sel),      //done
+      .fcb_din_int_l_only(fcb2efpga_din_int_l_only),     //done
+      .fcb_din_int_r_only(fcb2efpga_din_int_r_only),     //done
+      .fcb_din_slc_tb_int(fcb2efpga_din_slc_tb_int),     //done
       .fcb_fb_iso_enb    (fcb2efpga_fb_iso_enb),
       .fcb_fb_cfg_done   (fcb_fb_cfg_done),
       .fcb_iso_en        (fcb2efpga_iso_en[15:0]),
-      .fcb_pchg_b        (fcb2efpga_pchg_b),  //done
+      .fcb_pchg_b        (fcb2efpga_pchg_b),             //done
       .fcb_pi_pwr        (fcb2efpga_pi_pwr[15:0]),
       .fcb_pif_en        (efpga2fcb_pif_en),
       .fcb_prog          (fcb2efpga_prog[15:0]),
       .fcb_prog_ifx      (fcb2efpga_prog_ifx),
       .fcb_pwr_gate      (fcb2efpga_pwr_gate),
-      .fcb_re            (fcb2efpga_re),  //done
+      .fcb_re            (fcb2efpga_re),                 //done
       .fcb_vlp_clkdis    (fcb2efpga_vlp_clkdis[15:0]),
       .fcb_vlp_clkdis_ifx(fcb2efpga_vlp_clkdis_ifx),
       .fcb_vlp_srdis     (fcb2efpga_vlp_srdis[15:0]),
       .fcb_vlp_srdis_ifx (fcb2efpga_vlp_srdis_ifx),
       .fcb_vlp_pwrdis    (fcb2efpga_vlp_pwrdis[15:0]),
       .fcb_vlp_pwrdis_ifx(fcb2efpga_vlp_pwrdis_ifx),
-      .fcb_we            (fcb2efpga_we),  //done
-      .fcb_we_int        (fcb2efpga_we_int),  // done
+      .fcb_we            (fcb2efpga_we),                 //done
+      .fcb_we_int        (fcb2efpga_we_int),             // done
       .fcb_wl_cload_sel  (fcb2efpga_wl_cload_sel[2:0]),
       .fcb_wl_din        (fcb2efpga_wl_din[5:0]),
       .fcb_wl_en         (fcb2efpga_wl_en),

@@ -4,12 +4,35 @@
 //
 // `include "pulp_soc_defines.svh"
 module top (
+    output m0_m0_clk_def,
+    output m0_m1_clk_def,
+    output m1_m0_clk_def,
+    output m1_m1_clk_def,
+    output m0_oper0_wclk_def,
+    m0_oper0_rclk_def,
+    output m0_oper1_wclk_def,
+    m0_oper1_rclk_def,
+    output m0_coef_wclk_def,
+    m0_coef_rclk_def,
+    output m1_oper0_wclk_def,
+    m1_oper0_rclk_def,
+    output m1_oper1_wclk_def,
+    m1_oper1_rclk_def,
+    output m1_coef_wclk_def,
+    m1_coef_rclk_def,
+    output lint_clk_def,
+    output tcdm_clk_p0_def,
+    output tcdm_clk_p1_def,
+    output tcdm_clk_p2_def,
+    output tcdm_clk_p3_def,
+
+
     input [5:0] CLK,
     input [3:0] RESET,
     input       lint_REQ,
     lint_WEN,
 
-    input        [19:0] lint_ADDR,  //PADDR,
+    input        [19:0] lint_ADDR,   //PADDR,
     input        [31:0] lint_WDATA,  //PWDATA,
     input        [ 3:0] lint_BE,
     output logic        lint_VALID,
@@ -194,6 +217,29 @@ module top (
     tcdm_clk_p3
 );
 
+  assign m0_m0_clk_def = 1'b0;
+  assign m0_m1_clk_def = 1'b0;
+  assign m1_m0_clk_def = 1'b0;
+  assign m1_m1_clk_def = 1'b0;
+  assign m0_oper0_wclk_def = 1'b0;
+  assign m0_oper0_rclk_def = 1'b0;
+  assign m0_oper1_wclk_def = 1'b0;
+  assign m0_oper1_rclk_def = 1'b0;
+  assign m0_coef_wclk_def = 1'b0;
+  assign m0_coef_rclk_def = 1'b0;
+  assign m1_oper0_wclk_def = 1'b0;
+  assign m1_oper0_rclk_def = 1'b0;
+  assign m1_oper1_wclk_def = 1'b0;
+  assign m1_oper1_rclk_def = 1'b0;
+  assign m1_coef_wclk_def = 1'b0;
+  assign m1_coef_rclk_def = 1'b0;
+  assign lint_clk_def = 1'b0;
+  assign tcdm_clk_p0_def = 1'b0;
+  assign tcdm_clk_p1_def = 1'b0;
+  assign tcdm_clk_p2_def = 1'b0;
+  assign tcdm_clk_p3_def = 1'b0;
+
+
   logic [3:0] apb_fsm;
   logic [31:0] m0_m0_control, m0_m1_control, m1_m0_control, m1_m1_control;
   logic [31:0] m0_ram_control, m1_ram_control;
@@ -215,6 +261,10 @@ module top (
   logic [3:0] p0_fsm, p1_fsm, p2_fsm, p3_fsm;
   logic [7:0] p0_cnt, p1_cnt, p2_cnt, p3_cnt;
   logic [ 7:0] delay;
+  logic [31:0] blinker;
+  logic [30:0] blink_cnt;
+  logic        blink;
+
 
 
   logic [31:0] last_control;
@@ -325,7 +375,7 @@ module top (
 
 
 
-  assign fpgaio_out = ifpga_out;
+  assign fpgaio_out = (ifpga_out ^ {64'h0, blink, 14'h0});
   assign fpgaio_oe = ifpga_oe;
   assign events_o = i_events;
 
@@ -446,8 +496,17 @@ module top (
       m1_m0_cdata <= '0;
       m1_m1_cdata <= '0;
       delay <= 0;
+      blinker <= 32'h0;
+      blink_cnt <= 16'h0;
+
     end // if (RESET[0] == 0)
     else begin
+      if (blinker[31] == 1'b1) begin
+        if (blink_cnt == 30'h0) begin
+          blink <= ~blink;
+          blink_cnt <= blinker[30:0];
+        end else blink_cnt <= blink_cnt - 1;
+      end
       last_control <= control_in;
       saved_REQ <= lint_REQ;
       m0_m0_clken <= 0;
@@ -519,9 +578,8 @@ module top (
               m0_oper0_we <= 1;
               if (p0_cnt < control_in[23:16]) p0_fsm <= 2;
               else p0_fsm <= 0;
-            end
-                 else // write
-                   if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
+            end else  // write
+            if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
             else p0_fsm <= 0;
           end
         end  // if (tcdm_valid_p0 == 1)
@@ -571,9 +629,8 @@ module top (
               m0_oper1_wdata <= tcdm_rdata_p1;
               if (p1_cnt < control_in[23:16]) p1_fsm <= 2;
               else p1_fsm <= 0;
-            end
-                 else // write
-                   if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
+            end else  // write
+            if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
             else p1_fsm <= 0;
           end
         end  // if (tcdm_valid_p1 == 1)
@@ -623,9 +680,8 @@ module top (
               m1_oper0_we <= 1;
               if (p2_cnt < control_in[23:16]) p2_fsm <= 2;
               else p2_fsm <= 0;
-            end
-                 else // write
-                   if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
+            end else  // write
+            if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
             else p2_fsm <= 0;
           end
         end  // if (tcdm_valid_p2 == 1)
@@ -674,9 +730,8 @@ module top (
               m1_oper1_we <= 1;
               if (p3_cnt < control_in[23:16]) p3_fsm <= 2;
               else p3_fsm <= 0;
-            end
-                 else // write
-                   if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
+            end else  // write
+            if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
             else p3_fsm <= 0;
           end
         end  // if (tcdm_valid_p3 == 1)
@@ -830,6 +885,8 @@ module top (
             20'h54: ifpga_oe[63:32] <= lint_WDATA;
             20'h58: ifpga_oe[79:64] <= lint_WDATA[15:0];
             20'h6c: i_events <= lint_WDATA[15:0];
+            20'h70: blinker <= lint_WDATA;
+
             20'h80: begin
               tcdm_wdata_p0 <= lint_WDATA;
               tcdm_req_p0   <= 1;
@@ -1002,7 +1059,7 @@ module top (
             20'h64: lint_RDATA <= fpgaio_in[63:32];
             20'h68: lint_RDATA <= {saved_REQ, cnt5, cnt4, cnt3, cnt2, cnt1, fpgaio_in[79:64]};
             20'h6C: lint_RDATA <= {16'b0, i_events};
-
+            20'h70: lint_RDATA <= blinker;
             20'h80: lint_RDATA <= tcdm_result_p0;
             20'h84: lint_RDATA <= tcdm_result_p1;
             20'h88: lint_RDATA <= tcdm_result_p2;

@@ -18,8 +18,8 @@ set_property -dict { PACKAGE_PIN R19 IOSTANDARD LVCMOS33 } [get_ports { xilinx_i
 
 ## LEDs
 set_property -dict { PACKAGE_PIN T28 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[11] }]; #IO_L11N_T1_SRCC_14 Sch=led[0]
-#set_property -dict { PACKAGE_PIN V19   IOSTANDARD LVCMOS33 } [get_ports { led[1] }]; #IO_L19P_T3_A10_D26_14 Sch=led[1]
-#set_property -dict { PACKAGE_PIN U30   IOSTANDARD LVCMOS33 } [get_ports { led[2] }]; #IO_L15N_T2_DQS_DOUT_CSO_B_14 Sch=led[2]
+set_property -dict { PACKAGE_PIN V19 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[21] }]; #IO_L19P_T3_A10_D26_14 Sch=led[1]
+set_property -dict { PACKAGE_PIN U30 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[29] }]; #IO_L15N_T2_DQS_DOUT_CSO_B_14 Sch=led[2]
 #set_property -dict { PACKAGE_PIN U29   IOSTANDARD LVCMOS33 } [get_ports { led[3] }]; #IO_L15P_T2_DQS_RDWR_B_14 Sch=led[3]
 #set_property -dict { PACKAGE_PIN V20   IOSTANDARD LVCMOS33 } [get_ports { led[4] }]; #IO_L19N_T3_A09_D25_VREF_14 Sch=led[4]
 #set_property -dict { PACKAGE_PIN V26   IOSTANDARD LVCMOS33 } [get_ports { led[5] }]; #IO_L16P_T2_CSI_B_14 Sch=led[5]
@@ -164,7 +164,7 @@ set_property -dict { PACKAGE_PIN U22 IOSTANDARD LVCMOS33 } [get_ports { xilinx_i
 set_property -dict { PACKAGE_PIN U23 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[44] }]; #IO_L21N_T3_DQS_A06_D22_14 Sch=jb_n[4]
 
 ## PMOD Header JC
-set_property -dict { PACKAGE_PIN AC26 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[21] }]; #IO_L19P_T3_13 Sch=jc[1]
+#set_property -dict { PACKAGE_PIN AC26  IOSTANDARD LVCMOS33 } [get_ports { jc[1] }]; #IO_L19P_T3_13 Sch=jc[1]
 set_property -dict { PACKAGE_PIN AJ27 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[22] }]; #IO_L20P_T3_13 Sch=jc[2]
 set_property -dict { PACKAGE_PIN AH30 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[23] }]; #IO_L18N_T2_13 Sch=jc[3]
 set_property -dict { PACKAGE_PIN AK29 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[24] }]; #IO_L15P_T2_DQS_13 Sch=jc[4]
@@ -174,7 +174,7 @@ set_property -dict { PACKAGE_PIN AK30 IOSTANDARD LVCMOS33 } [get_ports { xilinx_
 set_property -dict { PACKAGE_PIN AK28 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[28] }]; #IO_L20N_T3_13 Sch=jc[10]
 
 ## PMOD Header JD
-set_property -dict { PACKAGE_PIN V27 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[29] }]; #IO_L16N_T2_A15_D31_14 Sch=jd[1]
+#set_property -dict { PACKAGE_PIN V27   IOSTANDARD LVCMOS33 } [get_ports { jd[1] }]; #IO_L16N_T2_A15_D31_14 Sch=jd[1]
 set_property -dict { PACKAGE_PIN Y30 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[30] }]; #IO_L8P_T1_13 Sch=jd[2]
 set_property -dict { PACKAGE_PIN V24 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[31] }]; #IO_L23N_T3_A02_D18_14 Sch=jd[3]
 set_property -dict { PACKAGE_PIN W22 IOSTANDARD LVCMOS33 } [get_ports { xilinx_io[32] }]; #IO_L24N_T3_A00_D16_14 Sch=jd[4]
