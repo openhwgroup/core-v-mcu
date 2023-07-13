@@ -72,14 +72,19 @@ module cv32e40p_fp_wrapper
   // Implementation (number of registers etc)
   localparam fpnew_pkg::fpu_implementation_t FPU_IMPLEMENTATION = '{
   PipeRegs:  '{// FP32, FP64, FP16, FP8, FP16alt
-  '{C_LAT_FP32, C_LAT_FP64, C_LAT_FP16, C_LAT_FP8, C_LAT_FP16ALT},  // ADDMUL
-  '{default: C_LAT_DIVSQRT},  // DIVSQRT
-  '{default: C_LAT_NONCOMP},  // NONCOMP
-  '{default: C_LAT_CONV}},  // CONV
-  UnitTypes: '{'{default: fpnew_pkg::MERGED},  // ADDMUL
-  '{default: fpnew_pkg::MERGED},  // DIVSQRT
-  '{default: fpnew_pkg::PARALLEL},  // NONCOMP
-  '{default: fpnew_pkg::MERGED}},  // CONV
+      '{
+          C_LAT_FP32, C_LAT_FP64, C_LAT_FP16, C_LAT_FP8, C_LAT_FP16ALT
+      },  // ADDMUL
+      '{default: C_LAT_DIVSQRT},  // DIVSQRT
+      '{default: C_LAT_NONCOMP},  // NONCOMP
+      '{default: C_LAT_CONV}
+  },  // CONV
+  UnitTypes: '{
+      '{default: fpnew_pkg::MERGED},  // ADDMUL
+      '{default: fpnew_pkg::MERGED},  // DIVSQRT
+      '{default: fpnew_pkg::PARALLEL},  // NONCOMP
+      '{default: fpnew_pkg::MERGED}
+  },  // CONV
   PipeConfig: fpnew_pkg::AFTER};
 
   //---------------
