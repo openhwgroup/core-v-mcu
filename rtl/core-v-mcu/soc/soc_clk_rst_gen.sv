@@ -113,7 +113,7 @@ module soc_clk_rst_gen (
 
       .test_mode_i(test_mode_i),
 
-      .rst_no (s_rstn_soc_sync),  //to be used by logic clocked with ref clock in AO domain
+      .rst_no(s_rstn_soc_sync),  //to be used by logic clocked with ref clock in AO domain
       .init_no()  //not used
   );
 `else
@@ -128,7 +128,7 @@ module soc_clk_rst_gen (
 
       .test_mode_i(test_mode_i),
 
-      .rst_no (s_rstn_cluster_sync),  //to be used by logic clocked with ref clock in AO domain
+      .rst_no(s_rstn_cluster_sync),  //to be used by logic clocked with ref clock in AO domain
       .init_no()  //not used
   );
 `else

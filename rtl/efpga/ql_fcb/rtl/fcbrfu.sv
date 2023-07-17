@@ -53,7 +53,7 @@ module fcbrfu #(
     //input logic                   fpmu_frfu_clr_quad_pd_wr_en_b1 ,   //Clear Enable, Once Asserted, the corres
 
     input logic [7:0] fcb_device_id_bo,
-    input logic       fcb_clp_mode_en_bo,  //JC 01262017
+    input logic       fcb_clp_mode_en_bo,             //JC 01262017
     input logic       fcb_vlp,
     input logic       fmic_frfu_set_pmu_chip_vlp_en,
     input logic       fmic_frfu_set_pmu_chip_wu_en,
@@ -77,20 +77,20 @@ module fcbrfu #(
     input logic [1:0] fpmu_frfu_pw_sta_32,
     input logic [1:0] fpmu_frfu_pw_sta_33,
     input logic       fsmc_frfu_set_fb_cfg_done,
-    input logic       fsmc_frfu_clr_rcclk_en,  //Clear RC CLK Enable
-    input logic       ffsr_frfu_rfifo_empty_p1,  //Empty Plus 1 Flag of Read FIFO
+    input logic       fsmc_frfu_clr_rcclk_en,         //Clear RC CLK Enable
+    input logic       ffsr_frfu_rfifo_empty_p1,       //Empty Plus 1 Flag of Read FIFO
 
-    input  logic       fclp_frfu_clear_vlp_en,  //Clear VLP EN Bit
-    input  logic       fclp_frfu_clear_vlp_wu_en,  //Clear VLP WU EN Bit
-    input  logic       fclp_frfu_clear_pd_en,  //Clear PD Enable
-    input  logic       fclp_frfu_clear_pd_wu_en,  //Clear PD WU Enable
-    input  logic [1:0] fclp_frfu_clp_pw_sta,  //Macro's Power Status
-    input  logic       fclp_frfu_clear_cfg_done,  //Clear the CFG Done.
-    input  logic       fsmc_frfu_set_pd,  //JC
-    input  logic       fsmc_frfu_set_clp_pd,  //JC
+    input  logic       fclp_frfu_clear_vlp_en,      //Clear VLP EN Bit
+    input  logic       fclp_frfu_clear_vlp_wu_en,   //Clear VLP WU EN Bit
+    input  logic       fclp_frfu_clear_pd_en,       //Clear PD Enable
+    input  logic       fclp_frfu_clear_pd_wu_en,    //Clear PD WU Enable
+    input  logic [1:0] fclp_frfu_clp_pw_sta,        //Macro's Power Status
+    input  logic       fclp_frfu_clear_cfg_done,    //Clear the CFG Done.
+    input  logic       fsmc_frfu_set_pd,            //JC
+    input  logic       fsmc_frfu_set_clp_pd,        //JC
     //input logic			fpmu_frfu_clr_pmu_chip_pd_en ,	//JC
-    input  logic [1:0] fpmu_frfu_chip_pw_sta,  //JC 05232017
-    input  logic       fpmu_frfu_clr_cfg_done,  //JC
+    input  logic [1:0] fpmu_frfu_chip_pw_sta,       //JC 05232017
+    input  logic       fpmu_frfu_clr_cfg_done,      //JC
     input  logic       fpmu_frfu_clr_pmu_chip_cmd,  //JC, Latest One
     input  logic       fpmu_frfu_pmu_busy,
     input  logic       fsmc_frfu_set_quad_pd,
@@ -107,33 +107,33 @@ module fcbrfu #(
     output logic [7:0] frfu_fpmu_prog_sd_0,
     output logic [7:0] frfu_fpmu_prog_sd_1,
 
-    output logic        frfu_fpmu_fb_cfg_done,  // JC
+    output logic        frfu_fpmu_fb_cfg_done,        // JC
     output logic        frfu_fpmu_prog_pmu_chip_cmd,  //JC
-    output logic [ 3:0] frfu_fpmu_pmu_chip_cmd,  //JC
-    output logic        frfu_fpmu_prog_cfg_done,  //JC
+    output logic [ 3:0] frfu_fpmu_pmu_chip_cmd,       //JC
+    output logic        frfu_fpmu_prog_cfg_done,      //JC
     output logic        frfu_fpmu_clr_cfg_done,
     //output logic			frfu_fpmu_prog_pmu_quad_pd_en, 	//JC
     //output logic			frfu_fpmu_prog_pmu_quad_wu_en, 	//JC
     //output logic			frfu_fpmu_pmu_chip_pd_en ,	//JC
     output logic [ 7:0] frfu_fsmc_spim_ckb_0,
     output logic [ 7:0] frfu_fsmc_spim_ckb_1,
-    output logic [ 7:0] frfu_bl_pw_cfg_0,  //
-    output logic [ 7:0] frfu_bl_pw_cfg_1,  //
-    output logic [ 7:0] frfu_wl_pw_cfg,  //
-    output logic        frfu_ffsr_rfifo_rd_en,  //Read Enable of Read FIFO
-    output logic [31:0] frfu_ffsr_wfifo_wdata,  //Write Data Of write FIFO
-    output logic        frfu_ffsr_wfifo_wr_en,  //Write Enable Of Write FIFO
-    output logic [ 1:0] frfu_ffsr_blclk_sut,  //JC 07
-    output logic [ 1:0] frfu_ffsr_wlclk_sut,  //JC 07
-    output logic [ 1:0] frfu_ffsr_wlen_sut,  //JC 07
-    output logic [ 7:0] frfu_sfr_rd_data,  //SFR Read Data
-    output logic        frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    output logic [31:0] frfu_frwf_crf_wr_data,  //Write Data of Cfg Read FIFO
-    output logic        frfu_frwf_crf_wr_en,  //Write Enable of Cfg Read FIFO
-    output logic [ 7:0] frfu_fsmc_spim_device_id,  //
-    output logic        frfu_fsmc_checksum_status,  //CheckSum Status
-    output logic        fcb_fb_cfg_done,  //Indicate the Fabric Configuration is do
-    output logic        frfu_fsmc_pending_pd_req,  //Pending Power Down Request
+    output logic [ 7:0] frfu_bl_pw_cfg_0,             //
+    output logic [ 7:0] frfu_bl_pw_cfg_1,             //
+    output logic [ 7:0] frfu_wl_pw_cfg,               //
+    output logic        frfu_ffsr_rfifo_rd_en,        //Read Enable of Read FIFO
+    output logic [31:0] frfu_ffsr_wfifo_wdata,        //Write Data Of write FIFO
+    output logic        frfu_ffsr_wfifo_wr_en,        //Write Enable Of Write FIFO
+    output logic [ 1:0] frfu_ffsr_blclk_sut,          //JC 07
+    output logic [ 1:0] frfu_ffsr_wlclk_sut,          //JC 07
+    output logic [ 1:0] frfu_ffsr_wlen_sut,           //JC 07
+    output logic [ 7:0] frfu_sfr_rd_data,             //SFR Read Data
+    output logic        frfu_cwf_full,                //Full Flag of Cfg Write FIFO
+    output logic [31:0] frfu_frwf_crf_wr_data,        //Write Data of Cfg Read FIFO
+    output logic        frfu_frwf_crf_wr_en,          //Write Enable of Cfg Read FIFO
+    output logic [ 7:0] frfu_fsmc_spim_device_id,     //
+    output logic        frfu_fsmc_checksum_status,    //CheckSum Status
+    output logic        fcb_fb_cfg_done,              //Indicate the Fabric Configuration is do
+    output logic        frfu_fsmc_pending_pd_req,     //Pending Power Down Request
     output logic [ 7:0] frfu_ffsr_bl_cnt_h,
     output logic [ 7:0] frfu_ffsr_bl_cnt_l,
     output logic [ 3:0] frfu_ffsr_cfg_wrp_ccnt,
@@ -160,22 +160,22 @@ module fcbrfu #(
 
     //output logic 			frfu_fpmu_pmu_chip_vlp_en ,
     //output logic 			frfu_fpmu_pmu_chip_vlp_wu_en ,
-    output logic 			frfu_fpmu_pmu_mux_sel_sd ,
-    output logic [5:0]		frfu_fpmu_pmu_pwr_gate_ccnt ,
-    output logic [7:0]		frfu_fpmu_pmu_timer_ccnt ,
+    output logic    frfu_fpmu_pmu_mux_sel_sd ,
+    output logic [5:0]  frfu_fpmu_pmu_pwr_gate_ccnt ,
+    output logic [7:0]  frfu_fpmu_pmu_timer_ccnt ,
     //output logic [7:0]		frfu_fpmu_quad_pd_en_b0 ,
     //output logic [7:0]		frfu_fpmu_quad_pd_en_b1 ,
     //output logic [1:0]		frfu_fpmu_quad_pd_mode , //JC
     //output logic [7:0]		frfu_fpmu_quad_wu_en_b0 ,
     //output logic [7:0]		frfu_fpmu_quad_wu_en_b1 ,
     //output logic [1:0]		frfu_fpmu_quad_wu_mode ,//JC
-    output logic [7:0]		frfu_fpmu_quad_cfg_b1 , //JC
-    output logic [7:0]		frfu_fpmu_quad_cfg_b0 , //JC
+    output logic [7:0]  frfu_fpmu_quad_cfg_b1 , //JC
+    output logic [7:0]  frfu_fpmu_quad_cfg_b0 , //JC
 
-    output logic 			frfu_fpmu_vlp_clkdis_ifx_sd ,
-    output logic [7:0]		frfu_fpmu_vlp_clkdis_sd_0 ,
-    output logic [7:0]		frfu_fpmu_vlp_clkdis_sd_1 ,
-    output logic 			frfu_fpmu_vlp_pwrdis_ifx_sd ,
+    output logic    frfu_fpmu_vlp_clkdis_ifx_sd ,
+    output logic [7:0]  frfu_fpmu_vlp_clkdis_sd_0 ,
+    output logic [7:0]  frfu_fpmu_vlp_clkdis_sd_1 ,
+    output logic    frfu_fpmu_vlp_pwrdis_ifx_sd ,
 
     output logic [7:0] frfu_fpmu_vlp_pwrdis_sd_0,
     output logic [7:0] frfu_fpmu_vlp_pwrdis_sd_1,
@@ -193,19 +193,19 @@ module fcbrfu #(
     //--								--//
     //----------------------------------------------------------------//
     output logic [1:0] frfu_ffsr_wlblclk_cfg,
-    output logic       frfu_fsmc_checksum_enable,  // How to generate it
+    output logic       frfu_fsmc_checksum_enable,   // How to generate it
     //output logic 	                frfu_fpmu_prog_quad_wu_en_b1 ,  //Pulse
     //output logic 	                frfu_fpmu_prog_quad_wu_en_b1 ,  //Pulse
     //output logic                  frfu_fpmu_prog_pmu_chip_wu_en ,     //Pulse for both VLP and PD JC
     //output logic                  frfu_fpmu_prog_pmu_chip_vlp_en ,        //Pulse
     //output logic                  frfu_fpmu_prog_pmu_chip_pd_en ,         //Pulse JC
-    output logic       frfu_fclp_cfg_done,  //Configure Done Signal, Used to Clear LT
-    output logic       frfu_fclp_clp_vlp_wu_en,  //VLP WU enable
-    output logic       frfu_fclp_clp_vlp_en,  //VLP Enable
-    output logic       frfu_fclp_clp_pd_wu_en,  //PD WU enable
-    output logic       frfu_fclp_clp_pd_en,  //PD enable
-    output logic [1:0] frfu_fpmu_pmu_time_ctl,  //Internal Timing Configure 
-    output logic [1:0] frfu_fclp_clp_time_ctl  //Internal Timing Configure 
+    output logic       frfu_fclp_cfg_done,          //Configure Done Signal, Used to Clear LT
+    output logic       frfu_fclp_clp_vlp_wu_en,     //VLP WU enable
+    output logic       frfu_fclp_clp_vlp_en,        //VLP Enable
+    output logic       frfu_fclp_clp_pd_wu_en,      //PD WU enable
+    output logic       frfu_fclp_clp_pd_en,         //PD enable
+    output logic [1:0] frfu_fpmu_pmu_time_ctl,      //Internal Timing Configure 
+    output logic [1:0] frfu_fclp_clp_time_ctl       //Internal Timing Configure 
 );
 
   //--------------------------------------------------------------------------------//
@@ -1177,8 +1177,8 @@ module fcbrfu #(
   } & {32{addr_02_rd_en}}) | ({
     31'h0, {frfu_fsmc_checksum_status}
   } & {32{addr_03_rd_en}}) |
-  //( {24'h0 , { frfu_fclp_clp_time_ctl }, { frfu_fmic_vlp_pin_en } ,{ frfu_fmic_done_op_mask_n } ,{ frfu_fmic_io_sv_180 } }  & {32{ addr_04_rd_en } })  | 
-  ({
+      //( {24'h0 , { frfu_fclp_clp_time_ctl }, { frfu_fmic_vlp_pin_en } ,{ frfu_fmic_done_op_mask_n } ,{ frfu_fmic_io_sv_180 } }  & {32{ addr_04_rd_en } })  | 
+      ({
     24'h0, {frfu_fclp_clp_time_ctl}, {1'b0}, {frfu_fmic_done_op_mask_n}, {frfu_fmic_io_sv_180}
   } & {32{addr_04_rd_en}}) | ({
     30'h0, {frfu_fsmc_rc_clk_dis_cfg}, {frfu_fsmc_sw2_spis}
@@ -1187,7 +1187,7 @@ module fcbrfu #(
   } & {32{addr_06_rd_en}}) | ({
     26'h0, {frfu_ffsr_wlen_sut, frfu_ffsr_wlclk_sut, frfu_ffsr_blclk_sut}
   } & {32{addr_07_rd_en}}) |  // JC 07
-  ({
+      ({
     24'h0, {frfu_bl_pw_cfg_0}
   } & {32{addr_08_rd_en}}) | ({
     24'h0, {frfu_bl_pw_cfg_1}
@@ -1236,8 +1236,8 @@ module fcbrfu #(
   } & {32{addr_1e_rd_en}}) | ({
     31'h0, {frfu_ffsr_fb_cfg_kickoff}
   } & {32{addr_1f_rd_en}}) |
-  //( {24'h0 , { frfu_wr_data_port } } 	 & 	{32{ addr_20_rd_en } })  | 
-  ({
+      //( {24'h0 , { frfu_wr_data_port } } 	 & 	{32{ addr_20_rd_en } })  | 
+      ({
     24'h0, {8'h00}
   } & {32{addr_20_rd_en}}) | ({
     30'h0, {fb_cfg_cleanup, frfu_fmic_fb_cfg_done}
@@ -1246,11 +1246,11 @@ module fcbrfu #(
   } & {32{addr_30_rd_en}}) | ({
     24'h0, {frfu_fpmu_quad_cfg_b1}
   } & {32{addr_31_rd_en}}) |
-  //( {30'h0 , { frfu_fpmu_quad_pd_mode } } 	 & 	{32{ addr_32_rd_en } })  | //JC
-  //( {24'h0 , { frfu_fpmu_quad_wu_en_b0 } } 	 & 	{32{ addr_33_rd_en } })  | 
-  //( {24'h0 , { frfu_fpmu_quad_wu_en_b1 } } 	 & 	{32{ addr_34_rd_en } })  | 
-  //( {30'h0 , { frfu_fpmu_quad_wu_mode } } 	 & 	{32{ addr_35_rd_en } })  | //JC
-  ({
+      //( {30'h0 , { frfu_fpmu_quad_pd_mode } } 	 & 	{32{ addr_32_rd_en } })  | //JC
+      //( {24'h0 , { frfu_fpmu_quad_wu_en_b0 } } 	 & 	{32{ addr_33_rd_en } })  | 
+      //( {24'h0 , { frfu_fpmu_quad_wu_en_b1 } } 	 & 	{32{ addr_34_rd_en } })  | 
+      //( {30'h0 , { frfu_fpmu_quad_wu_mode } } 	 & 	{32{ addr_35_rd_en } })  | //JC
+      ({
     24'h0,
     {frfu_quad_pw_sta_03},
     {frfu_quad_pw_sta_02},
@@ -1279,14 +1279,12 @@ module fcbrfu #(
   } & {32{addr_3a_rd_en}}) | ({
     26'h0, {frfu_fpmu_pmu_pwr_gate_ccnt}
   } & {32{addr_3b_rd_en}}) |
-  //( {31'h0 , { frfu_fpmu_pmu_chip_vlp_wu_en } }  & 	{32{ addr_3c_rd_en } })  |  // JC
-  //( {30'h0 , { fpmu_frfu_chip_pw_sta } }  & 	{32{ addr_3c_rd_en } })  |  // JC 05232017
-  //( {31'h0 , { frfu_fpmu_pmu_chip_vlp_en } } 	 & 	{32{ addr_3d_rd_en } })  |  // JC
-  //( {32'h0 } 	 				 & 	{32{ addr_3c_rd_en } })  |  // JC
-  ({
-    32'h0
-  } & {32{addr_3d_rd_en}}) |  // JC
-  ({
+      //( {31'h0 , { frfu_fpmu_pmu_chip_vlp_wu_en } }  & 	{32{ addr_3c_rd_en } })  |  // JC
+      //( {30'h0 , { fpmu_frfu_chip_pw_sta } }  & 	{32{ addr_3c_rd_en } })  |  // JC 05232017
+      //( {31'h0 , { frfu_fpmu_pmu_chip_vlp_en } } 	 & 	{32{ addr_3d_rd_en } })  |  // JC
+      //( {32'h0 } 	 				 & 	{32{ addr_3c_rd_en } })  |  // JC
+      ({32'h0} & {32{addr_3d_rd_en}}) |  // JC
+      ({
     30'h0, {frfu_fpmu_vlp_pin_value}, {fpmu_frfu_pmu_busy}
   } & {32{addr_3e_rd_en}}) | ({
     24'h0, {frfu_fpmu_iso_en_0}
@@ -1297,9 +1295,9 @@ module fcbrfu #(
   } & {32{addr_42_rd_en}}) | ({
     24'h0, {frfu_fpmu_pi_pwr_1}
   } & {32{addr_43_rd_en}}) |
-  //( {24'h0 , { frfu_fpmu_vlp_0 } } 	 & 	{32{ addr_44_rd_en } })  | 
-  //( {24'h0 , { frfu_fpmu_vlp_1 } } 	 & 	{32{ addr_45_rd_en } })  | 
-  ({
+      //( {24'h0 , { frfu_fpmu_vlp_0 } } 	 & 	{32{ addr_44_rd_en } })  | 
+      //( {24'h0 , { frfu_fpmu_vlp_1 } } 	 & 	{32{ addr_45_rd_en } })  | 
+      ({
     24'h0, {frfu_fpmu_vlp_clkdis_0}
   } & {32{addr_46_rd_en}}) | ({
     24'h0, {frfu_fpmu_vlp_clkdis_1}
@@ -1336,9 +1334,9 @@ module fcbrfu #(
   } & {32{addr_52_rd_en}}) | ({
     24'h0, {frfu_fpmu_pi_pwr_sd_1}
   } & {32{addr_53_rd_en}}) |
-  //( {24'h0 , { frfu_fpmu_vlp_sd_0 } } 	 & 	{32{ addr_54_rd_en } })  | 
-  //( {24'h0 , { frfu_fpmu_vlp_sd_1 } } 	 & 	{32{ addr_55_rd_en } })  | 
-  ({
+      //( {24'h0 , { frfu_fpmu_vlp_sd_0 } } 	 & 	{32{ addr_54_rd_en } })  | 
+      //( {24'h0 , { frfu_fpmu_vlp_sd_1 } } 	 & 	{32{ addr_55_rd_en } })  | 
+      ({
     24'h0, {frfu_fpmu_vlp_clkdis_sd_0}
   } & {32{addr_56_rd_en}}) | ({
     24'h0, {frfu_fpmu_vlp_clkdis_sd_1}
@@ -1381,14 +1379,10 @@ module fcbrfu #(
   } & {32{addr_2a_rd_en}}) | ({
     31'h0, {frfu_fclp_clp_pd_en}
   } & {32{addr_2b_rd_en}}) |
-  //( {31'h0 , {frfu_fpmu_pmu_chip_vlp_en }    &    {32{ addr_2d_rd_en } })  |				//JC
-  //( {31'h0 , {frfu_fpmu_pmu_chip_pd_en }     &    {32{ addr_2e_rd_en } })  |				//JC
-  ({
-    28'h0, {frfu_fpmu_pmu_chip_cmd}
-  } & {32{addr_2f_rd_en}}) |  //JC
-  ({
-    30'h0, {frfu_chip_pwr_Sta}
-  } & {32{addr_2c_rd_en}}));
+      //( {31'h0 , {frfu_fpmu_pmu_chip_vlp_en }    &    {32{ addr_2d_rd_en } })  |				//JC
+      //( {31'h0 , {frfu_fpmu_pmu_chip_pd_en }     &    {32{ addr_2e_rd_en } })  |				//JC
+      ({28'h0, {frfu_fpmu_pmu_chip_cmd}} & {32{addr_2f_rd_en}}) |  //JC
+      ({30'h0, {frfu_chip_pwr_Sta}} & {32{addr_2c_rd_en}}));
 
 
   assign fb_cfg_cleanup = ( fcb_clp_mode_en_bo == 1'b1 )
@@ -3057,9 +3051,9 @@ module fcbrfu #(
         fcbrfuwff_wr_byte[2] = 1'b1;
         fcbrfuwff_wr_data = {8'b0, fssc_frfu_cwf_wr_data, 16'b0};
       end else if (byte_cnt_cs == 2'b11 && fssc_frfu_cwf_wr_en == 1'b1) begin
-        fcbrfuwff_wr_data 	= {fssc_frfu_cwf_wr_data,24'b0} ;
-        fcbrfuwff_wr_byte[3] 	= 1'b1 ;
-        fcbrfuwff_wr_en   	= 1'b1 ;
+        fcbrfuwff_wr_data  = {fssc_frfu_cwf_wr_data,24'b0} ;
+        fcbrfuwff_wr_byte[3]  = 1'b1 ;
+        fcbrfuwff_wr_en    = 1'b1 ;
       end
     end else if (fsmc_frfu_spim_on == 1'b1) begin
       if (byte_cnt_cs == 2'b00 && fsmc_frfu_cwf_wr_en == 1'b1) begin
@@ -3129,7 +3123,7 @@ module fcbrfu #(
       2'b00: begin
         if (ffsr_frfu_rfifo_empty == 1'b0) begin
           rd_stm_ns    = 2'b01 ;
-          rdback_data_b0_en 	= 1'b1 ;
+          rdback_data_b0_en  = 1'b1 ;
         end
       end
       2'b01: begin

@@ -167,12 +167,15 @@ module soc_domain
 
 
   localparam dm::hartinfo_t RI5CY_HARTINFO = '{
-       zero1:        '0,
-       nscratch:      2, // Debug module needs at least two scratch regs
-  zero0: '0, dataaccess: 1'b1,  // data registers are memory mapped in the debugger
-  datasize: dm::DataCount, dataaddr: dm::DataAddr};
+      zero1: '0,
+      nscratch: 2,  // Debug module needs at least two scratch regs
+      zero0: '0,
+      dataaccess: 1'b1,  // data registers are memory mapped in the debugger
+      datasize: dm::DataCount,
+      dataaddr: dm::DataAddr
+  };
 
-  dm::hartinfo_t [                 NrHarts-1:0      ] hartinfo;
+  dm::hartinfo_t [   NrHarts-1:0]       hartinfo;
 
   /*
        This module has been tested only with the default parameters.
@@ -182,49 +185,49 @@ module soc_domain
   //***************** SIGNALS DECLARATION ******************
   //********************************************************
 
-  logic                                               s_dmactive;
+  logic                                 s_dmactive;
 
-  logic                                               s_stoptimer;
-  logic                                               s_wd_expired;
-  logic            [           1:0]                   s_fc_hwpe_events;
-  logic            [          31:0]                   s_fc_events;
+  logic                                 s_stoptimer;
+  logic                                 s_wd_expired;
+  logic          [           1:0]       s_fc_hwpe_events;
+  logic          [          31:0]       s_fc_events;
 
-  logic            [           7:0]                   s_soc_events_ack;
-  logic            [           7:0]                   s_soc_events_val;
+  logic          [           7:0]       s_soc_events_ack;
+  logic          [           7:0]       s_soc_events_val;
 
-  logic                                               s_timer_lo_event;
-  logic                                               s_timer_hi_event;
+  logic                                 s_timer_lo_event;
+  logic                                 s_timer_hi_event;
 
-  logic            [EVNT_WIDTH-1:0]                   s_cl_event_data;
-  logic                                               s_cl_event_valid;
-  logic                                               s_cl_event_ready;
+  logic          [EVNT_WIDTH-1:0]       s_cl_event_data;
+  logic                                 s_cl_event_valid;
+  logic                                 s_cl_event_ready;
 
 
-  logic            [           7:0]           [31:0]  s_apb_mpu_rules;
-  logic                                               s_supervisor_mode;
+  logic          [           7:0][31:0] s_apb_mpu_rules;
+  logic                                 s_supervisor_mode;
 
-  logic            [          31:0]                   s_fc_bootaddr;
+  logic          [          31:0]       s_fc_bootaddr;
 
-  logic                                               s_periph_clk;
-  logic                                               s_periph_rst;
-  logic                                               s_soc_clk;
-  logic                                               s_soc_rstn;
-  logic                                               s_rstn_glob;
-  logic                                               s_sel_fll_clk;
+  logic                                 s_periph_clk;
+  logic                                 s_periph_rst;
+  logic                                 s_soc_clk;
+  logic                                 s_soc_rstn;
+  logic                                 s_rstn_glob;
+  logic                                 s_sel_fll_clk;
 
-  logic                                               s_dma_pe_evt;
-  logic                                               s_dma_pe_irq;
-  logic                                               s_pf_evt;
+  logic                                 s_dma_pe_evt;
+  logic                                 s_dma_pe_irq;
+  logic                                 s_pf_evt;
 
-  logic                                               s_fc_fetchen;
-  logic            [   NrHarts-1:0]                   dm_debug_req;
+  logic                                 s_fc_fetchen;
+  logic          [   NrHarts-1:0]       dm_debug_req;
 
-  logic                                               jtag_req_valid;
-  logic                                               debug_req_ready;
-  logic                                               jtag_resp_ready;
-  logic                                               jtag_resp_valid;
-  dm::dmi_req_t                                       jtag_dmi_req;
-  dm::dmi_resp_t                                      debug_resp;
+  logic                                 jtag_req_valid;
+  logic                                 debug_req_ready;
+  logic                                 jtag_resp_ready;
+  logic                                 jtag_resp_valid;
+  dm::dmi_req_t                         jtag_dmi_req;
+  dm::dmi_resp_t                        debug_resp;
   logic slave_grant, slave_valid, dm_slave_req, dm_slave_we;
   logic [31:0] dm_slave_addr, dm_slave_wdata, dm_slave_rdata;
   logic [ 3:0] dm_slave_be;
@@ -399,10 +402,10 @@ module soc_domain
 
 `ifndef PULP_FPGA_EMUL
   edge_propagator_rx ep_pf_evt_i (
-      .clk_i  (s_soc_clk),
-      .rstn_i (1'b0),  //s_rstn_cluster_sync_soc),
+      .clk_i(s_soc_clk),
+      .rstn_i(1'b0),  //s_rstn_cluster_sync_soc),
       .valid_o(s_pf_evt),
-      .ack_o  (pf_evt_ack_o),
+      .ack_o(pf_evt_ack_o),
       .valid_i(pf_evt_valid_i)
   );
 `endif
@@ -435,7 +438,7 @@ module soc_domain
       .sel_fll_clk_i(s_sel_fll_clk),
 
       .rstn_glob_i        (rstn_glob_i),
-      .rstn_soc_sync_o    (s_rstn_glob),  // (s_soc_rstn),
+      .rstn_soc_sync_o    (s_rstn_glob),    // (s_soc_rstn),
       .rstn_cluster_sync_o(s_cluster_rstn),
 
       .clk_cluster_o (s_cluster_clk),
@@ -497,7 +500,7 @@ module soc_domain
       .IdcodeValue(`DMI_JTAG_IDCODE)
   ) i_dmi_jtag (
       .clk_i           (s_soc_clk),
-      .rst_ni          (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni          (rstn_glob_i),      //(s_soc_rstn),
       .testmode_i      (1'b0),
       .dmi_req_o       (jtag_dmi_req),
       .dmi_req_valid_o (jtag_req_valid),
@@ -505,7 +508,7 @@ module soc_domain
       .dmi_resp_i      (debug_resp),
       .dmi_resp_ready_o(jtag_resp_ready),
       .dmi_resp_valid_i(jtag_resp_valid),
-      .dmi_rst_no      (),  // not connected
+      .dmi_rst_no      (),                 // not connected
       .tck_i           (jtag_tck_i),
       .tms_i           (jtag_tms_i),
       .trst_ni         (jtag_trst_ni),
@@ -532,10 +535,10 @@ module soc_domain
       .SelectableHarts(SELECTABLE_HARTS)
   ) i_dm_top (
       .clk_i        (s_soc_clk),
-      .rst_ni       (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni       (rstn_glob_i),        //(s_soc_rstn),
       .testmode_i   (1'b0),
       .ndmreset_o   (s_periph_rst),
-      .dmactive_o   (s_dmactive),  // active debug session
+      .dmactive_o   (s_dmactive),         // active debug session
       .debug_req_o  (dm_debug_req),
       .unavailable_i(~SELECTABLE_HARTS),
       .hartinfo_i   (hartinfo),
@@ -556,7 +559,7 @@ module soc_domain
       .master_r_valid_i(s_lint_riscv_jtag_bus.r_valid),
       .master_r_rdata_i(s_lint_riscv_jtag_bus.r_rdata),
 
-      .dmi_rst_ni      (rstn_glob_i),  //(s_soc_rstn),
+      .dmi_rst_ni      (rstn_glob_i),      //(s_soc_rstn),
       .dmi_req_valid_i (jtag_req_valid),
       .dmi_req_ready_o (debug_req_ready),
       .dmi_req_i       (jtag_dmi_req),

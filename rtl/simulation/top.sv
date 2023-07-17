@@ -9,7 +9,7 @@ module top (
     input       lint_REQ,
     lint_WEN,
 
-    input        [19:0] lint_ADDR,  //PADDR,
+    input        [19:0] lint_ADDR,   //PADDR,
     input        [31:0] lint_WDATA,  //PWDATA,
     input        [ 3:0] lint_BE,
     output logic        lint_VALID,
@@ -519,9 +519,8 @@ module top (
               m0_oper0_we <= 1;
               if (p0_cnt < control_in[23:16]) p0_fsm <= 2;
               else p0_fsm <= 0;
-            end
-                 else // write
-                   if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
+            end else  // write
+            if (p0_cnt < control_in[23:16]) p0_fsm <= 1;
             else p0_fsm <= 0;
           end
         end  // if (tcdm_valid_p0 == 1)
@@ -571,9 +570,8 @@ module top (
               m0_oper1_wdata <= tcdm_rdata_p1;
               if (p1_cnt < control_in[23:16]) p1_fsm <= 2;
               else p1_fsm <= 0;
-            end
-                 else // write
-                   if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
+            end else  // write
+            if (p1_cnt < control_in[23:16]) p1_fsm <= 1;
             else p1_fsm <= 0;
           end
         end  // if (tcdm_valid_p1 == 1)
@@ -623,9 +621,8 @@ module top (
               m1_oper0_we <= 1;
               if (p2_cnt < control_in[23:16]) p2_fsm <= 2;
               else p2_fsm <= 0;
-            end
-                 else // write
-                   if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
+            end else  // write
+            if (p2_cnt < control_in[23:16]) p2_fsm <= 1;
             else p2_fsm <= 0;
           end
         end  // if (tcdm_valid_p2 == 1)
@@ -674,9 +671,8 @@ module top (
               m1_oper1_we <= 1;
               if (p3_cnt < control_in[23:16]) p3_fsm <= 2;
               else p3_fsm <= 0;
-            end
-                 else // write
-                   if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
+            end else  // write
+            if (p3_cnt < control_in[23:16]) p3_fsm <= 1;
             else p3_fsm <= 0;
           end
         end  // if (tcdm_valid_p3 == 1)

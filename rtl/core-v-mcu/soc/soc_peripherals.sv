@@ -612,7 +612,7 @@ module soc_peripherals #(
       .fpga_clk0_i(fpga_clk_in),
       .fpga_clk1_i(ref_clk_i),
       .fpga_clk2_i(periph_clk_i),
-      .fpga_clk3_i(fpgaio_in_i[9]),  // qspi clk
+      .fpga_clk3_i(fpgaio_in_i[9]),   // qspi clk
       .fpga_clk4_i(fpgaio_in_i[18]),  //cam_clk
       .fpga_clk5_i(fpgaio_in_i[30]),  // sdio_clk
 

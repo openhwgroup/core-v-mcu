@@ -6,30 +6,30 @@ module fcbssc (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic       fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic       fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic       fcb_spis_clk,  //Clock for SPIS Slave Interface
-    input  logic       fcb_spis_rst_n,  //Reset for SPIS slave Interface, it is a
-    input  logic       fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic       fcb_spis_mosi,  //SPI Slave MOSI
-    input  logic       fcb_spis_cs_n,  //SPI Slave Chip Select
-    input  logic       fcb_spi_mode_en_bo,  //1'b1 : SPI Master/Slave is Enable. 1'b0
-    input  logic [7:0] frfu_sfr_rd_data,  //SFR Read Data
-    input  logic       frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    input  logic       fmic_spi_master_en,  //1'b1: Enable SPI Master Mode, 1'b0: Ena
+    input  logic       fcb_sys_clk,            //Main Clock for FCB except SPI Slave Int
+    input  logic       fcb_sys_rst_n,          //Main Reset for FCB except SPI Slave int
+    input  logic       fcb_spis_clk,           //Clock for SPIS Slave Interface
+    input  logic       fcb_spis_rst_n,         //Reset for SPIS slave Interface, it is a
+    input  logic       fcb_sys_stm,            //1'b1 : Put the module into Test Mode
+    input  logic       fcb_spis_mosi,          //SPI Slave MOSI
+    input  logic       fcb_spis_cs_n,          //SPI Slave Chip Select
+    input  logic       fcb_spi_mode_en_bo,     //1'b1 : SPI Master/Slave is Enable. 1'b0
+    input  logic [7:0] frfu_sfr_rd_data,       //SFR Read Data
+    input  logic       frfu_cwf_full,          //Full Flag of Cfg Write FIFO
+    input  logic       fmic_spi_master_en,     //1'b1: Enable SPI Master Mode, 1'b0: Ena
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic       fcb_spis_miso,  //SPI Slave MISO
-    output logic       fcb_spis_miso_en,  //SPI Slave MISO output enable
-    output logic [6:0] fssc_frfu_wr_addr,  //SFR Write Address
-    output logic       fssc_frfu_wr_en,  //SFR Write Enable
-    output logic [7:0] fssc_frfu_wr_data,  //SFR Write Data
-    output logic       fssc_frfu_spis_on,  //SPI Slave is ON
-    output logic [6:0] fssc_frfu_rd_addr,  //SFR Read Address
-    output logic       fssc_frfu_rd_en,  //SFR Read Enable
+    output logic       fcb_spis_miso,          //SPI Slave MISO
+    output logic       fcb_spis_miso_en,       //SPI Slave MISO output enable
+    output logic [6:0] fssc_frfu_wr_addr,      //SFR Write Address
+    output logic       fssc_frfu_wr_en,        //SFR Write Enable
+    output logic [7:0] fssc_frfu_wr_data,      //SFR Write Data
+    output logic       fssc_frfu_spis_on,      //SPI Slave is ON
+    output logic [6:0] fssc_frfu_rd_addr,      //SFR Read Address
+    output logic       fssc_frfu_rd_en,        //SFR Read Enable
     output logic [7:0] fssc_frfu_cwf_wr_data,  //Write Data of Cfg Write FIFO
-    output logic       fssc_frfu_cwf_wr_en  //Write Enable to indicate the whole 32-B
+    output logic       fssc_frfu_cwf_wr_en     //Write Enable to indicate the whole 32-B
 );
 
   //------------------------------------------------------------------------//
@@ -84,9 +84,8 @@ module fcbssc (
   assign fssc_frfu_cwf_wr_data = fifo_rd_data[7:0];
 
   //assign fssc_frfu_spis_on	= ( 	fcb_sys_stm 		== 1'b0 &&
-  assign fssc_frfu_spis_on	= ( 	fcb_spi_mode_en_bo 	== 1'b1	&&	// JC 20170830
-					fmic_spi_master_en	== 1'b0 )
-				? 1'b1 : 1'b0 ;
+  assign fssc_frfu_spis_on = (fcb_spi_mode_en_bo == 1'b1 &&  // JC 20170830
+      fmic_spi_master_en == 1'b0) ? 1'b1 : 1'b0;
 
   assign fssc_frfu_rd_addr = ssc_addr;  // Dont care power for now
   assign fssc_frfu_rd_en = 1'b0;  // Floating
@@ -166,7 +165,7 @@ module fcbssc (
       //
       .fifo_rd_data         (fifo_rd_data),
       .fifo_empty_flag_rdclk(fifo_empty_flag_rdclk),
-      .fifo_full_flag_wrclk (fifo_full_flag_wrclk_nc)  // Floating
+      .fifo_full_flag_wrclk (fifo_full_flag_wrclk_nc)   // Floating
   );
 
   //------------------------------------------------------------------------//
@@ -174,18 +173,18 @@ module fcbssc (
   //------------------------------------------------------------------------//
   SPI_slave SPI_slave (
       .rst_n          (fcb_sys_rst_n),
-      .int_rst_n      (fcb_spis_rst_n),  // Reset by Chip Select As well
+      .int_rst_n      (fcb_spis_rst_n),            // Reset by Chip Select As well
       .SPI_SCLK       (fcb_spis_clk),
       .SPI_MOSI       (fcb_spis_mosi),
-      .SPI_SS         (fcb_spis_cs_n_qf),  // Qualify
+      .SPI_SS         (fcb_spis_cs_n_qf),          // Qualify
       .rd_data        (frfu_sfr_rd_data_syncff1),
       // 
       .SPI_MISO       (fcb_spis_miso),
       .write_pending_p(ssc_write_pending_p),
       .addr           (ssc_addr),
       .wr_data        (ssc_wr_data),
-      .wr_data_valid  (ssc_wr_data_valid_nc),  // Floating
-      .rd_data_ack    (ssc_rd_data_ack_nc)  // Floating
+      .wr_data_valid  (ssc_wr_data_valid_nc),      // Floating
+      .rd_data_ack    (ssc_rd_data_ack_nc)         // Floating
   );
 
   //--------------------------------------------------------------------------------//

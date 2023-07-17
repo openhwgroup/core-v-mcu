@@ -1,4 +1,4 @@
-# Copyright 2021 OpenHW Group
+# Copyright 2021, 2023 OpenHW Group
 # Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -7,7 +7,7 @@ name: lint
 on: [push, pull_request]
 
 env:
-  VERIBLE_VERSION: 0.0-1051-gd4cd328
+  VERIBLE_VERSION: 0.0-3373-g54e37ed0
 
 jobs:
   ##################
@@ -29,7 +29,7 @@ jobs:
         set -e
         mkdir -p build/verible
         cd build/verible
-        curl -Ls -o verible.tar.gz https://github.com/google/verible/releases/download/v$VERIBLE_VERSION/verible-v$VERIBLE_VERSION-Ubuntu-18.04-bionic-x86_64.tar.gz
+        curl -Ls -o verible.tar.gz https://github.com/google/verible/releases/download/v$VERIBLE_VERSION/verible-v$VERIBLE_VERSION-Ubuntu-20.04-focal-x86_64.tar.gz
         sudo mkdir -p /tools/verible && sudo chmod 777 /tools/verible
         tar -C /tools/verible -xf verible.tar.gz --strip-components=1
         echo "PATH=$PATH:/tools/verible/bin" >> $GITHUB_ENV

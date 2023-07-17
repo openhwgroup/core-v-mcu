@@ -16,7 +16,7 @@ module udma_subsystem #(
     parameter L2_ADDR_WIDTH  = 19,  //L2 addr space of 2MB
     parameter CAM_DATA_WIDTH = 8,
     parameter APB_ADDR_WIDTH = 12,  //APB slaves are 4KB by default
-    parameter TRANS_SIZE     = 20  //max uDMA transaction size of 1MB
+    parameter TRANS_SIZE     = 20   //max uDMA transaction size of 1MB
 ) (
     output logic                       L2_ro_wen_o,
     output logic                       L2_ro_req_o,
@@ -426,7 +426,7 @@ module udma_subsystem #(
           .cfg_rx_pending_i   (s_rx_ch_pending[CH_ID_RX_UART+g_uart]),
           .cfg_rx_curr_addr_i (s_rx_ch_curr_addr[CH_ID_RX_UART+g_uart]),
           .cfg_rx_bytes_left_i(s_rx_ch_bytes_left[CH_ID_RX_UART+g_uart]),
-          .cfg_rx_datasize_o  (),  // FIXME ANTONIO
+          .cfg_rx_datasize_o  (),                                           // FIXME ANTONIO
 
           .cfg_tx_startaddr_o (s_tx_cfg_startaddr[CH_ID_TX_UART+g_uart]),
           .cfg_tx_size_o      (s_tx_cfg_size[CH_ID_TX_UART+g_uart]),
@@ -437,7 +437,7 @@ module udma_subsystem #(
           .cfg_tx_pending_i   (s_tx_ch_pending[CH_ID_TX_UART+g_uart]),
           .cfg_tx_curr_addr_i (s_tx_ch_curr_addr[CH_ID_TX_UART+g_uart]),
           .cfg_tx_bytes_left_i(s_tx_ch_bytes_left[CH_ID_TX_UART+g_uart]),
-          .cfg_tx_datasize_o  (),  // FIXME ANTONIO
+          .cfg_tx_datasize_o  (),                                           // FIXME ANTONIO
 
           .data_tx_req_o     (s_tx_ch_req[CH_ID_TX_UART+g_uart]),
           .data_tx_gnt_i     (s_tx_ch_gnt[CH_ID_TX_UART+g_uart]),
