@@ -20,7 +20,7 @@ xa_n[0],IO_17,17,,1,apbio_40,apbio_10,fpgaio_10
 xa_n[1],IO_18,18,,1,apbio_41,apbio_11,fpgaio_11
 xa_n[2],IO_19,19,,qspim0_data2,apbio_42,apbio_12,fpgaio_12
 xa_n[3],IO_20,20,,qspim0_data3,apbio_43,apbio_13,fpgaio_13
-jc[1],IO_21,21,,cam0_vsync,apbio_36,apbio_14,fpgaio_14
+led[1],IO_21,21,,cam0_vsync,apbio_36,apbio_14,fpgaio_14
 jc[2],IO_22,22,,cam0_hsync,apbio_39,apbio_15,fpgaio_15
 jc[3],IO_23,23,,i2cm0_scl,,apbio_16,fpgaio_16
 jc[4],IO_24,24,,i2cm0_sda,,apbio_17,fpgaio_17
@@ -28,7 +28,7 @@ jc[7],IO_25,25,,cam0_clk,apbio_33,apbio_18,fpgaio_18
 jc[8],IO_26,26,,apbio_32,qspim0_csn1,apbio_19,fpgaio_19
 jc[9],IO_27,27,,apbio_48,qspim0_csn2,apbio_20,fpgaio_20
 jc[10],IO_28,28,,apbio_49,qspim0_csn3,apbio_21,fpgaio_21
-jd[1],IO_29,29,,cam0_data0,qspim1_csn0,apbio_22,fpgaio_22
+led[2],IO_29,29,,cam0_data0,qspim1_csn0,apbio_22,fpgaio_22
 jd[2],IO_30,30,,cam0_data1,qspim1_data0,apbio_23,fpgaio_23
 jd[3],IO_31,31,,cam0_data2,qspim1_data1,apbio_24,fpgaio_24
 jd[4],IO_32,32,,cam0_data3,qspim1_clk,apbio_25,fpgaio_25

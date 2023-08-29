@@ -99,7 +99,7 @@ module soc_clk_rst_gen (
   );
   assign s_clk_soc     = s_clk_fll_soc;
   assign s_clk_cluster = s_clk_fll_cluster;  //emul_clk;
-  assign slow_clk_o    = s_clk_fll_cluster;
+  assign slow_clk_o    = s_clk_fll_per;
 
   assign s_clk_per     = s_clk_fll_per;
 
