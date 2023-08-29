@@ -46,21 +46,14 @@ module soc_domain
 
 
 
-    input  logic ref_clk_i,
-    input  logic sclk_in,
-    output logic slow_clk_o,  // for emulation generation of refclk
-    input  logic test_clk_i,
-    input  logic rstn_glob_i,
+    input logic ref_clk_i,
+    input logic test_clk_i,
+    input logic rstn_glob_i,
 
-    input  logic                               dft_test_mode_i,
-    input  logic                               dft_cg_enable_i,
-    input  logic                               bootsel_i,
-    //    output logic                               dma_pe_evt_ack_o,
-    //    input  logic                               dma_pe_evt_valid_i,
-    //    output logic                               dma_pe_irq_ack_o,
-    //    input  logic                               dma_pe_irq_valid_i,
-    //    output logic                               pf_evt_ack_o,
-    //    input  logic                               pf_evt_valid_i,
+    input logic dft_test_mode_i,
+    input logic dft_cg_enable_i,
+    input logic bootsel_i,
+
     ///////////////////////////////////////////////////
     //      To I/O Controller and padframe           //
     ///////////////////////////////////////////////////
@@ -82,18 +75,6 @@ module soc_domain
     ///////////////////////////////////////////////////
     //      To EFPGA                                 //
     ///////////////////////////////////////////////////
-    //    input  logic [          1:0] selected_mode_i,
-
-
-    //eFPGA SPIS
-    //    input  logic efpga_fcb_spis_rst_n_i,
-    //    input  logic efpga_fcb_spis_mosi_i,
-    //    input  logic efpga_fcb_spis_cs_n_i,
-    //    input  logic efpga_fcb_spis_clk_i,
-    //    input  logic efpga_fcb_spi_mode_en_bo_i,
-    //    output logic efpga_fcb_spis_miso_en_o,
-    //    output logic efpga_fcb_spis_miso_o,
-
 
     //eFPGA TEST MODE
     input        [20:0] testio_i,
@@ -167,10 +148,13 @@ module soc_domain
 
 
   localparam dm::hartinfo_t RI5CY_HARTINFO = '{
-       zero1:        '0,
-       nscratch:      2, // Debug module needs at least two scratch regs
-  zero0: '0, dataaccess: 1'b1,  // data registers are memory mapped in the debugger
-  datasize: dm::DataCount, dataaddr: dm::DataAddr};
+      zero1: '0,
+      nscratch: 2,  // Debug module needs at least two scratch regs
+      zero0: '0,
+      dataaccess: 1'b1,  // data registers are memory mapped in the debugger
+      datasize: dm::DataCount,
+      dataaddr: dm::DataAddr
+  };
 
   dm::hartinfo_t [                 NrHarts-1:0      ] hartinfo;
 
@@ -249,20 +233,6 @@ module soc_domain
   logic spi_master0_csn3, spi_master0_csn2;
 
   APB_BUS s_apb_debug_bus ();
-  FLL_BUS #(
-      .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
-      .FLL_DATA_WIDTH(FLL_DATA_WIDTH)
-  ) s_soc_fll_master ();
-
-  FLL_BUS #(
-      .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
-      .FLL_DATA_WIDTH(FLL_DATA_WIDTH)
-  ) s_per_fll_master ();
-
-  FLL_BUS #(
-      .FLL_ADDR_WIDTH(FLL_ADDR_WIDTH),
-      .FLL_DATA_WIDTH(FLL_DATA_WIDTH)
-  ) s_cluster_fll_master ();
 
   APB_BUS s_apb_periph_bus ();
 
@@ -271,7 +241,7 @@ module soc_domain
   XBAR_TCDM_BUS s_mem_l2_bus[NB_L2_BANKS-1:0] ();
   XBAR_TCDM_BUS s_mem_l2_pri_bus[NB_L2_BANKS_PRI-1:0] ();
 
-  XBAR_TCDM_BUS s_lint_pulp_jtag_bus ();
+
   XBAR_TCDM_BUS s_lint_riscv_jtag_bus ();
   XBAR_TCDM_BUS s_lint_udma_tx_bus ();
   XBAR_TCDM_BUS s_lint_udma_rx_bus ();
@@ -326,9 +296,9 @@ module soc_domain
       .NB_CLUSTERS   (`NB_CLUSTERS),
       .EVNT_WIDTH    (EVNT_WIDTH)
   ) soc_peripherals_i (
-
-      .clk_i          (s_soc_clk),
-      .periph_clk_i   (s_periph_clk),
+      .soc_clk_o      (s_soc_clk),
+      //      .clk_i          (s_soc_clk),
+      //      .periph_clk_i   (s_periph_clk),
       .rst_ni         (s_soc_rstn),
       .rstpin_ni      (rstn_glob_i),
       .sel_fll_clk_i  (s_sel_fll_clk),
@@ -364,9 +334,9 @@ module soc_domain
       .dma_pe_irq_i(s_dma_pe_irq),
       .pf_evt_i    (s_pf_evt),
 
-      .soc_fll_master    (s_soc_fll_master),
-      .per_fll_master    (s_per_fll_master),
-      .cluster_fll_master(s_cluster_fll_master),
+      //      .soc_fll_master    (s_soc_fll_master),
+      //      .per_fll_master    (s_per_fll_master),
+      //      .cluster_fll_master(s_cluster_fll_master),
 
       // pad control signals
       .pad_mux_o   (pad_mux_o),
@@ -385,7 +355,7 @@ module soc_domain
       .fpgaio_oe_o (fpgaio_oe_o),
 
       // other FPGA signals
-      .fpga_clk_in(s_cluster_clk),
+      //      .fpga_clk_in(s_cluster_clk),
 
 
       //eFPGA TEST MODE
@@ -399,10 +369,10 @@ module soc_domain
 
 `ifndef PULP_FPGA_EMUL
   edge_propagator_rx ep_pf_evt_i (
-      .clk_i  (s_soc_clk),
-      .rstn_i (1'b0),  //s_rstn_cluster_sync_soc),
+      .clk_i(s_soc_clk),
+      .rstn_i(1'b0),  //s_rstn_cluster_sync_soc),
       .valid_o(s_pf_evt),
-      .ack_o  (pf_evt_ack_o),
+      .ack_o(pf_evt_ack_o),
       .valid_i(pf_evt_valid_i)
   );
 `endif
@@ -425,50 +395,7 @@ module soc_domain
 
       .supervisor_mode_o(s_supervisor_mode)
   );
-  assign s_soc_rstn = !(!s_rstn_glob | s_wd_expired | s_periph_rst);
-
-  soc_clk_rst_gen i_clk_rst_gen (
-      .ref_clk_i    (ref_clk_i),
-      .sclk_in      (sclk_in),
-      .slow_clk_o   (slow_clk_o),
-      .test_clk_i   (test_clk_i),
-      .sel_fll_clk_i(s_sel_fll_clk),
-
-      .rstn_glob_i        (rstn_glob_i),
-      .rstn_soc_sync_o    (s_rstn_glob),  // (s_soc_rstn),
-      .rstn_cluster_sync_o(s_cluster_rstn),
-
-      .clk_cluster_o (s_cluster_clk),
-      .test_mode_i   (dft_test_mode_i),
-      .shift_enable_i(1'b0),
-
-      .soc_fll_slave_req_i   (s_soc_fll_master.req),
-      .soc_fll_slave_wrn_i   (s_soc_fll_master.wrn),
-      .soc_fll_slave_add_i   (s_soc_fll_master.add[4:0]),
-      .soc_fll_slave_data_i  (s_soc_fll_master.data),
-      .soc_fll_slave_ack_o   (s_soc_fll_master.ack),
-      .soc_fll_slave_r_data_o(s_soc_fll_master.r_data),
-      .soc_fll_slave_lock_o  (s_soc_fll_master.lock),
-
-      .per_fll_slave_req_i   (s_per_fll_master.req),
-      .per_fll_slave_wrn_i   (s_per_fll_master.wrn),
-      .per_fll_slave_add_i   (s_per_fll_master.add[4:0]),
-      .per_fll_slave_data_i  (s_per_fll_master.data),
-      .per_fll_slave_ack_o   (s_per_fll_master.ack),
-      .per_fll_slave_r_data_o(s_per_fll_master.r_data),
-      .per_fll_slave_lock_o  (s_per_fll_master.lock),
-
-      .cluster_fll_slave_req_i   (s_cluster_fll_master.req),
-      .cluster_fll_slave_wrn_i   (s_cluster_fll_master.wrn),
-      .cluster_fll_slave_add_i   (s_cluster_fll_master.add[4:0]),
-      .cluster_fll_slave_data_i  (s_cluster_fll_master.data),
-      .cluster_fll_slave_ack_o   (s_cluster_fll_master.ack),
-      .cluster_fll_slave_r_data_o(s_cluster_fll_master.r_data),
-      .cluster_fll_slave_lock_o  (s_cluster_fll_master.lock),
-
-      .clk_soc_o(s_soc_clk),
-      .clk_per_o(s_periph_clk)
-  );
+  assign s_soc_rstn = !(!rstn_glob_i | s_wd_expired | s_periph_rst);
 
   soc_interconnect_wrap #(
       .NR_HWPE_PORTS(NB_HWPE_PORTS),
@@ -497,7 +424,7 @@ module soc_domain
       .IdcodeValue(`DMI_JTAG_IDCODE)
   ) i_dmi_jtag (
       .clk_i           (s_soc_clk),
-      .rst_ni          (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni          (rstn_glob_i),      //(s_soc_rstn),
       .testmode_i      (1'b0),
       .dmi_req_o       (jtag_dmi_req),
       .dmi_req_valid_o (jtag_req_valid),
@@ -505,7 +432,7 @@ module soc_domain
       .dmi_resp_i      (debug_resp),
       .dmi_resp_ready_o(jtag_resp_ready),
       .dmi_resp_valid_i(jtag_resp_valid),
-      .dmi_rst_no      (),  // not connected
+      .dmi_rst_no      (),                 // not connected
       .tck_i           (jtag_tck_i),
       .tms_i           (jtag_tms_i),
       .trst_ni         (jtag_trst_ni),
@@ -532,10 +459,10 @@ module soc_domain
       .SelectableHarts(SELECTABLE_HARTS)
   ) i_dm_top (
       .clk_i        (s_soc_clk),
-      .rst_ni       (rstn_glob_i),  //(s_soc_rstn),
+      .rst_ni       (rstn_glob_i),        //(s_soc_rstn),
       .testmode_i   (1'b0),
       .ndmreset_o   (s_periph_rst),
-      .dmactive_o   (s_dmactive),  // active debug session
+      .dmactive_o   (s_dmactive),         // active debug session
       .debug_req_o  (dm_debug_req),
       .unavailable_i(~SELECTABLE_HARTS),
       .hartinfo_i   (hartinfo),
@@ -556,7 +483,7 @@ module soc_domain
       .master_r_valid_i(s_lint_riscv_jtag_bus.r_valid),
       .master_r_rdata_i(s_lint_riscv_jtag_bus.r_rdata),
 
-      .dmi_rst_ni      (rstn_glob_i),  //(s_soc_rstn),
+      .dmi_rst_ni      (rstn_glob_i),      //(s_soc_rstn),
       .dmi_req_valid_i (jtag_req_valid),
       .dmi_req_ready_o (debug_req_ready),
       .dmi_req_i       (jtag_dmi_req),

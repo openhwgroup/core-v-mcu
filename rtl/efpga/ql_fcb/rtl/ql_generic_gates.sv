@@ -24,12 +24,12 @@ endmodule
 //-- Driving Strength X 2                                       --//
 //----------------------------------------------------------------//
 module ql_mux4_x2 (
-    input       [1:0] s,  // MUX Select 
+    input       [1:0] s,   // MUX Select 
     input             i0,  // Input Port 0
     input             i1,  // Input Port 1
     input             i2,  // Input Port 2
     input             i3,  // Input Port 3
-    output wire       z  // Output
+    output wire       z    // Output
 );
 
 
@@ -50,7 +50,7 @@ endmodule
 module ql_and2_x2 (
     input       A1,  // Input Port 0
     input       A2,  // Input Port 1
-    output wire X  // Output
+    output wire X    // Output
 );
 
 
@@ -65,7 +65,7 @@ endmodule
 //----------------------------------------------------------------//
 module ql_buf_x2 (
     input       A,  // Input Port 0
-    output wire X  // Output
+    output wire X   // Output
 );
 
   assign X = A;
@@ -78,7 +78,7 @@ endmodule
 //----------------------------------------------------------------//
 module ql_clkbuf_x2 (
     input       A,  // Input Port 0
-    output wire X  // Output
+    output wire X   // Output
 );
 
 
@@ -93,7 +93,7 @@ endmodule
 //----------------------------------------------------------------//
 module ql_inv_x2 (
     input       A,  // Input Port 0
-    output wire X  // Output
+    output wire X   // Output
 );
 
 
@@ -105,10 +105,10 @@ endmodule
 //-- MUX2 X2                                                    --//
 //----------------------------------------------------------------//
 module ql_mux2_x2 (
-    input       s,  // MUX Select 
+    input       s,   // MUX Select 
     input       i0,  // Input Port 0
     input       i1,  // Input Port 1
-    output wire z  // Output
+    output wire z    // Output
 );
 
 
@@ -124,7 +124,7 @@ module ql_or3_x4 (
     input       A1,  // Input Port 1
     input       A2,  // Input Port 2
     input       A3,  // Input Port 3
-    output wire X  // Output
+    output wire X    // Output
 );
 
   logic X0;

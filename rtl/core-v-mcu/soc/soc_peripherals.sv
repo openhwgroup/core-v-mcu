@@ -20,9 +20,11 @@ module soc_peripherals #(
     parameter NB_CLUSTERS    = 0,
     parameter EVNT_WIDTH     = 8
 ) (
-    input  logic                 clk_i,
-    input  logic                 periph_clk_i,
-    input  logic                 fpga_clk_in,
+    //    input  logic                 sclk_in,
+    output logic                 soc_clk_o,
+    //    input  logic                 clk_i,
+    //    input  logic                 periph_clk_i,
+    //    input  logic                 fpga_clk_in,
     input  logic                 rst_ni,
     input  logic                 rstpin_ni,
     input  logic                 ref_clk_i,
@@ -47,11 +49,11 @@ module soc_peripherals #(
     XBAR_TCDM_BUS.Master l2_rx_master,
     XBAR_TCDM_BUS.Master l2_tx_master,
     // MASTER PORT TO SOC FLL
-    FLL_BUS.Master soc_fll_master,
+    //    FLL_BUS.Master soc_fll_master,
     // MASTER PORT TO PER FLL
-    FLL_BUS.Master per_fll_master,
+    //    FLL_BUS.Master per_fll_master,
     // MASTER PORT TO CLUSTER FLL
-    FLL_BUS.Master cluster_fll_master,
+    //    FLL_BUS.Master cluster_fll_master,
     // MASTER PORT TO L2 from eFPGA
     XBAR_TCDM_BUS.Master l2_efpga_tcdm_master[`N_EFPGA_TCDM_PORTS-1:0],
     XBAR_TCDM_BUS.Slave efpga_apbt1_slave,
@@ -183,6 +185,11 @@ module soc_peripherals #(
 
   logic s_soft_reset, apb_reset;
 
+
+  logic s_periph_clk;
+  logic s_ref_clk;
+
+
   assign apb_reset = rst_ni & !s_soft_reset;
 
 
@@ -216,10 +223,10 @@ module soc_peripherals #(
   assign fc_events_o[30] = s_efpga_events[5];
   assign fc_events_o[31] = s_fc_err_events;
   pulp_sync_wedge i_ref_clk_sync (
-      .clk_i   (clk_i),
+      .clk_i   (soc_clk_o),
       .rstn_i  (rst_ni),
       .en_i    (1'b1),
-      .serial_i(ref_clk_i),
+      .serial_i(s_ref_clk),
       .r_edge_o(s_ref_rise_event),
       .f_edge_o(s_ref_fall_event),
       .serial_o()
@@ -239,7 +246,7 @@ module soc_peripherals #(
       .APB_ADDR_WIDTH(32),
       .APB_DATA_WIDTH(32)
   ) periph_bus_i (
-      .clk_i (clk_i),
+      .clk_i (soc_clk_o),
       .rst_ni(rst_ni),
 
       .rto_i(s_rto),
@@ -276,12 +283,12 @@ module soc_peripherals #(
   // ██║  ██║██║     ██████╔╝    ██║     ███████╗███████╗    ██║██║      //
   // ╚═╝  ╚═╝╚═╝     ╚═════╝     ╚═╝     ╚══════╝╚══════╝    ╚═╝╚═╝      //
   /////////////////////////////////////////////////////////////////////////
-  apb_fll_if #(
+  apb_pll #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) apb_fll_if_i (
-      .HCLK   (clk_i),
+      .HCLK   (soc_clk_o),
       .HRESETn(apb_reset),
-
+      .rst_ni(rstpin_ni),
       .PADDR  (s_fll_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_fll_bus.pwdata),
       .PWRITE (s_fll_bus.pwrite),
@@ -290,31 +297,18 @@ module soc_peripherals #(
       .PRDATA (s_fll_bus.prdata),
       .PREADY (s_fll_bus.pready),
       .PSLVERR(s_fll_bus.pslverr),
-
-      .fll1_req   (soc_fll_master.req),
-      .fll1_wrn   (soc_fll_master.wrn),
-      .fll1_add   (soc_fll_master.add[4:0]),
-      .fll1_data  (soc_fll_master.data),
-      .fll1_ack   (soc_fll_master.ack),
-      .fll1_r_data(soc_fll_master.r_data),
-      .fll1_lock  (soc_fll_master.lock),
-
-      .fll2_req   (per_fll_master.req),
-      .fll2_wrn   (per_fll_master.wrn),
-      .fll2_add   (per_fll_master.add[4:0]),
-      .fll2_data  (per_fll_master.data),
-      .fll2_ack   (per_fll_master.ack),
-      .fll2_r_data(per_fll_master.r_data),
-      .fll2_lock  (per_fll_master.lock),
-
-      .fll3_req   (cluster_fll_master.req),
-      .fll3_wrn   (cluster_fll_master.wrn),
-      .fll3_add   (cluster_fll_master.add[4:0]),
-      .fll3_data  (cluster_fll_master.data),
-      .fll3_ack   (cluster_fll_master.ack),
-      .fll3_r_data(cluster_fll_master.r_data),
-      .fll3_lock  (cluster_fll_master.lock)
+      .ref_clk_i(ref_clk_i),
+      .soc_clk_o(soc_clk_o),
+      .periph_clk_o(s_periph_clk),
+      .cluster_clk_o(s_fpga_clk),
+      .ref_clk_o(s_ref_clk),
+      .AVDD(AVDD),
+      .AVDD2(AVDD2),
+      .AVSS(AVSS),
+      .VDDC(VDDC),
+      .VSSC(VSSC)
   );
+
 
   ///////////////////////////////////////////////////////////////
   //  █████╗ ██████╗ ██████╗      ██████╗ ██████╗ ██╗ ██████╗  //
@@ -328,7 +322,7 @@ module soc_peripherals #(
   apb_gpiov2 #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) i_apb_gpio (
-      .HCLK   (clk_i),
+      .HCLK   (soc_clk_o),
       .HRESETn(apb_reset),
 
       .dft_cg_enable_i(dft_cg_enable_i),
@@ -384,9 +378,9 @@ module soc_peripherals #(
       .dft_test_mode_i(dft_test_mode_i),
       .dft_cg_enable_i(1'b0),
 
-      .sys_clk_i   (clk_i),
-      .periph_clk_i(periph_clk_i),
-      .efpga_clk_i (periph_clk_i),  // FIXME if udma stays
+      .sys_clk_i   (soc_clk_o),
+      .periph_clk_i(s_periph_clk),
+      .efpga_clk_i (s_periph_clk),  // FIXME if udma stays
       .sys_resetn_i(apb_reset),
 
       .udma_apb_paddr  (s_udma_bus.paddr[APB_ADDR_WIDTH-1:0]),
@@ -435,10 +429,10 @@ module soc_peripherals #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH),
       .NBIT_PADCFG   (`NBIT_PADCFG)
   ) i_apb_soc_ctrl (
-      .HCLK   (clk_i),
+      .HCLK   (soc_clk_o),
       .HRESETn(rst_ni),
       .rstpin_ni(rstpin_ni),
-      .ref_clk_i(ref_clk_i),
+      .ref_clk_i(s_ref_clk),
       .PADDR  (s_soc_ctrl_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA (s_soc_ctrl_bus.pwdata),
       .PWRITE (s_soc_ctrl_bus.pwrite),
@@ -488,7 +482,7 @@ module soc_peripherals #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH),
       .EXTSIG_NUM    (32)
   ) i_apb_adv_timer (
-      .HCLK   (clk_i),
+      .HCLK   (soc_clk_o),
       .HRESETn(apb_reset),
 
       .dft_cg_enable_i(dft_cg_enable_i),
@@ -502,7 +496,7 @@ module soc_peripherals #(
       .PREADY (s_adv_timer_bus.pready),
       .PSLVERR(s_adv_timer_bus.pslverr),
 
-      .low_speed_clk_i(ref_clk_i),
+      .low_speed_clk_i(s_ref_clk),
       .ext_sig_i      (s_gpio_sync),
 
       .events_o(s_adv_timer_events),
@@ -533,7 +527,7 @@ module soc_peripherals #(
       .EVNT_WIDTH    (EVNT_WIDTH),
       .FC_EVENT_POS  (7)
   ) u_evnt_gen (
-      .HCLK   (clk_i),
+      .HCLK   (soc_clk_o),
       .HRESETn(apb_reset),
 
       .PADDR  (s_soc_evnt_gen_bus.paddr[APB_ADDR_WIDTH-1:0]),
@@ -545,7 +539,7 @@ module soc_peripherals #(
       .PREADY (s_soc_evnt_gen_bus.pready),
       .PSLVERR(s_soc_evnt_gen_bus.pslverr),
 
-      .low_speed_clk_i   (ref_clk_i),
+      .low_speed_clk_i   (s_ref_clk),
       .timer_event_lo_o  (s_timer_in_lo_event),
       .timer_event_hi_o  (s_timer_in_hi_event),
       .per_events_i      (s_events),
@@ -574,7 +568,7 @@ module soc_peripherals #(
   apb_timer_unit #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) i_apb_timer_unit (
-      .HCLK       (clk_i),
+      .HCLK       (soc_clk_o),
       .HRESETn    (rst_ni),
       .PADDR      (s_apb_timer_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .PWDATA     (s_apb_timer_bus.pwdata),
@@ -584,7 +578,7 @@ module soc_peripherals #(
       .PRDATA     (s_apb_timer_bus.prdata),
       .PREADY     (s_apb_timer_bus.pready),
       .PSLVERR    (s_apb_timer_bus.pslverr),
-      .ref_clk_i  (ref_clk_i),
+      .ref_clk_i  (s_ref_clk),
       .event_lo_i (s_timer_in_lo_event),
       .event_hi_i (s_timer_in_hi_event),
       .irq_lo_o   (s_timer_lo_event),
@@ -608,11 +602,11 @@ module soc_peripherals #(
       .L2_ADDR_WIDTH      (TCDM_EFPGA_ADDR_WIDTH),
       .APB_FPGA_ADDR_WIDTH(APB_EFPGA_HWCE_ADDR_WIDTH)
   ) i_efpga_subsystem (
-      .asic_clk_i (clk_i),
-      .fpga_clk0_i(fpga_clk_in),
-      .fpga_clk1_i(ref_clk_i),
-      .fpga_clk2_i(periph_clk_i),
-      .fpga_clk3_i(fpgaio_in_i[9]),  // qspi clk
+      .asic_clk_i (soc_clk_o),
+      .fpga_clk0_i(s_fpga_clk),
+      .fpga_clk1_i(s_ref_clk),
+      .fpga_clk2_i(s_periph_clk),
+      .fpga_clk3_i(fpgaio_in_i[9]),   // qspi clk
       .fpga_clk4_i(fpgaio_in_i[18]),  //cam_clk
       .fpga_clk5_i(fpgaio_in_i[30]),  // sdio_clk
 
@@ -660,7 +654,7 @@ module soc_peripherals #(
   apb_i2cs #(
       .APB_ADDR_WIDTH(APB_ADDR_WIDTH)
   ) i_apb_i2cs (
-      .apb_pclk_i   (clk_i),
+      .apb_pclk_i   (soc_clk_o),
       .apb_presetn_i(apb_reset),
       .apb_paddr_i  (s_apb_i2cs_bus.paddr[APB_ADDR_WIDTH-1:0]),
       .apb_pwdata_i (s_apb_i2cs_bus.pwdata),
