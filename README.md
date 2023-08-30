@@ -167,7 +167,7 @@ Two important things to note.
 
 1.  If you do not have Verible installed (which is likely), then `util/format-verible` will silently do nothing.
 
-2.  You must install the correct version of Verible, currently v0.0-3373-g54e37ed0.  Chips Alliance has [prebuilt versions](https://github.com/chipsalliance/verible/releases?ref=circuitcove.com). The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
+2.  You must install the correct version of Verible, currently v0.0-3410-g398a8505.  Chips Alliance has [prebuilt versions](https://github.com/chipsalliance/verible/releases?ref=circuitcove.com). The version may change in the future.  In the event of the check failing, the details with the failure will tell you which version was used.
 
 ## References
 
