@@ -7,7 +7,7 @@ name: lint
 on: [push, pull_request]
 
 env:
-  VERIBLE_VERSION: 0.0-3373-g54e37ed0
+  VERIBLE_VERSION: 0.0-3410-g398a8505
 
 jobs:
   ##################
@@ -18,8 +18,8 @@ jobs:
     # This job runs on Linux (fixed ubuntu version)
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
       with:
         python-version: 3.9
     - name: Install requirements
@@ -46,8 +46,8 @@ jobs:
     name: Vendor Up-to-Date
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
       with:
         python-version: 3.9
     - name: Install requirements
@@ -88,8 +88,8 @@ jobs:
   #  name: YAML Sources
   #  runs-on: ubuntu-latest
   #  steps:
-  #  - uses: actions/checkout@v2
-  #  - uses: actions/setup-python@v2
+  #  - uses: actions/checkout@v3
+  #  - uses: actions/setup-python@v3
   #    with:
   #      python-version: 3.9
   #  - name: Install requirements
