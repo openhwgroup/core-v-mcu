@@ -44,9 +44,7 @@ module interleaved_crossbar #(
   //Elaboration time asserations
   //Number of slaves must be power of two
   if ((NR_SLAVE_PORTS & (NR_SLAVE_PORTS - 1)) != 0) begin
-    $error(
-        "NR_SLAVE_PORTS must be power of two but was %d", NR_SLAVE_PORTS
-    );
+    $error("NR_SLAVE_PORTS must be power of two but was %d", NR_SLAVE_PORTS);
   end
 
   // Explode the input interface array to arrays of individual signals

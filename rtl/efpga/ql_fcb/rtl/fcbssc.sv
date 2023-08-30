@@ -84,9 +84,8 @@ module fcbssc (
   assign fssc_frfu_cwf_wr_data = fifo_rd_data[7:0];
 
   //assign fssc_frfu_spis_on	= ( 	fcb_sys_stm 		== 1'b0 &&
-  assign fssc_frfu_spis_on	= ( 	fcb_spi_mode_en_bo 	== 1'b1	&&	// JC 20170830
-					fmic_spi_master_en	== 1'b0 )
-				? 1'b1 : 1'b0 ;
+  assign fssc_frfu_spis_on = (fcb_spi_mode_en_bo == 1'b1 &&  // JC 20170830
+      fmic_spi_master_en == 1'b0) ? 1'b1 : 1'b0;
 
   assign fssc_frfu_rd_addr = ssc_addr;  // Dont care power for now
   assign fssc_frfu_rd_en = 1'b0;  // Floating
