@@ -6,40 +6,40 @@ module fcbrwf (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic        fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic        fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic        fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic        fpif_frwf_pif_on,  //PIF Path is ON			//
+    input  logic        fcb_sys_clk,            //Main Clock for FCB except SPI Slave Int
+    input  logic        fcb_sys_rst_n,          //Main Reset for FCB except SPI Slave int
+    input  logic        fcb_sys_stm,            //1'b1 : Put the module into Test Mode
+    input  logic        fpif_frwf_pif_on,       //PIF Path is ON			//
     input  logic [39:0] fpif_frwf_wff_wr_data,  //Bit 31:0 : Write Data, Bit 38:32 : SFR //
-    input  logic        fpif_frwf_wff_wr_en,  //Write Data Enable 			 //
-    input  logic        fpif_frwf_crf_rd_en,  //Read Enable Of Read Back FIFO		//
-    input  logic        faps_frwf_apb_on,  //APB Path Is ON.			//	
+    input  logic        fpif_frwf_wff_wr_en,    //Write Data Enable 			 //
+    input  logic        fpif_frwf_crf_rd_en,    //Read Enable Of Read Back FIFO		//
+    input  logic        faps_frwf_apb_on,       //APB Path Is ON.			//	
     input  logic [39:0] faps_frwf_wff_wr_data,  //Bit 31:0 : Write Data, Bit 38:32 : SFR//
-    input  logic        faps_frwf_wff_wr_en,  //Write Data Enable			//
-    input  logic        faps_frwf_crf_rd_en,  //Read Enable Of Read Back FIFO		//
-    input  logic [ 7:0] frfu_sfr_rd_data,  //SFR Read Data				//
-    input  logic        frfu_cwf_full,  //Full Flag of Cfg Write FIFO
-    input  logic        frfu_frwf_crf_wr_en,  //Write Enable of Cfg Read FIFO
+    input  logic        faps_frwf_wff_wr_en,    //Write Data Enable			//
+    input  logic        faps_frwf_crf_rd_en,    //Read Enable Of Read Back FIFO		//
+    input  logic [ 7:0] frfu_sfr_rd_data,       //SFR Read Data				//
+    input  logic        frfu_cwf_full,          //Full Flag of Cfg Write FIFO
+    input  logic        frfu_frwf_crf_wr_en,    //Write Enable of Cfg Read FIFO
     input  logic [31:0] frfu_frwf_crf_wr_data,  //Write Enable of Cfg Read FIFO
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic        frwf_frfu_ff0_of,  // FIFO 0 Overflow
-    output logic        frwf_wff_full,  // Full Flag of Write Data FIFO
-    output logic        frwf_wff_full_m1,  //Full minus 1 Flag of Write Data FIFO
-    output logic        frwf_crf_empty,  //Empty Flag of Read Back FIFO
-    output logic        frwf_crf_empty_p1,  //Empty Plus One Flag of Read Back FIFO
-    output logic [31:0] frwf_crf_rd_data,  // Read Data for APBS/PIF
-    output logic [ 6:0] frwf_frfu_wr_addr,  //SFR Write Addr
-    output logic [ 6:0] frwf_frfu_rd_addr,  //SFR Read Addr
-    output logic        frwf_frfu_wr_en,  //SFR Write Enable
-    output logic        frwf_frfu_rd_en,  //SFR Read Enable
-    output logic [ 7:0] frwf_frfu_wr_data,  //SFR Write Data
-    output logic        frwf_frfu_frwf_on,  //APB/PIF Path ON
+    output logic        frwf_frfu_ff0_of,       // FIFO 0 Overflow
+    output logic        frwf_wff_full,          // Full Flag of Write Data FIFO
+    output logic        frwf_wff_full_m1,       //Full minus 1 Flag of Write Data FIFO
+    output logic        frwf_crf_empty,         //Empty Flag of Read Back FIFO
+    output logic        frwf_crf_empty_p1,      //Empty Plus One Flag of Read Back FIFO
+    output logic [31:0] frwf_crf_rd_data,       // Read Data for APBS/PIF
+    output logic [ 6:0] frwf_frfu_wr_addr,      //SFR Write Addr
+    output logic [ 6:0] frwf_frfu_rd_addr,      //SFR Read Addr
+    output logic        frwf_frfu_wr_en,        //SFR Write Enable
+    output logic        frwf_frfu_rd_en,        //SFR Read Enable
+    output logic [ 7:0] frwf_frfu_wr_data,      //SFR Write Data
+    output logic        frwf_frfu_frwf_on,      //APB/PIF Path ON
     output logic [31:0] frwf_frfu_cwf_wr_data,  //Cfg Write Data
-    output logic        frwf_frfu_cwf_wr_en,  //Write Enable to indicate the whole 32-B
-    output logic        frwf_frfu_crf_full,  //Full Flag of Cfg Read FIFO
-    output logic        frwf_frfu_crf_full_m1  //Full minus 1 Flag of Cfg Read FIFO
+    output logic        frwf_frfu_cwf_wr_en,    //Write Enable to indicate the whole 32-B
+    output logic        frwf_frfu_crf_full,     //Full Flag of Cfg Read FIFO
+    output logic        frwf_frfu_crf_full_m1   //Full minus 1 Flag of Cfg Read FIFO
 );
 
   //------------------------------------------------------------------------//

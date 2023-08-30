@@ -125,16 +125,16 @@ nexys-emul:
 				@echo "*                                   *"
 				@echo "*************************************"
 				mkdir -p emulation/core-v-mcu-nexys/rtl
-				python3 util/ioscript.py\
-					--soc-defines rtl/includes/pulp_soc_defines.svh\
-					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
-					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
-					--pin-table nexys-pin-table.csv\
-					--perdef-json perdef.json\
-					--pad-control rtl/core-v-mcu/top/pad_control.sv\
-					--emulation-toplevel core_v_mcu_nexys\
-					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
-					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\
+				python3 util/ioscript.py \
+					--soc-defines rtl/includes/pulp_soc_defines.svh \
+					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh \
+					--periph-bus-defines rtl/includes/periph_bus_defines.svh \
+					--pin-table nexys-pin-table.csv \
+					--perdef-json perdef.json \
+					--pad-control rtl/core-v-mcu/top/pad_control.sv \
+					--emulation-toplevel core_v_mcu_nexys \
+					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc \
+		                        --xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_util.v \
 					--output-xdc emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 				util/format-verible
 				@echo "*************************************"
@@ -210,6 +210,7 @@ ${IOSCRIPT_OUT}:	${IOSCRIPT}
 					--peripheral-defines rtl/includes/pulp_peripheral_defines.svh\
 					--periph-bus-defines rtl/includes/periph_bus_defines.svh\
 					--perdef-json perdef.json\
+					--pin-table nexys-pin-table.csv \
 					--pad-control rtl/core-v-mcu/top/pad_control.sv\
 					--xilinx-core-v-mcu-sv emulation/core-v-mcu-nexys/rtl/core_v_mcu_nexys.v\
 					--input-xdc emulation/core-v-mcu-nexys/constraints/Nexys-A7-100T-Master.xdc\

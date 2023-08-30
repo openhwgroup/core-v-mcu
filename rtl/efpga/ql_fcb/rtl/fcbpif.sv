@@ -6,32 +6,32 @@ module fcbpif (
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic        fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic        fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic        fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic        fcb_pif_vldi,  //PIF Input Data Valid
-    input  logic [ 3:0] fcb_pif_di_l,  //PIF Input Data, Lower 4 Bits
-    input  logic [ 3:0] fcb_pif_di_h,  //PIF Input Data, Higher 4 Bits
-    input  logic        fcb_pif_en,  //1'b1 : Enable the PIF mode. Note this b
-    input  logic        fcb_pif_8b_mode_bo,  //1'b1 : PIF DI/DO are 8 bits and in Simp
-    input  logic        frwf_wff_full,  //Full Flag of Write FIFO
-    input  logic        frwf_wff_full_m1,  //Full minus 1 Flag of Write FIFO
-    input  logic        frwf_crf_empty,  //Empty Flag of Cfg Read FIFO
-    input  logic        frwf_crf_empty_p1,  //Empty Flag plus 1 of Cfg Read FIFO
-    input  logic [31:0] frwf_crf_rd_data,  //Cfg Read FIFO Data
+    input  logic        fcb_sys_clk,            //Main Clock for FCB except SPI Slave Int
+    input  logic        fcb_sys_rst_n,          //Main Reset for FCB except SPI Slave int
+    input  logic        fcb_sys_stm,            //1'b1 : Put the module into Test Mode
+    input  logic        fcb_pif_vldi,           //PIF Input Data Valid
+    input  logic [ 3:0] fcb_pif_di_l,           //PIF Input Data, Lower 4 Bits
+    input  logic [ 3:0] fcb_pif_di_h,           //PIF Input Data, Higher 4 Bits
+    input  logic        fcb_pif_en,             //1'b1 : Enable the PIF mode. Note this b
+    input  logic        fcb_pif_8b_mode_bo,     //1'b1 : PIF DI/DO are 8 bits and in Simp
+    input  logic        frwf_wff_full,          //Full Flag of Write FIFO
+    input  logic        frwf_wff_full_m1,       //Full minus 1 Flag of Write FIFO
+    input  logic        frwf_crf_empty,         //Empty Flag of Cfg Read FIFO
+    input  logic        frwf_crf_empty_p1,      //Empty Flag plus 1 of Cfg Read FIFO
+    input  logic [31:0] frwf_crf_rd_data,       //Cfg Read FIFO Data
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic        fcb_pif_vldo,  //PIF Output Data Valid
-    output logic        fcb_pif_vldo_en,  //PIF Output Data Valid Output Enable
-    output logic [ 3:0] fcb_pif_do_l,  //PIF Output Data, Lower 4 Bits
-    output logic        fcb_pif_do_l_en,  //PIF Output Data Output Enable for Lower
-    output logic [ 3:0] fcb_pif_do_h,  //PIF Output Data, Higher 4 Bits
-    output logic        fcb_pif_do_h_en,  //PIF Output Data Output Enable for Highe
-    output logic        fpif_frwf_pif_on,  //PIF Mode Enable
+    output logic        fcb_pif_vldo,           //PIF Output Data Valid
+    output logic        fcb_pif_vldo_en,        //PIF Output Data Valid Output Enable
+    output logic [ 3:0] fcb_pif_do_l,           //PIF Output Data, Lower 4 Bits
+    output logic        fcb_pif_do_l_en,        //PIF Output Data Output Enable for Lower
+    output logic [ 3:0] fcb_pif_do_h,           //PIF Output Data, Higher 4 Bits
+    output logic        fcb_pif_do_h_en,        //PIF Output Data Output Enable for Highe
+    output logic        fpif_frwf_pif_on,       //PIF Mode Enable
     output logic [39:0] fpif_frwf_wff_wr_data,  //Bit 31:0 : Write Data, Bit 38:32 : SFR
-    output logic        fpif_frwf_wff_wr_en,  //Write enable of Write FIFO
-    output logic        fpif_frwf_crf_rd_en  //Read Enable of Cfg Read FIFO
+    output logic        fpif_frwf_wff_wr_en,    //Write enable of Write FIFO
+    output logic        fpif_frwf_crf_rd_en     //Read Enable of Cfg Read FIFO
 );
 
   //------------------------------------------------------------------------//

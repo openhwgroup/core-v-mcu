@@ -27,6 +27,23 @@ module pad_functional_pd
   );
 
 endmodule
+module pad_functional
+(
+   input  logic             OEN,
+   input  logic             I,
+   output logic             O,
+   input  logic             PEN,
+   inout  logic             PAD
+);
+
+  IOBUF iobuf_i (
+    .T ( OEN ),
+    .I ( I    ),
+    .O ( O    ),
+    .IO( PAD  )
+  );
+
+endmodule
 
 module pad_functional_pu
 (
