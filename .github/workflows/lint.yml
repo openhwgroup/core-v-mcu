@@ -78,7 +78,7 @@ jobs:
   #      pip install -r docs/requirements.txt
   #  - name: Generate doc and diff
   #    run: |
-  #      make -C docs doc && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation."
+  #      make -C docs doc && util/git-diff.py --error-msg "::error ::Found differences, please re-generate the documentation.
 
   ####################
   # Format YML Files #

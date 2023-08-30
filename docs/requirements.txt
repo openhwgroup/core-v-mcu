@@ -6,3 +6,4 @@ recommonmark
 sphinx>=4.3.0
 sphinx_markdown_tables
 sphinx_rtd_theme>=0.5.1
+pandoc
