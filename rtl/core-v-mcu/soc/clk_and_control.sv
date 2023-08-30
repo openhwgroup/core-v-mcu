@@ -21,10 +21,10 @@ module clk_and_control (
     input  logic        RET,
     input  logic        TM,
     input  logic        TE,
-    input  logic        TD,  //TO FIX DFT
-    output logic        TQ,  //TO FIX DFT
-    input  logic        JTD,  //TO FIX DFT
-    output logic        JTQ  //TO FIX DFT
+    input  logic        TD,      //TO FIX DFT
+    output logic        TQ,      //TO FIX DFT
+    input  logic        JTD,     //TO FIX DFT
+    output logic        JTQ      //TO FIX DFT
 
 );
 

@@ -119,7 +119,11 @@ module eFPGA_wrapper (
     output logic [3:0] tcdm_be_p3,
     tcdm_be_p2,
     tcdm_be_p1,
-    tcdm_be_p0
+    tcdm_be_p0,
+    inout              VSSC,
+    VDDC_FPGA,
+    NB,
+    PB
 
 
 );
@@ -196,7 +200,10 @@ module eFPGA_wrapper (
 
   A2_design Arnold2_Design (  // use this to go to A2F/F2A
       //top Arnold2_Design (  // use this to connect rtl directly
-
+      .VSSC(VSSC),
+      .NB(NB),
+      .PB(PB),
+      .VDDC_FPGA(VDDC_FPGA),
 
       // SOC signals
       .control_in(control_in),
@@ -411,8 +418,6 @@ module eFPGA_wrapper (
       .fcb_fb_iso_enb    (fcb_fb_iso_enb),
       .FB_SPE_IN         (test_fb_spe_in),
       .fcb_iso_en        (fcb_iso_en),
-      .NB                (),
-      .PB                (),
       .fcb_pchg_b        (fcb_pchg_b),
       .fcb_pi_pwr        (fcb_pi_pwr),
       .POR               (POR),

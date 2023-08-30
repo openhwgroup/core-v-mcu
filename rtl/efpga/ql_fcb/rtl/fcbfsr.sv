@@ -8,80 +8,80 @@ module fcbfsr #(
     //------------------------------------------------------------------------//
     //-- INPUT PORT                                                         --//
     //------------------------------------------------------------------------//
-    input  logic        fcb_sys_clk,  //Main Clock for FCB except SPI Slave Int
-    input  logic        fcb_sys_rst_n,  //Main Reset for FCB except SPI Slave int
-    input  logic        fcb_sys_stm,  //1'b1 : Put the module into Test Mode
-    input  logic [31:0] fcb_bl_dout,  //Fabric BL Read Data
-    input  logic [17:0] fcb_apbm_prdata_0,  //APB Read Data, the RAMFIFO will impleme
-    input  logic [17:0] fcb_apbm_prdata_1,  //APB Read Data, the RAMFIFO will impleme
-    input  logic [ 7:0] frfu_ffsr_fb_cfg_cmd,  //0x1E
-    input  logic        frfu_ffsr_fb_cfg_kickoff,  //Level Signal
-    input  logic [ 7:0] frfu_ffsr_ram_cfg_0,  //RAM Cfg
-    input  logic [ 7:0] frfu_ffsr_ram_cfg_1,  //RAM Cfg
-    input  logic [ 7:0] frfu_wrd_cnt_b0,  //Cfg/Ram FIFO Data Count
-    input  logic [ 7:0] frfu_wrd_cnt_b1,  //Cfg/Ram FIFO Data Count
-    input  logic [ 7:0] frfu_wrd_cnt_b2,  //Cfg/Ram FIFO Data Count
-    input  logic [ 7:0] frfu_ffsr_bl_cnt_l,  //BitLine CNT
-    input  logic [ 7:0] frfu_ffsr_bl_cnt_h,  //BitLine CNT
-    input  logic [ 7:0] frfu_ffsr_wl_cnt_l,  //WordLine CNT
-    input  logic [ 7:0] frfu_ffsr_wl_cnt_h,  //WordLine CNT
-    input  logic [ 7:0] frfu_ffsr_col_cnt,  //Column CNT
-    input  logic [ 7:0] frfu_ffsr_ram_size_b0,  //RAM Size
-    input  logic [ 7:0] frfu_ffsr_ram_size_b1,  //RAM Size
-    input  logic [ 7:0] frfu_ffsr_ram_data_width,  //RAM Data Widht
-    input  logic [ 3:0] frfu_ffsr_cfg_wrp_ccnt,  //Cfg Ctl Signal Cycle
-    input  logic [ 3:0] frfu_ffsr_rcfg_wrp_ccnt,  //Cfg Ctl Signal Cycle
-    input  logic [ 7:0] frfu_bl_pw_cfg_0,  //BL Power Gate
-    input  logic [ 7:0] frfu_bl_pw_cfg_1,  //BL Power Gate
-    input  logic [ 7:0] frfu_wl_pw_cfg,  //WL Power Gate
-    input  logic        frfu_ffsr_rfifo_rd_en,  //Read Enable of Read FIFO
-    input  logic [31:0] frfu_ffsr_wfifo_wdata,  //Write Data of Write FIFO
-    input  logic        frfu_ffsr_wfifo_wr_en,  //Write Enable of Write FIFO
-    input  logic [ 1:0] frfu_ffsr_wlblclk_cfg,  // JC 01302017
-    input  logic [ 1:0] frfu_ffsr_blclk_sut,  //JC 07
-    input  logic [ 1:0] frfu_ffsr_wlclk_sut,  //JC 07
-    input  logic [ 1:0] frfu_ffsr_wlen_sut,  //JC 07
+    input  logic        fcb_sys_clk,                   //Main Clock for FCB except SPI Slave Int
+    input  logic        fcb_sys_rst_n,                 //Main Reset for FCB except SPI Slave int
+    input  logic        fcb_sys_stm,                   //1'b1 : Put the module into Test Mode
+    input  logic [31:0] fcb_bl_dout,                   //Fabric BL Read Data
+    input  logic [17:0] fcb_apbm_prdata_0,             //APB Read Data, the RAMFIFO will impleme
+    input  logic [17:0] fcb_apbm_prdata_1,             //APB Read Data, the RAMFIFO will impleme
+    input  logic [ 7:0] frfu_ffsr_fb_cfg_cmd,          //0x1E
+    input  logic        frfu_ffsr_fb_cfg_kickoff,      //Level Signal
+    input  logic [ 7:0] frfu_ffsr_ram_cfg_0,           //RAM Cfg
+    input  logic [ 7:0] frfu_ffsr_ram_cfg_1,           //RAM Cfg
+    input  logic [ 7:0] frfu_wrd_cnt_b0,               //Cfg/Ram FIFO Data Count
+    input  logic [ 7:0] frfu_wrd_cnt_b1,               //Cfg/Ram FIFO Data Count
+    input  logic [ 7:0] frfu_wrd_cnt_b2,               //Cfg/Ram FIFO Data Count
+    input  logic [ 7:0] frfu_ffsr_bl_cnt_l,            //BitLine CNT
+    input  logic [ 7:0] frfu_ffsr_bl_cnt_h,            //BitLine CNT
+    input  logic [ 7:0] frfu_ffsr_wl_cnt_l,            //WordLine CNT
+    input  logic [ 7:0] frfu_ffsr_wl_cnt_h,            //WordLine CNT
+    input  logic [ 7:0] frfu_ffsr_col_cnt,             //Column CNT
+    input  logic [ 7:0] frfu_ffsr_ram_size_b0,         //RAM Size
+    input  logic [ 7:0] frfu_ffsr_ram_size_b1,         //RAM Size
+    input  logic [ 7:0] frfu_ffsr_ram_data_width,      //RAM Data Widht
+    input  logic [ 3:0] frfu_ffsr_cfg_wrp_ccnt,        //Cfg Ctl Signal Cycle
+    input  logic [ 3:0] frfu_ffsr_rcfg_wrp_ccnt,       //Cfg Ctl Signal Cycle
+    input  logic [ 7:0] frfu_bl_pw_cfg_0,              //BL Power Gate
+    input  logic [ 7:0] frfu_bl_pw_cfg_1,              //BL Power Gate
+    input  logic [ 7:0] frfu_wl_pw_cfg,                //WL Power Gate
+    input  logic        frfu_ffsr_rfifo_rd_en,         //Read Enable of Read FIFO
+    input  logic [31:0] frfu_ffsr_wfifo_wdata,         //Write Data of Write FIFO
+    input  logic        frfu_ffsr_wfifo_wr_en,         //Write Enable of Write FIFO
+    input  logic [ 1:0] frfu_ffsr_wlblclk_cfg,         // JC 01302017
+    input  logic [ 1:0] frfu_ffsr_blclk_sut,           //JC 07
+    input  logic [ 1:0] frfu_ffsr_wlclk_sut,           //JC 07
+    input  logic [ 1:0] frfu_ffsr_wlen_sut,            //JC 07
     //------------------------------------------------------------------------//
     //-- OUTPUT PORT                                                        --//
     //------------------------------------------------------------------------//
-    output logic        fcb_blclk,  //Fabric Bit Line Clock, Does not need to
-    output logic        fcb_re,  //Fabric Read Enable
-    output logic        fcb_we,  //Fabric Write Enable
-    output logic        fcb_we_int,  //Fabric Write Enable Left/write Interfac
-    output logic        fcb_pchg_b,  //Fabric Pre-Charge, Low active
-    output logic [31:0] fcb_bl_din,  //Fabric BL Write Data
-    output logic        fcb_cload_din_sel,  //Fabric Column Load Data in Select
-    output logic        fcb_din_slc_tb_int,  //Fabric Bit Line Shift Register Data In
-    output logic        fcb_din_int_l_only,  //Fabric Bit line shift register Data in
-    output logic        fcb_din_int_r_only,  //Fabric Bit Line Shift Register Data in
-    output logic [15:0] fcb_bl_pwrgate,  //Fabric Bit Line Cfg Shift Register Powe
-    output logic        fcb_wlclk,  //Fabric Word Line Clock, Does not need t
-    output logic        fcb_wl_resetb,  //Fabric Word Line Shift Register Bank Re
-    output logic        fcb_wl_en,  //Fabric Word Line enable
-    output logic [15:0] fcb_wl_sel,  //Fabric Word Line Select
-    output logic [ 2:0] fcb_wl_cload_sel,  //Fabric Word Line Column Load Select
-    output logic [ 7:0] fcb_wl_pwrgate,  //Fabric Word Line Power Gate Control. 1'
-    output logic [ 5:0] fcb_wl_din,  //Fabric Word Line Shfit Register Data In
-    output logic        fcb_wl_int_din_sel,  //Fabric Word Line interface Data in Sele
+    output logic        fcb_blclk,                     //Fabric Bit Line Clock, Does not need to
+    output logic        fcb_re,                        //Fabric Read Enable
+    output logic        fcb_we,                        //Fabric Write Enable
+    output logic        fcb_we_int,                    //Fabric Write Enable Left/write Interfac
+    output logic        fcb_pchg_b,                    //Fabric Pre-Charge, Low active
+    output logic [31:0] fcb_bl_din,                    //Fabric BL Write Data
+    output logic        fcb_cload_din_sel,             //Fabric Column Load Data in Select
+    output logic        fcb_din_slc_tb_int,            //Fabric Bit Line Shift Register Data In
+    output logic        fcb_din_int_l_only,            //Fabric Bit line shift register Data in
+    output logic        fcb_din_int_r_only,            //Fabric Bit Line Shift Register Data in
+    output logic [15:0] fcb_bl_pwrgate,                //Fabric Bit Line Cfg Shift Register Powe
+    output logic        fcb_wlclk,                     //Fabric Word Line Clock, Does not need t
+    output logic        fcb_wl_resetb,                 //Fabric Word Line Shift Register Bank Re
+    output logic        fcb_wl_en,                     //Fabric Word Line enable
+    output logic [15:0] fcb_wl_sel,                    //Fabric Word Line Select
+    output logic [ 2:0] fcb_wl_cload_sel,              //Fabric Word Line Column Load Select
+    output logic [ 7:0] fcb_wl_pwrgate,                //Fabric Word Line Power Gate Control. 1'
+    output logic [ 5:0] fcb_wl_din,                    //Fabric Word Line Shfit Register Data In
+    output logic        fcb_wl_int_din_sel,            //Fabric Word Line interface Data in Sele
     //output logic [15:0]             fcb_prog ,      	//Fabric Configuration Enable for Quads,
     //output logic                    fcb_prog_ifx ,  	//Fabric Configuration Enable for IFX, Hi
-    output logic        fcb_wl_sel_tb_int,  //Disable the TB Configuration during Qua
-    output logic [11:0] fcb_apbm_paddr,  //APB Address in byte Resolution, Bit 11
-    output logic [ 7:0] fcb_apbm_psel,  //APB Slave Select Signals. Bit 0 is used
-    output logic        fcb_apbm_penable,  //APB Enable signal for data transfer
-    output logic        fcb_apbm_pwrite,  //APB write Enable Signal
-    output logic [17:0] fcb_apbm_pwdata,  //APB Write Data
-    output logic        fcb_apbm_ramfifo_sel,  //1'b1 : RAMFIFO APB Interface Enable.	//
-    output logic        fcb_apbm_mclk,  // APB Master Clock
+    output logic        fcb_wl_sel_tb_int,             //Disable the TB Configuration during Qua
+    output logic [11:0] fcb_apbm_paddr,                //APB Address in byte Resolution, Bit 11
+    output logic [ 7:0] fcb_apbm_psel,                 //APB Slave Select Signals. Bit 0 is used
+    output logic        fcb_apbm_penable,              //APB Enable signal for data transfer
+    output logic        fcb_apbm_pwrite,               //APB write Enable Signal
+    output logic [17:0] fcb_apbm_pwdata,               //APB Write Data
+    output logic        fcb_apbm_ramfifo_sel,          //1'b1 : RAMFIFO APB Interface Enable.	//
+    output logic        fcb_apbm_mclk,                 // APB Master Clock
     output logic        ffsr_frfu_clr_fb_cfg_kickoff,  //Clear Kick-Off Register
-    output logic [31:0] ffsr_frfu_rfifo_rdata,  //Read Data of Read FIFO
-    output logic        ffsr_frfu_rfifo_empty,  //Empty Flag of Read FIFO
-    output logic        ffsr_frfu_rfifo_empty_p1,  //Empty Plus 1 Flag of Read FIFO
-    output logic        ffsr_frfu_wfifo_full,  //Full Flag of Write FIFO
-    output logic        ffsr_frfu_wfifo_full_m1,  //Full minus 1 Flag of Write FIFO
-    output logic        ffsr_fsr_busy,  //Indicate the FSR is busy
+    output logic [31:0] ffsr_frfu_rfifo_rdata,         //Read Data of Read FIFO
+    output logic        ffsr_frfu_rfifo_empty,         //Empty Flag of Read FIFO
+    output logic        ffsr_frfu_rfifo_empty_p1,      //Empty Plus 1 Flag of Read FIFO
+    output logic        ffsr_frfu_wfifo_full,          //Full Flag of Write FIFO
+    output logic        ffsr_frfu_wfifo_full_m1,       //Full minus 1 Flag of Write FIFO
+    output logic        ffsr_fsr_busy,                 //Indicate the FSR is busy
     //output logic [15:0]             fcb_rst ,       	//Fabric Reset
-    output logic        fcb_rst  //For Tamar Only
+    output logic        fcb_rst                        //For Tamar Only
     //output logic                    fcb_tb_rst ,    	//TB Reset
     //output logic                    fcb_lr_rst ,    	//LR Reset
     //output logic                    fcb_iso_rst    	//LR Reset
@@ -482,9 +482,8 @@ module fcbfsr #(
       if ( frfu_ffsr_cfg_wrp_ccnt == 4'b0000 || frfu_ffsr_cfg_wrp_ccnt == 4'b0001 || frfu_ffsr_cfg_wrp_ccnt == 4'b0010 ) // 2 Cycles
 	begin
         fcb_wl_en = fcb_wl_en_cs_dly1cyc;
-      end
-        	//----------------------------------------------------------------//
-        	//-- IF WL_EN is 3 Cycles 					--//
+      end  //----------------------------------------------------------------//
+           //-- IF WL_EN is 3 Cycles 					--//
       //-- WL_EN cna only delay 1 Cycle or 2 Cycles			--//
       //----------------------------------------------------------------//
       else
@@ -495,13 +494,11 @@ module fcbfsr #(
         end else begin
           fcb_wl_en = fcb_wl_en_cs_dly2cyc;
         end
-      end
-        	//----------------------------------------------------------------//
-        	//-- IF WL_EN is 4 Cycles or longer 				--//
+      end  //----------------------------------------------------------------//
+           //-- IF WL_EN is 4 Cycles or longer 				--//
       //-- WL_EN cna only delay 1, 2 or 3 Cycles			--//
       //----------------------------------------------------------------//
-      else
-      begin
+      else begin
         if (frfu_ffsr_wlen_sut == 2'b00) begin
           fcb_wl_en = fcb_wl_en_cs_dly1cyc;
         end else if (frfu_ffsr_wlen_sut == 2'b01) begin
@@ -612,9 +609,8 @@ module fcbfsr #(
         fcb_din_slc_tb_int = 'b0;
         fcb_din_int_l_only = 'b0;
         fcb_din_int_r_only = 'b0;
-      end
-      else				// Read
-	begin
+      end else  // Read
+      begin
         fcb_bl_din[31:0]   = 'b0;
         fcb_din_slc_tb_int = 'b0;
         fcb_din_int_l_only = 'b0;
@@ -656,19 +652,19 @@ module fcbfsr #(
       //------------------------------------------------------------//
       //-- INPUT	                                                --//
       //------------------------------------------------------------//
-      .fifo_clk			(fcb_sys_clk	) ,
-      .fifo_rst_n			(fcb_sys_rst_n	) ,
-      .fifo_rd_en			(frfu_ffsr_rfifo_rd_en ) ,
-      .fifo_wr_data			(rff_wdata) ,
-      .fifo_wr_en			(rff_wr_en) ,
+      .fifo_clk   (fcb_sys_clk ) ,
+      .fifo_rst_n   (fcb_sys_rst_n ) ,
+      .fifo_rd_en   (frfu_ffsr_rfifo_rd_en ) ,
+      .fifo_wr_data   (rff_wdata) ,
+      .fifo_wr_en   (rff_wr_en) ,
       //------------------------------------------------------------//
       //-- OUTPUT	                                                --//
       //------------------------------------------------------------//
-      .fifo_empty_flag		(rff_empty)  ,
-      .fifo_empty_p1_flag		(ffsr_frfu_rfifo_empty_p1)  ,
-      .fifo_full_flag			(rff_full)  ,
-      .fifo_full_m1_flag		()  ,
-      .fifo_rd_data			(ffsr_frfu_rfifo_rdata)
+      .fifo_empty_flag  (rff_empty)  ,
+      .fifo_empty_p1_flag  (ffsr_frfu_rfifo_empty_p1)  ,
+      .fifo_full_flag   (rff_full)  ,
+      .fifo_full_m1_flag  ()  ,
+      .fifo_rd_data   (ffsr_frfu_rfifo_rdata)
   );
   //--------------------------------------------------------//
   //-- qf_sff Instance                                    --//
@@ -1192,10 +1188,10 @@ module fcbfsr #(
         fsr_stm_ns = SLC_S03;
       end
       SLC_S03: begin
-        fsr_stm_ns 		= SLC_S04 ;
-        fsr_timer_kickoff 	= 1'b1 ;
-        fsr_timer_ini_value 	= 8'h80 ;	// 128 Cycles
-        fcb_wl_resetb_ns   	= 1'b0  ;
+        fsr_stm_ns   = SLC_S04 ;
+        fsr_timer_kickoff  = 1'b1 ;
+        fsr_timer_ini_value  = 8'h80 ; // 128 Cycles
+        fcb_wl_resetb_ns    = 1'b0  ;
         if (frfu_ffsr_fb_cfg_cmd[7:0] == 8'h20) begin
           //fcb_rst_ns		= fcb_bl_pwrgate_cs ;
         end else if (frfu_ffsr_fb_cfg_cmd[7:0] == 8'h21) begin
@@ -1356,9 +1352,8 @@ module fcbfsr #(
         if ( frfu_ffsr_fb_cfg_cmd[7:0] == 8'h20 )	// L/C
           begin
           fcb_we_ns = 1'b1;
-        end
-	else						// Column,T/B
-          begin
+        end else  // Column,T/B
+        begin
           fcb_we_ns = 1'b0;
         end
         if (frfu_ffsr_cfg_wrp_ccnt == 4'b0000 || frfu_ffsr_cfg_wrp_ccnt == 4'b0001) begin
@@ -1535,10 +1530,10 @@ module fcbfsr #(
         fsr_stm_ns = FCR_S03;
       end
       FCR_S03: begin
-        fsr_stm_ns 		= FCR_S04 ;
-        fsr_timer_kickoff 	= 1'b1 ;
-        fsr_timer_ini_value 	= 8'h80 ;	// 128 Cycles
-        fcb_wl_resetb_ns   	= 1'b0  ;
+        fsr_stm_ns   = FCR_S04 ;
+        fsr_timer_kickoff  = 1'b1 ;
+        fsr_timer_ini_value  = 8'h80 ; // 128 Cycles
+        fcb_wl_resetb_ns    = 1'b0  ;
         //fcb_rst_ns         	= fcb_bl_pwrgate_cs ; // NEW ADDED 20170710 20180411
       end
       FCR_S04 :		// Wait until FIFO is NOT full, 11-22
@@ -1834,21 +1829,21 @@ module fcbfsr #(
           fsr_stm_ns = ARR_S01;
         end else if (rff_full == 1'b0) begin
           fcb_apbm_psel_ns[ramfifo_index_cs[3:1]] = 1'b1  ;
-          fsr_stm_ns				= ARR_S04 ;
+          fsr_stm_ns    = ARR_S04 ;
         end else begin
           fsr_stm_ns = fsr_stm_cs;
         end
       end
       ARR_S04: begin
         fcb_apbm_psel_ns[ramfifo_index_cs[3:1]] = 1'b1 ;
-        fcb_apbm_mclk_ns 			= 1'b1 ;
-        fsr_stm_ns				= ARR_S05 ;
+        fcb_apbm_mclk_ns    = 1'b1 ;
+        fsr_stm_ns    = ARR_S05 ;
       end
       ARR_S05: begin
         fcb_apbm_psel_ns[ramfifo_index_cs[3:1]] = 1'b1 ;
-        fcb_apbm_mclk_ns 			= 1'b0 ;
-        fcb_apbm_penable_ns			= 1'b1 ;
-        fsr_stm_ns				= ARR_S06 ;
+        fcb_apbm_mclk_ns    = 1'b0 ;
+        fcb_apbm_penable_ns   = 1'b1 ;
+        fsr_stm_ns    = ARR_S06 ;
       end
       ARR_S06: begin
         fcb_apbm_psel_ns[ramfifo_index_cs[3:1]] = 1'b1;

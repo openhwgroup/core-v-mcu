@@ -23,6 +23,8 @@ module core_v_mcu_tb;
    localparam IO_UART0_TX = 7;
    localparam IO_UART1_RX = 9;
    localparam IO_UART1_TX = 10;
+   localparam IO_UART2_RX = 11;
+   localparam IO_UART2_TX = 12;
 
    //localparam  REF_CLK_PERIOD =  2.5ns; // Use this for fake PLL pPLL02F.sv
    localparam  REF_CLK_PERIOD =  100ns; // Use this for Perceptia PLL pd_gf22_PLL02_model.v (10 MHz ref)
@@ -102,6 +104,17 @@ module core_v_mcu_tb;
 	   .rst (~resetn),
 	   .tx(io_in_i[IO_UART1_TX]),
 	   .rx(io_out_o[IO_UART1_RX])
+	   );
+
+   uartdpi #(.BAUD(115200 * 40),  //SW thinks the per clk is 5 MHz, but it is really running at 10 MHz in bootloader, hence the multiplication of 2 [ 5 * 2 = 10]
+	     .FREQ(BAUD_CLK_FREQ),
+     	     .NAME("uart2"),
+	     .USEPTY(`USE_PTY))
+   uart_2 (
+	   .clk(uart_clk),
+	   .rst (~resetn),
+	   .tx(io_in_i[IO_UART2_TX]),
+	   .rx(io_out_o[IO_UART2_RX])
 	   );
 
 

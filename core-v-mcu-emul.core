@@ -6,7 +6,6 @@ CAPI=2:
 
 name: openhwgroup.org:systems:core-v-mcu-emul
 description: CORE-V MCU Emulation Top.
-
 filesets:
   emulation-rtl:
     depend:
@@ -23,28 +22,23 @@ filesets:
     - emulation/xilinx/rtl/pulp_clock_gating_xilinx.sv
     - emulation/xilinx/rtl/xilinx_core_v_mcu.v
     file_type: systemVerilogSource
-
   genesys2-xdc:
     files:
     - constraints/genesys2.xdc
     file_type: xdc
-
   genesys2-cfg:
     files:
     - fpga/genesys2.tcl
     file_type: tclSource
-
   nexys-xdc:
     files:
     - emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
     file_type: xdc
-
   nexys-cfg:
     files:
     - emulation/core-v-mcu-nexys/tcl/common.tcl
     - emulation/core-v-mcu-nexys/tcl/flatten.tcl
     file_type: tclSource
-
   xilinx-ips:
     files:
     - emulation/xilinx/ips/xilinx_clk_mngr.tcl
@@ -52,20 +46,17 @@ filesets:
     - emulation/xilinx/ips/xilinx_interleaved_ram.tcl
     - emulation/xilinx/ips/xilinx_private_ram.tcl
     file_type: tclSource
-
 parameters:
   PULP_FPGA_EMUL:
     datatype: bool
     paramtype: vlogdefine
     default: true
-
 targets:
   default: &default
     filesets:
     - emulation-rtl
     - xilinx-ips
     toplevel: xilinx_core_v_mcu
-
   genesys2:
     default_tool: vivado
     parameters: [PULP_FPGA_EMUL=true]
@@ -79,7 +70,6 @@ targets:
       vivado:
         part: xc7k325tffg900-2
     toplevel: xilinx_core_v_mcu
-
   nexys-a7-100t:
     <<: *default
     default_tool: vivado

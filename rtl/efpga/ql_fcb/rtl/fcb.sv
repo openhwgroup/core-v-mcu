@@ -488,14 +488,14 @@ module fcb #(
       .fclp_frfu_clear_pd_wu_en     (fclp_frfu_clear_pd_wu_en),
       .fclp_frfu_clp_pw_sta         (fclp_frfu_clp_pw_sta),
       .fclp_frfu_clear_cfg_done     (fclp_frfu_clear_cfg_done),
-      .fsmc_frfu_set_pd             (fsmc_frfu_set_pd),  //JC
-      .fsmc_frfu_set_clp_pd         (fsmc_frfu_set_clp_pd),  //JC
+      .fsmc_frfu_set_pd             (fsmc_frfu_set_pd),                  //JC
+      .fsmc_frfu_set_clp_pd         (fsmc_frfu_set_clp_pd),              //JC
       //.fpmu_frfu_clr_pmu_chip_pd_en 		(fpmu_frfu_clr_pmu_chip_pd_en) , //JC
-      .fpmu_frfu_chip_pw_sta        (fpmu_frfu_chip_pw_sta),  // JC 05232017
+      .fpmu_frfu_chip_pw_sta        (fpmu_frfu_chip_pw_sta),             // JC 05232017
       .fpmu_frfu_pmu_busy           (fpmu_frfu_pmu_busy),
-      .fpmu_frfu_clr_cfg_done       (fpmu_frfu_clr_cfg_done),  //JC
-      .fpmu_frfu_clr_quads          (fpmu_frfu_clr_quads),  //JC 05242017
-      .fpmu_frfu_clr_pmu_chip_cmd   (fpmu_frfu_clr_pmu_chip_cmd),  //JC
+      .fpmu_frfu_clr_cfg_done       (fpmu_frfu_clr_cfg_done),            //JC
+      .fpmu_frfu_clr_quads          (fpmu_frfu_clr_quads),               //JC 05242017
+      .fpmu_frfu_clr_pmu_chip_cmd   (fpmu_frfu_clr_pmu_chip_cmd),        //JC
       .fpmu_frfu_fb_cfg_cleanup     (fpmu_frfu_fb_cfg_cleanup),
       .fclp_frfu_fb_cfg_cleanup     (fclp_frfu_fb_cfg_cleanup),
       .fsmc_frfu_set_quad_pd        (fsmc_frfu_set_quad_pd),
@@ -518,8 +518,8 @@ module fcb #(
       .frfu_fpmu_pmu_chip_cmd       (frfu_fpmu_pmu_chip_cmd[3:0]),
       .frfu_fpmu_quad_cfg_b0        (frfu_fpmu_quad_cfg_b0[7:0]),
       .frfu_fpmu_quad_cfg_b1        (frfu_fpmu_quad_cfg_b1[7:0]),
-      .frfu_fpmu_prog_cfg_done      (frfu_fpmu_prog_cfg_done),  //JC
-      .frfu_fpmu_clr_cfg_done       (frfu_fpmu_clr_cfg_done),  //JC
+      .frfu_fpmu_prog_cfg_done      (frfu_fpmu_prog_cfg_done),           //JC
+      .frfu_fpmu_clr_cfg_done       (frfu_fpmu_clr_cfg_done),            //JC
       //.frfu_fpmu_prog_pmu_quad_pd_en		(frfu_fpmu_prog_pmu_quad_pd_en	), 	//JC
       //.frfu_fpmu_prog_pmu_quad_wu_en		(frfu_fpmu_prog_pmu_quad_wu_en	), 	//JC
       //.frfu_fpmu_pmu_chip_pd_en		(frfu_fpmu_pmu_chip_pd_en	),	//JC
@@ -559,8 +559,8 @@ module fcb #(
       .frfu_fpmu_iso_en_sd_1        (frfu_fpmu_iso_en_sd_1[7:0]),
       //.frfu_fpmu_pi_pwr_0                  (frfu_fpmu_pi_pwr_0[7:0]     )  ,	//XXX
       //.frfu_fpmu_pi_pwr_1                  (frfu_fpmu_pi_pwr_1[7:0]     )  ,
-      .frfu_fpmu_pi_pwr_sd_0        (frfu_fpmu_pi_pwr_sd_0[7:0]),  //XXX
-      .frfu_fpmu_pi_pwr_sd_1        (frfu_fpmu_pi_pwr_sd_1[7:0]),  //XXX
+      .frfu_fpmu_pi_pwr_sd_0        (frfu_fpmu_pi_pwr_sd_0[7:0]),        //XXX
+      .frfu_fpmu_pi_pwr_sd_1        (frfu_fpmu_pi_pwr_sd_1[7:0]),        //XXX
       //.frfu_fpmu_pmu_chip_vlp_en              (frfu_fpmu_pmu_chip_vlp_en      )  ,
       //.frfu_fpmu_pmu_chip_vlp_wu_en           (frfu_fpmu_pmu_chip_vlp_wu_en   )  ,
       .frfu_fpmu_pmu_mux_sel_sd     (frfu_fpmu_pmu_mux_sel_sd),
@@ -660,8 +660,8 @@ module fcb #(
       .ffsr_fsr_busy              (ffsr_fsr_busy),
       .fmic_spi_master_en         (fmic_spi_master_en),
       .fpmu_pmu_busy              (fpmu_pmu_busy),
-      .fclp_clp_busy              (fclp_clp_busy),  //JC
-      .fcb_clp_mode_en_bo         (fcb_clp_mode_en_bo),  //JC
+      .fclp_clp_busy              (fclp_clp_busy),                  //JC
+      .fcb_clp_mode_en_bo         (fcb_clp_mode_en_bo),             //JC
       .frfu_cwf_full              (frfu_cwf_full),
       .frfu_fsmc_checksum_enable  (frfu_fsmc_checksum_enable),
       .frfu_fsmc_checksum_status  (frfu_fsmc_checksum_status),
@@ -681,8 +681,8 @@ module fcb #(
       //-- OUTPUT                                                 --//
       //------------------------------------------------------------//
       .fsmc_frfu_set_quad_pd      (fsmc_frfu_set_quad_pd),
-      .fsmc_frfu_set_pd           (fsmc_frfu_set_pd),  //JC
-      .fsmc_frfu_set_clp_pd       (fsmc_frfu_set_clp_pd),  //JC
+      .fsmc_frfu_set_pd           (fsmc_frfu_set_pd),               //JC
+      .fsmc_frfu_set_clp_pd       (fsmc_frfu_set_clp_pd),           //JC
       .fcb_spim_ckout             (fcb_spim_ckout),
       .fcb_spim_ckout_en          (fcb_spim_ckout_en),
       .fcb_spim_cs_n              (fcb_spim_cs_n),
@@ -917,7 +917,7 @@ module fcb #(
       .fcb_vlp                      (1'b0),
       .ffsr_fmic_fsr_busy           (ffsr_fsr_busy),
       .fpmu_fmic_pmu_busy           (fpmu_pmu_busy),
-      .fclp_clp_busy                (fclp_clp_busy),  // New Added
+      .fclp_clp_busy                (fclp_clp_busy),                  // New Added
       .frfu_fmic_done_op_mask_n     (frfu_fmic_done_op_mask_n),
       .frfu_fmic_io_sv_180          (frfu_fmic_io_sv_180[3:0]),
       //.frfu_fmic_rc_clk_en                  (frfu_fmic_rc_clk_en    ) ,
@@ -926,13 +926,13 @@ module fcb #(
       .fsmc_fmic_clr_spi_master_en  (fsmc_fmic_clr_spi_master_en),
       .fsmc_fmic_fsmc_busy          (fsmc_fmic_fsmc_busy),
       .frfu_fmic_fb_cfg_done        (frfu_fmic_fb_cfg_done),
-      .frfu_fpmu_pmu_chip_vlp_en    (1'b0),  // VLP Pin is no used
-      .frfu_fpmu_pmu_chip_vlp_wu_en (1'b0),  // VLP Pin is no used
+      .frfu_fpmu_pmu_chip_vlp_en    (1'b0),                           // VLP Pin is no used
+      .frfu_fpmu_pmu_chip_vlp_wu_en (1'b0),                           // VLP Pin is no used
       .fclp_frfu_clp_pw_sta         (fclp_frfu_clp_pw_sta),
       .fcb_clp_mode_en_bo           (fcb_clp_mode_en_bo),
-      .frfu_fclp_clp_vlp_wu_en      (frfu_fclp_clp_vlp_wu_en),  //JC 01262017
-      .frfu_fclp_clp_vlp_en         (frfu_fclp_clp_vlp_en),  //JC 01262017
-      .fcb_vlp_pwrdis_ifx           (fcb_vlp_pwrdis_ifx),  //JC 01262017
+      .frfu_fclp_clp_vlp_wu_en      (frfu_fclp_clp_vlp_wu_en),        //JC 01262017
+      .frfu_fclp_clp_vlp_en         (frfu_fclp_clp_vlp_en),           //JC 01262017
+      .fcb_vlp_pwrdis_ifx           (fcb_vlp_pwrdis_ifx),             //JC 01262017
       .fsmc_fmic_seq_done           (fsmc_fmic_seq_done),
       //------------------------------------------------------------//
       //-- OUTPUT                                                 --//
@@ -1015,7 +1015,7 @@ module fcb #(
       //.fcb_prog_ifx                   	(fcb_prog_ifx   )  ,
       .fcb_re                      (fcb_re),
       //.fcb_rst                        	(fcb_rst[15:0]  )  ,
-      .fcb_rst                     (fcb_rst),  // One Bit now
+      .fcb_rst                     (fcb_rst),                        // One Bit now
       //.fcb_tb_rst                     	(fcb_tb_rst     )  ,
       .fcb_we                      (fcb_we),
       .fcb_we_int                  (fcb_we_int),
@@ -1078,8 +1078,8 @@ module fcb #(
   fcbclp #(
       .PAR_QLFCB_11BIT_100NS(PAR_QLFCB_11BIT_100NS),  // 1: Default ON, 0: Default Off
       .PAR_QLFCB_11BIT_200NS(PAR_QLFCB_11BIT_200NS),  // Default Assume 100MHz
-      .PAR_QLFCB_11BIT_1US  (PAR_QLFCB_11BIT_1US),  // Default Assume 100MHz
-      .PAR_QLFCB_11BIT_10US (PAR_QLFCB_11BIT_10US)  // Default Assume 100MHz
+      .PAR_QLFCB_11BIT_1US  (PAR_QLFCB_11BIT_1US),    // Default Assume 100MHz
+      .PAR_QLFCB_11BIT_10US (PAR_QLFCB_11BIT_10US)    // Default Assume 100MHz
   ) fcbclp_INST (
       //------------------------------------------------------------//
       //-- INPUT                                                  --//
@@ -1095,12 +1095,12 @@ module fcb #(
       .frfu_fclp_clp_vlp_wu_en  (frfu_fclp_clp_vlp_wu_en),
       .fcb_sys_stm              (fcb_sys_stm),
       .fcb_pif_en               (fcb_pif_en),
-      .fcb_fb_default_on_bo     (fcb_fb_default_on_bo),  //eFPGA Macro Default Power State
+      .fcb_fb_default_on_bo     (fcb_fb_default_on_bo),         //eFPGA Macro Default Power State
       //------------------------------------------------------------//
       //-- OUTPUT                                                 --//
       //------------------------------------------------------------//
       .fclp_frfu_fb_cfg_cleanup (fclp_frfu_fb_cfg_cleanup),
-      .fcb_clp_set_por          (fcb_clp_set_por),  //POR Signal
+      .fcb_clp_set_por          (fcb_clp_set_por),              //POR Signal
       .fcb_clp_cfg_done         (fcb_clp_cfg_done),
       .fcb_clp_cfg_done_n       (fcb_clp_cfg_done_n),
       .fcb_clp_cfg_enb          (fcb_clp_cfg_enb),

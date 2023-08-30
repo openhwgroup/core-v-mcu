@@ -64,8 +64,8 @@ module soc_event_generator #(
     output logic                      PREADY,
     output logic                      PSLVERR,
     input  logic                      low_speed_clk_i,
-    input  logic [  PER_EVNT_NUM-1:0] per_events_i,  // events coming from peripherals
-    output logic [               1:0] fc_events_o,  // events going to the FC EU
+    input  logic [  PER_EVNT_NUM-1:0] per_events_i,        // events coming from peripherals
+    output logic [               1:0] fc_events_o,         // events going to the FC EU
     input        [               4:0] core_irq_ack_id_i,
     input                             core_irq_ack_i,
     output                            event_fifo_valid_o,
