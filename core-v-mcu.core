@@ -212,7 +212,7 @@ scripts:
   pre_build_scripts:
     cmd:
     - sh
-    - ../src/openhwgroup.org_systems_core-v-mcu_0/rtl/core-v-mcu/scripts/vedit.sh
+    - src/openhwgroup.org_systems_core-v-mcu_0/rtl/core-v-mcu/scripts/vedit.sh
     - openhwgroup.org_systems_core-v-mcu_0.vc
 
 targets:
