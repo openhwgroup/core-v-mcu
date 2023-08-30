@@ -1,3 +1,5 @@
+// Copyright 2021 QuickLogic Corp.
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 /*****************************************************************
           Vendor       : QuickLogic Corp.
           File Name    : QL_eFPGA_ArcticPro2_32X32_GF_22_top1.vq
