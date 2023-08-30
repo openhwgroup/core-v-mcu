@@ -121,6 +121,17 @@ The bitmap file has a _.bit_ file extension and the cli_test is an "S record" fi
 Currently an example bitmap and srec file can be found in this directory.
 In the near future these will be made available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
+In case of errors like
+```
+libusb_open() failed with LIBUSB_ERROR_ACCESS
+```
+add this `60-hs2.rules` file to `/etc/udev/rules.d/`
+```
+# HS2
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", MODE="664", GROUP="plugdev"
+```
+and restart the utility with `sudo udevadm control --reload`.
+
 ### Nexys A7-100T Hardware Steup
 You will need to refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual)
 to complete all of the steps below.
