@@ -156,7 +156,7 @@ module soc_domain
       dataaddr: dm::DataAddr
   };
 
-  dm::hartinfo_t [   NrHarts-1:0]       hartinfo;
+  dm::hartinfo_t [                 NrHarts-1:0      ] hartinfo;
 
   /*
        This module has been tested only with the default parameters.
@@ -166,49 +166,49 @@ module soc_domain
   //***************** SIGNALS DECLARATION ******************
   //********************************************************
 
-  logic                                 s_dmactive;
+  logic                                               s_dmactive;
 
-  logic                                 s_stoptimer;
-  logic                                 s_wd_expired;
-  logic          [           1:0]       s_fc_hwpe_events;
-  logic          [          31:0]       s_fc_events;
+  logic                                               s_stoptimer;
+  logic                                               s_wd_expired;
+  logic            [           1:0]                   s_fc_hwpe_events;
+  logic            [          31:0]                   s_fc_events;
 
-  logic          [           7:0]       s_soc_events_ack;
-  logic          [           7:0]       s_soc_events_val;
+  logic            [           7:0]                   s_soc_events_ack;
+  logic            [           7:0]                   s_soc_events_val;
 
-  logic                                 s_timer_lo_event;
-  logic                                 s_timer_hi_event;
+  logic                                               s_timer_lo_event;
+  logic                                               s_timer_hi_event;
 
-  logic          [EVNT_WIDTH-1:0]       s_cl_event_data;
-  logic                                 s_cl_event_valid;
-  logic                                 s_cl_event_ready;
+  logic            [EVNT_WIDTH-1:0]                   s_cl_event_data;
+  logic                                               s_cl_event_valid;
+  logic                                               s_cl_event_ready;
 
 
-  logic          [           7:0][31:0] s_apb_mpu_rules;
-  logic                                 s_supervisor_mode;
+  logic            [           7:0]           [31:0]  s_apb_mpu_rules;
+  logic                                               s_supervisor_mode;
 
-  logic          [          31:0]       s_fc_bootaddr;
+  logic            [          31:0]                   s_fc_bootaddr;
 
-  logic                                 s_periph_clk;
-  logic                                 s_periph_rst;
-  logic                                 s_soc_clk;
-  logic                                 s_soc_rstn;
-  logic                                 s_rstn_glob;
-  logic                                 s_sel_fll_clk;
+  logic                                               s_periph_clk;
+  logic                                               s_periph_rst;
+  logic                                               s_soc_clk;
+  logic                                               s_soc_rstn;
+  logic                                               s_rstn_glob;
+  logic                                               s_sel_fll_clk;
 
-  logic                                 s_dma_pe_evt;
-  logic                                 s_dma_pe_irq;
-  logic                                 s_pf_evt;
+  logic                                               s_dma_pe_evt;
+  logic                                               s_dma_pe_irq;
+  logic                                               s_pf_evt;
 
-  logic                                 s_fc_fetchen;
-  logic          [   NrHarts-1:0]       dm_debug_req;
+  logic                                               s_fc_fetchen;
+  logic            [   NrHarts-1:0]                   dm_debug_req;
 
-  logic                                 jtag_req_valid;
-  logic                                 debug_req_ready;
-  logic                                 jtag_resp_ready;
-  logic                                 jtag_resp_valid;
-  dm::dmi_req_t                         jtag_dmi_req;
-  dm::dmi_resp_t                        debug_resp;
+  logic                                               jtag_req_valid;
+  logic                                               debug_req_ready;
+  logic                                               jtag_resp_ready;
+  logic                                               jtag_resp_valid;
+  dm::dmi_req_t                                       jtag_dmi_req;
+  dm::dmi_resp_t                                      debug_resp;
   logic slave_grant, slave_valid, dm_slave_req, dm_slave_we;
   logic [31:0] dm_slave_addr, dm_slave_wdata, dm_slave_rdata;
   logic [ 3:0] dm_slave_be;
