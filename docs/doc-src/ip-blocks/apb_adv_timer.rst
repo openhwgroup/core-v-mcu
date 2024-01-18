@@ -1,3 +1,10 @@
+..
+   Copyright (c) 2023 OpenHW Group
+   Copyright (c) 2024 CircuitSutra
+
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+.. _apb_adv_timer:
+
 APB Advanced Timer
 ==================
 
