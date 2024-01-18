@@ -1,4 +1,24 @@
+..
+   Copyright (c) 2023 OpenHW Group
+   Copyright (c) 2024 CircuitSutra
+
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+.. Level 1
+   =======
+
+   Level 2
+   -------
+
+   Level 3
+   ~~~~~~~
+
+   Level 4
+   ^^^^^^^
+.. _udma_sd_card_interface:
+
 UDMA SD CARD INTERFACE
+======================
 
 The SDIO (Secure digital I/O) card provides high speed data I/O with low
 power consumption for mobile electronic devices. Host devices supporting
@@ -6,12 +26,14 @@ SDIO can connect the SD slot with I/O devices like Bluetooth, wireless,
 LAN, GPS Receiver, Digit Camera etc.
 
 SDIO INTERFACE BUS:
+-------------------
 
 .. udma_sdio_image:: udma_sdio_image8.png
    :width: 4.17708in
    :height: 2.51042in
 
 FEATURES:
+---------
 
 -  It has a clock, command and 4-bit data bus.
 
@@ -42,6 +64,7 @@ FEATURES:
    -  Response busy timeout
 
 THEORY OF OPERATION:
+^^^^^^^^^^^^^^^^^^^^
 
 Communication over the SD bus is based on command and data bit streams
 that are initiated by a start and terminated by a stop bit.
@@ -115,7 +138,7 @@ Data transfer to/from the SD memory card is done in blocks. Data blocks
 are succeeded by CRC bits.
 
 BLOCK DIAGRAM:
-
+^^^^^^^^^^^^^^
 .. udma_sdio_image:: udma_sdio_image6.png
    :width: 4.72292in
    :height: 5.44022in
@@ -130,6 +153,7 @@ Command module handles command interface and data module handles data
 transfer.
 
 SDIO TX/RX:
+^^^^^^^^^^^
 
 This module is responsible for sending and receiving command and data
 between host and device. It instantiates command and data modules.

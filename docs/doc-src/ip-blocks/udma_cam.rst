@@ -1,5 +1,24 @@
+..
+   Copyright (c) 2023 OpenHW Group
+   Copyright (c) 2024 CircuitSutra
+
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+.. Level 1
+   =======
+
+   Level 2
+   -------
+
+   Level 3
+   ~~~~~~~
+
+   Level 4
+   ^^^^^^^
+.. _udma_cam:
+
 uDMA CAMERA
-==================
+===========
 A camera interface is a hardware block that interfaces with different
 image sensor interfaces and generates output that can be used for
 image processing.

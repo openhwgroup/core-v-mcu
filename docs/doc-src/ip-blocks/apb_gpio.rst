@@ -1,37 +1,39 @@
-**Author’s Notes:** (this should not be part of the specifications):
+..
+   Copyright (c) 2023 OpenHW Group
+   Copyright (c) 2024 CircuitSutra
 
--  In order to prepare this document. I have tried to understand the
-      system verilog code placed in git
-      https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/apb_gpio/rtl/apb_gpio.sv
+   SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
--  I have created this block diagram using the
-      https://lucid.app/lucidchart/df5461ff-e4f0-4f5c-a09b-7e8aeeed2a7f/edit?beaconFlowId=96B7DACD40CCA0A9&invitationId=inv_bdd3a7f7-544e-4611-bb61-4264601b3d64&page=0_0#
+.. Level 1
+   =======
 
--  The logic for OUT1, OUT2, OUT3, PIN1, PIN2, PIN3 registers are not
-      supported in the system-verilog code in the git hub.
+   Level 2
+   -------
 
--  The logic for the rising_edge and falling_edge interrupts is not
-      clear in the system verilog code as the RTL is not holding the
-      previous values of inputs.
+   Level 3
+   ~~~~~~~
 
--  The logic for the open drain for the gpio_out port is also not clear
-      for the open drain mode.
+   Level 4
+   ^^^^^^^
+.. _apb_gpio:
 
--  I have copied the register set from the kshitij’s document. Need to
-      check if we can make it better.
-
-**APB_GPIO**\ The General Purpose Input/Output (GPIO) IP block supports S/W access
+APB_GPIO
+========
+The General Purpose Input/Output (GPIO) IP block supports S/W access
 to read and write the values on selected I/O, and configuring selected
 I/O to generate interrupts.
 
-**Features**
+Features
+--------
 
 -  32-bit bits of user-selectable I/O.
 
 -  I/O can be configured for level type interrupts or edge triggered
       interrupts.
 
-**Theory of Operation**\ Block diagram of APB_GPIO peripheral:
+Theory of Operation
+^^^^^^^^^^^^^^^^^^^
+Block diagram of APB_GPIO peripheral:
 
 .. image:: apb_gpio_image.png
    :width: 5in

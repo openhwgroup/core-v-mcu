@@ -3,7 +3,19 @@
    Copyright (c) 2024 CircuitSutra
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
-.. _apb_adv_timer:
+
+.. Level 1
+   =======
+
+   Level 2
+   -------
+
+   Level 3
+   ~~~~~~~
+
+   Level 4
+   ^^^^^^^
+.. _apb_advanced_timer:
 
 APB Advanced Timer
 ==================
