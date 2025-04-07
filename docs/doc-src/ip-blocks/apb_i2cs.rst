@@ -17,185 +17,167 @@
    ^^^^^^^
 .. _apb_i2c_slave:
 
-**APB I2C SLAVE**
+APB I2C SLAVE
 =================
 
-The I2C slave responds to the transaction made by the master.
+The I2C slave enables the Core-V MCU to interact with an I2C master device by responding to transactions on an I2C bus.
 
-**FEATURES:**
+Features
+--------
 
--  Supports 32 bit read and write data.
+- Bidirectional communication between I2C and APB interfaces
+- Configurable I2C device address (7-bit)
+- Adjustable timing parameters for I2C operation:
+    - Debounce length
+    - SCL delay length
+    - SDA delay length
+- Dual communication modes:
+    - Single-byte messaging with status tracking
+    - FIFO-based data transfer for bulk transfer (up to 256 bytes in each direction)
+- Comprehensive interrupt support:
+    - Programmable interrupt conditions based on FIFO status flags
+    - Separate interrupt paths for I2C and APB interfaces
+- FIFO management features:
+    - 256-byte FIFO depth for each direction
+    - Read and write flags to monitor FIFO status.
+    - FIFO flush capability
+- I2C enable/disable control
 
--  Interrupts may be generated in any direction.
-
--  Support 7 bit I2C addressing.
-
--  Data is transferred in the sequence of 8 bits.
-
-**THEORY OF OPERATION:**
+Architecture
+------------
 
 I2C slave contains i2c peripheral interface and APB slave interface.
-There are FIFO and registers for handling communication with external
+There are FIFOs and registers for handling communication with external
 I2C controllers.
 
-**Block diagram of APB I2C Peripheral:**
+The figure below is a high-level block diagram of the I2C Slave:-
 
-.. APB_I2C_slave_image:: APB_I2C_slave_image2.png
-   :width: 6.5in
-   :height: 3.38889in
+.. figure:: apb_i2cs_image2.png
+   :name: I2C_Slave_Block_Diagram
+   :align: center
+   :alt:
 
-**Block diagram of internal modules:**
+   I2C Slave Block Diagram
 
-.. APB_I2C_slave_image:: APB_I2C_slave_image3.png
-   :width: 6.5in
-   :height: 2.69444in
+The figure below depicts the internal connections between the 3 sub-modules of I2C Slave:-
 
-**APB SLAVE INTERFACE:**
+.. figure:: apb_i2cs_image3.png
+   :name: I2C_Slave_Internal_Diagram
+   :align: center
+   :alt:
 
--  APB slave interface is driving the APB output ports and input to register module.
+   I2C Slave Sub-Modules Diagram
 
--  A successful reset will clear apb_reg_waddr_o, apb_reg_wdata_o, apb_reg_wrenable_o, apb_reg_rd_byte_complete_o.
 
--  apb_pready_o is driven high if apb_psel_i and apb_penable_i are high.
+Below is a brief description of the 3 sub-modules:
 
--  apb_prdata_o is driven by apb_reg_rdata_i which we get from the i2c peripheral register.
+APB SLAVE INTERFACE:
+^^^^^^^^^^^^^^^^^^^^
 
--  apb_reg_raddr_o and apb_reg_waddr_o are driven by apb_paddr_i.
+Responsible for APB communication: passing information to and from the I2C register module.
 
--  apb_reg_wdata_o is driven by apb_pwdata_i.
+I2C PERIPHERAL REGISTER:
+^^^^^^^^^^^^^^^^^^^^^^^^
 
--  apb_reg_wrenable_o is driven high if apb_psel_i, apb_penable_i and apb_pwrite_i are high else it is driven low.
+The I2C peripheral register assigns values to CSRs and drives the
+interrupt port for APB and I2C. It takes input from the APB slave interface and the I2C interface.
 
--  apb_reg_rd_byte_complete_o is driven high if apb_psel_i and apb_penable_i are high and apb_pwrite_i is low else it is driven low.
+This module instantiates two FIFOs:
 
-**I2C PERIPHERAL REGISTER:**
+  - FIFO_sync_256x8_i2c_to_apb: Transfers data from I2C to APB.
 
-I2C peripheral register is assigning value to CSRs and driving the
-interrupt port for APB and I2C. It is taking input from APB slave
-interface and i2c interface.
+  - FIFO_sync_256x8_apb_to_i2c: Transfers data from APB to I2C.
 
-There are two FIFO instantiated in this module:
+I2C PERIPHERAL INTERFACE:
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
--  FIFO_sync_256x8_i2c_to_apb: Transfer data from i2c to apb.
+It handles all I2C protocol operations, including detecting start/stop conditions, address recognition,
+data transmission/reception, sending ACK/NACK signals, and managing SDA and SCL timing with line filtering.
+It passes information to and from the I2C register module.
 
--  FIFO_sync_256x8_apb_to_i2c: Transfer data from apb to i2c.
 
-**I2C PERIPHERAL INTERFACE:** 
-
-START AND STOP CONDITION:
-
--  The start and stop sequence mark the start and end of the transaction.e
-
-..
-
-   .. APB_I2C_slave_image:: APB_I2C_slave_image1.png
-      :width: 6.41667in
-      :height: 1.98958in
-
--  To generate the start condition, the data line should change from high to low while the clock is high.
-
--  To generate the stop condition, the data line should change from low to high while the clock is high.
-
-READ/WRITE BIT:
-
--  When sending out the 7 bit address we still send 8 bits. The last bit is used to inform if the master wants to write to the slave or read from the slave. If the bit is 0, master is writing to the slave else it is reading from the slave.
-
-ACKNOWLEDGEMENT BIT:
-
--  For every 8 bit transfer the device receiving the data sends an acknowledgement bit.
-
-   .. APB_I2C_slave_image:: APB_I2C_slave_image4.png
-      :width: 5.16667in
-      :height: 1.14583in
-
--  Low acknowledgement bit sent by the receiving device indicate that it has received the data and it is ready to accept another byte.
-
--  High acknowledgement bit sent by the receiving device indicate that it cannot accept new data and the master should terminate the transfer.
-
-**I2C STATES:**
+I2C STATES:
+~~~~~~~~~~~
 
 -  I2C slave has 10 states:
 
    -  ST_IDLE:
 
-      -  Initially slave is in this state.
+      -  Initially, the slave is in this state.
 
-      -  Slave may also come to this state if stop is detected.
+      -  The slave may also return to this state if a STOP condition is detected.
 
    -  ST_DEVADDR:
 
-      -  Slave comes to this state after the start sequence is detected and i2c_enabled_i is high.
+      -  The slave enters this state after detecting the START sequence and when I2C is enabled through the I2C enable register.
 
-      -  Slave receives the device address and transfer type (read/write).
+      -  The slave receives the device address and transfer type (read/write).
 
-      -  Stop the transfer if the device address is not received.
+      -  The transfer stops if the received device address does not match the configured address in the I2C device address register.
 
    -  ST_DEVADDRACK:
 
-      -  Slave comes to this state after receiving the i2c device address and sends the acknowledgement.
+      -  The slave enters this state after receiving the I2C device address and sends an acknowledgment.
 
-      -  i2c_sda_o is driven low to indicate successful acknowledgement.
+      -  i2c_sda_o is driven low to indicate a successful acknowledgement.
 
-      -  Acknowledgement is released by driving i2c_sda_o to high before new transfer.
+      -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
-      -  Read operation sets i2c state to ST_REGRDATA. I2c_reg_rddata_i is driven to i2c_sda_o.
+      -  A read operation sets the I2C state to ST_REGRDATA.
 
-      -  Write operation sets i2c state to ST_REGADDR.
+      -  A write operation sets the I2C state to ST_REGADDR.
 
    -  ST_REGADDR:
 
-      -  If the master wants to write then the slave comes to this state.
+      -  If the master wants to write, the slave comes to this state.
 
-      -  Slave receives the register address inside the device where the master wants to write. This register address is driven to i2c_reg_addr_o.
+      -  The slave receives the register address inside the device where the master wants to write.
 
    -  ST_REGADDRACK:
 
-      -  After receiving the register address successfully the slave comes to this state and sends acknowledgement.
+      -  After successfully receiving the register address, the slave enters this state and sends an acknowledgment.
 
-      -  i2c_sda_o is driven low to indicate successful acknowledgement.
+      -  i2c_sda_o is driven low to indicate a successful acknowledgement.
 
-      -  Acknowledgement is released by driving i2c_sda_o to high before new transfer.
+      -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    -  ST_REGWDATA:
 
-      -  After sending acknowledgement, the slave comes to this state and writes data to the register.
-
-      -  I2c_reg_wrenable is driven high.
+      -  After sending an acknowledgment, the slave enters this state and writes data to the register.
 
    -  ST_REGWDATAACK:
 
-      -  After successfully writing the data, an acknowledgement bit is sent.
+      -  After successfully writing the data, an acknowledgment bit is sent.
 
-      -  I2c_reg_wrenable is driven low.
+      -  i2c_sda_o is driven low to indicate a successful acknowledgment.
 
-      -  i2c_sda_o is driven low to indicate successful acknowledgement.
-
-      -  Acknowledgement is released by driving i2c_sda_o to high before new transfer.
+      -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    -  ST_REGRDATA:
 
-      -  Slave comes to this state if the master wants to read the data.
+      -  The slave enters this state if the master wants to read data.
 
-      -  After successful read i2c_rd_byte_complete is driven high.
+      -  The slave device places the data from the last addressed register onto the i2c_sda_o line.
 
    -  ST_REGRDATAACK:
 
-      -  After successful reading, acknowledgement is received.
+      -  After a successful read, an acknowledgment is received.
 
-      -  I2c_rd_byte_complete is cleared.
+      -  If a negative acknowledgment is received, the transfer stops.
 
-      -  If negative acknowledgement is received, transfer is stopped.
-
-      -  If successful acknowledgement is received then i2c state is set to ST_REGRDATA and more data is read.
+      -  If a successful acknowledgement is received, then I2C state is set to ST_REGRDATA, and more data is read.
 
    -  ST_WTSTOP:
 
-      -  Slave comes to this state if there is no more transaction or we want to stop the transfer.
+      -  The slave enters this state if there are no more transactions or if the transfer is to be stopped.
 
-**APB I2C CSR's:**
-------------------
+APB I2C Slave CSR's:
+--------------------
 
-**I2CS_DEV_ADDRESS:Offset = 0x000**
+The CSRs of the I2C slave are 8 bit registers mapped to a 32 bit data bus.
+
+I2CS_DEV_ADDRESS:Offset = 0x000
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+------------------------------+
 | Field            | Bits | Type | Default | Description                  |
@@ -205,7 +187,8 @@ ACKNOWLEDGEMENT BIT:
 | SLAVE_ADDR       | 6:0  | RW   | 0X6F    | I2C device address           |
 +------------------+------+------+---------+------------------------------+
 
-**I2CS_ENABLE:Offset = 0X004**
+I2CS_ENABLE:Offset = 0X004
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+------------------------------+
 | Field            | Bits | Type | Default | Description                  |
@@ -215,7 +198,8 @@ ACKNOWLEDGEMENT BIT:
 | IP_ENABLE        | 0:0  | RW   | 0X00    | IP enabling bit              |
 +------------------+------+------+---------+------------------------------+
 
-**I2CS_DEBOUNCE_LENGTH:Offset = 0x008**
+I2CS_DEBOUNCE_LENGTH:Offset = 0x008
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -226,7 +210,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | should be debounced.        |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_SCL_DELAY_LENGTH:Offset = 0x00C**
+I2CS_SCL_DELAY_LENGTH:Offset = 0x00C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -237,7 +222,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | relative to SDA line        |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_SDA_DELAY_LENGTH:Offset = 0x010**
+I2CS_SDA_DELAY_LENGTH:Offset = 0x010
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+--------+-----------------------------+
 | Field            | Bits | Type | Default| Description                 |
@@ -249,7 +235,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |        | line.                       |
 +------------------+------+------+--------+-----------------------------+
 
-**I2CS_MSG_I2C_APB:Offset = 0x040**
+I2CS_MSG_I2C_APB:Offset = 0x040
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -261,7 +248,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | interface.                  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_MSG_I2C_APB_STATUS:Offset = 0x044**
+I2CS_MSG_I2C_APB_STATUS:Offset = 0x044
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -275,7 +263,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | interface.                  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_MSG_APB_I2C:Offset = 0x048**
+I2CS_MSG_APB_I2C:Offset = 0x048
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -287,7 +276,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | interface.                  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_MSG_APB_I2C_STATUS:Offset = 0x4C**
+I2CS_MSG_APB_I2C_STATUS:Offset = 0x4C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -301,7 +291,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | interface.                  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_I2C_APB_WRITE_DATA_PORT:Offset = 0x080**
+I2CS_FIFO_I2C_APB_WRITE_DATA_PORT:Offset = 0x080
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -310,7 +301,8 @@ ACKNOWLEDGEMENT BIT:
 | TA_PORT          |      |      |         | for the I2C to APB fifo.    |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_I2C_APB_READ_DATA_PORT:Offset = 0x084**
+I2CS_FIFO_I2C_APB_READ_DATA_PORT:Offset = 0x084
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -319,7 +311,8 @@ ACKNOWLEDGEMENT BIT:
 | TA_PORT          |      |      |         | for the I2C to APB fifo.    |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_I2C_APB_FLUSH:Offset = 0x088**
+I2CS_FIFO_I2C_APB_FLUSH:Offset = 0x088
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -334,7 +327,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | empty.                      |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_I2C_APB_WRITE_FLAGS:Offset = 0x08C**
+I2CS_FIFO_I2C_APB_WRITE_FLAGS:Offset = 0x08C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -345,7 +339,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | spaces left in FIFO.        |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_I2C_APB_READ_FLAGS:Offset = 0x90**
+I2CS_FIFO_I2C_APB_READ_FLAGS:Offset = 0x90
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -356,7 +351,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | present in FIFO to read.    |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_APB_I2C_WRITE_DATA_PORT:Offset = 0X0C0**
+I2CS_FIFO_APB_I2C_WRITE_DATA_PORT:Offset = 0X0C0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -365,7 +361,8 @@ ACKNOWLEDGEMENT BIT:
 | TA_PORT          |      |      |         | port for the APBtoI2C FIFO  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_APB_I2C_READ_DATA_PORT:Offset = 0X0C4**
+I2CS_FIFO_APB_I2C_READ_DATA_PORT:Offset = 0X0C4
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -374,7 +371,8 @@ ACKNOWLEDGEMENT BIT:
 | TA_PORT          |      |      |         | port for the APBtoI2C FIFO  |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_APB_I2C_FLUSH:Offset = 0X0C8**
+I2CS_FIFO_APB_I2C_FLUSH:Offset = 0X0C8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -389,7 +387,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | empty.                      |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_APB_I2C_WRITE_FLAGS:Offset = 0X0CC**
+I2CS_FIFO_APB_I2C_WRITE_FLAGS:Offset = 0X0CC
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -400,7 +399,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | left in FIFO                |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_FIFO_APB_I2C_READ_FLAGS:Offset = 0X0D0**
+I2CS_FIFO_APB_I2C_READ_FLAGS:Offset = 0X0D0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -411,7 +411,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | present in FIFO to read.    |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_INTERRUPT_STATUS:Offset = 0x100**
+I2CS_INTERRUPT_STATUS:Offset = 0x100
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -431,7 +432,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |      |      |         | 0: Not genertated           |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_INTERRUPT_ENABLE:Offset = 0x104**
+I2CS_INTERRUPT_ENABLE:Offset = 0x104
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+------+------+---------+-----------------------------+
 | Field            | Bits | Type | Default | Description                 |
@@ -451,7 +453,8 @@ ACKNOWLEDGEMENT BIT:
 | LABLE_INT_ENABLE |      |      |         |                             |
 +------------------+------+------+---------+-----------------------------+
 
-**I2CS_INTERRUPT_I2C_APB_WRITE_FLAGS_SELECT:Offset = 0x108**
+I2CS_INTERRUPT_I2C_APB_WRITE_FLAGS_SELECT:Offset = 0x108
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -480,7 +483,8 @@ ACKNOWLEDGEMENT BIT:
 | 28__SPACE_AVAIL  |     |      |       |                            |
 +------------------+-----+------+-------+----------------------------+
 
-**I2CS_INTERRUPT_APB_I2C_READ_FLAGS_SELECT:Offset = 0x10C**
+I2CS_INTERRUPT_APB_I2C_READ_FLAGS_SELECT:Offset = 0x10C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -509,7 +513,8 @@ ACKNOWLEDGEMENT BIT:
 | READ_FLAG_EMPTY  | 0:0 | RW   |       | 1: 0 items, empty          |
 +------------------+-----+------+-------+----------------------------+
 
-**I2CS_INTERRUPT_TO_APB_STATUS:Offset = 0x140**
+I2CS_INTERRUPT_TO_APB_STATUS:Offset = 0x140
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -535,7 +540,8 @@ ACKNOWLEDGEMENT BIT:
 |                  |     |      |       | 1: Interrupt generated     |
 +------------------+-----+------+-------+----------------------------+
 
-**I2CS_INTERRUPT_TO_APB_ENABLE:Offset = 0x0144**
+I2CS_INTERRUPT_TO_APB_ENABLE:Offset = 0x0144
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -552,7 +558,8 @@ ACKNOWLEDGEMENT BIT:
 | SG_AVAIL_ENABLE  |     |      |       |                            |
 +------------------+-----+------+-------+----------------------------+
 
-**I2CS_INTERRUPT_APB_I2C_WRITE_FLAGS_SELECT:Offset = 0x148**
+I2CS_INTERRUPT_APB_I2C_WRITE_FLAGS_SELECT:Offset = 0x148
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -581,7 +588,8 @@ ACKNOWLEDGEMENT BIT:
 | _128_SPACE_AVAIL |     |      |       |                            |
 +------------------+-----+------+-------+----------------------------+
 
-**I2CS_INTERRUPT_I2C_APB_READ_FLAGS_SELECT:Offset = 0x14C**
+I2CS_INTERRUPT_I2C_APB_READ_FLAGS_SELECT:Offset = 0x14C
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +------------------+-----+------+-------+----------------------------+
 | Field            | Bits| Type |Default| Description                |
@@ -609,3 +617,150 @@ ACKNOWLEDGEMENT BIT:
 +------------------+-----+------+-------+----------------------------+
 | READ_FLAG_EMPTY  | 0:0 | RW   |       | 1: 0 items, empty          |
 +------------------+-----+------+-------+----------------------------+
+
+Firmware Guidelines
+-------------------
+
+Initialization:
+^^^^^^^^^^^^^^^
+  - Set the I2C device address in the I2C device address register.
+  - Configure appropriate debounce and delay values for SCL and SDA lines through I2CS_DEBOUNCE_LENGTH, I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH registers.
+  - Enable the I2C interface by writing 1 to the I2C enable register.
+
+Single-Byte Communication:
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  - APB to I2C:
+      - APB master writes data to I2CS_MSG_APB_I2C register.
+      - Status bit in I2CS_MSG_APB_I2C_STATUS register is set by hardware.
+      - Output interrupt i2c_interrupt_o is raised if the interrupt is enabled in the I2CS_INTERRUPT_ENABLE register.
+      - I2C master reads register I2CS_MSG_APB_I2C to retrieve data.
+      - Status bit in I2CS_MSG_APB_I2C_STATUS is cleared by hardware and the interrupt is lowered.
+
+  - I2C to APB:
+      - I2C master writes data to I2CS_MSG_I2C_APB register.
+      - Status bit in I2CS_MSG_I2C_APB_STATUS register is set by hardware.
+      - Output interrupt apb_interrupt_o is raised if the interrupt is enabled in the I2CS_INTERRUPT_TO_APB_STATUS register.
+      - APB master reads I2CS_MSG_I2C_APB register to retrieve data.
+      - Status bit in I2CS_INTERRUPT_TO_APB_STATUS is cleared by hardware and the interrupt is lowered.
+
+FIFO-Based Communication:
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  - APB to I2C:
+      - APB master writes data to I2CS_FIFO_APB_I2C_WRITE_DATA_PORT register.
+      - The data is pushed in the APB to I2C FIFO by the hardware.
+      - FIFO status is reflected in I2CS_FIFO_APB_I2C_WRITE_FLAGS register.
+      - Interrupt can be generated based on FIFO status.
+      - I2C master reads data from I2CS_FIFO_APB_I2C_READ_DATA_PORT register.
+      - The data is popped from the APB to I2C FIFO by the hardware.
+      - FIFO status is updated in I2CS_FIFO_APB_I2C_READ_FLAGS register.
+
+  - I2C to APB:
+      - I2C master writes data to I2CS_FIFO_I2C_APB_WRITE_DATA_PORT register.
+      - The data is pushed in the I2C to APB FIFO by the hardware.
+      - FIFO status is reflected in I2CS_FIFO_I2C_APB_WRITE_FLAGS register.
+      - Interrupt can be generated based on FIFO status.
+      - APB master reads data from I2CS_FIFO_I2C_APB_READ_DATA_PORT register.
+      - The data is popped from the I2C to APB FIFO by the hardware.
+      - FIFO status is updated in I2CS_FIFO_I2C_APB_READ_FLAGS register.
+
+FIFO Management:
+^^^^^^^^^^^^^^^^
+
+  - FIFOs can be flushed by writing 1 to I2CS_FIFO_I2C_APB_FLUSH register(I2C to APB FIFO) or I2CS_FIFO_APB_I2C_FLUSH (APB to I2C FIFO).
+  - Monitor FIFO read amd write status flags to prevent overflow/underflow conditions.
+  - Interrupts can be set to trigger for different conditions based on the read and write flags.
+      - The below table describes the different meanings of the READ flags and how bit numbers to set in 
+        I2CS_INTERRUPT_I2C_APB_WRITE_FLAGS_SELECT(I2C to APB FIFO) or I2CS_INTERRUPT_APB_I2C_WRITE_FLAGS_SELECT(APB to I2C FIFO) register to generate interrupt.
+            +------------+----------------------------------+------------------------+
+            | Flag Value | Description                      | Select Bit in Register |
+            +============+==================================+========================+
+            | 0b000      | Trigger if FIFO Empty            | 0                      |
+            +------------+----------------------------------+------------------------+
+            | 0b001      | Trigger if 1 item present        | 1                      |
+            +------------+----------------------------------+------------------------+
+            | 0b010      | Trigger if 2-3 items present     | 2                      |
+            +------------+----------------------------------+------------------------+
+            | 0b011      | Trigger if 4-7 items present     | 3                      |
+            +------------+----------------------------------+------------------------+
+            | 0b100      | Trigger if 8-31 items present    | 4                      |
+            +------------+----------------------------------+------------------------+
+            | 0b101      | Trigger if 32-63 items present   | 5                      |
+            +------------+----------------------------------+------------------------+
+            | 0b110      | Trigger if 63-127 items present  | 6                      |
+            +------------+----------------------------------+------------------------+
+            | 0b111      | Trigger if 127+ items present    | 7                      |
+            +------------+----------------------------------+------------------------+
+
+      - The below table describes the different meanings of the WRITE flags and how bit numbers to set in 
+        I2CS_INTERRUPT_I2C_APB_WRITE_FLAGS_SELECT(I2C to APB FIFO) or I2CS_INTERRUPT_APB_I2C_WRITE_FLAGS_SELECT(APB to I2C FIFO) register to generate interrupt.
+            +------------+----------------------------------+------------------------+
+            | Flag Value | Description                      | Select Bit in Register |
+            +============+==================================+========================+
+            | 0b000      | Trigger if 128+ space available  | 0                      |
+            +------------+----------------------------------+------------------------+
+            | 0b001      | Trigger if 64-127 space available| 1                      |
+            +------------+----------------------------------+------------------------+
+            | 0b010      | Trigger if 32-63 space available | 2                      |
+            +------------+----------------------------------+------------------------+
+            | 0b011      | Trigger if 8-31 space available  | 3                      |
+            +------------+----------------------------------+------------------------+
+            | 0b100      | Trigger if 4-7 space available   | 4                      |
+            +------------+----------------------------------+------------------------+
+            | 0b101      | Trigger if 2-3 space available   | 5                      |
+            +------------+----------------------------------+------------------------+
+            | 0b110      | Trigger if 1 space available     | 6                      |
+            +------------+----------------------------------+------------------------+
+            | 0b111      | Trigger if FIFO Full             | 7                      |
+            +------------+----------------------------------+------------------------+
+
+Interrupt Handling
+^^^^^^^^^^^^^^^^^^
+
+  - Read the interrupt status register (I2CS_INTERRUPT_STATUS for I2C interrupts, I2CS_INTERRUPT_TO_APB_STATUS for APB interrupts).
+  - Determine the interrupt source:
+      - Bit 0: New message available
+      - Bit 1: FIFO read flags match specified pattern
+      - Bit 2: FIFO write flags match specified pattern
+  - Service the interrupt by reading/writing appropriate data.
+  - Interrupts are automatically cleared when the condition is resolved.
+
+Pin Diagram
+-----------
+
+The figure below is a high-level block diagram of the I2C Slave:-
+
+.. figure:: apb_i2cs_image2.png
+   :name: I2C_Slave_Pin_Diagram
+   :align: center
+   :alt:
+
+   I2C Slave Pin Diagram
+
+Clock and Reset Signals
+^^^^^^^^^^^^^^^^^^^^^^^
+  - apb_pclk_i: System clock input
+  - apb_presetn_i: Active-low reset input
+
+APB Interface Signals
+^^^^^^^^^^^^^^^^^^^^^
+  - apb_paddr_i[11:0]: APB address bus input
+  - apb_psel_i: APB peripheral select input
+  - apb_penable_i: APB enable input
+  - apb_pwrite_i: APB write control input (high for write, low for read)
+  - apb_pwdata_i[31:0]: APB write data bus input
+  - apb_pready_o: APB ready output to indicate transfer completion
+  - apb_prdata_o[31:0]: APB read data bus output
+
+I2C Interface Signals
+^^^^^^^^^^^^^^^^^^^^^
+  - i2c_scl_i: I2C clock input
+  - i2c_sda_i: I2C data input
+  - i2c_sda_o: I2C data output
+  - i2c_sda_oe: I2C data output enable (active high)
+
+Interrupt Signals
+^^^^^^^^^^^^^^^^^^^^^
+  - i2c_interrupt_o: I2C interrupt request output
+  - apb_interrupt_o: APB interrupt request output
