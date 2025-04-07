@@ -52,7 +52,7 @@ I2C controllers.
 
 The figure below is a high-level block diagram of the I2C Slave:-
 
-.. figure:: apb_i2cs_image2.png
+.. figure:: apb_i2cs_block_diagram.png
    :name: I2C_Slave_Block_Diagram
    :align: center
    :alt:
@@ -268,7 +268,7 @@ MSG_I2C_TO_APB
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_I2C_TO_APB_STATUS
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
   - APB Offset: 0x44
   - I2C Offset: 0x11
