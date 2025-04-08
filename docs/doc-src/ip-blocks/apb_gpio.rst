@@ -26,136 +26,89 @@ I/O to generate interrupts.
 Features
 --------
 
--  32-bit bits of user-selectable I/O.
+-  Configurable number of GPIO pins (Upto 128, current implementation supports 32).
+-  Programmable direction control for each pin (input, output, or open-drain).
+-  Individual control for setting, clearing, or toggling output pins
+-  Pin status reading capability
+-  Interrupt generation capabilities with multiple configurable types:
+    - Rising edge detection
+    - Falling edge detection
+    - Active low level detection
+    - Active high level detection
+-  Input synchronization to prevent metastability issues.
 
--  I/O can be configured for level type interrupts or edge triggered
-      interrupts.
+Architecture
+------------
 
-Theory of Operation
-^^^^^^^^^^^^^^^^^^^
-Block diagram of APB_GPIO peripheral:
+The figure below is a high-level block diagram of the APB GPIO module:-
 
-.. image:: apb_gpio_image.png
-   :width: 5in
-   :height: 2.33333in
+.. figure:: apb_gpio_block_diagram.png
+   :name: APB_GPIO_Block_Diagram
+   :align: center
+   :alt:
 
-The GPIO module supports a range of configuration options and various
-types of interrupts.
+   APB GPIO Block Diagram
 
-**Pin Direction and Mode:**
+The APB GPIO IP consists of the following key components:
 
--  Input Mode: Configures the pin to read external digital signals into
-      the registers .
+APB control logic
+^^^^^^^^^^^^^^^^^
+The APB control logic interfaces with the APB bus to decode and execute commands.
+It handles register reads and writes according to the APB protocol, providing a standardized interface to the system.
 
--  Output Mode: Sets the pin to drive an external digital signal from
-      the registers.
+GPIO Configuration Registers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+These registers store the configuration for each GPIO pin, including:
+  - Direction settings (input, output, open-drain)
+  - Output value
+  - Interrupt type configuration
+  - Interrupt enable status
 
-**Interrupts:**
+Input Synchronization
+^^^^^^^^^^^^^^^^^^^^^
+A dual-stage synchronizer prevents metastability issues when sampling external inputs by synchronizing them to the system clock domain.
 
--  Edge-Triggered Interrupts: Allows the GPIO pin to generate an
-      interrupt on a rising or falling edge.
+Interrupt Generation Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+The interrupt logic detects events based on the configured interrupt type for each pin:
+  - Edge detection circuitry for rising and falling edges
+  - Level detection for active-high and active-low signals
+  - Interrupt blocking mechanism to prevent repeated level interrupts
 
--  Level-Triggered Interrupts: Generates an interrupt when the pin is at
-      a specified logic level (high or low).
+Programming View Model
+----------------------
+The APB GPIO IP follows a simple programming model:
 
-**Programming model**\ Following FW configurations can be done for the Input mode and
-Output mode.
+GPIO Pin Configuration
+^^^^^^^^^^^^^^^^^^^^^^
+Each GPIO pin can be configured individually or in groups:
+  - Set the desired pin number using the SELECT register
+  - Configure the pin direction (input, output, or open-drain) using the SETDIR register
+  - Configure interrupt behavior if necessary using the SETINT register
 
--  Input mode FW configurations
+GPIO Pin Control
+^^^^^^^^^^^^^^^^
+To control GPIO pins:
+  - Use SETGPIO to set a pin high
+  - Use CLRGPIO to set a pin low
+  - Use TOGGPIO to toggle a pin's state
+  - Use OUTx registers to set multiple pins at once
 
-   -  Driving the input ports and reading the register pin values:
+GPIO Pin Status
+^^^^^^^^^^^^^^^
+To read GPIO pin status:
+  - Use RDSTAT to read a selected pin's status
+  - Use PINx registers to read the status of multiple pins at once
 
-      -  FW can drive the input pins and these values will be stored in
-            the PIN0 register.
+Interrupt Handling
+^^^^^^^^^^^^^^^^^^
+When an interrupt occurs:
+  - Determine the source by reading pin status
+  - Handle the interrupt according to application requirements
+  - Acknowledge the interrupt using the INTACK register
 
-      -  FW can also read these input pins of selected GPIOs by reading
-            the PIN0 register.
-
-      -  Note: Before reading any register make sure that PSEL, PENABLE
-            are driven to 1 and PWRITE is driven to 0.
-
-   -  Driving the input ports and generating an interrupt via outport
-         port:
-
-      -  FW can drive the input pins and these values will be stored in
-            the PIN0 register.
-
-      -  if the Interrupts are enabled and if the type of the interrupt
-            is also set by FW then the GPIO will accordingly
-            generate/drive that particular output interrupt pin
-
--  Output mode FW configurations
-
-   -  Driving the output ports:
-
-      -  FW should configure the gpio_dir register correctly.
-
-      -  FW can issue a write to any 32 bits of the OUT0 register and
-            that will drive corresponding gpio_num related gpio_out pin
-
-      -  it will also drive the gpio_dir output port depending on the
-            values configured in gpio_dir register.
-
-      -  Note: Before writing any register make sure that PSEL, PENABLE
-            and PWRITE are driven to 1.
-
-   -  Setting the output ports:
-
-      -  FW should configure the gpio_dir register correctly.
-
-      -  FW can issue a set operation to any 32 bits of the OUT0
-            register and that will drive corresponding gpio_num related
-            gpio_out pin to value '1'.
-
-      -  it will also drive the gpio_dir output port depending on the
-            values configured in gpio_dir register.
-
-      -  Note: Before writing any register make sure that PSEL, PENABLE
-            and PWRITE are driven to 1.
-
-   -  Clearing the output ports:
-
-      -  FW should configure the gpio_dir register correctly.
-
-      -  FW can issue a clear operation to any 32 bits of the OUT0
-            register and that will drive corresponding gpio_num related
-            gpio_out pin to value '0'.
-
-      -  it will also drive the gpio_dir output port depending on the
-            values configured in gpio_dir register.
-
-      -  Note: Before writing any register make sure that PSEL, PENABLE
-            and PWRITE are driven to 1.
-
-   -  Toggling the output ports:
-
-      -  FW should configure the gpio_dir register correctly.
-
-      -  FW can issue a toggle operation to any 32 bits of the OUT0
-            register and that will drive corresponding gpio_num related
-            gpio_out pin to toggle w.r.t previous value.
-
-      -  it will also drive the gpio_dir output port depending on the
-            values configured in gpio_dir register.
-
-      -  Note: Before writing any register make sure that PSEL, PENABLE
-            and PWRITE are driven to 1.
-
-      -  
-
--  Read status operation via register.
-
-   -  FW can issue a write to the register SETSEL to select the GPIO
-         number of the pin.
-
-   -  FW can issue a read to the RDSTAT register to get all the current
-         operations in GPIO like the mode, PIN0 value, OUT0 value,
-         Interrupt type, Interrupt enable, GPIO number etc.\|
-
-   -  Note: Before reading any register make sure that PSEL, PENABLE are
-         driven to 1 and PWRITE is driven to 0.
-
-**APB GPIO CSRs**
+APB GPIO CSRs
+-------------
 
 The GPIO module is typically associated with a set of status and control
 registers. These registers allow the processor to read input states, set
@@ -289,3 +242,127 @@ output levels, and configure various GPIO settings.
 |           |           |           |           |      | G             |
 |           |           |           |           |      | PIO[gpio_num] |
 +-----------+-----------+-----------+-----------+------+---------------+
+
+Firmware Guidelines
+-------------------
+GPIO Pin Configuration Procedure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Configuring Pin Direction:
+      - Direction of a pin can be configured using the REG_SETDIR register (address 0x038).
+          - To configure as input: Place a value of 0 in bits [25:24] along with the pin number in bits [6:0].
+          - To configure as output: Place a value of 1 in bits [25:24] along with the pin number in bits [6:0].
+          - To configure as open-drain: Place a value of 3 in bits [25:24] along with the pin number in bits [6:0].
+  - Configuring Interrupt Behavior
+      - If the pin requires interrupt capability, write to the REG_SETINT register (address 0x03C).
+      - Include the pin number in bits [6:0].
+      - To enable interrupts, set bit [16] to 1; to disable, set to 0.
+      - To configure interrupt type, set bits [19:17] as follows:
+          - 000: Active-Low level detection
+          - 001: Falling edge detection
+          - 010: Rising edge detection
+          - 011: Both edges detection
+          - 100: Active-High level detection
+  - Setting Initial Output Values
+      - For individual pins: Use REG_SETGPIO to set high or REG_CLRGPIO to set low, include the pin number in bits [6:0] of input data.
+      - For multiple pins simultaneously: Write to the REG_OUT0 register, in which each bit represents corresponding output pin.
+      - For REG_OUT0 registers, set the corresponding bit to 1 for high output or 0 for low output.
+
+GPIO Status Reading Procedure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Reading Individual Pin Status:
+      - First, select the desired pin by writing its number to REG_SETSEL.
+      - Read the REG_RDSTAT register (address 0x034).
+      - Examine bit [12] for the current input state of the pin.
+      - Examine bit [8] for the current output value.
+      - Other fields provide configuration information:
+            - Bits [25:24]: Direction configuration
+            - Bits [19:17]: Interrupt type
+            - Bit [16]: Interrupt enable status
+  - Reading Multiple Pin States:
+      - To read the status of multiple pins at once, read the REG_PIN0 register, in which each bit represents corresponding output pin.
+      - A bit value of 1 indicates a high state, 0 indicates a low state.
+
+GPIO Control Procedure
+^^^^^^^^^^^^^^^^^^^^^^
+  - Setting Individual Pins High:
+      - Write the pin number to the REG_SETGPIO register (address 0x000).
+      - This operation sets the specified pin to a high state.
+  - Setting Individual Pins Low:
+      - Write the pin number to the REG_CLRGPIO register (address 0x004).
+      - This operation sets the specified pin to a low state.
+  - Toggling Individual Pins:
+      - Write the pin number to the REG_TOGGPIO register (address 0x008).
+      - This inverts the current state of the specified pin.
+  - Controlling Multiple Pins Simultaneously:
+      - To control multiple pins in one operation, write to the REG_OUT0 register.
+      - Each bit position corresponds to the respective pin number.
+      - Setting a bit to 1 drives the corresponding pin high; setting to 0 drives it low.
+
+Interrupt Handling Procedure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Determining the Interrupt Source:
+      - Read the REG_PIN0 register to determine which pin(s) triggered the interrupt.
+      - For level-sensitive interrupts (active-high or active-low), check the current pin state.
+      - For edge-sensitive interrupts, the hardware has already latched the event.
+  - Interrupt Processing:
+      - Process the interrupt according to application requirements.
+      - Note that for level-sensitive interrupts, the source condition must be cleared before acknowledging.
+  - Acknowledging the Interrupt:
+      - Write the pin number to the REG_INTACK register (address 0x040).
+      - This clears the interrupt blocking mechanism for level-sensitive interrupts.
+
+Open-Drain Configuration Guidelines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Understanding Open-Drain Operation:
+      - In open-drain mode, the pin can drive low or be in high-impedance state.
+      - External pull-up resistors are required for pins configured as open-drain.
+  - Configuring Open-Drain Mode:
+      - Write to REG_SETDIR with a value of 3 in bits [25:24], setting bit 24 makes the pin direction as output and setting bit 25 enables open drain configuration.
+      - Include the pin number in bits [6:0].
+      - The output value controls whether the pin drives low (output value = 0) or is in high-impedance state (output value = 1).
+  - Using Open-Drain Pins:
+      - To drive the pin low: Use REG_CLRGPIO or write a 0 to the corresponding bit in REG_OUT0.
+      - To place the pin in high-impedance state: Use REG_SETGPIO or write a 1 to the corresponding bit in REG_OUT0.
+
+Pin Diagram
+-----------
+
+The figure below represents the input and output pins for the APB GPIO:-
+
+.. figure:: apb_gpio_pin_diagram.png
+   :name: APB_GPIO_Pin_Diagram
+   :align: center
+   :alt:
+
+   APB GPIO Pin Diagram
+
+Clock and Reset
+^^^^^^^^^^^^^^^
+
+- HCLK: System clock input.
+- HRESETn: Active-low reset signal for initializing all internal registers and logic.
+- dft_cg_enable_i: Clock gating enable input for DFT or low-power scenarios.
+
+APB Interface Signals
+^^^^^^^^^^^^^^^^^^^^^
+
+- PADDR[11:0]: APB address bus input
+- PWDATA[31:0]:  APB write data bus input
+- PWRITE: APB write control input (high for write, low for read)
+- PSEL: APB peripheral select input
+- PENABLE: APB enable input
+- PRDATA: APB write data bus input
+- PREADY: APB ready output to indicate transfer completion
+- PSLVERR: APB error response output signal
+
+GPIO Data Signals
+^^^^^^^^^^^^^^^^^
+- gpio_in[31:0]: External GPIO input values from the physical pins.
+- gpio_in_sync[31:0]: Synchronized version of `gpio_in`.
+- gpio_out[31:0]: Output values driven onto GPIO pins, if configured as outputs.
+- gpio_dir[31:0]: Direction control per pin; 1 = output, 0 = input (or high-impedance for open-drain).
+
+Interrupt Signals
+^^^^^^^^^^^^^^^^^
+- interrupt[31:0]: Per-pin interrupt outputs, asserted based on edge or level-triggered conditions.
+
