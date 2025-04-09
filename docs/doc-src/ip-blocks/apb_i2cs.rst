@@ -20,7 +20,7 @@
 APB I2C SLAVE
 =================
 
-The I2C slave enables the Core-V MCU to interact with an I2C master device by responding to transactions on an I2C bus.
+The I2C slave enables the Core-V MCU to interact with an external I2C master device by responding to transactions on an I2C bus.
 
 Features
 --------
@@ -102,74 +102,130 @@ I2C STATES:
 -  I2C slave has 10 states:
 
    -  ST_IDLE:
-
       -  Initially, the slave is in this state.
-
       -  The slave may also return to this state if a STOP condition is detected.
 
    -  ST_DEVADDR:
-
       -  The slave enters this state after detecting the START sequence and when I2C is enabled through the I2C enable register.
-
       -  The slave receives the device address and transfer type (read/write).
-
       -  The transfer stops if the received device address does not match the configured address in the I2C device address register.
 
    -  ST_DEVADDRACK:
-
       -  The slave enters this state after receiving the I2C device address and sends an acknowledgment.
-
       -  i2c_sda_o is driven low to indicate a successful acknowledgement.
-
       -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
-
       -  A read operation sets the I2C state to ST_REGRDATA.
-
       -  A write operation sets the I2C state to ST_REGADDR.
 
    -  ST_REGADDR:
-
       -  If the master wants to write, the slave comes to this state.
-
       -  The slave receives the register address inside the device where the master wants to write.
 
    -  ST_REGADDRACK:
-
       -  After successfully receiving the register address, the slave enters this state and sends an acknowledgment.
-
       -  i2c_sda_o is driven low to indicate a successful acknowledgement.
-
       -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    -  ST_REGWDATA:
-
       -  After sending an acknowledgment, the slave enters this state and writes data to the register.
 
    -  ST_REGWDATAACK:
-
       -  After successfully writing the data, an acknowledgment bit is sent.
-
       -  i2c_sda_o is driven low to indicate a successful acknowledgment.
-
       -  The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    -  ST_REGRDATA:
-
       -  The slave enters this state if the master wants to read data.
-
       -  The slave device places the data from the last addressed register onto the i2c_sda_o line.
 
    -  ST_REGRDATAACK:
-
       -  After a successful read, an acknowledgment is received.
-
       -  If a negative acknowledgment is received, the transfer stops.
-
       -  If a successful acknowledgement is received, then I2C state is set to ST_REGRDATA, and more data is read.
 
    -  ST_WTSTOP:
-
       -  The slave enters this state if there are no more transactions or if the transfer is to be stopped.
+
+Programming View Model
+----------------------
+
+FIFO Usage
+^^^^^^^^^^
+The module employs two First-In, First-Out (FIFO) buffers to handle burst data transfer between the APB and I2C interfaces.
+
+  - I2C-to-APB FIFO: 
+      - Buffers data received from the I2C interface before it's read by the APB interface. 
+      - The I2C master needs to write data on the FIFO_I2C_TO_APB_WRITE_DATA_PORT register, which is then pushed on this FIFO.
+      - The APB master can then read the FIFO_I2C_TO_APB_READ_DATA_PORT register in order to retrieve the data, which is then popped from the FIFO.
+      - There are read and write flag registers showing the current status of FIFO and can be accessed by both I2C and APB interfaces.
+  - APB-to-I2C FIFO: 
+      - Buffers data written by the APB interface before it's transmitted via the I2C interface.
+      - The APB master needs to write data on the FIFO_APB_TO_I2C_WRITE_DATA_PORT register, which is then pushed on this FIFO.
+      - The I2C master can then read the FIFO_APB_TO_I2C_READ_DATA_PORT register in order to retrieve the data, which is then popped from the FIFO.
+      - There are read and write flag registers showing the current status of FIFO and can be accessed by both I2C and APB interfaces.
+
+
+Data Flow
+^^^^^^^^^
+
+Write Operation from I2C Master and Read from APB Master:
+  - I2C Master sends START condition(drives SDA line low when SCL is high)
+  - I2C Master sends device address with write bit (0)
+  - Slave acknowledges
+  - I2C Master sends register address
+      - MSG_I2C_TO_APB register for single byte
+      - FIFO_I2C_TO_APB_WRITE_DATA_PORT register for multi-byte transfer
+  - Slave acknowledges
+  - I2C Master sends data byte
+  - Slave acknowledges
+  - I2C Master may send more data bytes with acknowledgment after each, or send STOP condition
+  - Flags and interrupt signals are updated accordingly.
+  - The APB master can read the data from the appropriate register
+      - MSG_I2C_TO_APB for single byte message
+      - FIFO_I2C_TO_APB_READ_DATA_PORT register for multi-byte transfer
+  - Flags and interrupt signals are updated accordingly.
+
+
+Write Operation from APB Master and Read from I2C Master:
+  - The APB master will write data on the appropriate register
+      - MSG_APB_TO_I2C for single byte message
+      - FIFO_APB_TO_I2C_WRITE_DATA_PORT register for multi-byte transfer
+  - Flags and interrupt signals are updated accordingly.
+  - I2C Master sends START condition
+  - I2C Master sends device address with write bit (0)
+  - Slave acknowledges
+  - I2C Master sends register address
+      - MSG_APB_TO_I2C for single byte message
+      - FIFO_APB_TO_I2C_READ_DATA_PORT register for multi-byte transfer
+  - Slave acknowledges
+  - I2C Master sends repeated START
+  - I2C Master sends device address with read bit (1)
+  - Slave acknowledges
+  - Slave sends data byte
+  - I2C Master sends ACK to request more data or NACK to indicate last byte
+  - I2C Master sends STOP condition
+  - Flags and interrupt signals are updated accordingly.
+
+Interrupt Generation
+^^^^^^^^^^^^^^^^^^^^
+The I2C Slave provides interrupt generation for both APB and I2C interfaces
+
+I2C interrupts:
+  - The availability of a new single-byte message from the APB to I2C.
+  - The write flags of the I2C-to-APB FIFO reaching certain levels (e.g., FIFO becoming full),
+    indicating how much space is currently available in FIFO.
+  - The read flags of the APB-to-I2C FIFO reaching certain levels (e.g., FIFO becoming empty),
+    indicating how much items APB master had written that the I2C master still has to process.
+  - Interrupts can be triggered for 8 different levels of both read and write flags, and these interrupt sources can be selectively enabled. 
+
+APB interrupts:
+  - The availability of a new single-byte message from the I2C to APB.
+  - The write flags of the APB-to-I2C FIFO reaching certain levels (e.g., FIFO becoming full),
+    indicating how much space is currently available in FIFO.
+  - The read flags of the I2C-to-APB FIFO reaching certain levels (e.g., FIFO becoming empty),
+    indicating how much items I2C master had written that the APB master still has to process.
+  - Interrupts can be triggered for 8 different levels of both read and write flags, and these interrupt sources can be selectively enabled.
+
 
 APB I2C Slave CSR's:
 --------------------
@@ -278,11 +334,9 @@ MSG_I2C_TO_APB_STATUS
 +======================+==========+==================+==================+============+=============================+
 | RESERVED             | 7:1      | --               | --               |            |                             |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
-| I2C_TO_APB_STATUS    | 0:0      | R                | R                | 0X00       | This register provide a     |
-|                      |          |                  |                  |            | method for passing a single |
-|                      |          |                  |                  |            | byte message from the I2C   |
-|                      |          |                  |                  |            | interface to the APB        |
-|                      |          |                  |                  |            | interface.                  |
+| I2C_TO_APB_STATUS    | 0:0      | R                | R                | 0X00       | This register indicates if  |
+|                      |          |                  |                  |            | a single byte message is    |
+|                      |          |                  |                  |            | available from I2C to APB.  |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_APB_TO_I2C
@@ -312,11 +366,9 @@ MSG_APB_I2C_STATUS
 +======================+==========+==================+==================+============+=============================+
 | RESERVED             | 7:1      | --               | --               |            |                             |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
-| APB_TO_I2C_STATUS    | 0:0      | R                | R                | 0X00       | This register provides a    |
-|                      |          |                  |                  |            | method for passing a single |
-|                      |          |                  |                  |            | byte message from the APB   |
-|                      |          |                  |                  |            | interface to the I2C        |
-|                      |          |                  |                  |            | interface.                  |
+| APB_TO_I2C_STATUS    | 0:0      | R                | R                | 0X00       | This register indicates if  |
+|                      |          |                  |                  |            | a single byte message is    |
+|                      |          |                  |                  |            | available from APB to I2C.  |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_WRITE_DATA_PORT
@@ -813,9 +865,9 @@ Interrupt Handling
 Pin Diagram
 -----------
 
-The figure below is a high-level block diagram of the I2C Slave:-
+The figure below represents the input and output pins for the I2C Slave:-
 
-.. figure:: apb_i2cs_image2.png
+.. figure:: apb_i2cs_pin_diagram.png
    :name: I2C_Slave_Pin_Diagram
    :align: center
    :alt:
