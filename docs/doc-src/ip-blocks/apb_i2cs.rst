@@ -59,14 +59,14 @@ The figure below is a high-level block diagram of the I2C Slave:-
 
    I2C Slave Block Diagram
 
-The figure below depicts the internal connections between the 3 sub-modules of I2C Slave:-
+The figure below depicts the connections between the I2C Slave and rest of the modules in Core-V-MCU:-
 
-.. figure:: apb_i2cs_image3.png
-   :name: I2C_Slave_Internal_Diagram
+.. figure:: apb_i2cs_soc_connections.png
+   :name: I2C_Slave_SoC_Connections
    :align: center
    :alt:
 
-   I2C Slave Sub-Modules Diagram
+   I2C Slave Core-V-MCU connections diagram
 
 
 Below is a brief description of the 3 sub-modules:
@@ -898,5 +898,5 @@ I2C Interface Signals
 
 Interrupt Signals
 ^^^^^^^^^^^^^^^^^^^^^
-  - i2c_interrupt_o: I2C interrupt request output
-  - apb_interrupt_o: APB interrupt request output
+  - i2c_interrupt_o: I2C interrupt request output, connects to external I2C master
+  - apb_interrupt_o: APB interrupt request output, connects to Core Complex 
