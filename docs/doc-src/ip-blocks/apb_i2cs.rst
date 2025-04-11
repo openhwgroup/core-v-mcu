@@ -208,9 +208,9 @@ Write Operation from APB Master and Read from I2C Master:
 
 Interrupt Generation
 ^^^^^^^^^^^^^^^^^^^^
-The I2C Slave provides interrupt generation for both APB and I2C interfaces
+The I2C Slave provides interrupt generation for both APB and I2C interfaces.
 
-I2C interrupts:
+The i2c_interrupt goes to the external I2C master device, and is generated in the following conditions:
   - The availability of a new single-byte message from the APB to I2C.
   - The write flags of the I2C-to-APB FIFO reaching certain levels (e.g., FIFO becoming full),
     indicating how much space is currently available in FIFO.
@@ -218,7 +218,7 @@ I2C interrupts:
     indicating how much items APB master had written that the I2C master still has to process.
   - Interrupts can be triggered for 8 different levels of both read and write flags, and these interrupt sources can be selectively enabled. 
 
-APB interrupts:
+The apb_interrupt goes to the core complex block of Core-V-MCU, and is generated in the following conditions:
   - The availability of a new single-byte message from the I2C to APB.
   - The write flags of the APB-to-I2C FIFO reaching certain levels (e.g., FIFO becoming full),
     indicating how much space is currently available in FIFO.
