@@ -17,7 +17,7 @@
    ^^^^^^^
 .. _apb_gpio:
 
-APB_GPIO
+APB GPIO
 ========
 The General Purpose Input/Output (GPIO) IP block supports S/W access
 to read and write the values on selected I/O, and configuring selected
@@ -49,6 +49,15 @@ The figure below is a high-level block diagram of the APB GPIO module:-
 
    APB GPIO Block Diagram
 
+The figure below depicts the connections between the GPIO and rest of the modules in Core-V-MCU:-
+
+.. figure:: apb_gpio_soc_connections.png
+   :name: APB_GPIO_SoC_Connections
+   :align: center
+   :alt:
+
+   APB GPIO Core-V-MCU connections diagram
+
 The APB GPIO IP consists of the following key components:
 
 APB control logic
@@ -70,10 +79,15 @@ A dual-stage synchronizer prevents metastability issues when sampling external i
 
 Interrupt Generation Logic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+GPIO pins can be used to receive the interrupt from the external device. Each GPIO pin may be configured for interrupt.
+
 The interrupt logic detects events based on the configured interrupt type for each pin:
   - Edge detection circuitry for rising and falling edges
   - Level detection for active-high and active-low signals
   - Interrupt blocking mechanism to prevent repeated level interrupts
+
+On detection of an event based on configuration, the corresponding interrupt pin is raised.
+APB master can acknowledge the interrupt by writing to the register REG_INTACK.
 
 Programming View Model
 ----------------------
@@ -117,6 +131,7 @@ output levels, and configure various GPIO settings.
 REG_SETGPIO
 ^^^^^^^^^^^
   - Address Offset: 0x000
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -126,6 +141,7 @@ REG_SETGPIO
 REG_CLRGPIO
 ^^^^^^^^^^^
   - Address Offset: 0x004
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -135,6 +151,7 @@ REG_CLRGPIO
 REG_TOGGPIO
 ^^^^^^^^^^^
   - Address Offset: 0x008
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -144,6 +161,7 @@ REG_TOGGPIO
 REG_PIN0
 ^^^^^^^^
   - Address Offset: 0x010
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -153,6 +171,7 @@ REG_PIN0
 REG_PIN1
 ^^^^^^^^
   - Address Offset: 0x014
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -163,6 +182,7 @@ REG_PIN1
 REG_PIN2
 ^^^^^^^^
   - Address Offset: 0x018
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -173,6 +193,7 @@ REG_PIN2
 REG_PIN3
 ^^^^^^^^
   - Address Offset: 0x01C
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -183,6 +204,7 @@ REG_PIN3
 REG_OUT0
 ^^^^^^^^
   - Address Offset: 0x020
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -192,6 +214,7 @@ REG_OUT0
 REG_OUT1
 ^^^^^^^^
   - Address Offset: 0x024
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -202,6 +225,7 @@ REG_OUT1
 REG_OUT2
 ^^^^^^^^
   - Address Offset: 0x028
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -212,6 +236,7 @@ REG_OUT2
 REG_OUT3
 ^^^^^^^^
   - Address Offset: 0x02C
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -222,6 +247,7 @@ REG_OUT3
 REG_SETSEL
 ^^^^^^^^^^
   - Address Offset: 0x030
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -232,6 +258,7 @@ REG_SETSEL
 REG_RDSTAT
 ^^^^^^^^^^
   - Address Offset: 0x034
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -254,6 +281,7 @@ REG_RDSTAT
 REG_SETDIR
 ^^^^^^^^^^
   - Address Offset: 0x038
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -269,6 +297,7 @@ REG_SETDIR
 REG_SETINT
 ^^^^^^^^^^
   - Address Offset: 0x03C
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -290,6 +319,7 @@ REG_SETINT
 REG_INTACK
 ^^^^^^^^^^
   - Address Offset: 0x040
+
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
@@ -414,7 +444,7 @@ APB Interface Signals
 GPIO Data Signals
 ^^^^^^^^^^^^^^^^^
 - gpio_in[31:0]: External GPIO input values from the physical pins.
-- gpio_in_sync[31:0]: Synchronized version of `gpio_in`.
+- gpio_in_sync[31:0]: Synchronized version of `gpio_in`, provides the external signals to Advanced timer block.
 - gpio_out[31:0]: Output values driven onto GPIO pins, if configured as outputs.
 - gpio_dir[31:0]: Direction control per pin; 1 = output, 0 = input (or high-impedance for open-drain).
 
