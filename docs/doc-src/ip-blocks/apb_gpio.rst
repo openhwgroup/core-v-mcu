@@ -58,6 +58,11 @@ The figure below depicts the connections between the GPIO and rest of the module
 
    APB GPIO Core-V-MCU connections diagram
 
+The gpio_in_sync output is directly connected to the Advanced Timer module.
+It provides synchronized GPIO input signals that serve as external event sources for the Advanced Timer.
+These signals are processed by the Advanced Timer logic and can ultimately control the up/down counter functionality.
+This integration enables external events captured by GPIO pins to influence timer operations.
+
 The APB GPIO IP consists of the following key components:
 
 APB control logic
