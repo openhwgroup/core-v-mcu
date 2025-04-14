@@ -312,18 +312,18 @@ Firmware Guidelines
 -------------------
 
 Clock Enable, Rest uDMA I2C
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Configure the uDMA Core's PERIPH_CLK_ENABLE register to enable uDMA I2C's peripheral clock.
 - Set the uDMA Core's PERIPH_RESET register to issue a soft reset signal to uDMA I2C. 
 
 Tx Operation (Read from L2 memory)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Configure the uDMA I2C's TX_SADDR register with an interleaved(L2) memory address. I2C will read the data from this memory address. 
 - Set the uDMA I2C's TX_SIZE register to specify the amount of data (in bytes) to be transferred/read from the L2 memory address provided in TX_SADDR.
 - Configure uDMA I2C's TX_CFG register to enable the Tx channel, which allows the Tx channel to start reading data.
 
 Rx Operation (Write to L2 memory)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Configure the uDMA I2C's RX_SADDR register with an interleaved(L2) memory address. I2C will write the data to this memory address. 
 - Set the uDMA I2C's RX_SIZE register to specify the amount of data (in bytes) to be transferred/written to the L2 memory address provided in RX_SADDR.
 - Configure uDMA I2C's RX_CFG register to enable the Rx channel, which allows the Rx channel to start writing the data.
@@ -341,7 +341,7 @@ The figure below is the pin diagram of the uDMA I2C
 Below is the categorization of the pins:
 
 Tx Channel Interface
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 The following pins constitute the Tx channel interface of uDMA I2C. These pins are used to read the data from interleaved (L2) memory:
 
 - data_tx_req_o
@@ -352,7 +352,7 @@ The following pins constitute the Tx channel interface of uDMA I2C. These pins a
 - data_tx_ready_o
 
 Rx Channel Interface
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 The following pins constitute the Rx channel interface of uDMA I2C. These pins are used to write the data to interleaved (L2) memory:
 
 - data_rx_datasize_o [1:0]
@@ -361,7 +361,7 @@ The following pins constitute the Rx channel interface of uDMA I2C. These pins a
 - data_rx_ready_i
 
 uDMA I2C interface to get/send data from/to external device
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - scl_i
 - scl_o
 - scl_oe
@@ -370,7 +370,7 @@ uDMA I2C interface to get/send data from/to external device
 - sda_oe
 
 uDMA I2C interface to read-write CSRs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following interfaces are used to read and write to I2C CSRs. These interfaces are managed by uDMA Core.
 
 - cfg_data_i [31:0]
@@ -381,7 +381,7 @@ The following interfaces are used to read and write to I2C CSRs. These interface
 - cfg_ready_o
 
 uDMA I2C Tx channel configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 uDMA I2C uses these pins to share TX_SADDR, TX_SIZE and TX_CFG register details with core:
 
 - cfg_tx_startaddr_o
@@ -399,7 +399,7 @@ uDMA I2C shares the values of the below pins as read values of TX_SADDR, TX_SIZE
 - cfg_tx_bytes_left_i
 
 uDMA I2C Rx channel configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 uDMA I2C uses these pins to share RX_SADDR, RX_SIZE and RX_CFG register details with core:
 
 - cfg_rx_startaddr_o
@@ -417,25 +417,26 @@ uDMA I2C shares the values of the below pins as read values of RX_SADDR, RX_SIZE
 - cfg_rx_bytes_left_i
 
 Clock interface
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 These pins are used to synchronize I2C with uDMA core.
 
 - sys_clk_i
 - periph_clk_i
 
 Reset interface
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 uDMA core issues reset signal to I2C via this pin.
 
 - rstn_i
 
 External events
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 uDMA core triggers these events based on specific conditions. The I2C will only wait for these events when I2C_WAIT_EV command is issued.
 
 - ext_events_i [3:0]
 
 uDMA I2C interface to generate error
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - err_o
-**NOTE**: Currently, no details are provided for this pin.
+
+.. note:: Currently, no details are provided for this pin.
