@@ -44,6 +44,8 @@ The figure below is the high-level block diagram of the uDMA I2C:-
    :align: center
    :alt: 
 
+   uDMA I2C Block Diagram
+
 uDMA I2C uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external device. uDMA I2C uses the Rx channel interface to store the data received from the external device in interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
@@ -181,130 +183,136 @@ These CSRs retain the last value written by software.
 
 A CSRs volatility is indicated by its "type".
 
-Details of Register access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>_`.
+Details of Register access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_ .
 
 The registers RX_SADDR, RX_SIZE specifies the configuration for the transaction on the RX channel. The registers TX_SADDR, TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and use it for current ongoing transaction.
 
-RX_SADDR offset = 0x00
-~~~~~~~~~~~~~~~~~~~~~~
+RX_SADDR
+~~~~~~~~
 - Offset: 0x0
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SADDR      |  11:0 |   RW |            | Address of Rx buffer on write. This is the address of L2 memory where I2C will write the received data.     |
+| SADDR      |  11:0 |   RW |    0x0     | Address of Rx buffer on write. This is the address of L2 memory where I2C will write the received data.     |
 |            |       |      |            | Read & write to this register access different information.                                                 |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction.    |
+|            |       |      |            |                                                                                                             |
 |            |       |      |            | **On Read**: Address of Rx buffer for the current ongoing transaction. This is the local copy of information|
 |            |       |      |            | maintained inside the uDMA Core.                                                                            |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-RX_SIZE offset = 0x04
-~~~~~~~~~~~~~~~~~~~~~
+RX_SIZE
+~~~~~~~
 - Offset: 0x04
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |            | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this register     |
+| SIZE       |  15:0 |   RW |    0x0     | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this register     |
 |            |       |      |            | access different information.                                                                               |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Rx buffer for next transaction. It does not impact current ongoing transaction.       |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Read**: Bytes left for the current ongoing transaction i.e., bytes left to write to L2 memory.         |
 |            |       |      |            | This is the local copy of information maintained inside the uDMA Core.                                      |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-RX_CFG offset = 0x08
-~~~~~~~~~~~~~~~~~~~~
+RX_CFG
+~~~~~~
 - Offset: 0x08
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| CLR        |   6:6 |   WO |            | Clear the receive channel                                                                                   |
+| CLR        |   6:6 |   WO |    0x0     | Clear the receive channel                                                                                   |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| PENDING    |   5:5 |   RO |            | Receive transaction is pending                                                                              |
+| PENDING    |   5:5 |   RO |    0x0     | Receive transaction is pending                                                                              |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| EN         |   4:4 |   RW |            | Enable the receive channel                                                                                  |
+| EN         |   4:4 |   RW |    0x0     | Enable the receive channel                                                                                  |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| CONTINUOUS |   0:0 |   RW |            | 0x0: stop after last transfer for channel                                                                   |
-+------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-|            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              |
+| CONTINUOUS |   0:0 |   RW |    0x0     | 0x0: stop after last transfer for channel                                                                   |
+|            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              | 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-TX_SADDR offset = 0x10
-~~~~~~~~~~~~~~~~~~~~~~
+TX_SADDR
+~~~~~~~~
 - Offset: 0x10
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SADDR      |  11:0 |   RW |            | Address of Tx buffer on write. This is the address of L2 memory from where I2C will read the data to        |
+| SADDR      |  11:0 |   RW |   0x0      | Address of Tx buffer on write. This is the address of L2 memory from where I2C will read the data to        |
 |            |       |      |            | transmit. Read & write to this register access different information.                                       |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Tx buffer for next transaction. It does not impact current ongoing transaction.    |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Read**: Address of Tx buffer for the current ongoing transaction. This is the local copy of information|
 |            |       |      |            | maintained inside the uDMA Core.                                                                            |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-TX_SIZE offset = 0x14
-~~~~~~~~~~~~~~~~~~~~~
+TX_SIZE
+~~~~~~~
 - Offset: 0x14
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |            | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this register access   |
+| SIZE       |  15:0 |   RW |   0x0      | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this register access   |
 |            |       |      |            | different information.                                                                                      |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Tx buffer for next transaction. It does not impact current ongoing transaction.       |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Read**: Bytes left for the current ongoing transaction i.e., bytes left to read from L2 memory.        |
 |            |       |      |            | This is the local copy of information maintained inside the uDMA Core.                                      |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-TX_CFG offset = 0x18
-~~~~~~~~~~~~~~~~~~~~
+TX_CFG
+~~~~~~
 - Offset: 0x18
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| CLR        |   6:6 |   WO |            | Clear the transmit channel                                                                                  |
+| CLR        |   6:6 |   WO |    0x0     | Clear the transmit channel                                                                                  |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| PENDING    |   5:5 |   RO |            | Transmit transaction is pending                                                                             |
+| PENDING    |   5:5 |   RO |    0x0     | Transmit transaction is pending                                                                             |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| EN         |   4:4 |   RW |            | Enable the transmit channel                                                                                 |
+| EN         |   4:4 |   RW |    0x0     | Enable the transmit channel                                                                                 |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-| CONTINUOUS |   0:0 |   RW |            | 0x0: stop after last transfer for channel                                                                   |
-+------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW |    0x0     | 0x0: stop after last transfer for channel                                                                   |
 |            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
-STATUS offset = 0x20
-~~~~~~~~~~~~~~~~~~~~
+STATUS
+~~~~~~
 - Offset: 0x20
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                 |
 +============+=======+======+============+=============================================================+
-| AL         |   1:1 |   RO |            | Always returns 0                                            |
+| AL         |   1:1 |   RO |   0x0      | Always returns 0                                            |
 +------------+-------+------+------------+-------------------------------------------------------------+
-| BUSY       |   0:0 |   RO |            | Always returns 0                                            |
+| BUSY       |   0:0 |   RO |   0x0      | Always returns 0                                            |
 +------------+-------+------+------------+-------------------------------------------------------------+
 
-SETUP offset = 0x24
-~~~~~~~~~~~~~~~~~~~
+SETUP
+~~~~~
 - Offset: 0x24
 - Type  : Volatile
 
 +------------+-------+------+------------+-------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                 |
 +============+=======+======+============+=============================================================+
-| RESET      |   0:0 |   RW |            | Reset I2C controller                                        |
+| RESET      |   0:0 |   RW |    0x0     | Reset I2C controller                                        |
 +------------+-------+------+------------+-------------------------------------------------------------+
 
 
@@ -337,6 +345,8 @@ The figure below is the pin diagram of the uDMA I2C
    :name: uDMA I2C Pin Diagram
    :align: center
    :alt:
+
+   uDMA I2C Pin Diagram
 
 Below is the categorization of the pins:
 
