@@ -354,96 +354,94 @@ Tx Channel Interface
 ~~~~~~~~~~~~~~~~~~~~
 The following pins constitute the Tx channel interface of uDMA I2C. These pins are used to read the data from interleaved (L2) memory:
 
-- data_tx_req_o
-- data_tx_gnt_i
-- data_tx_datasize_o [1:0]
-- data_tx_i [7:0]
-- data_tx_valid_i
-- data_tx_ready_o
+- ``data_tx_req_o``: Read request signal.
+- ``data_tx_gnt_i``: Read grant signal.
+- ``data_tx_datasize_o [1:0]``:  Data size for Tx channel.
+- ``data_tx_i [7:0]``: Data input for Tx channel.
+- ``data_tx_valid_i``: Valid data input signal.
+- ``data_tx_ready_o``: Tx ready output signal.
 
 Rx Channel Interface
 ~~~~~~~~~~~~~~~~~~~~
 The following pins constitute the Rx channel interface of uDMA I2C. These pins are used to write the data to interleaved (L2) memory:
 
-- data_rx_datasize_o [1:0]
-- data_rx_i [7:0]
-- data_rx_valid_o
-- data_rx_ready_i
+- ``data_rx_datasize_o [1:0]``: Data size for Rx channel.
+- ``data_rx_o [7:0]``: Data output for Rx channel.
+- ``data_rx_valid_o``: Valid data output signal.
+- ``data_rx_ready_i``: Rx ready input signal.
 
 uDMA I2C interface to get/send data from/to external device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- scl_i
-- scl_o
-- scl_oe
-- sda_i
-- sda_o
-- sda_oe
+- ``scl_i``: I2C clock input signal.
+- ``scl_o``: I2C clock output signal.
+- ``scl_oe``: Output enable for clock line.
+- ``sda_i``: I2C data input signal.
+- ``sda_o``: I2C data output.
+- ``sda_oe``: Output enable for data line
 
 uDMA I2C interface to read-write CSRs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following interfaces are used to read and write to I2C CSRs. These interfaces are managed by uDMA Core.
 
-- cfg_data_i [31:0]
-- cfg_addr_i [4:0]
-- cfg_valid_i
-- cfg_rwn_i
-- cfg_data_o [31:0]
-- cfg_ready_o
+- ``cfg_data_i [31:0]``: APB Write data.
+- ``cfg_addr_i [4:0]``: APB Address.
+- ``cfg_valid_i``: APB data valid signal.
+- ``cfg_rwn_i``: APB read or write signal.
+- ``cfg_data_o [31:0]``: APB read data output.
+- ``cfg_ready_o``: APB ready signal.
 
 uDMA I2C Tx channel configuration interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 uDMA I2C uses these pins to share TX_SADDR, TX_SIZE and TX_CFG register details with core:
 
-- cfg_tx_startaddr_o
-- cfg_tx_size_o
-- cfg_tx_datasize_o
-- cfg_tx_continuous_o
-- cfg_tx_en_o
-- fg_tx_clr_o
+- ``cfg_tx_startaddr_o``: Start address configuration output.
+- ``cfg_tx_size_o``: Transfer size configuration output.
+- ``cfg_tx_continuous_o``: Continuous transfer mode enable signal.
+- ``cfg_tx_en_o``: Tx channel enable configuration output.
+- ``cfg_tx_clr_o``: Clear config signal for Tx.
 
 uDMA I2C shares the values of the below pins as read values of TX_SADDR, TX_SIZE and TX_CFG registers:
 
-- cfg_tx_en_i
-- cfg_tx_pending_i
-- cfg_tx_curr_addr_i
-- cfg_tx_bytes_left_i
+- ``cfg_tx_en_i``: Enable signal for Tx channel.
+- ``cfg_tx_pending_i``: Tx pending status input.
+- ``cfg_tx_curr_addr_i``: Current address being written to.
+- ``cfg_tx_bytes_left_i``: Bytes remaining to transmit.
 
 uDMA I2C Rx channel configuration interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 uDMA I2C uses these pins to share RX_SADDR, RX_SIZE and RX_CFG register details with core:
 
-- cfg_rx_startaddr_o
-- cfg_rx_size_o
-- cfg_rx_datasize_o
-- cfg_rx_continuous_o
-- cfg_rx_en_o
-- cfg_rx_clr_o
+- ``cfg_rx_startaddr_o``: Start address configuration output.
+- ``cfg_rx_size_o``: Transfer size configuration output.
+- ``cfg_rx_continuous_o``: Continuous transfer mode enable signal.
+- ``cfg_rx_en_o``: Rx channel enable configuration output.
+- ``cfg_rx_clr_o``: Clear config signal for Rx.
 
 uDMA I2C shares the values of the below pins as read values of RX_SADDR, RX_SIZE and RX_CFG registers:
 
-- cfg_rx_en_i
-- cfg_rx_pending_i
-- cfg_rx_curr_addr_i
-- cfg_rx_bytes_left_i
+- ``cfg_rx_en_i``: Enable signal for Rx channel.
+- ``cfg_rx_pending_i``: rx pending status input.
+- ``cfg_rx_curr_addr_i``: Current address being read from.
+- ``cfg_rx_bytes_left_i``: Bytes remaining to left.
 
 Clock interface
 ~~~~~~~~~~~~~~~
 These pins are used to synchronize I2C with uDMA core.
 
-- sys_clk_i
-- periph_clk_i
+- ``sys_clk_i``: System clock.
+- ``periph_clk_i``: Peripheral clock.
 
 Reset interface
 ~~~~~~~~~~~~~~~
 uDMA core issues reset signal to I2C via this pin.
 
-- rstn_i
+- ``rstn_i``: soft reset signal enabled through the uDMA core CSR.
 
 External events
 ~~~~~~~~~~~~~~~
 uDMA core triggers these events based on specific conditions. The I2C will only wait for these events when I2C_WAIT_EV command is issued.
 
-- ext_events_i [3:0]
+- ``ext_events_i [3:0]``: Input external events.
 
 uDMA I2C interface to generate error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
