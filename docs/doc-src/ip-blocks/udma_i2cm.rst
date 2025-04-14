@@ -231,7 +231,7 @@ RX_CFG offset = 0x08
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW |            | 0x0: stop after last transfer for channel                                                                   |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
-|            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              |                                             |
+|            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
 TX_SADDR offset = 0x10
@@ -243,7 +243,7 @@ TX_SADDR offset = 0x10
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
 | SADDR      |  11:0 |   RW |            | Address of Tx buffer on write. This is the address of L2 memory from where I2C will read the data to        |
-|            |       |      |            | transmit. Read & write to this register access different information.                                                 |
+|            |       |      |            | transmit. Read & write to this register access different information.                                       |
 |            |       |      |            | **On Write**: Address of Tx buffer for next transaction. It does not impact current ongoing transaction.    |
 |            |       |      |            | **On Read**: Address of Tx buffer for the current ongoing transaction. This is the local copy of information|
 |            |       |      |            | maintained inside the uDMA Core.                                                                            |
