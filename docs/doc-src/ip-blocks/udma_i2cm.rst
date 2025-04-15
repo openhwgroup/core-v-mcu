@@ -111,6 +111,20 @@ A list of the available commands and their encoding is shown in the Table below.
 uDMA I2C Master Data Control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+FSM
+^^^
+I2C Master controller operates through disctinct states, each handling a specific part of I2C transaction process:
+
+- I2C_ST_WAIT_FOR_CMD :- Also known as the *idle* state. Initially, the controller starts here and waits for commands. Based on the received command, it transitions to the corresponding operational state. 
+- I2C_ST_WAIT:- Holds the controller in a delay state for a specified number of cycles before returning to *idle* state.
+- I2C_ST_WAIT_EV:- Waits for one of the external events to be triggered. Upon receiving the specified events, it transitions back to *idle* state.
+- I2C_ST_REPEAT: stores the repeat count, indicating how many times the next applicable command should to be repeated.
+- I2C_ST_WRTIE:- Starts a new I2C transfer by sending the slave address on the bus. It also determines the direction of data transfer (read or write). 
+- I2C_ST_GET_DATA:- Reads data from the slave and sends ACK or NACK after each byte based on the command received. If in repeat mode, it continues this operation for the specified number of bytes and stores the read data into its internal RX FIFO.
+- I2C_ST_SEND_DATA: Sends data bytes to the slave and waits for an acknowledgment (ACK) after each transmission. If in repeat mode, it continues this operation for the specified number of bytes. The data to be written is taken from the internal TX FIFO.
+- I2C_ST_STOP:- Sends a STOP condition on the I2C bus, signaling the end of current transaction. Once completed, it returns to *idle* state.
+
+
 Eg: Command Sequence (Write and Read Operation)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -236,6 +250,7 @@ RX_CFG
 | EN         |   4:4 |   RW |    0x0     | Enable the receive channel                                                                                  |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW |    0x0     | 0x0: stop after last transfer for channel                                                                   |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              | 
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
@@ -288,6 +303,7 @@ TX_CFG
 | EN         |   4:4 |   RW |    0x0     | Enable the transmit channel                                                                                 |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW |    0x0     | 0x0: stop after last transfer for channel                                                                   |
+|            |       |      |            |                                                                                                             | 
 |            |       |      |            | 0x1: after last transfer for channel, reload buffer size and start address and restart channel              |
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 
@@ -346,7 +362,7 @@ The figure below is the pin diagram of the uDMA I2C
    :align: center
    :alt:
 
-   uDMA I2C Pin Diagram
+   **uDMA I2C Pin Diagram**
 
 Below is the categorization of the pins:
 
@@ -447,4 +463,4 @@ uDMA I2C interface to generate error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - err_o
 
-.. note:: Currently, no details are provided for this pin.
+``**Note**:: Currently, no details are provided for this pin.``
