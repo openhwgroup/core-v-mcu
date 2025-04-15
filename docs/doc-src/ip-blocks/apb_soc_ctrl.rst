@@ -18,73 +18,263 @@
    ^^^^^^^
 .. _apb_soc_controller:
 
-**APB SoC controller**
-======================
+APB SoC controller
+==================
 
-**APB SoC Controller:-**
+This APB peripheral primarily controls I/O configuration and serves as the central configuration hub in the CORE-V-MCU for pad multiplexing, boot control, watchdog monitoring, and eFPGA interfacing.
 
--  This APB peripheral primarily controls I/O configuration and I/O function connection. It also supports a few registers for miscellaneous functions.
+Features
+--------
+  - Control interface for configurable pad multiplexer and IO configuration
+  - Watchdog timer with programmable timeout and reset capability
+  - JTAG register access for debug and configuration
+  - Boot address and fetch enable control for the Fabric Controller (FC)
+  - eFPGA control and configuration interface
+  - Ready timeout monitoring for system level recovery
+  - System information and status registers
+  - Soft reset capability for all APB Client Peripherals
+  - Build date and time information
 
-**APB SoC CTRL CSRs**
----------------------
+Block Architecture
+------------------
 
-**INFO offset = 0x0000**
+The figure below is a high-level block diagram of the APB SoC Controller module:-
+
+.. figure:: apb_soc_controller_block_diagram.png
+   :name: APB_SOC_Controller_Block_Diagram
+   :align: center
+   :alt:
+
+   APB SoC Controller Block Diagram
+
+The APB SoC Controller IP consists of the following key components:
+
+Pad Configuration
+^^^^^^^^^^^^^^^^^
+The controller manages pad multiplexing and configuration for all system IOs. It provides the multiplexing information to the Pad control module, which directly manages the IO pads.
+ Each pad can be individually configured for:
+  - Pad multiplexing (selecting function)
+  - Pad electrical configuration (drive strength, pull-up/down, etc.)
+
+Watchdog Timer
+^^^^^^^^^^^^^^
+A programmable watchdog timer runs on the reference clock and can generate system reset signals when expired. Features include:
+  - Configurable timeout period
+  - Enable/disable control
+  - Reset capability with specific pattern
+  - Status monitoring
+
+eFPGA Interface
+^^^^^^^^^^^^^^^
+Dedicated control and status registers for managing the embedded FPGA subsystem:
+  - Reset controls
+  - Clock gating
+  - Interface enables (UDMA, events, APB, TCDM interfaces)
+  - Status monitoring
+
+Ready Timeout Mechanism
+^^^^^^^^^^^^^^^^^^^^^^^
+A monitoring mechanism that can detect system hangs:
+  - Programmable timeout counter
+  - Peripheral-specific timeout monitoring
+  - Status reporting
+
+Boot Control
+^^^^^^^^^^^^
+Manages the boot process for the system:
+  - Boot address configuration
+  - Fetch enable control
+  - Boot mode selection
+
+JTAG Interface
+^^^^^^^^^^^^^^
+Allows communication with external JTAG devices
+
+
+System Architecture
+-------------------
+
+The figure below depicts the connections between the SoC Controller and rest of the modules in CORE-V-MCU:-
+
+.. figure:: apb_soc_controller_soc_connections.png
+   :name: APB_SOC_Controller_SoC_Connections
+   :align: center
+   :alt:
+
+   APB SoC Controller CORE-V-MCU connections diagram
+
+Programming View Model
+----------------------
+
+The APB SOC Controller is memory-mapped at a base address defined by the system. All registers are accessible via standard APB read/write operations.
+
+Register Access
+^^^^^^^^^^^^^^^
+Registers are accessed using 32-bit reads and writes over the APB bus. The address space is organized as follows:
+  - Base registers: 0x000 - 0x0FC
+  - Pad configuration registers: 0x400 - 0x4C0
+
+Programming Sequence
+^^^^^^^^^^^^^^^^^^^^
+Typical programming sequences include:
+  - Read system information from INFO register
+  - Configure boot address and fetch enable
+  - Set up pad configuration and multiplexing
+  - Configure watchdog timer if needed
+  - Set up eFPGA control parameters
+  - Monitor status registers as needed
+
+APB SoC CTRL CSRs
+-----------------
+
+INFO
+^^^^
+  - Address Offset = 0x0000
 
 +----------------+-----------+----------+-------------+----------------------------------+
 | **Field**      | **Bits**  | **Type** | **Default** | **Description**                  |
 +================+===========+==========+=============+==================================+
-|   N_CORES      |   31:16   |  RO      |             | Number of cores in design        |
+|   N_CORES      |   31:16   |   RO     |     0x1     | Number of cores in design        |
 +----------------+-----------+----------+-------------+----------------------------------+
-|   N_CLUSTERS   |   15:0    |   RO     |             | Number of clusters in design     |
+|   N_CLUSTERS   |   15:0    |   RO     |     0x0     | Number of clusters in design     |
 +----------------+-----------+----------+-------------+----------------------------------+
 
-**BUILD_DATE offset = 0x000C**
+FCBOOT
+^^^^^^
+  - Address Offset = 0x0004
+
++----------------+-----------+----------+-------------+----------------------------------+
+| **Field**      | **Bits**  | **Type** | **Default** | **Description**                  |
++================+===========+==========+=============+==================================+
+|   BOOT_ADDR    |   31:0    |  RW      | 0x1A000080  | Boot address for the FC core     |
++----------------+-----------+----------+-------------+----------------------------------+
+
+FCFETCH
+^^^^^^^
+  - Address Offset = 0x0008
+
++----------------+-----------+----------+-------------+----------------------------------+
+| **Field**      | **Bits**  | **Type** | **Default** | **Description**                  |
++================+===========+==========+=============+==================================+
+|   ENABLE       |   0:0     |  RO      |     0x1     | Fetch enable bit                 |
+|                |           |          |             | (1: enabled, 0: disabled)        |
++----------------+-----------+----------+-------------+----------------------------------+
+
+BUILD_DATE
+^^^^^^^^^^
+  - Address Offset = 0x000C
 
 +-------------+----------+----------+-------------+--------------------+
 | **Field**   | **Bits** | **Type** | **Default** | **Description**    |
 +=============+==========+==========+=============+====================+
-|   YEAR      |  31:16   |   RO     |             |   Year in BCD      |
+|   YEAR      |  31:16   |   RO     |     0x0     |   Year in BCD      |
 +-------------+----------+----------+-------------+--------------------+
-|   MONTH     |   15:8   |   RO     |             |   Month in BCD     |
+|   MONTH     |   15:8   |   RO     |     0x0     |   Month in BCD     |
 +-------------+----------+----------+-------------+--------------------+
-|   DAY       |   7:0    |   RO     |             |   Day in BCD       |
+|   DAY       |   7:0    |   RO     |     0x0     |   Day in BCD       |
 +-------------+----------+----------+-------------+--------------------+
 
-**BUILD_TIME offset = 0x0010**
+BUILD_TIME
+^^^^^^^^^^
+  - Address Offset = 0x0010
 
 +---------------+----------+----------+-------------+---------------------+
 | **Field**     | **Bits** | **Type** | **Default** | **Description**     |
 +===============+==========+==========+=============+=====================+
-|   HOUR        |   23:16  |   RO     |             |   Hour in BCD       |
+|   HOUR        |   23:16  |   RO     |     0x0     |   Hour in BCD       |
 +---------------+----------+----------+-------------+---------------------+
-|   MINUTES     |   15:8   |   RO     |             |   Minutes in BCD    |
+|   MINUTES     |   15:8   |   RO     |     0x0     |   Minutes in BCD    |
 +---------------+----------+----------+-------------+---------------------+
-|   SECONDS     |   7:0    |   RO     |             |   Seconds in BCD    |
+|   SECONDS     |   7:0    |   RO     |     0x0     |   Seconds in BCD    |
 +---------------+----------+----------+-------------+---------------------+
 
-**JTAGREG offset = 0x0074**
+WCFGFUN
+^^^^^^^
+  - Address Offset = 0x0060
+  - Sets multiplexer and configuration for specified IO pad
 
-+-----------+----------+----------+-------------+--------------------------+
-| **Field** | **Bits** | **Type** | **Default** | **Description**          |
-+===========+==========+==========+=============+==========================+
-|   TBD     |   31:0   |   R/W    |             |   To Be Determined       |
-+-----------+----------+----------+-------------+--------------------------+
++-------------+----------+----------+-------------+------------------------------+
+| Field       | Bits     | Type     | Default     | Description                  |
++=============+==========+==========+=============+==============================+
+| RESERVED    | 31:30    | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| PADCFG      | 29:24    | RW       |    0x0      | Pad configuration (TBD)      |
++-------------+----------+----------+-------------+------------------------------+
+| RESERVED    | 23:18    | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| PADMUX      | 17:16    | RW       |    0x0      | Pad mux configuration        |
++-------------+----------+----------+-------------+------------------------------+
+| RESERVED    | 15:6     | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| IO_PAD      | 5:0      | RW       |    0x0      | IO pad index                 |
++-------------+----------+----------+-------------+------------------------------+
 
-**BOOTSEL offset = 0x00C4**
+RCFGFUN
+^^^^^^^
+  - Address Offset = 0x0064
+  - Reads multiplexer and configuration for specified IO pad
 
-+-------------+----------+-----------+-------------+----------------------------------------+
-| **Field**   | **Bits** | **Types** | **Default** | **Description**                        |
-+=============+==========+===========+=============+========================================+
-|   BootDev   |   0:0    |           |             |   Selects Boot device 1=SPI, 0=Host    |
-|             |          |           |             |   mode via I2Cs                        |
-+-------------+----------+-----------+-------------+----------------------------------------+
++-------------+----------+----------+-------------+------------------------------+
+| Field       | Bits     | Type     | Default     | Description                  |
++=============+==========+==========+=============+==============================+
+| RESERVED    | 31:30    | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| PADCFG      | 29:24    | RW       |    0x0      | Pad configuration (TBD)      |
++-------------+----------+----------+-------------+------------------------------+
+| RESERVED    | 23:18    | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| PADMUX      | 17:16    | RW       |    0x0      | Pad mux configuration        |
++-------------+----------+----------+-------------+------------------------------+
+| RESERVED    | 15:6     | RW       |    0x0      | Reserved                     |
++-------------+----------+----------+-------------+------------------------------+
+| IO_PAD      | 5:0      | RW       |    0x0      | IO pad index                 |
++-------------+----------+----------+-------------+------------------------------+
 
-**CLKSEL offset = 0x00C8**
+JTAGREG
+^^^^^^^
+  - Address Offset = 0x0074
+
++---------------+----------+----------+-------------+--------------------------+
+| **Field**     | **Bits** | **Type** | **Default** | **Description**          |
++===============+==========+==========+=============+==========================+
+| RESERVED      | 31:16    | RO       |    0x0      | Reserved                 |
++---------------+----------+----------+-------------+--------------------------+
+| JTAG_REG_IN   | 15:8     | RO       |    0x0      | JTAG register input      |
++---------------+----------+----------+-------------+--------------------------+
+| JTAG_REG_OUT  | 7:0      | RW       |    0x0      | JTAG register output     |
++---------------+----------+----------+-------------+--------------------------+
+
+BOOTSEL
+^^^^^^^
+  - Address Offset = 0x00C4
+
++-------------+----------+-----------+-------------+-----------------------------------------+
+| **Field**   | **Bits** | **Types** | **Default** | **Description**                         |
++=============+==========+===========+=============+=========================================+
+| BOOTSEL     |   0:0    | RO        |             | Selected Boot device                    |
+|             |          |           |             |  1=SPI                                  |
+|             |          |           |             |  0=Host mode via I2Cs                   |
+|             |          |           |             |                                         | 
+|             |          |           |             | Configured from bootsel_i pin on reset  |
++-------------+----------+-----------+-------------+-----------------------------------------+
+| DMACTIVE    | 1:1      | RO        |             | DMA active value                        |
+|             |          |           |             | Configured from dmactive_i pin on reset |
++-------------+----------+-----------+-------------+-----------------------------------------+
+| RESERVED    | 29:2     | RO        |             | Reserved                                |
++-------------+----------+-----------+-------------+-----------------------------------------+
+| BOOTSEL_IN  | 30       | RO        |             | Current status of bootsel_i pin         |
++-------------+----------+-----------+-------------+-----------------------------------------+
+| DMACTIVE_IN | 31       | RO        |             | Current status of dmactive_i pin        |
++-------------+----------+-----------+-------------+-----------------------------------------+
+
+CLKSEL
+^^^^^^
+  - Address Offset = 0x00C8
 
 +-----------+----------+----------+-------------+--------------------------------+
 | **Field** | **Bits** | **Type** | **Default** | **Description**                |
 +===========+==========+==========+=============+================================+
-|   S       |   0:0    |   R/W    |             |   This register contains       |
+|   S       |   0:0    |   RW     |             |   This register contains       |
 |           |          |          |             |   whether the system clock     |
 |           |          |          |             |   is coming from               |
 |           |          |          |             |   the FLL or the FLL is        |
@@ -92,157 +282,189 @@
 |           |          |          |             |   It is a read-only            |
 |           |          |          |             |   register by the core but it  |
 |           |          |          |             |   can be written via JTAG.     |
+|           |          |          |             |                                |
+|           |          |          |             | Shows current status of        |
+|           |          |          |             | sel_fll_clk_i pin              |
 +-----------+----------+----------+-------------+--------------------------------+
 
-**WD_COUNT offset = 0x00D0**
+WD_COUNT
+^^^^^^^^
+  - Address Offset = 0x00D0
 
 +-----------+----------+-----------+-------------+-------------------------------------+
 | **Field** | **Bits** | **Types** | **Default** | **Description**                     |
 +===========+==========+===========+=============+=====================================+
-|   COUNT   |   3:0    |   R/W     |   0x8000    |   Only writable before Watchdog is  |
+|   COUNT   |   30:0   |   RW      |   0x8000    |   Only writable before Watchdog is  |
 |           |          |           |             |   enabled                           |
 +-----------+----------+-----------+-------------+-------------------------------------+
 
-**WD_CONTROL offset = 0x00D4**
+WD_CONTROL
+^^^^^^^^^^
+  - Address Offset = 0x00D4
 
 +-----------------+----------+----------+-----------+----------------------------------------+
 | **Field**       | **Bits** | **Type** |**Default**| **Description**                        |
 +=================+==========+==========+===========+========================================+
-|  ENABLE_STATUS  |   31:31  |   RO     |           |   1=Watchdog Enabled,                  |
+|  ENABLE_STATUS  |   31:31  |   RW     |   0x0     |   1=Watchdog Enabled,                  |
 |                 |          |          |           |   0=Watchdog not enabled.              |
 |                 |          |          |           |   Note: once enabled, cannot be        |
 |                 |          |          |           |   disabled                             |
 +-----------------+----------+----------+-----------+----------------------------------------+
-|  WD_VALUE       |   15:0   |   WO     |   NA      |  Set to 0x6699 to reset watchdog when  |
+|  WD_VALUE       |   15:0   |   RW     |           |  Set to 0x6699 to reset watchdog when  |
 |                 |          |          |           |  enabled, read current WD value        |
 +-----------------+----------+----------+-----------+----------------------------------------+
 
-**RESET_REASON offset = 0x00D8**
+RESET_REASON
+^^^^^^^^^^^^
+  - Address Offset = 0x00D8
+  - The register will get cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
 
 +-----------+----------+-----------+-------------+-------------------------------------+
 | **Field** | **Bits** | **Types** | **Default** | **Description**                     |
 +===========+==========+===========+=============+=====================================+
-|   REASON  |   1:0    |   R/W     |             |   2'b01= reset pin, 2'b11=Watchdog  |
+|   REASON  |   1:0    |   RW      |     0x0     |   2'b01= reset pin, 2'b11=Watchdog  |
 |           |          |           |             |   expired                           |
 +-----------+----------+-----------+-------------+-------------------------------------+
 
-**RTO_PERIPHERAL_ERROR offset = 0x00E0**
+RTO_PERIPHERAL_ERROR
+^^^^^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00E0
+  - Configured from peripheral_rto_i pin
+  - Writing to this register will clear it
 
 +-------------+----------+-----------+-------------+----------------------------------------+
 | **Field**   | **Bits** | **Types** | **Default** | **Description**                        |
 +=============+==========+===========+=============+========================================+
-|   FCB_RTO   |   8:8    | R/W       | 0x0         | 1 indicates that the FCB interface     |
+|   FCB_RTO   |   8:8    | RW        | 0x0         | 1 indicates that the FCB interface     |
 |             |          |           |             | caused a ready timeout                 |
 +-------------+----------+-----------+-------------+----------------------------------------+
-| TIMER_RTO   |   7:7    | R/W       | 0x0         | 1 indicates that the TIMER interface   |
+| TIMER_RTO   |   7:7    | RW        | 0x0         | 1 indicates that the TIMER interface   |
 |             |          |           |             | caused a ready timeout                 |
 +-------------+----------+-----------+-------------+----------------------------------------+
-| I2CS_RTO    |   6:6    | R/W       | 0x0         | 1 indicates that the I2CS interface    |
+| I2CS_RTO    |   6:6    | RW        | 0x0         | 1 indicates that the I2CS interface    |
 |             |          |           |             | caused a ready timeout                 |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|EVENT_GEN_RTO|   5:5    | R/W       | 0x0         | 1 indicates that the EVENT GENERATOR   |
+|EVENT_GEN_RTO|   5:5    | RW        | 0x0         | 1 indicates that the EVENT GENERATOR   |
 |             |          |           |             | interface caused a ready timeout       |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|ADV_TIMER_RTO|   4:4    | R/W       | 0x0         | 1 indicates that the ADVANCED TIMER    |
+|ADV_TIMER_RTO|   4:4    | RW        | 0x0         | 1 indicates that the ADVANCED TIMER    |
 |             |          |           |             | interface caused a ready timeout       |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|SOC_CONTROL_R|   3:3    | R/W       | 0x0         | 1 indicates that the SOC CONTROL       |
+|SOC_CONTROL_R|   3:3    | RW        | 0x0         | 1 indicates that the SOC CONTROL       |
 |TO           |          |           |             | interface caused a ready timeout       |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|UDMA_RTO     |   2:2    | R/W       | 0x0         | 1 indicates that the UDMA CONTROL      |
+|UDMA_RTO     |   2:2    | RW        | 0x0         | 1 indicates that the UDMA CONTROL      |
 |             |          |           |             | interface caused a ready timeout       |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|GPIO_RTO     |   1:1    | R/W       | 0x0         | 1 indicates that the GPIO interface    |
+|GPIO_RTO     |   1:1    | RW        | 0x0         | 1 indicates that the GPIO interface    |
 |             |          |           |             | caused a ready timeout                 |
 +-------------+----------+-----------+-------------+----------------------------------------+
-|FLL_RTO      |   0:0    | R/W       | 0x0         | 1 indicates that the FLL interface     |
+|FLL_RTO      |   0:0    | RW        | 0x0         | 1 indicates that the FLL interface     |
 |             |          |           |             | caused a ready timeout                 |
 +-------------+----------+-----------+-------------+----------------------------------------+
 
-**READY_TIMEOUT_COUNT offset = 0x00E4**
+READY_TIMEOUT_COUNT
+^^^^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00E4
 
 +-------------+----------+-----------+-------------+----------------------------------------+
 | **Field**   | **Bits** | **Types** | **Default** | **Description**                        |
 +=============+==========+===========+=============+========================================+
-| COUNT       |  19:0    | R/W       | 0xFF        | Number of APB clocks before a ready    |
-|             |          |           |             | timeout occurs                         |
+| COUNT       |  19:0    | RW        | 0xFF        | Number of APB clocks before a ready    |
+|             |          |           |             | timeout occurs.                        |
+|             |          |           |             | When writing to this register, last 4  |
+|             |          |           |             | bits from write data will be replaced  |
+|             |          |           |             | by 0xf.                                |
 +-------------+----------+-----------+-------------+----------------------------------------+
 
-**RESET_TYPE1_EFPGA offset = 0x00E8**
+RESET_TYPE1_EFPGA
+^^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00E8
 
 +-------------+----------+-----------+-------------+-----------------------------------+
 | **Field**   | **Bits** | **Types** | **Default** | **Description**                   |
 +=============+==========+===========+=============+===================================+
-| RESET_LB    |   3:3    | R/W       | 0x0         | Reset eFPGA Left Bottom Quadrant  |
+| RESET_LB    |   3:3    | RW        | 0x0         | Reset eFPGA Left Bottom Quadrant  |
 +-------------+----------+-----------+-------------+-----------------------------------+
-| RESET_RB    |   2:2    | R/W       | 0x0         | Reset eFPGA Right Bottom Quadrant |
+| RESET_RB    |   2:2    | RW        | 0x0         | Reset eFPGA Right Bottom Quadrant |
 +-------------+----------+-----------+-------------+-----------------------------------+
-| RESET_RT    |   1:1    | R/W       | 0x0         | Reset eFPGA Right Top Quadrant    |
+| RESET_RT    |   1:1    | RW        | 0x0         | Reset eFPGA Right Top Quadrant    |
 +-------------+----------+-----------+-------------+-----------------------------------+
-| RESET_LT    |   0:0    | R/W       | 0x0         | Reset eFPGA Left Top Quadrant     |
+| RESET_LT    |   0:0    | RW        | 0x0         | Reset eFPGA Left Top Quadrant     |
 +-------------+----------+-----------+-------------+-----------------------------------+
 
-**ENABLE_IN_OUT_EFPGA offset = 0x00EC**
+ENABLE_IN_OUT_EFPGA
+^^^^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00EC
 
 +--------------+----------+-----------+-------------+----------------------------------------+
 | **Field**    | **Bits** | **Types** | **Default** | **Description**                        |
 +==============+==========+===========+=============+========================================+
-|ENABLE_EVENTS |   5:5    | R/W       | 0x0         | Enable events from efpga to SOC caused |
+|ENABLE_EVENTS |   5:5    | RW        | 0x0         | Enable events from efpga to SOC caused |
 |              |          |           |             | a ready timeout                        |
 +--------------+----------+-----------+-------------+----------------------------------------+
-|ENABLE_SOC_ACC|   4:4    | R/W       | 0x0         | Enable SOC memory mapped access to     |
+|ENABLE_SOC_ACC|   4:4    | RW        | 0x0         | Enable SOC memory mapped access to     |
 |ESS           |          |           |             | EFPGA                                  |
 +--------------+----------+-----------+-------------+----------------------------------------+
-|ENABLE_TCDM_P3|   3:3    | R/W       | 0x0         | Enable EFPGA access via TCDM port 3    |
+|ENABLE_TCDM_P3|   3:3    | RW        | 0x0         | Enable EFPGA access via TCDM port 3    |
 +--------------+----------+-----------+-------------+----------------------------------------+
-|ENABLE_TCDM_P2|   2:2    | R/W       | 0x0         | Enable EFPGA access via TCDM port 2    |
+|ENABLE_TCDM_P2|   2:2    | RW        | 0x0         | Enable EFPGA access via TCDM port 2    |
 +--------------+----------+-----------+-------------+----------------------------------------+
-|ENABLE_TCDM_P1|   1:1    | R/W       | 0x0         | Enable EFPGA access via TCDM port 1    |
+|ENABLE_TCDM_P1|   1:1    | RW        | 0x0         | Enable EFPGA access via TCDM port 1    |
 +--------------+----------+-----------+-------------+----------------------------------------+
-|ENABLE_TCDM_P0|   0:0    | R/W       | 0x0         | Enable EFPGA access via TCDM port 0    |
+|ENABLE_TCDM_P0|   0:0    | RW        | 0x0         | Enable EFPGA access via TCDM port 0    |
 +--------------+----------+-----------+-------------+----------------------------------------+
 
-**EFPGA_CONTROL_IN offset = 0x00F0**
+EFPGA_CONTROL_IN
+^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00F0
 
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
-|EFPGA_CONTROL_IN |   31:0   | R/W        | 0x00        | EFPGA control bits use per eFPGA |
+|EFPGA_CONTROL_IN |   31:0   | RW         | 0x00        | EFPGA control bits use per eFPGA |
 |                 |          |            |             | design                           |
 +-----------------+----------+------------+-------------+----------------------------------+
 
-**EFPGA_STATUS_OUT offset = 0x00F4**
+EFPGA_STATUS_OUT
+^^^^^^^^^^^^^^^^
+  - Address Offset = 0x00F4
 
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
 |EFPGA_CONTROL_OUT|   31:0   | RO         |             | Status from eFPGA                |
+|                 |          |            |             | Configured from status_out pin   |
 +-----------------+----------+------------+-------------+----------------------------------+
 
-**EFPGA_VERSION offset = 0x00F8**
+EFPGA_VERSION
+^^^^^^^^^^^^^
+  - Address Offset = 0x00F8
 
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
 |EFPGA_VERSION    |    7:0   | RO         |             | EFPGA version info               |
+|                 |          |            |             | Configured from version pin      |
 +-----------------+----------+------------+-------------+----------------------------------+
 
-**SOFT_RESET offset = 0x00FC**
+SOFT_RESET
+^^^^^^^^^^
+  - Address Offset = 0x00FC
 
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
-| SOFT_RESET      |    1:1   | WO         |             | Write only strobe to reset all   |
+| SOFT_RESET      |    0:0   | WO         |             | Write only strobe to reset all   |
 |                 |          |            |             | APB clients                      |
 +-----------------+----------+------------+-------------+----------------------------------+
 
-**IO_CTRL offset = 0x0400**
-
-I/O control supports two functions:
-
--  I/O configuration
-
--  I/O function selection
+IO_CTRL
+^^^^^^^
+  - Address Offset = 0x0400**
+  - I/O control supports two functions:
+      -  I/O configuration
+      -  I/O function selection
 
 I/O configuration (CFG) is a series of bits that may be used to
 control I/O PAD characteristics, such as drive strength and slew rate.
@@ -261,214 +483,185 @@ example, the IO_CTRL CSR for IO_PORT 8 is at offset 0x0420.
 | MUX         |   1:0    | RW        | 0x00        | Mux select              |
 +-------------+----------+-----------+-------------+-------------------------+
 
-**Theory of Operation:-**
-
--  **Ports:-**
-
-   -    input logic HCLK,  
-
-   -    input logic HRESETn,  
-
-   -    input ref_clk_i,  
-
-   -    input rstpin_ni,  
-
-   -    input logic [APB_ADDR_WIDTH-1:0] PADDR,  
-
-   -    input logic [ 31:0] PWDATA,  
-
-   -    input logic PWRITE,  
-
-   -    input logic PSEL,  
-
-   -    input logic PENABLE,  
-
-   -    output logic [ 31:0] PRDATA,  
-
-   -    output logic PREADY,  
-
-   -    output logic PSLVERR,  
-
-   -  
-
-   -    input logic sel_fll_clk_i,  
-
-   -    input logic bootsel_i,  
-
-   -    input [31:0] status_out,  
-
-   -    input [ 7:0] version,  
-
-   -    input stoptimer_i,  
-
-   -    input dmactive_i,  
-
-   -    output logic wd_expired_o,  
-
-   -    output logic [31:0] control_in,  
-
-   -  
-
-   -  
-
-   -    output logic [N_IO-1:0][NBIT_PADCFG-1:0] pad_cfg_o,  
-
-   -    output logic [N_IO-1:0][NBIT_PADMUX-1:0] pad_mux_o,  
-
-   -  
-
-   -    input logic [JTAG_REG_SIZE-1:0] soc_jtag_reg_i,  
-
-   -    output logic [JTAG_REG_SIZE-1:0] soc_jtag_reg_o,  
-
-   -  
-
-   -    output logic [31:0] fc_bootaddr_o,  
-
-   -  
-
-   -    // eFPGA connections  
-
-   -  
-
-   -    output logic clk_gating_dc_fifo_o,  
-
-   -    output logic [3:0] reset_type1_efpga_o,  
-
-   -    output logic enable_udma_efpga_o,  
-
-   -    output logic enable_events_efpga_o,  
-
-   -    output logic enable_apb_efpga_o,  
-
-   -    output logic enable_tcdm3_efpga_o,  
-
-   -    output logic enable_tcdm2_efpga_o,  
-
-   -    output logic enable_tcdm1_efpga_o,  
-
-   -    output logic enable_tcdm0_efpga_o,  
-
-   -    output logic fc_fetchen_o,  
-
-   -    output logic rto_o,  
-
-   -    input logic start_rto_i,  
-
-   -    input logic [NB_MASTER-1:0] peripheral_rto_i,  
-
-   -    output logic soft_reset_o  
-
-
-
--  In reset mode that is when HRESETn is made low,register is set to the default values.The watchdog timer is disabled, watchdog counter is set to default value 32768,state if the module is set to IDLE.Assign fc_bootaddr_o to 32'h1A000080; fc_fetchen_o, pad_cfg_o,clk_gating_dc_fifo set to 1. READY_TIMEOUT_COUNT is set to 20’h000ff.Remaining all the outputs are low.
-
--  At every positive edge of the clock HCLKn,
-
-   -    If the watchdog timer is in reset mode,in this clock edge the reset mode is turned off.  
-
-   -    If start_rto_i is high then the ready_timeout_count will be decrementing ,else if start_rto_i is low, then the ready_timeout_count is set to the default value in register READY_TIMEOUT_COUNT .  
-
-   -    Whenever ready_timeout_count reaches zero then rto_o is made high.  
-
-   -    Based on the input peripheral_rto_i,The register RTO_PERIPHERAL_ERROR is updated .  
-
-   -    The output soc_jtag_reg_o changes with right shift and current value of soc_jtag_reg_i will be inserted on MSB side.  
-
-   -    If the module is in WAIT state then it is changed to IDLE state. If PADDR[11:0] is the address of RESET_REASON then the register value is set to default 0 meaning the reset clear has been commanded.  
-
-   -    If the module is in IDLE state then if PSEL,PENABLE and PWRITE are high then it changes to WRITE state,else if PWRITE is low,then it is in READ state.  
-
-   -    If the state is WRITE state,then PREADY is made high and state is changed to WAIT and operation based on PADDR[11:0] happens.  
-
-
-
-        **If PADDR[11:0] is:-**
-
-   		-  WD_COUNT offset = 0x00D0
-
-   			-  The start count of the watchdog timer is changed if the watchdog is enabled otherwise not changed.( PWDATA[30:0]).
-
-		-  WD_CONTROL offset = 0x00D4
-
-   			-  If PWDATA[31] is high ,then watchdog is enabled and reset.
-
-   			-  If the watchdog is already enabled and PWDATA[15:0]=16'h6699,then watchdog is reset.
-
-		-  RTO_PERIPHERAL_ERROR offset = 0x00E0
-
-   			-  The register RTO_PERIPHERAL_ERROR is set to 0.
-
-		-  READY_TIMEOUT_COUNT offset = 0x00E4
-        
-   			-  The register READY_TIMEOUT_COUNT is set to {PWDATA[19:4],4'hf}.
-
-		-  RESET_TYPE1_EFPGA offset = 0x00E8
-
-   			-  The register RESET_TYPE1_EFPGA is set to PWDATA[3:0]
-
-		-  ENABLE_IN_OUT_EFPGA offset = 0x00EC
-
-   			-  The register ENABLE_IN_OUT_EFPGA is set to PWDATA[5:0]
-
-		-  EFPGA_CONTROL_IN offset = 0x00F0
-
-   			-  The register EFPGA_CONTROL_IN is set to PWDATA
-
-		-  SOFT_RESET offset = 0x00FC
-
-   			-  All the registers are set to default values.
-
-		-  IO_CTRL CSRs offset = 0x04??
-
-   			-  If PADDR[9:2] is less than the number of ports then, pad_cfg_o[PADDR[9:2]] <= PWDATA[8+:NBIT_PADCFG] and pad_mux_o[PADDR[9:2]]=PWDATA[0+:NBIT_PADMUX]
-
-			-  The port number is also stored in a variable.
-
-			-  Here NBIT_PADCFG is 6 and NBIT_PADMUX is 2.
-
-	-  If the state is in READ mode,then
-
-		-  Based on the PADDR[11:0] ,corresponding registers are read and sent on the PRDATA.
-
-   		-  PREADY is made high and state is made to WAIT.
-
-   		-  If PWDATA[11:0] is
-
-      		-  INFO offset = 0x0000
-
-         		-  INFO register is read
-
-      		-  BUILD_DATE offset = 0x000C
-
-         		-  BUILD_DATE Register is read into the PRDATA.
-
-   		-  Like above all the registers are read based on the address provided.Here PRADATA is a 32 bit bus.So,if the register width is less than 32 bits,remaining bits till the MSB in PRDATA are filled with 0.
-
-   		-  If PADDR[11:0] is not equal to any of the addresses of CSRs then PSLVERR is made high and PRDATA is written 32'h0095BEEF.
-
-   		-  If the Address PADDR[11:10] == 2'b01 which means the address is like 12'h4?? ,this means we are accessing I/O port configs.
-
-      		-  Then if PADDR[9:2](port number) is less than N_IO(number of I/O ports) ,then PRDATA[8+:NBIT_PADCFG] will store the configuration value of the port and PRDATA[0+:NBIT_PADMUX] will store the mux value of the port.
-
-      		-  If PADDR[9:2] is greater than N_IO then PRDATA is 32'h0095BEEF.
-
--  **WORKING OF THE WATCHDOG TIMER**
-
-   -  The watchdog timer is sensitive to , and rstpin_ni.
-
-   -  When rstpin_ni is low,then it is set to default where the current wd timer value is set to 32768.
-
-   -  In active mode ,at every positive edge of the ref_clk_i,if watchdog is in reset mode then it resets with current count to the register WD_COUNT value and the reset mode is turned off in the next HCLK positive edge.
-
-   -  If it is not in reset mode and is in normal working mode,ifwatchdog is enabled and stoptimer_i is low,then current watchdog count is decremented by 1 .Now,If current count reaches 1 then wd_expired_o is made high.
-
--  **WORKING OF RESET_REASON register**
-
-   -  If rstpin_ni is low then the register value is 1
-
-   -  If wd_expired_o is high then register value is 2
-
-   -  If the Reset reason is commanded to be cleared then the register value is made 0.
-
--  If HRESET_n is low then the register BOOTSEL value becomes equal to {dmactive_i, bootsel_i}.Otherwise at every positive clock edge it remains the same.
+Firmware Guidelines
+--------------------
+
+Initialization Sequence
+^^^^^^^^^^^^^^^^^^^^^^^
+  - Read System Information
+      - Read the INFO register at offset 0x00 from the SOC_CTRL_BASE address.
+      - Extract the number of cores from bits [31:16] of the read value.
+      - Extract the number of clusters from bits [15:0] of the read value.
+      - Use this information to properly configure system resources.
+  - Configure Boot Parameters
+      - Write the desired boot address to the FCBOOT register at offset 0x04.
+      - The fetch enable bit of to the FCFETCH register at offset 0x08 if enabled by default.
+      - Verify the boot configuration by reading back these registers.
+  - Configure IO Pads
+      - For each IO pad that needs configuration:
+          - Determine the IO pad index (0 to 47).
+          - Select the appropriate multiplexer value for the desired function.
+          - Determine the electrical pad configuration ( TBD ).
+          - Combine these values: IO index in bits [5:0], multiplexer in bits [17:16], and configuration in bits [29:24].
+          - Write this combined value to the WCFGFUN register at offset 0x60.
+      - Alternatively, configure pads directly through their dedicated addresses:
+          - Calculate the pad register address: 0x400 + (IO_PORT * 4).
+          - Write the multiplexer value to bits [1:0] and configuration to bits [13:8].
+  - Configure Watchdog Timer (if needed)
+      - While the watchdog is disabled, set the desired timeout by writing to the WD_COUNT register at offset 0xD0.
+      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL register at offset 0xD4.
+      - Set up a regular timer interrupt to periodically reset the watchdog.
+  - Ready Timeout Configuration
+      - Set the desired timeout value by writing to the RTO_COUNT register at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
+  - Configure eFPGA (if applicable)
+      - Reset particular eFPGA Quadrant by writing to the RESET_TYPE1_EFPGA register at offset 0xE8.
+      - Enable the desired interfaces by writing to ENABLE_IN_OUT_EFPGA register at offset 0xEC:
+          - Bit 0: Enable TCDM0 interface
+          - Bit 1: Enable TCDM1 interface
+          - Bit 2: Enable TCDM2 interface
+          - Bit 3: Enable TCDM3 interface
+          - Bit 4: Enable APB interface
+          - Bit 5: Enable events interface
+      - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL register at offset 0xF0.
+
+Ready Timeout Management
+^^^^^^^^^^^^^^^^^^^^^^^^
+  - Initialization:
+      - Set the desired timeout value by writing to the RTO_COUNT CSR at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
+      - The default value after reset is 0x000FF
+  - Normal Operation:
+      - The timeout counter starts decrementing when start_rto_i is asserted.
+      - If start_rto_i is deasserted then the timer counter is set to it's initial value as configured in RTO_COUNT CSR.
+  - Timeout Detection:
+      - If the counter reaches zero, the rto_o signal is asserted.
+      - Based on the input peripheral_rto_i,The register RTO_PERIPHERAL_ERROR is updated.
+  - Error Handling:
+      - When a timeout is detected, identify the source peripheral through RTO_PERIPHERAL_ERROR register.
+      - Take appropriate recovery actions for the affected peripheral
+      - Write any value to the RTO_PERIPHERAL register to clear the timeout flags
+      - This resets the peripheral timeout indicators but doesn't affect the timeout counter
+
+Watchdog Management
+^^^^^^^^^^^^^^^^^^^
+  - Watchdog Initialization
+      - Determine the appropriate timeout value based on your system requirements.
+      - Write this value to the WD_COUNT register before enabling the watchdog.
+      - The timeout should be long enough to accommodate normal processing delays but short enough to catch system hangs.
+  - Watchdog Enabling
+      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL register.
+  - Normal Operation
+      - Once enabled, the watchdog timer will begin counting down from the configured value on every positive edge of ref_clk_i, given that stoptimer_i pin is low.
+      - If stoptimer_i is asserted, then the watchdog timer will pause until it is deasserted.
+      - When the counter reaches 1, wd_expired_o pin will be set high for one cycle of ref_clk_i.
+      - RESET_REASON register will be updadated with value 2b'11.
+  - Regular Servicing
+      - Establish a reliable mechanism to service the watchdog at regular intervals.
+      - This can be a dedicated timer interrupt or part of a main processing loop.
+      - The servicing interval should be shorter than the watchdog timeout.
+      - To service the watchdog, write 0x00006699 to the WD_CONTROL register.
+  - Watchdog Recovery Handling
+      - After a watchdog reset, firmware can detect this by reading the RESET_REASON register.
+      - If the value is 0x2, a watchdog timeout caused the reset.
+      - Implement appropriate recovery actions, such as logging the event.
+  - Hard reset behaviour
+      - When rstpin_ni is asserted, then the watchdog timer is set to it's default value of 0x8000.
+      - After this, the watchdog timer will only start counting down from the configured value in WD_COUNT register upon servicing.
+
+Soft Reset Procedure
+^^^^^^^^^^^^^^^^^^^^
+  - Prepare for Reset
+      - Complete any pending operations and save critical state if needed.
+  - Trigger Reset
+      - Write any value to the SOFT_RESET register at offset 0xFC.
+      - The system will immediately begin the reset sequence.
+      - The below CSR will be reset to their default values
+          - WCFGFUN
+          - RCFGFUN
+          - IO_CTRL (0x400-0x4C0)
+          - RESET_TYPE1_EFPGA
+          - ENABLE_IN_OUT_EFPGA
+          - EFPGA_CONTROL_IN
+          - RTO_PERIPHERAL_ERROR
+          - READY_TIMEOUT_COUNT
+      - The reset signal will propagate to other APB Client peripherals.
+  - Post-Reset
+      - The system will restart and execute the boot sequence.
+      - Firmware should check the RESET_REASON register to differentiate between power-on and soft reset.
+
+Pin Diagram
+-----------
+
+The figure below represents the input and output pins for the APB SoC Controller:-
+
+.. figure:: apb_soc_Controller_pin_diagram.png
+   :name: APB_SoC_Controller_Pin_Diagram
+   :align: center
+   :alt:
+
+   APB SoC Controller Pin Diagram
+
+Clock and Reset
+^^^^^^^^^^^^^^^
+  - HCLK: APB system clock input
+  - HRESETn: Active-low system reset signal for initializing registers and logic
+  - ref_clk_i: Reference clock input, used for watchdog operations
+  - rstpin_ni: Active-low reset pin input, for resetting watchdog
+
+APB Interface
+^^^^^^^^^^^^^
+  - PADDR[11:0]: APB address bus input
+  - PWDATA[31:0]: APB write data bus input
+  - PWRITE: APB write enable signal
+  - PSEL: APB slave select input
+  - PENABLE: APB enable signal
+  - PRDATA[31:0]: APB read data bus output
+  - PREADY: APB ready signal output, indicates completion of APB transaction
+  - PSLVERR: APB slave error output
+
+Boot and Configuration
+^^^^^^^^^^^^^^^^^^^^^^
+- sel_fll_clk_i: FLL clock selection input
+- bootsel_i: Boot select input
+- fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller), controlled via register FCBOOT
+- fc_fetchen_o: Fetch enable output for FC, controlled via register FCFETCH
+
+Status and Control
+^^^^^^^^^^^^^^^^^^
+  - status_out[31:0]: Status input signals from peripherals
+  - version[7:0]: Version input
+  - dmactive_i: Debug mode active input
+
+Watchdog Interface
+^^^^^^^^^^^^^^^^^^
+  - wd_expired_o: Watchdog expired output signal, triggered when watchdog counter reaches 1
+  - stoptimer_i: Timer stop input signal
+
+Pad Configuration Interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - pad_cfg_o[47:0][5:0]: Pad configuration output signals
+  - pad_mux_o[47:0][1:0]: Pad multiplexing output signals
+
+JTAG Interface
+^^^^^^^^^^^^^^
+  - soc_jtag_reg_i[7:0]: JTAG register input
+  - soc_jtag_reg_o[7:0]: JTAG register output, driven by register JTAGREG
+
+eFPGA Interface
+^^^^^^^^^^^^^^^
+  - control_in[31:0]: Control output to peripherals, driven by register EFPGA_CONTROL
+  - clk_gating_dc_fifo_o: Clock gating for DC FIFO to eFPGA, always 1 as per current implementation
+  - reset_type1_efpga_o[3:0]: Reset signals for eFPGA, driven by register RESET_TYPE1_EFPGA
+  - enable_udma_efpga_o: Enable uDMA to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_events_efpga_o: Enable events to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_apb_efpga_o: Enable APB to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_tcdm3_efpga_o: Enable TCDM3 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_tcdm2_efpga_o: Enable TCDM2 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_tcdm1_efpga_o: Enable TCDM1 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - enable_tcdm0_efpga_o: Enable TCDM0 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+
+Ready Timeout Interface
+^^^^^^^^^^^^^^^^^^^^^^^
+  - rto_o: Ready timeout output signal, asserted when ready timeout count reaches 0.
+  - start_rto_i: Start ready timeout input
+  - peripheral_rto_i[10:0]: Peripheral ready timeout input
+  - soft_reset_o: Soft reset output, triggered by writing to register SOFT_RESET
