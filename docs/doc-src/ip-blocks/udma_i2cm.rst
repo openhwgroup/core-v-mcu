@@ -237,7 +237,7 @@ RX_SADDR
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
 | SADDR      |  11:0 |   RW |    0x0     | Address of Rx buffer on write. This is the address of L2 memory where I2C will write the received data.     |
-|            |       |      |            | Read & write to this CSR access different information.                                                 |
+|            |       |      |            | Read & write to this CSR access different information.                                                      |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction.    |
 |            |       |      |            |                                                                                                             |
@@ -253,7 +253,7 @@ RX_SIZE
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |    0x0     | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this CSR     |
+| SIZE       |  15:0 |   RW |    0x0     | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this CSR          |
 |            |       |      |            | access different information.                                                                               |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Rx buffer for next transaction. It does not impact current ongoing transaction.       |
@@ -290,7 +290,7 @@ TX_SADDR
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
 | SADDR      |  11:0 |   RW |   0x0      | Address of Tx buffer on write. This is the address of L2 memory from where I2C will read the data to        |
-|            |       |      |            | transmit. Read & write to this CSR access different information.                                       |
+|            |       |      |            | transmit. Read & write to this CSR access different information.                                            |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Tx buffer for next transaction. It does not impact current ongoing transaction.    |
 |            |       |      |            |                                                                                                             | 
@@ -306,7 +306,7 @@ TX_SIZE
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |   0x0      | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this CSR access   |
+| SIZE       |  15:0 |   RW |   0x0      | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this CSR access        |
 |            |       |      |            | different information.                                                                                      |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Tx buffer for next transaction. It does not impact current ongoing transaction.       |
