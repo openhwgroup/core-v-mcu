@@ -20,7 +20,7 @@
 UDMA I2C Master
 ===============
 I²C (Inter-Integrated Circuit) is a multi-master, multi-slave, single-ended serial bus developed by Philips Semiconductor (now NXP Semiconductors), commonly used to connect lower-speed peripheral ICs to processors and microcontrollers.
-Core-V-MCU CV32E40P (v1.0.0) has two I2C instances.
+CORE-V-MCU CV32E40P (v1.0.0) has two I2C instances.
 
 Features
 -------------------
@@ -49,6 +49,31 @@ The figure below is the high-level block diagram of the uDMA I2C:-
 uDMA I2C uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external device. uDMA I2C uses the Rx channel interface to store the data received from the external device in interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
+Dual clock FIFO
+~~~~~~~~~~~~~~~
+The uDMA core operates on the system clock, while the uDMA I2C uses both the system clock and the peripheral clock.
+To manage synchronization between I2C and uDMA Core, the uDMA I2C uses dual-clock FIFOs — 4-depth buffers capable of storing 8-bit data. Seperated FIFOs are used for transmit (TX) and receive (RX) operation.
+The I2C communicates with external devices via SDA(serial Data) and SCL(serial clock) lines. Data sent to or received from exernal device over I2C bus is transferred from or to the dual-clock FIFO.
+These FIFOs handle synchronization by aligning the data and control signal (like ready, valid etc.) to system clock domain used by uDMA core's Rx/Tx channels.
+Once synchronized, the uDMA I2C reads from or writes to the dual-clock FIFO and exchange data with core's RX and TX channels.
+
+TX Operation
+~~~~~~~~~~~~
+To initiate a data transmission to an external I2C device, the uDMA I2C must be configured using the TX_SADDR, TX_SIZE and TX_CFG control registers.
+The uDMA I2C asserts request signal to uDMA core's Tx channel and when its TX FIFO has space, also asserts a ready signal to indicate it is ready to receive data from L2 memory.
+Once the request is made, uDMA core arbitrates among all Tx channel requests and grants access to one of them. If the I2C is granted access and the ready signal is active, uDMA core reads data from L2 memory through TCDM interconnect and pushes it to I2C Tx FIFO.
+After receiving the data, I2C decodes the instructions from it (Refer to the read/write command sequence example given below) and processes it.
+The data may contain both write-to-slave or read-from-slave instructions. 
+- If it's a *write* instruction, the data from internal FIFO is sent to external device over the I2C Bus.
+- If it's a *read* instruction, the I2C reads data from the external device over the I2C Bus and stores it in the internal FIFO for later retrieval by the core.
+
+RX Operation
+~~~~~~~~~~~~
+To read data from an external device into I2C's internal RX FIFO, a TX operation must be performed to issue a *read instruction*, as explained above.
+To transmit this data to L2 memory, the uDMA I2C must be configured using the RX_SADDR, RX_SIZE and RX_CFG control registers.
+Once the I2C receives the requested data from external data, it asserts valid signal to uDMA core's RX channel.The uDMA core then arbitrates access among all RX channels.
+If the uDMA I2C is granted access, the uDMA core sends a ready-high signal back to the I2C and reads the data. Finally, uDMA core writes the received data into L2 memory through TCDM Interconnect.
+
 Theory of Operation
 -------------------
 
@@ -69,6 +94,22 @@ All I2C transfers could be splitted in a reduced number of bus accesses types, t
 With different combinations of the above, we can create any type of I2C transfer.
 Under those conditions, the I2C IP interface is updated to fetch command from L2 memory instead of just transferring data.
 In this way we can recreate complex I2C transfer fully autonomously and without any intervention of the CPU.
+
+
+I2C controller state machine
+----------------------------
+
+I2C Master controller operates through disctinct states, each handling a specific part of I2C transaction process:
+
+- I2C_ST_WAIT_FOR_CMD :- Also known as the *idle* state. Initially, the controller starts here and waits for commands. Based on the received command, it transitions to the corresponding operational state. 
+- I2C_ST_WAIT:- Holds the controller in a delay state for a specified number of cycles before returning to *idle* state.
+- I2C_ST_WAIT_EV:- Waits for one of the external events to be triggered. Upon receiving the specified events, it transitions back to *idle* state.
+- I2C_ST_REPEAT: stores the repeat count, indicating how many times the next applicable command should to be repeated.
+- I2C_ST_WRTIE:- Starts a new I2C transfer by sending the slave address on the bus. It also determines the direction of data transfer (read or write). 
+- I2C_ST_GET_DATA:- Reads data from the slave and sends ACK or NACK after each byte based on the command received. If in repeat mode, it continues this operation for the specified number of bytes and stores the read data into its internal RX FIFO.
+- I2C_ST_SEND_DATA: Sends data bytes to the slave and waits for an acknowledgment (ACK) after each transmission. If in repeat mode, it continues this operation for the specified number of bytes. The data to be written is taken from the internal TX FIFO.
+- I2C_ST_STOP:- Sends a STOP condition on the I2C bus, signaling the end of current transaction. Once completed, it returns to *idle* state.
+
 
 Programming Model
 -----------------
@@ -110,20 +151,6 @@ A list of the available commands and their encoding is shown in the Table below.
 
 uDMA I2C Master Data Control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-FSM
-^^^
-I2C Master controller operates through disctinct states, each handling a specific part of I2C transaction process:
-
-- I2C_ST_WAIT_FOR_CMD :- Also known as the *idle* state. Initially, the controller starts here and waits for commands. Based on the received command, it transitions to the corresponding operational state. 
-- I2C_ST_WAIT:- Holds the controller in a delay state for a specified number of cycles before returning to *idle* state.
-- I2C_ST_WAIT_EV:- Waits for one of the external events to be triggered. Upon receiving the specified events, it transitions back to *idle* state.
-- I2C_ST_REPEAT: stores the repeat count, indicating how many times the next applicable command should to be repeated.
-- I2C_ST_WRTIE:- Starts a new I2C transfer by sending the slave address on the bus. It also determines the direction of data transfer (read or write). 
-- I2C_ST_GET_DATA:- Reads data from the slave and sends ACK or NACK after each byte based on the command received. If in repeat mode, it continues this operation for the specified number of bytes and stores the read data into its internal RX FIFO.
-- I2C_ST_SEND_DATA: Sends data bytes to the slave and waits for an acknowledgment (ACK) after each transmission. If in repeat mode, it continues this operation for the specified number of bytes. The data to be written is taken from the internal TX FIFO.
-- I2C_ST_STOP:- Sends a STOP condition on the I2C bus, signaling the end of current transaction. Once completed, it returns to *idle* state.
-
 
 Eg: Command Sequence (Write and Read Operation)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -197,9 +224,9 @@ These CSRs retain the last value written by software.
 
 A CSRs volatility is indicated by its "type".
 
-Details of Register access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_ .
+Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_ .
 
-The registers RX_SADDR, RX_SIZE specifies the configuration for the transaction on the RX channel. The registers TX_SADDR, TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and use it for current ongoing transaction.
+The CSR's RX_SADDR, RX_SIZE specifies the configuration for the transaction on the RX channel. The CSR's TX_SADDR, TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and use it for current ongoing transaction.
 
 RX_SADDR
 ~~~~~~~~
@@ -210,7 +237,7 @@ RX_SADDR
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
 | SADDR      |  11:0 |   RW |    0x0     | Address of Rx buffer on write. This is the address of L2 memory where I2C will write the received data.     |
-|            |       |      |            | Read & write to this register access different information.                                                 |
+|            |       |      |            | Read & write to this CSR access different information.                                                 |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction.    |
 |            |       |      |            |                                                                                                             |
@@ -226,7 +253,7 @@ RX_SIZE
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |    0x0     | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this register     |
+| SIZE       |  15:0 |   RW |    0x0     | Size of Rx buffer (amount of data to be transferred by I2C to L2 memory). Read & write to this CSR     |
 |            |       |      |            | access different information.                                                                               |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Rx buffer for next transaction. It does not impact current ongoing transaction.       |
@@ -263,7 +290,7 @@ TX_SADDR
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
 | SADDR      |  11:0 |   RW |   0x0      | Address of Tx buffer on write. This is the address of L2 memory from where I2C will read the data to        |
-|            |       |      |            | transmit. Read & write to this register access different information.                                       |
+|            |       |      |            | transmit. Read & write to this CSR access different information.                                       |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Address of Tx buffer for next transaction. It does not impact current ongoing transaction.    |
 |            |       |      |            |                                                                                                             | 
@@ -279,7 +306,7 @@ TX_SIZE
 +------------+-------+------+------------+-------------------------------------------------------------------------------------------------------------+
 | Field      |  Bits | Type | Default    | Description                                                                                                 |
 +============+=======+======+============+=============================================================================================================+
-| SIZE       |  15:0 |   RW |   0x0      | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this register access   |
+| SIZE       |  15:0 |   RW |   0x0      | Size of Tx buffer (amount of data to be read by I2C from L2 memory). Read & write to this CSR access   |
 |            |       |      |            | different information.                                                                                      |
 |            |       |      |            |                                                                                                             | 
 |            |       |      |            | **On Write**: Size of Tx buffer for next transaction. It does not impact current ongoing transaction.       |
@@ -337,20 +364,22 @@ Firmware Guidelines
 
 Clock Enable, Rest uDMA I2C
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- Configure the uDMA Core's PERIPH_CLK_ENABLE register to enable uDMA I2C's peripheral clock.
-- Set the uDMA Core's PERIPH_RESET register to issue a soft reset signal to uDMA I2C. 
+- Configure the uDMA Core's PERIPH_CLK_ENABLE CSR to enable uDMA I2C's peripheral clock.
+- Set the uDMA Core's PERIPH_RESET CSR to issue a soft reset signal to uDMA I2C. 
 
 Tx Operation (Read from L2 memory)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- Configure the uDMA I2C's TX_SADDR register with an interleaved(L2) memory address. I2C will read the data from this memory address. 
-- Set the uDMA I2C's TX_SIZE register to specify the amount of data (in bytes) to be transferred/read from the L2 memory address provided in TX_SADDR.
-- Configure uDMA I2C's TX_CFG register to enable the Tx channel, which allows the Tx channel to start reading data.
+- Configure the uDMA I2C's TX_SADDR CSR with an interleaved(L2) memory address. I2C will read the data from this memory address. 
+- Set the uDMA I2C's TX_SIZE CSR to specify the amount of data (in bytes) to be transferred/read from the L2 memory address provided in TX_SADDR.
+- Configure uDMA I2C's TX_CFG CSR to enable the Tx channel, which allows the Tx channel to start reading data.
+- The completion of the Tx operation can be determined by reading the TX_SIZE CSR. A value of 0 indicates that there are no pending bytes remaining for transfer.
 
 Rx Operation (Write to L2 memory)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- Configure the uDMA I2C's RX_SADDR register with an interleaved(L2) memory address. I2C will write the data to this memory address. 
-- Set the uDMA I2C's RX_SIZE register to specify the amount of data (in bytes) to be transferred/written to the L2 memory address provided in RX_SADDR.
-- Configure uDMA I2C's RX_CFG register to enable the Rx channel, which allows the Rx channel to start writing the data.
+- Configure the uDMA I2C's RX_SADDR CSR with an interleaved(L2) memory address. I2C will write the data to this memory address. 
+- Set the uDMA I2C's RX_SIZE CSR to specify the amount of data (in bytes) to be transferred/written to the L2 memory address provided in RX_SADDR.
+- Configure uDMA I2C's RX_CFG CSR to enable the Rx channel, which allows the Rx channel to start writing the data.
+- The completion of the Rx operation can be determined by reading the RX_SIZE CSR. A value of 0 indicates that there are no pending bytes remaining for transfer.
 
 
 Pin Diagram
@@ -408,7 +437,7 @@ The following interfaces are used to read and write to I2C CSRs. These interface
 
 uDMA I2C Tx channel configuration interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-uDMA I2C uses these pins to share TX_SADDR, TX_SIZE and TX_CFG register details with core:
+uDMA I2C uses these pins to share TX_SADDR, TX_SIZE and TX_CFG CSR details with core:
 
 - ``cfg_tx_startaddr_o``: Start address configuration output.
 - ``cfg_tx_size_o``: Transfer size configuration output.
@@ -416,7 +445,7 @@ uDMA I2C uses these pins to share TX_SADDR, TX_SIZE and TX_CFG register details 
 - ``cfg_tx_en_o``: Tx channel enable configuration output.
 - ``cfg_tx_clr_o``: Clear config signal for Tx.
 
-uDMA I2C shares the values of the below pins as read values of TX_SADDR, TX_SIZE and TX_CFG registers:
+uDMA I2C shares the values of the below pins as read values of TX_SADDR, TX_SIZE and TX_CFG CSR:
 
 - ``cfg_tx_en_i``: Enable signal for Tx channel.
 - ``cfg_tx_pending_i``: Tx pending status input.
@@ -425,7 +454,7 @@ uDMA I2C shares the values of the below pins as read values of TX_SADDR, TX_SIZE
 
 uDMA I2C Rx channel configuration interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-uDMA I2C uses these pins to share RX_SADDR, RX_SIZE and RX_CFG register details with core:
+uDMA I2C uses these pins to share RX_SADDR, RX_SIZE and RX_CFG CSR details with core:
 
 - ``cfg_rx_startaddr_o``: Start address configuration output.
 - ``cfg_rx_size_o``: Transfer size configuration output.
@@ -433,7 +462,7 @@ uDMA I2C uses these pins to share RX_SADDR, RX_SIZE and RX_CFG register details 
 - ``cfg_rx_en_o``: Rx channel enable configuration output.
 - ``cfg_rx_clr_o``: Clear config signal for Rx.
 
-uDMA I2C shares the values of the below pins as read values of RX_SADDR, RX_SIZE and RX_CFG registers:
+uDMA I2C shares the values of the below pins as read values of RX_SADDR, RX_SIZE and RX_CFG CSR:
 
 - ``cfg_rx_en_i``: Enable signal for Rx channel.
 - ``cfg_rx_pending_i``: rx pending status input.
