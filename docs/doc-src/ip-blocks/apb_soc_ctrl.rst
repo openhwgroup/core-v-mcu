@@ -88,7 +88,7 @@ Manages the boot process for the system:
 
 JTAG Interface
 ^^^^^^^^^^^^^^
-Allows communication with external JTAG devices
+  - Allows communication with external JTAG devices
 
 
 System Architecture
@@ -593,7 +593,7 @@ Pin Diagram
 
 The figure below represents the input and output pins for the APB SoC Controller:-
 
-.. figure:: apb_soc_Controller_pin_diagram.png
+.. figure:: apb_soc_controller_pin_diagram.png
    :name: APB_SoC_Controller_Pin_Diagram
    :align: center
    :alt:
@@ -620,21 +620,16 @@ APB Interface
 
 Boot and Configuration
 ^^^^^^^^^^^^^^^^^^^^^^
-- sel_fll_clk_i: FLL clock selection input
-- bootsel_i: Boot select input
-- fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller), controlled via register FCBOOT
-- fc_fetchen_o: Fetch enable output for FC, controlled via register FCFETCH
-
-Status and Control
-^^^^^^^^^^^^^^^^^^
-  - status_out[31:0]: Status input signals from peripherals
-  - version[7:0]: Version input
-  - dmactive_i: Debug mode active input
+  - sel_fll_clk_i: FLL clock selection input
+  - bootsel_i: Boot select input
+  - fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller), controlled via register FCBOOT
+  - fc_fetchen_o: Fetch enable output for FC, controlled via register FCFETCH
+  
 
 Watchdog Interface
 ^^^^^^^^^^^^^^^^^^
   - wd_expired_o: Watchdog expired output signal, triggered when watchdog counter reaches 1
-  - stoptimer_i: Timer stop input signal
+  - stoptimer_i: Timer stop input signal, triggered by core complex
 
 Pad Configuration Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -658,6 +653,10 @@ eFPGA Interface
   - enable_tcdm2_efpga_o: Enable TCDM2 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
   - enable_tcdm1_efpga_o: Enable TCDM1 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
   - enable_tcdm0_efpga_o: Enable TCDM0 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+
+  - status_out[31:0]: Status input signals from peripherals
+  - version[7:0]: Version input
+  - dmactive_i: Debug mode active input
 
 Ready Timeout Interface
 ^^^^^^^^^^^^^^^^^^^^^^^
