@@ -37,8 +37,8 @@ Features
     - Active high level detection
 -  Input synchronization to prevent metastability issues.
 
-Architecture
-------------
+Block Architecture
+------------------
 
 The figure below is a high-level block diagram of the APB GPIO module:-
 
@@ -49,30 +49,16 @@ The figure below is a high-level block diagram of the APB GPIO module:-
 
    APB GPIO Block Diagram
 
-The figure below depicts the connections between the GPIO and rest of the modules in Core-V-MCU:-
-
-.. figure:: apb_gpio_soc_connections.png
-   :name: APB_GPIO_SoC_Connections
-   :align: center
-   :alt:
-
-   APB GPIO Core-V-MCU connections diagram
-
-The gpio_in_sync output is directly connected to the Advanced Timer module.
-It provides synchronized GPIO input signals that serve as external event sources for the Advanced Timer.
-These signals are processed by the Advanced Timer logic and can ultimately control the up/down counter functionality.
-This integration enables external events captured by GPIO pins to influence timer operations.
-
 The APB GPIO IP consists of the following key components:
 
 APB control logic
 ^^^^^^^^^^^^^^^^^
 The APB control logic interfaces with the APB bus to decode and execute commands.
-It handles register reads and writes according to the APB protocol, providing a standardized interface to the system.
+It handles CSR reads and writes according to the APB protocol, providing a standardized interface to the system.
 
-GPIO Configuration Registers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-These registers store the configuration for each GPIO pin, including:
+GPIO CSR
+^^^^^^^^
+These CSRs store the configuration for each GPIO pin, including:
   - Direction settings (input, output, open-drain)
   - Output value
   - Interrupt type configuration
@@ -92,7 +78,24 @@ The interrupt logic detects events based on the configured interrupt type for ea
   - Interrupt blocking mechanism to prevent repeated level interrupts
 
 On detection of an event based on configuration, the corresponding interrupt pin is raised.
-APB master can acknowledge the interrupt by writing to the register REG_INTACK.
+APB master can acknowledge the interrupt by writing to the CSR REG_INTACK.
+
+System Architecture
+-------------------
+
+The figure below depicts the connections between the GPIO and rest of the modules in CORE-V-MCU:-
+
+.. figure:: apb_gpio_soc_connections.png
+   :name: APB_GPIO_SoC_Connections
+   :align: center
+   :alt:
+
+   APB GPIO CORE-V-MCU connections diagram
+
+The gpio_in_sync output is directly connected to the Advanced Timer module.
+It provides synchronized GPIO input signals that serve as external event sources for the Advanced Timer.
+These signals are processed by the Advanced Timer logic and can ultimately control the up/down counter functionality.
+This integration enables external events captured by GPIO pins to influence timer operations.
 
 Programming View Model
 ----------------------
@@ -101,9 +104,11 @@ The APB GPIO IP follows a simple programming model:
 GPIO Pin Configuration
 ^^^^^^^^^^^^^^^^^^^^^^
 Each GPIO pin can be configured individually or in groups:
-  - Set the desired pin number using the SELECT register
-  - Configure the pin direction (input, output, or open-drain) using the SETDIR register
-  - Configure interrupt behavior if necessary using the SETINT register
+  - Set the desired pin number using the SELECT CSR
+  - Configure the pin direction (input, output, or open-drain) using the SETDIR CSR
+  - Configure interrupt behavior if necessary using the SETINT CSR
+
+For details, please refer to the 'Firmware Guidelines'.
 
 GPIO Pin Control
 ^^^^^^^^^^^^^^^^
@@ -111,26 +116,32 @@ To control GPIO pins:
   - Use SETGPIO to set a pin high
   - Use CLRGPIO to set a pin low
   - Use TOGGPIO to toggle a pin's state
-  - Use OUTx registers to set multiple pins at once
+  - Use OUTx CSRs to set multiple pins at once
+
+For details, please refer to the 'Firmware Guidelines'.
 
 GPIO Pin Status
 ^^^^^^^^^^^^^^^
 To read GPIO pin status:
   - Use RDSTAT to read a selected pin's status
-  - Use PINx registers to read the status of multiple pins at once
+  - Use PINx CSRs to read the status of multiple pins at once
+
+For details, please refer to the 'Firmware Guidelines'.
 
 Interrupt Handling
 ^^^^^^^^^^^^^^^^^^
 When an interrupt occurs:
   - Determine the source by reading pin status
   - Handle the interrupt according to application requirements
-  - Acknowledge the interrupt using the INTACK register
+  - Acknowledge the interrupt using the INTACK CSR
+
+For details, please refer to the 'Firmware Guidelines'.
 
 APB GPIO CSRs
 -------------
 
 The GPIO module is typically associated with a set of status and control
-registers. These registers allow the processor to read input states, set
+CSRs. These CSRs allow the processor to read input states, set
 output levels, and configure various GPIO settings.
 
 REG_SETGPIO
@@ -140,7 +151,7 @@ REG_SETGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin to set high             |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to set high             |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 REG_CLRGPIO
@@ -150,7 +161,7 @@ REG_CLRGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin to set low              |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to set low              |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 REG_TOGGPIO
@@ -160,7 +171,7 @@ REG_TOGGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin to toggle               |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to toggle               |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 REG_PIN0
@@ -170,7 +181,7 @@ REG_PIN0
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| GPIO_IN        | [31:0]       | R        | 0x0         | Read status of GPIO pins 31:0    |
+| GPIO_IN        | [31:0]       | RO       | 0x0         | Read status of GPIO pins 31:0    |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 REG_PIN1
@@ -180,7 +191,7 @@ REG_PIN1
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| GPIO_IN        | [31:0]       | R        | 0x0         | Read status of GPIO pins 63:32   |
+| GPIO_IN        | [31:0]       | RO       | 0x0         | Read status of GPIO pins 63:32   |
 |                |              |          |             | (Not supported)                  |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -191,7 +202,7 @@ REG_PIN2
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| GPIO_IN        | [31:0]       | R        | 0x0         | Read status of GPIO pins 95:64   |
+| GPIO_IN        | [31:0]       | RO       | 0x0         | Read status of GPIO pins 95:64   |
 |                |              |          |             | (Not supported)                  |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -202,7 +213,7 @@ REG_PIN3
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| GPIO_IN        | [31:0]       | R        | 0x0         | Read status of GPIO pins 127:96  |
+| GPIO_IN        | [31:0]       | RO       | 0x0         | Read status of GPIO pins 127:96  |
 |                |              |          |             | (Not supported)                  |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -256,7 +267,7 @@ REG_SETSEL
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin number to select for    |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin number to select for    |
 |                |              |          |             | reading pin using REG_RDSTAT     |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -267,20 +278,20 @@ REG_RDSTAT
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| DIR            | [25:24]      | R        | 0x0         | Direction configuration for      |
+| DIR            | [25:24]      | RO       | 0x0         | Direction configuration for      |
 |                |              |          |             | selected pin                     |
 +----------------+--------------+----------+-------------+----------------------------------+
-| INT_TYPE       | [19:17]      | R        | 0x0         | Interrupt type configuration for |
+| INT_TYPE       | [19:17]      | RO       | 0x0         | Interrupt type configuration for |
 |                |              |          |             | selected pin                     |
 +----------------+--------------+----------+-------------+----------------------------------+
-| INT_EN         | [16]         | R        | 0x0         | Interrupt enable status for      |
+| INT_EN         | [16]         | RO       | 0x0         | Interrupt enable status for      |
 |                |              |          |             | selected pin                     |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_IN         | [12]         | R        | 0x0         | Input value of selected pin      |
+| PIN_IN         | [12]         | RO       | 0x0         | Input value of selected pin      |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_OUT        | [8]          | R        | 0x0         | Output value of selected pin     |
+| PIN_OUT        | [8]          | RO       | 0x0         | Output value of selected pin     |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_SELECT     | [6:0]        | R        | 0x0         | Currently selected pin number    |
+| PIN_SELECT     | [6:0]        | RO       | 0x0         | Currently selected pin number    |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 REG_SETDIR
@@ -290,12 +301,12 @@ REG_SETDIR
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| DIR            | [25:24]      | W        | 0x0         | Direction configuration:         |
+| DIR            | [25:24]      | WO       | 0x0         | Direction configuration:         |
 |                |              |          |             | 00: Input                        |
 |                |              |          |             | 01: Output                       |
 |                |              |          |             | 11: Open-Drain                   |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin number to configure     |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin number to configure     |
 |                |              |          |             | direction                        |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -306,18 +317,18 @@ REG_SETINT
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| INT_TYPE       | [19:17]      | W        | 0x0         | Interrupt type:                  |
+| INT_TYPE       | [19:17]      | WO       | 0x0         | Interrupt type:                  |
 |                |              |          |             | 000: Active-Low level            |
 |                |              |          |             | 001: Falling edge                |
 |                |              |          |             | 010: Rising edge                 |
 |                |              |          |             | 011: Both edges                  |
 |                |              |          |             | 100: Active-High level           |
 +----------------+--------------+----------+-------------+----------------------------------+
-| INT_EN         | [16]         | W        | 0x0         | Interrupt enable:                |
+| INT_EN         | [16]         | WO       | 0x0         | Interrupt enable:                |
 |                |              |          |             | 0: Disable                       |
 |                |              |          |             | 1: Enable                        |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_SELECT     | [6:0]        | W        | 0x0         | GPIO pin number to configure     |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin number to configure     |
 |                |              |          |             | interrupt                        |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -328,7 +339,7 @@ REG_INTACK
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Type     | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_NUM        | [7:0]        | W        | 0x0         | GPIO pin number to acknowledge   |
+| PIN_NUM        | [7:0]        | WO       | 0x0         | GPIO pin number to acknowledge   |
 |                |              |          |             | interrupt                        |
 +----------------+--------------+----------+-------------+----------------------------------+
 
@@ -338,13 +349,13 @@ Firmware Guidelines
 GPIO Pin Configuration Procedure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - Configuring Pin Direction:
-      - Direction of a pin can be configured using the REG_SETDIR register (address 0x038).
+      - Direction of a pin can be configured using the REG_SETDIR CSR (address 0x038).
           - To configure as input: Place a value of 0 in bits [25:24] along with the pin number in bits [6:0].
           - To configure as output: Place a value of 1 in bits [25:24] along with the pin number in bits [6:0].
           - To configure as open-drain: Place a value of 3 in bits [25:24] along with the pin number in bits [6:0].
   - Configuring Interrupt Behavior
       - Interrupts can only be configured for input pins.
-      - If the input pin requires interrupt capability, write to the REG_SETINT register (address 0x03C).
+      - If the input pin requires interrupt capability, write to the REG_SETINT CSR (address 0x03C).
       - Include the pin number in bits [6:0].
       - To enable interrupts, set bit [16] to 1; to disable, set to 0.
       - To configure interrupt type, set bits [19:17] as follows:
@@ -355,14 +366,14 @@ GPIO Pin Configuration Procedure
           - 100: Active-High level detection
   - Setting Initial Output Values
       - For individual pins: Use REG_SETGPIO to set high or REG_CLRGPIO to set low, include the pin number in bits [6:0] of input data.
-      - For multiple pins simultaneously: Write to the REG_OUT0 register, in which each bit represents corresponding output pin.
-      - For REG_OUT0 registers, set the corresponding bit to 1 for high output or 0 for low output.
+      - For multiple pins simultaneously: Write to the REG_OUT0 CSR, in which each bit represents corresponding output pin.
+      - For REG_OUT0 CSRs, set the corresponding bit to 1 for high output or 0 for low output.
 
 GPIO Status Reading Procedure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - Reading Individual Pin Status:
       - First, select the desired pin by writing its number to REG_SETSEL.
-      - Read the REG_RDSTAT register (address 0x034).
+      - Read the REG_RDSTAT CSR (address 0x034).
       - Examine bit [12] for the current input state of the pin.
       - Examine bit [8] for the current output value.
       - Other fields provide configuration information:
@@ -370,36 +381,36 @@ GPIO Status Reading Procedure
             - Bits [19:17]: Interrupt type
             - Bit [16]: Interrupt enable status
   - Reading Multiple Pin States:
-      - To read the status of multiple pins at once, read the REG_PIN0 register, in which each bit represents corresponding output pin.
+      - To read the status of multiple pins at once, read the REG_PIN0 CSR, in which each bit represents corresponding output pin.
       - A bit value of 1 indicates a high state, 0 indicates a low state.
 
 GPIO Control Procedure
 ^^^^^^^^^^^^^^^^^^^^^^
   - Setting Individual Pins High:
-      - Write the pin number to the REG_SETGPIO register (address 0x000).
+      - Write the pin number to the REG_SETGPIO CSR (address 0x000).
       - This operation sets the specified pin to a high state.
   - Setting Individual Pins Low:
-      - Write the pin number to the REG_CLRGPIO register (address 0x004).
+      - Write the pin number to the REG_CLRGPIO CSR (address 0x004).
       - This operation sets the specified pin to a low state.
   - Toggling Individual Pins:
-      - Write the pin number to the REG_TOGGPIO register (address 0x008).
+      - Write the pin number to the REG_TOGGPIO CSR (address 0x008).
       - This inverts the current state of the specified pin.
   - Controlling Multiple Pins Simultaneously:
-      - To control multiple pins in one operation, write to the REG_OUT0 register.
+      - To control multiple pins in one operation, write to the REG_OUT0 CSR.
       - Each bit position corresponds to the respective pin number.
       - Setting a bit to 1 drives the corresponding pin high; setting to 0 drives it low.
 
 Interrupt Handling Procedure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - Determining the Interrupt Source:
-      - Read the REG_PIN0 register to determine which pin(s) triggered the interrupt.
+      - Read the REG_PIN0 CSR to determine which pin(s) triggered the interrupt.
       - For level-sensitive interrupts (active-high or active-low), check the current pin state.
       - For edge-sensitive interrupts, the hardware has already latched the event.
   - Interrupt Processing:
       - Process the interrupt according to application requirements.
       - Note that for level-sensitive interrupts, the source condition must be cleared before acknowledging.
   - Acknowledging the Interrupt:
-      - Write the pin number to the REG_INTACK register (address 0x040).
+      - Write the pin number to the REG_INTACK CSR (address 0x040).
       - This clears the interrupt blocking mechanism for level-sensitive interrupts.
 
 Open-Drain Configuration Guidelines
@@ -431,7 +442,7 @@ Clock and Reset
 ^^^^^^^^^^^^^^^
 
 - HCLK: System clock input.
-- HRESETn: Active-low reset signal for initializing all internal registers and logic.
+- HRESETn: Active-low reset signal for initializing all internal CSRs and logic.
 - dft_cg_enable_i: Clock gating enable input for DFT or low-power scenarios.
 
 APB Interface Signals
