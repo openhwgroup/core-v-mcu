@@ -548,14 +548,17 @@ I2C_INTERRUPT_STATUS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | I2C_APB_F            | 2:2      | RO               | RO               | 0x0        | 1: Interrupt is generated   |
 | IFO_WRITE_STATUS     |          |                  |                  |            | for this field              |
+|                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | 0: Not genertated           |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | APB_I2C_F            | 1:1      | RO               | RO               | 0x0        | 1: Interrupt is generated   |
 | IFO_READ_STATUS      |          |                  |                  |            | for this field              |
+|                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | 0: Not genertated           |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | APB_I2C_M            | 0:0      | RO               | RO               | 0x0        | 1: Interrupt is generated   |
 | ESSAGE_AVAILABLE     |          |                  |                  |            | for this field              |
+|                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | 0: Not genertated           |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
@@ -664,18 +667,21 @@ APB_INTERRUPT_STATUS
 | IFO_WRITE_STATUS     |          |                  |                  |            | representing whether       |
 |                      |          |                  |                  |            | interrupt will generate or |
 |                      |          |                  |                  |            | not.                       |
+|                      |          |                  |                  |            |                            |
 |                      |          |                  |                  |            | 1: Interrupt generated     |
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 | I2C_APB_F            | 1:1      | RO               | RO               | 0x0        | Interrupt status           |
 | IFO_READ_STATUS      |          |                  |                  |            | representing whether       |
 |                      |          |                  |                  |            | interrupt will generate or |
 |                      |          |                  |                  |            | not.                       |
+|                      |          |                  |                  |            |                            |
 |                      |          |                  |                  |            | 1: Interrupt generated     |
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 | NEW_I                | 0:0      | RO               | RO               | 0x0        | Interrupt status           |
 | 2C_APB_MSG_AVAIL     |          |                  |                  |            | representing whether       |
 |                      |          |                  |                  |            | interrupt will generate or |
 |                      |          |                  |                  |            | not.                       |
+|                      |          |                  |                  |            |                            |
 |                      |          |                  |                  |            | 1: Interrupt generated     |
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
