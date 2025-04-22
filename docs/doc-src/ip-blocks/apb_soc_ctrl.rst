@@ -27,11 +27,11 @@ Features
 --------
   - Control interface for configurable pad multiplexer and IO configuration
   - Watchdog timer with programmable timeout and reset capability
-  - JTAG register access for debug and configuration
+  - JTAG CSR access for debug and configuration
   - Boot address and fetch enable control for the Fabric Controller (FC)
   - eFPGA control and configuration interface
   - Ready timeout monitoring for system level recovery
-  - System information and status registers
+  - System information and status CSRs
   - Soft reset capability for all APB Client Peripherals
   - Build date and time information
 
@@ -66,7 +66,7 @@ A programmable watchdog timer runs on the reference clock and can generate syste
 
 eFPGA Interface
 ^^^^^^^^^^^^^^^
-Dedicated control and status registers for managing the embedded FPGA subsystem:
+Dedicated control and status CSRs for managing the embedded FPGA subsystem:
   - Reset controls
   - Clock gating
   - Interface enables (UDMA, events, APB, TCDM interfaces)
@@ -88,7 +88,8 @@ Manages the boot process for the system:
 
 JTAG Interface
 ^^^^^^^^^^^^^^
-  - Allows communication with external JTAG devices
+  - Allows bidirectional communication of 8-bit data with external JTAG devices
+  - Accessible through dedicated CSR and interface
 
 
 System Architecture
@@ -106,23 +107,23 @@ The figure below depicts the connections between the SoC Controller and rest of 
 Programming View Model
 ----------------------
 
-The APB SOC Controller is memory-mapped at a base address defined by the system. All registers are accessible via standard APB read/write operations.
+The APB SOC Controller is memory-mapped at a base address defined by the system. All CSRs are accessible via standard APB read/write operations.
 
-Register Access
+CSR Access
 ^^^^^^^^^^^^^^^
-Registers are accessed using 32-bit reads and writes over the APB bus. The address space is organized as follows:
-  - Base registers: 0x000 - 0x0FC
-  - Pad configuration registers: 0x400 - 0x4C0
+CSRs are accessed using 32-bit reads and writes over the APB bus. The address space is organized as follows:
+  - Base CSRs: 0x000 - 0x0FC
+  - Pad configuration CSRs: 0x400 - 0x4C0
 
 Programming Sequence
 ^^^^^^^^^^^^^^^^^^^^
 Typical programming sequences include:
-  - Read system information from INFO register
+  - Read system information from INFO CSR
   - Configure boot address and fetch enable
   - Set up pad configuration and multiplexing
   - Configure watchdog timer if needed
   - Set up eFPGA control parameters
-  - Monitor status registers as needed
+  - Monitor status CSRs as needed
 
 APB SoC CTRL CSRs
 -----------------
@@ -239,9 +240,11 @@ JTAGREG
 +===============+==========+==========+=============+==========================+
 | RESERVED      | 31:16    | RO       |    0x0      | Reserved                 |
 +---------------+----------+----------+-------------+--------------------------+
-| JTAG_REG_IN   | 15:8     | RO       |    0x0      | JTAG register input      |
+| JTAG_REG_IN   | 15:8     | RO       |    0x0      | synchronized data input  |
+|               |          |          |             | from soc_jtag_reg_i port |
 +---------------+----------+----------+-------------+--------------------------+
-| JTAG_REG_OUT  | 7:0      | RW       |    0x0      | JTAG register output     |
+| JTAG_REG_OUT  | 7:0      | RW       |    0x0      | data to be driven on     |
+|               |          |          |             | soc_jtag_reg_o port      |
 +---------------+----------+----------+-------------+--------------------------+
 
 BOOTSEL
@@ -260,7 +263,7 @@ BOOTSEL
 | DMACTIVE    | 1:1      | RO        |             | DMA active value                        |
 |             |          |           |             | Configured from dmactive_i pin on reset |
 +-------------+----------+-----------+-------------+-----------------------------------------+
-| RESERVED    | 29:2     | RO        |             | Reserved                                |
+| RESERVED    | 29:2     | RO        | 0x0         | Reserved                                |
 +-------------+----------+-----------+-------------+-----------------------------------------+
 | BOOTSEL_IN  | 30       | RO        |             | Current status of bootsel_i pin         |
 +-------------+----------+-----------+-------------+-----------------------------------------+
@@ -274,13 +277,13 @@ CLKSEL
 +-----------+----------+----------+-------------+--------------------------------+
 | **Field** | **Bits** | **Type** | **Default** | **Description**                |
 +===========+==========+==========+=============+================================+
-|   S       |   0:0    |   RW     |             |   This register contains       |
+|   S       |   0:0    |   RW     |             |   This CSR contains            |  
 |           |          |          |             |   whether the system clock     |
 |           |          |          |             |   is coming from               |
 |           |          |          |             |   the FLL or the FLL is        |
 |           |          |          |             |   bypassed.                    |
 |           |          |          |             |   It is a read-only            |
-|           |          |          |             |   register by the core but it  |
+|           |          |          |             |   CSR by the core but it       |
 |           |          |          |             |   can be written via JTAG.     |
 |           |          |          |             |                                |
 |           |          |          |             | Shows current status of        |
@@ -317,7 +320,7 @@ WD_CONTROL
 RESET_REASON
 ^^^^^^^^^^^^
   - Address Offset = 0x00D8
-  - The register will get cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
+  - The CSR will get cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
 
 +-----------+----------+-----------+-------------+-------------------------------------+
 | **Field** | **Bits** | **Types** | **Default** | **Description**                     |
@@ -330,7 +333,7 @@ RTO_PERIPHERAL_ERROR
 ^^^^^^^^^^^^^^^^^^^^
   - Address Offset = 0x00E0
   - Configured from peripheral_rto_i pin
-  - Writing to this register will clear it
+  - Writing to this CSR will clear it
 
 +-------------+----------+-----------+-------------+----------------------------------------+
 | **Field**   | **Bits** | **Types** | **Default** | **Description**                        |
@@ -372,7 +375,7 @@ READY_TIMEOUT_COUNT
 +=============+==========+===========+=============+========================================+
 | COUNT       |  19:0    | RW        | 0xFF        | Number of APB clocks before a ready    |
 |             |          |           |             | timeout occurs.                        |
-|             |          |           |             | When writing to this register, last 4  |
+|             |          |           |             | When writing to this CSR, last 4       |
 |             |          |           |             | bits from write data will be replaced  |
 |             |          |           |             | by 0xf.                                |
 +-------------+----------+-----------+-------------+----------------------------------------+
@@ -422,7 +425,7 @@ EFPGA_CONTROL_IN
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
-|EFPGA_CONTROL_IN |   31:0   | RW         | 0x00        | EFPGA control bits use per eFPGA |
+|EFPGA_CONTROL_IN |   31:0   | RW         | 0x0         | EFPGA control bits use per eFPGA |
 |                 |          |            |             | design                           |
 +-----------------+----------+------------+-------------+----------------------------------+
 
@@ -489,40 +492,40 @@ Firmware Guidelines
 Initialization Sequence
 ^^^^^^^^^^^^^^^^^^^^^^^
   - Read System Information
-      - Read the INFO register at offset 0x00 from the SOC_CTRL_BASE address.
+      - Read the INFO CSR at offset 0x00 from the SOC_CTRL_BASE address.
       - Extract the number of cores from bits [31:16] of the read value.
       - Extract the number of clusters from bits [15:0] of the read value.
       - Use this information to properly configure system resources.
   - Configure Boot Parameters
-      - Write the desired boot address to the FCBOOT register at offset 0x04.
-      - The fetch enable bit of to the FCFETCH register at offset 0x08 if enabled by default.
-      - Verify the boot configuration by reading back these registers.
+      - Write the desired boot address to the FCBOOT CSR at offset 0x04.
+      - The fetch enable bit of to the FCFETCH CSR at offset 0x08 if enabled by default.
+      - Verify the boot configuration by reading back these CSRs.
   - Configure IO Pads
       - For each IO pad that needs configuration:
           - Determine the IO pad index (0 to 47).
           - Select the appropriate multiplexer value for the desired function.
           - Determine the electrical pad configuration ( TBD ).
           - Combine these values: IO index in bits [5:0], multiplexer in bits [17:16], and configuration in bits [29:24].
-          - Write this combined value to the WCFGFUN register at offset 0x60.
+          - Write this combined value to the WCFGFUN CSR at offset 0x60.
       - Alternatively, configure pads directly through their dedicated addresses:
-          - Calculate the pad register address: 0x400 + (IO_PORT * 4).
+          - Calculate the pad CSR address: 0x400 + (IO_PORT * 4).
           - Write the multiplexer value to bits [1:0] and configuration to bits [13:8].
   - Configure Watchdog Timer (if needed)
-      - While the watchdog is disabled, set the desired timeout by writing to the WD_COUNT register at offset 0xD0.
-      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL register at offset 0xD4.
+      - While the watchdog is disabled, set the desired timeout by writing to the WD_COUNT CSR at offset 0xD0.
+      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL CSR at offset 0xD4.
       - Set up a regular timer interrupt to periodically reset the watchdog.
   - Ready Timeout Configuration
-      - Set the desired timeout value by writing to the RTO_COUNT register at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
+      - Set the desired timeout value by writing to the RTO_COUNT CSR at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
   - Configure eFPGA (if applicable)
-      - Reset particular eFPGA Quadrant by writing to the RESET_TYPE1_EFPGA register at offset 0xE8.
-      - Enable the desired interfaces by writing to ENABLE_IN_OUT_EFPGA register at offset 0xEC:
+      - Reset particular eFPGA Quadrant by writing to the RESET_TYPE1_EFPGA CSR at offset 0xE8.
+      - Enable the desired interfaces by writing to ENABLE_IN_OUT_EFPGA CSR at offset 0xEC:
           - Bit 0: Enable TCDM0 interface
           - Bit 1: Enable TCDM1 interface
           - Bit 2: Enable TCDM2 interface
           - Bit 3: Enable TCDM3 interface
           - Bit 4: Enable APB interface
           - Bit 5: Enable events interface
-      - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL register at offset 0xF0.
+      - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL CSR at offset 0xF0.
 
 Ready Timeout Management
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -534,45 +537,45 @@ Ready Timeout Management
       - If start_rto_i is deasserted then the timer counter is set to it's initial value as configured in RTO_COUNT CSR.
   - Timeout Detection:
       - If the counter reaches zero, the rto_o signal is asserted.
-      - Based on the input peripheral_rto_i,The register RTO_PERIPHERAL_ERROR is updated.
+      - Based on the input peripheral_rto_i,The CSR RTO_PERIPHERAL_ERROR is updated.
   - Error Handling:
-      - When a timeout is detected, identify the source peripheral through RTO_PERIPHERAL_ERROR register.
+      - When a timeout is detected, identify the source peripheral through RTO_PERIPHERAL_ERROR CSR.
       - Take appropriate recovery actions for the affected peripheral
-      - Write any value to the RTO_PERIPHERAL register to clear the timeout flags
+      - Write any value to the RTO_PERIPHERAL CSR to clear the timeout flags
       - This resets the peripheral timeout indicators but doesn't affect the timeout counter
 
 Watchdog Management
 ^^^^^^^^^^^^^^^^^^^
   - Watchdog Initialization
       - Determine the appropriate timeout value based on your system requirements.
-      - Write this value to the WD_COUNT register before enabling the watchdog.
+      - Write this value to the WD_COUNT CSR before enabling the watchdog.
       - The timeout should be long enough to accommodate normal processing delays but short enough to catch system hangs.
   - Watchdog Enabling
-      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL register.
+      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL CSR.
   - Normal Operation
       - Once enabled, the watchdog timer will begin counting down from the configured value on every positive edge of ref_clk_i, given that stoptimer_i pin is low.
       - If stoptimer_i is asserted, then the watchdog timer will pause until it is deasserted.
       - When the counter reaches 1, wd_expired_o pin will be set high for one cycle of ref_clk_i.
-      - RESET_REASON register will be updadated with value 2b'11.
+      - RESET_REASON CSR will be updadated with value 2b'11.
   - Regular Servicing
       - Establish a reliable mechanism to service the watchdog at regular intervals.
       - This can be a dedicated timer interrupt or part of a main processing loop.
       - The servicing interval should be shorter than the watchdog timeout.
-      - To service the watchdog, write 0x00006699 to the WD_CONTROL register.
+      - To service the watchdog, write 0x00006699 to the WD_CONTROL CSR.
   - Watchdog Recovery Handling
-      - After a watchdog reset, firmware can detect this by reading the RESET_REASON register.
+      - After a watchdog reset, firmware can detect this by reading the RESET_REASON CSR.
       - If the value is 0x2, a watchdog timeout caused the reset.
       - Implement appropriate recovery actions, such as logging the event.
   - Hard reset behaviour
       - When rstpin_ni is asserted, then the watchdog timer is set to it's default value of 0x8000.
-      - After this, the watchdog timer will only start counting down from the configured value in WD_COUNT register upon servicing.
+      - After this, the watchdog timer will only start counting down from the configured value in WD_COUNT CSR upon servicing.
 
 Soft Reset Procedure
 ^^^^^^^^^^^^^^^^^^^^
   - Prepare for Reset
       - Complete any pending operations and save critical state if needed.
   - Trigger Reset
-      - Write any value to the SOFT_RESET register at offset 0xFC.
+      - Write any value to the SOFT_RESET CSR at offset 0xFC.
       - The system will immediately begin the reset sequence.
       - The below CSR will be reset to their default values
           - WCFGFUN
@@ -586,7 +589,17 @@ Soft Reset Procedure
       - The reset signal will propagate to other APB Client peripherals.
   - Post-Reset
       - The system will restart and execute the boot sequence.
-      - Firmware should check the RESET_REASON register to differentiate between power-on and soft reset.
+      - Firmware should check the RESET_REASON CSR to differentiate between power-on and soft reset.
+
+JTAG communication
+^^^^^^^^^^^^^^^^^^
+  - Write to external device
+      - Write the data to the JTAGREG CSR through the APB bus.
+      - The written value will be available on the soc_jtag_reg_o output port.
+  - Read from external device
+      - The external JTAG device writes the data on soc_jtag_reg_i input port.
+      - There is double synchronization for the input signal to prevent metastability.
+      - Post synchronization, the data can be read from the JTAGREG CSR through the APB bus.
 
 Pin Diagram
 -----------
@@ -603,7 +616,7 @@ The figure below represents the input and output pins for the APB SoC Controller
 Clock and Reset
 ^^^^^^^^^^^^^^^
   - HCLK: APB system clock input
-  - HRESETn: Active-low system reset signal for initializing registers and logic
+  - HRESETn: Active-low system reset signal for initializing CSRs and logic
   - ref_clk_i: Reference clock input, used for watchdog operations
   - rstpin_ni: Active-low reset pin input, for resetting watchdog
 
@@ -622,8 +635,8 @@ Boot and Configuration
 ^^^^^^^^^^^^^^^^^^^^^^
   - sel_fll_clk_i: FLL clock selection input
   - bootsel_i: Boot select input
-  - fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller), controlled via register FCBOOT
-  - fc_fetchen_o: Fetch enable output for FC, controlled via register FCFETCH
+  - fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller), controlled via CSR FCBOOT
+  - fc_fetchen_o: Fetch enable output for FC, controlled via CSR FCFETCH
   
 
 Watchdog Interface
@@ -638,21 +651,21 @@ Pad Configuration Interface
 
 JTAG Interface
 ^^^^^^^^^^^^^^
-  - soc_jtag_reg_i[7:0]: JTAG register input
-  - soc_jtag_reg_o[7:0]: JTAG register output, driven by register JTAGREG
+  - soc_jtag_reg_i[7:0]: JTAG CSR input
+  - soc_jtag_reg_o[7:0]: JTAG CSR output, driven by CSR JTAGREG
 
 eFPGA Interface
 ^^^^^^^^^^^^^^^
-  - control_in[31:0]: Control output to peripherals, driven by register EFPGA_CONTROL
+  - control_in[31:0]: Control output to peripherals, driven by CSR EFPGA_CONTROL
   - clk_gating_dc_fifo_o: Clock gating for DC FIFO to eFPGA, always 1 as per current implementation
-  - reset_type1_efpga_o[3:0]: Reset signals for eFPGA, driven by register RESET_TYPE1_EFPGA
-  - enable_udma_efpga_o: Enable uDMA to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_events_efpga_o: Enable events to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_apb_efpga_o: Enable APB to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_tcdm3_efpga_o: Enable TCDM3 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_tcdm2_efpga_o: Enable TCDM2 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_tcdm1_efpga_o: Enable TCDM1 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
-  - enable_tcdm0_efpga_o: Enable TCDM0 to eFPGA, driven by ENABLE_IN_OUT_EFPGA register
+  - reset_type1_efpga_o[3:0]: Reset signals for eFPGA, driven by CSR RESET_TYPE1_EFPGA
+  - enable_udma_efpga_o: Enable uDMA to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_events_efpga_o: Enable events to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_apb_efpga_o: Enable APB to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_tcdm3_efpga_o: Enable TCDM3 to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_tcdm2_efpga_o: Enable TCDM2 to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_tcdm1_efpga_o: Enable TCDM1 to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
+  - enable_tcdm0_efpga_o: Enable TCDM0 to eFPGA, driven by ENABLE_IN_OUT_EFPGA CSR
 
   - status_out[31:0]: Status input signals from peripherals
   - version[7:0]: Version input
@@ -663,4 +676,4 @@ Ready Timeout Interface
   - rto_o: Ready timeout output signal, asserted when ready timeout count reaches 0.
   - start_rto_i: Start ready timeout input
   - peripheral_rto_i[10:0]: Peripheral ready timeout input
-  - soft_reset_o: Soft reset output, triggered by writing to register SOFT_RESET
+  - soft_reset_o: Soft reset output, triggered by writing to CSR SOFT_RESET
