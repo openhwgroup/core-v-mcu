@@ -605,7 +605,6 @@ Clock and Reset
 ^^^^^^^^^^^^^^^
   - HCLK: APB clock input
   - HRESETn: Active low reset signal
-  - low_speed_clk_i: Low-speed clock input
 
 APB Interface Signals
 ^^^^^^^^^^^^^^^^^^^^^
@@ -622,7 +621,7 @@ Peripheral Event Signals
 ^^^^^^^^^^^^^^^^^^^^^^^^
   - per_events_i[159:0]: Peripheral event inputs
   - pr_event_valid_o: Peripheral event valid output
-  - pr_event_data_o: Peripheral event data output, indicating the event ID
+  - pr_event_data_o[7:0]: Peripheral event data output, indicating the event ID
   - pr_event_ready_i: Peripheral event ready input, indicating readiness to process the event
 
 Fabric Controller Event Signals
@@ -640,6 +639,7 @@ Cluster Event Signals
 
 Timer Event Signals
 ^^^^^^^^^^^^^^^^^^^
+  - low_speed_clk_i: Low-speed clock input
   - timer_event_lo_o: Timer event low output
   - timer_event_hi_o: Timer event high output
 
