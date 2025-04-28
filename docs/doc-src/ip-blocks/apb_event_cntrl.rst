@@ -19,358 +19,630 @@
 
 APB EVENT CONTROL
 ==================
-This APB peripheral device collects all the events which are
-presented to the CPU as IRQ11 (Machine interrupt). Each event is
-individually maskable by the appropriate bit in the REG_MASKx
-register. When an enabled event (unmasked) is received it is placed
-in an event FIFO and the IRQ11 signal is presented to the CPU which
-can then read the REG_FIFO to determine which event caused the
-interrupt. Each event has a queue of depth four to collect events if
-the queue for any event overflows an error is logged into the
-appropriate REG_ERR register and IRQ31 is presented to the CPU.
+
+The SOC Event Controller module serves as a centralized event management system for CORE-V-MCU.
+It handles the routing and prioritization of events from peripherals to various destinations through configurable masks and an arbitration mechanism.
 
 Features
 --------
-- Events are generated from the cluster and peripherals and go to
-  fabric control. 
+  - Centralized event handling system for CORE-V-MCU
+  - Support for multiple event sources:
+      - Peripheral events (up to 256 configurable inputs, 160 currently implemented)
+      - APB-generated events (up to 32 events, 8 currently implemented)
+      - Low-speed clock events
+  - Three configurable output event channels:
+      - FC (Fabric Controller/Core Complex) events
+      - CL (Cluster) events
+      - PR (Peripheral) events
+  - Event masking capability for each output channel
+  - Timer event generation with selectable event sources
+  - FIFO-based event buffering for each input event
+  - Priority-based event arbitration
 
-- Events are maskable.
+Block Architecture
+------------------
 
-- Error register to log error.
+.. figure:: apb_event_controller_block_diagram.png
+   :name: APB_Event_Controller_Block_Diagram
+   :align: center
+   :alt:
 
-THEORY OF OPERATION:
-^^^^^^^^^^^^^^^^^^^^
+   APB Event Controller Block Diagram
 
-It contains soc_event_queue and soc_event_arbitrator. Events are
-stored in an event fifo. The CPU can read the event fifo to
-determine which event caused the interrupt.
+Event Processing Components
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The SOC Event Controller consists of several key components that work together to route and manage events throughout the system:
+  - Event Queues: One queue, having queue size of 4, per event source to handle event detection and buffering
+  - Event Arbiter: Prioritizes concurrent events from multiple sources using a parallel prefix arbitration algorithm with round-robin priority scheme
+  - Event Masking: Configurable masking for each output channel (FC, CL, PR)
+  - Timer Event Generator: Selectable event routing to timer outputs
 
-BLOCK DIAGRAM:
-^^^^^^^^^^^^^^^^^^^^
-.. image:: apb_event_cntrl_image.png
-   :width: 6.5in
-   :height: 2.83333in
+Event arbitration
+^^^^^^^^^^^^^^^^^
+The SOC Event Controller uses a sophisticated parallel prefix arbitration scheme to efficiently handle multiple simultaneous event requests.
 
-- fc_events_o is a two bit output port which drives the third and fourth bit of peripheral event input (per_events_i).
-  peripheral event input (per_events_i).
+**Key features of the arbiter include:**
+  - Round-Robin Priority: The arbiter implements a round-robin priority scheme to ensure fair servicing of event requests over time
+  - Parallel Prefix Algorithm: Uses a logarithmic-depth parallel prefix network to determine the highest priority request
+  - Priority Rotation: After granting an event, the priority shifts to the next position in a circular manner to maintain fairness
+  - Grant Acknowledgment: Uses a grant_ack signal to confirm event processing before updating priorities
 
-- Driving valid output signals:
+**Arbitration Process:**
+  - The arbiter receives request signals from all event sources.
+  - The event arbitration logic ensures only one event is processed at a time across all channels.
+  - Using the current priority pointer, it determines which request to grant
+  - The parallel prefix network efficiently resolves priority in multiple stages
+  - Once a grant is issued, the arbiter waits for acknowledgment
+  - After acknowledgment, the priority pointer rotates to the next position
 
-  ○ Fabric control event is said to be valid if there is at least one
-  event which is granted by soc_event_arbiter and is not masked.
-  Fabric control event valid data is sent to generic_fifo which
-  indicates there is valid data available for writing to fifo.
+System Architecture
+-------------------
+.. figure:: apb_event_controller_soc_connections.png
+   :name: APB_Event_Controller_SoC_Connections
+   :align: center
+   :alt:
 
-  ○ Cluster event is said to be valid if there is at least one event
-  which is
-  granted by soc_event_arbiter and is not masked. Cluster event valid
-  data is driven through cl_event_valid_o port.
+   APB Event Controller CORE-V-MCU connections diagram
 
-  ○ Peripheral event is said to be valid if there is at least one event
-  which is granted by soc_event_arbiter and is not masked. Peripheral
-  event valid data is driven through pr_event_valid_o port.
+Output Channels
+^^^^^^^^^^^^^^^
+  - FC (Fabric Controller/Core Complex) Channel: Directly routes 2 events to the FC Event Unit(Not connected in current implementation)
+  - CL (Cluster) Channel: Routes events to the Cluster (Not connected in current implementation)
+  - PR (Peripheral) Channel: Routes events to uDMA peripherals.
+  - Event FIFO: Buffers events for the FC channel
+      - FIFO Depth: 4 entries
+      - The Core can read the events through the REG_FIFO CSR
 
-- Readiness of FC, cluster and peripheral:
+Programming View Model
+----------------------
+The SOC Event Controller is programmed through an APB interface with a 4KB address space. The key programming interfaces include:
 
-  ○ Fabric control is said to be ready if the fabric control event is
-  valid and generic fifo is ready to accept data.
+Control Flow
+^^^^^^^^^^^^
+  - Event Generation: Events can be generated from peripherals (160 sources), software (8 sources), or low-speed clock
+  - Event Masking: Events can be selectively masked for each output channel using 256-bit mask registers
+  - Event Routing: Events are arbitrated and routed to the appropriate output channels
+  - Error Handling: Event processing errors are detected and reported through error registers
+  - Timer Control: Two timer event signals can be generated from any event source
 
-  ○ Cluster is said to be ready if the cluster event is valid and
-  cl_event_ready_i is high.
+Programming Interface
+^^^^^^^^^^^^^^^^^^^^^
+  - Software Event Generation: Write to REG_EVENT CSR
+  - Event Masking: Configure FC_MASK, CL_MASK, and PR_MASK registers
+  - Event Arbitration: The arbiter resolves concurrent events using a parallel prefix network with round-robin priority
+  - Timer Event Selection: Configure TIMER1_SEL_HI and TIMER1_SEL_LO registers
+  - Error Monitoring: Read ERR registers to detect event handling errors
+  - Error Clearing: Clear errors by reading from the corresponding ERR registers
+  - Event FIFO Access: Read from REG_FIFO CSR to retrieve buffered event
 
-  ○ Peripheral is said to be ready if the peripheral event is valid and
-  pr_event_ready_i is high.
+APB Event Control CSR
+---------------------
 
-- Register to store events: All the events from peripheral and
-  cluster are stored in an internal register. Peripheral events will
-  occupy the lower bits and cluster events will occupy the higher bits
-  of this register.
-
-  ○ For driving the timer_event_lo_o event at REG_TIMER1_SEL_LO index
-  of this register is selected.
-
-  ○ For driving the timer_event_hi_o the event at REG_TIMER1_SEL_HI○
-  index of this register is selected
+REG_EVENT
+^^^^^^^^^
+  - Offset: 0x00
   
-  ○ All the events from this register are provided as input to the
-  soc_event_queue.
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_EVENT        | 7:0  | WO   | 0x00    | 8 bits of software-          |
+|                  |      |      |         | generated event.             |
++------------------+------+------+---------+------------------------------+
 
-- soc_event_queue:
+REG_FC_MASK_0
+^^^^^^^^^^^^^
+  - Offset: 0x04
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_0    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 0-31 of core complex  |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ soc_event_queue is instantiated for all the events.
+REG_FC_MASK_1
+^^^^^^^^^^^^^
+  - Offset: 0x08
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_1    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 32-63 of core complex |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ Each event from the cluster and peripherals are provided as input
-  to soc_event_queue.
+REG_FC_MASK_2
+^^^^^^^^^^^^^
+  - Offset: 0x0C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_2    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 64-95 of core complex |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ An event acknowledgement input is provided which specifies○
-  acknowledgment of that event by soc_event_arbiter. It is high if
-  the event is ready and is acknowledged by the arbiter.
+REG_FC_MASK_3
+^^^^^^^^^^^^^
+  - Offset: 0x10
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_3    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 96-127 of core complex|
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ Total number of events in the queue is updated at every positive edge of the clock if there is a new event or an event acknowledgement.
-   - Event count is increased if there is an input event and an event is not acknowledged.
-   - Event count is decreased if an event is acknowledged and there is no new input event.
-   - Event count is reset at negedge of reset.
+REG_FC_MASK_4
+^^^^^^^^^^^^^
+  - Offset: 0x14
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_4    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 128-159 of            |
+|                  |      |      |            | core complex (1=mask event). |
++------------------+------+------+------------+------------------------------+
 
-  ○ Error will be generated for an event if the event queue is full. Depth of the queue is four. err_event_o is asserted to indicate error in the input events.
-  ○ A successful event is generated from the soc_event_queue if the queue is not empty.
+REG_FC_MASK_5
+^^^^^^^^^^^^^
+  - Offset: 0x18
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_5    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 160-191 of            |
+|                  |      |      |            | core complex (1=mask event). |
++------------------+------+------+------------+------------------------------+
 
-- soc_event_arbiter:
+REG_FC_MASK_6
+^^^^^^^^^^^^^
+  - Offset: 0x1C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_6    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 192-223 of            |
+|                  |      |      |            | core complex (1=mask event). |
++------------------+------+------+------------+------------------------------+
 
-  ○ soc_event_arbiter sets priority for the event. Out of the input events it selects the events to be granted.
-  ○ It takes output events from soc_event_queue as the input.
-  ○ It takes an acknowledgement input which is set to one if fabric control, cluster and peripheral are ready.
-  ○ It uses the parallel prefix arbitration method to select events of higher priority. The granted events are sent as output.
+REG_FC_MASK_7
+^^^^^^^^^^^^^
+  - Offset: 0x20
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_FC_MASK_7    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 224-255 of            |
+|                  |      |      |            | core complex (1=mask event). |
++------------------+------+------+------------+------------------------------+
 
-- Cluster and peripheral event data output:
+REG_CL_MASK_0
+^^^^^^^^^^^^^
+  - Offset: 0x24
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_0    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 0-31 of cluster       |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ The index of the granted events are sent as output from the soc_event_generator through cl_event_data_o and pr_event_data_o.
+REG_CL_MASK_1
+^^^^^^^^^^^^^
+  - Offset: 0x28
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_1    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 32-63 of cluster      |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-- Reset: The model supports active low reset.
+REG_CL_MASK_2
+^^^^^^^^^^^^^
+  - Offset: 0x2C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_2    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 64-95 of cluster      |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-- Writing to registers: 
+REG_CL_MASK_3
+^^^^^^^^^^^^^
+  - Offset: 0x30
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_3    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 96-127 of cluster     |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ Data can be written to registers if PSEL, PENABLE and PWRITE are enabled.
-  ○ If PSEL and PENABLE is enabled and PWRITE is disabled then error registers(REG_ERR_X) are cleared.
+REG_CL_MASK_4
+^^^^^^^^^^^^^
+  - Offset: 0x34
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_4    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 128-159 of cluster    |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-- Generic_fifo: 
+REG_CL_MASK_5
+^^^^^^^^^^^^^
+  - Offset: 0x38
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_5    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 160-191 of cluster    |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-  ○ Push operation:
-    - A valid high input is sent if there is at least one granted unmasked event. It indicates there is a valid event for writing into fifo.
-    - A grant output is sent by the fifo which indicates fifo can accept new data. 
-    - Drive zero if fifo is full else drive one.
-    - The index of the granted events from the soc_event_arbiter is sent as an input.
-  ○ Pop operation:
-    - A valid output is sent by the fifo which indicates there is valid data available in fifo for reading. It drives value to event_fifo_valid_o port.
-      ○ Drive zero if fifo is empty else drive one.
-    - A grant input is sent which indicates if data can be read from fifo. It is set to 1 if acknowledgement from the core(core_irq_ack_i) is positive and core acknowledgement id(core_irq_ack_id_i) is 3.
-    - A data output is sent by the fifo. REG_FIFO register can be read to get this data if the fifo is not empty.
+REG_CL_MASK_6
+^^^^^^^^^^^^^
+  - Offset: 0x3C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_6    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 192-223 of cluster    |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
+REG_CL_MASK_7
+^^^^^^^^^^^^^
+  - Offset: 0x40
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_CL_MASK_7    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 224-255 of cluster    |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-APB EVENT CONTROL CSR’s
-^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 10 20
-   :header-rows: 1
+REG_PR_MASK_0
+^^^^^^^^^^^^^
+  - Offset: 0x44
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_0    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 0-31 of peripheral    |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
 
-   * - Offset
-     - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - 0x00
-     - REG_EVENT
-     - 15:0
-     - W
-     - 0x00
-     - 16 bits of software-generated event.
-   * - 0x04
-     - REG_FC_MASK_0
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 0-31 of fc_subsystem (1=mask event).
-   * - 0x08
-     - REG_FC_MASK_1
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 32-63 of fc_subsystem (1=mask event).
-   * - 0x0C
-     - REG_FC_MASK_2
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 64-95 of fc_subsystem (1=mask event).
-   * - 0x10
-     - REG_FC_MASK_3
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 96-127 of fc_subsystem (1=mask event).
-   * - 0x14
-     - REG_FC_MASK_4
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 128-159 of fc_subsystem (1=mask event).
-   * - 0x18
-     - REG_FC_MASK_5
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 160-191 of fc_subsystem (1=mask event).
-   * - 0x1C
-     - REG_FC_MASK_6
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 192-223 of fc_subsystem (1=mask event).
-   * - 0x20
-     - REG_FC_MASK_7
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 224-255 of fc_subsystem (1=mask event).
-   * - 0x24
-     - REG_CL_MASK_0
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 0-31 of clock (1=mask event).
-   * - 0x28
-     - REG_CL_MASK_1
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 31-63 of clock (1=mask event).
-   * - 0x2C
-     - REG_CL_MASK_2
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 64-95 of clock (1=mask event).
-   * - 0x30
-     - REG_CL_MASK_3
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 96-127 of clock (1=mask event).
-   * - 0x34
-     - REG_CL_MASK_4
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 128-159 of clock (1=mask event).
-   * - 0x38
-     - REG_CL_MASK_5
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 160-191 of clock (1=mask event).
-   * - 0x3C
-     - REG_CL_MASK_6
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 192-223 of clock (1=mask event).
-   * - 0x40
-     - REG_CL_MASK_7
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 224-255 of clock (1=mask event).
-   * - 0x44
-     - REG_PR_MASK_0
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 0-31 of peripheral (1=mask event).
-   * - 0x48
-     - REG_PR_MASK_1
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 32-63 of peripheral (1=mask event).
-   * - 0x4C
-     - REG_PR_MASK_2
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 64-95 of peripheral (1=mask event).
-   * - 0x50
-     - REG_PR_MASK_3
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 96-127 of peripheral (1=mask event).
-   * - 0x54
-     - REG_PR_MASK_4
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 128-159 of peripheral (1=mask event).
-   * - 0x58
-     - REG_PR_MASK_5
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 160-191 of peripheral (1=mask event).
-   * - 0x5C
-     - REG_PR_MASK_6
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 192-223 of peripheral (1=mask event).
-   * - 0x60
-     - REG_PR_MASK_7
-     - 31:00
-     - R/W
-     - 0xFFFFFFFF
-     - Individual masks for events 224-255 of peripheral (1=mask event).
-   * - 0x64
-     - REG_ERR_0
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 0-31.
-   * - 0x68
-     - REG_ERR_1
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 32-63.
-   * - 0x6C
-     - REG_ERR_2
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 64-95.
-   * - 0x70
-     - REG_ERR_3
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 96-127.
-   * - 0x74
-     - REG_ERR_4
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 128-159.
-   * - 0x78
-     - REG_ERR_5
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 160-191.
-   * - 0x7C
-     - REG_ERR_6
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 192-223.
-   * - 0x80
-     - REG_ERR_7
-     - 31:00
-     - R/W
-     - 0x00
-     - Error bits for event queue overflow for events 224-255.
-   * - 0x84
-     - REG_TIMER1_SEL_HI
-     - 7:0
-     - R/W
-     - 0x00
-     - Specifies which event should be routed to the lo timer.
-   * - 0x88
-     - REG_TIMER1_SEL_LO
-     - 7:0
-     - R/W
-     - 0x00
-     - Specifies which event should be routed to the hi timer.
-   * - 0x90
-     - REG_FIFO
-     - 7:0
-     - R
-     - 0x00
-     - ID of triggering event for interrupt handler.
+REG_PR_MASK_1
+^^^^^^^^^^^^^
+  - Offset: 0x48
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_1    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 32-63 of peripheral   |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_2
+^^^^^^^^^^^^^
+  - Offset: 0x4C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_2    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 64-95 of peripheral   |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_3
+^^^^^^^^^^^^^
+  - Offset: 0x50
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_3    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 96-127 of peripheral  |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_4
+^^^^^^^^^^^^^
+  - Offset: 0x54
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_4    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 128-159 of peripheral |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_5
+^^^^^^^^^^^^^
+  - Offset: 0x58
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_5    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 160-191 of peripheral |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_6
+^^^^^^^^^^^^^
+  - Offset: 0x5C
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_6    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 192-223 of peripheral |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_PR_MASK_7
+^^^^^^^^^^^^^
+  - Offset: 0x60
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_PR_MASK_7    | 31:0 | RW   | 0xFFFFFFFF | Individual masks for         |
+|                  |      |      |            | events 224-255 of peripheral |
+|                  |      |      |            | (1=mask event).              |
++------------------+------+------+------------+------------------------------+
+
+REG_ERR_0
+^^^^^^^^^
+  - Offset: 0x64
+  
++------------------+------+------+------------+------------------------------+
+| Field            | Bits | Type | Default    | Description                  |
++==================+======+======+============+==============================+
+| REG_ERR_0        | 31:0 | R1C  | 0x00       | Error bits for event queue   |
+|                  |      |      |            | overflow for events 0-31.    |
++------------------+------+------+------------+------------------------------+
+
+REG_ERR_1
+^^^^^^^^^
+  - Offset: 0x68
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_1        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 32-63.   |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_2
+^^^^^^^^^
+  - Offset: 0x6C
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_2        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 64-95.   |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_3
+^^^^^^^^^
+  - Offset: 0x70
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_3        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 96-127.  |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_4
+^^^^^^^^^
+  - Offset: 0x74
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_4        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 128-159. |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_5
+^^^^^^^^^
+  - Offset: 0x78
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_5        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 160-191. |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_6
+^^^^^^^^^
+  - Offset: 0x7C
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_6        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 192-223. |
++------------------+------+------+---------+------------------------------+
+
+REG_ERR_7
+^^^^^^^^^
+  - Offset: 0x80
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_ERR_7        | 31:0 | R1C  | 0x00    | Error bits for event queue   |
+|                  |      |      |         | overflow for events 224-255. |
++------------------+------+------+---------+------------------------------+
+
+REG_TIMER1_SEL_HI
+^^^^^^^^^^^^^^^^^
+  - Offset: 0x84
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_TIMER1_SEL_HI| 7:0  | RW   | 0x00    | Specifies which event should |
+|                  |      |      |         | be routed to the lo timer.   |
++------------------+------+------+---------+------------------------------+
+
+REG_TIMER1_SEL_LO
+^^^^^^^^^^^^^^^^^
+  - Offset: 0x88
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_TIMER1_SEL_LO| 7:0  | RW   | 0x00    | Specifies which event should |
+|                  |      |      |         | be routed to the hi timer.   |
++------------------+------+------+---------+------------------------------+
+
+REG_FIFO
+^^^^^^^^
+  - Offset: 0x90
+  
++------------------+------+------+---------+------------------------------+
+| Field            | Bits | Type | Default | Description                  |
++==================+======+======+=========+==============================+
+| REG_FIFO         | 7:0  | RO   | 0x00    | ID of triggering event for   |
+|                  |      |      |         | interrupt handler.           |
++------------------+------+------+---------+------------------------------+
+
+Firmware Guidelines
+-------------------
+Follow these steps to properly configure and use the SOC Event Controller IP:
+
+  1. Initialize the event controller by setting appropriate mask values:
+
+    - Write to REG_FC_MASK_0 through REG_FC_MASK_7 to configure which events to mask and which should be routed to the FC.
+    - Write to REG_CL_MASK_0 through REG_CL_MASK_7 to configure which events to mask and which should be routed to the cluster.
+    - Write to REG_PR_MASK_0 through REG_PR_MASK_7 to configure which events to mask and which should be routed to peripherals.
+    - Remember that mask bits are active high (1 = masked/blocked, 0 = enabled).
+
+  2. Configure timer event sources if needed:
+
+    - Write to REG_TIMER1_SEL_LO with the event index (0-169) that should trigger the timer low signal.
+    - Write to REG_TIMER1_SEL_HI with the event index (0-169) that should trigger the timer high signal.
+    - Note that valid event indices range from 0 to 169 due to peripheral events(160), APB events(8), and low-speed clock event(1).
+
+  3. Clear any pending errors:
+
+    - Read from REG_ERR_0 through REG_ERR_7 to clear any existing error flags.
+
+  4. Generate software events when needed:
+
+    - Write to REG_EVENT register with bits set for the specific events to trigger.
+    - Only the lower 8 bits are used.
+    - Example: Write 0x01 to REG_EVENT to trigger APB event 0.
+    - Example: Write 0x80 to REG_EVENT to trigger APB event 7.
+
+  5. Process FC events through the FIFO:
+
+    - Monitor the event_fifo_valid_o signal to know when an event is available in the FIFO.
+    - When valid, read the event ID from REG_FIFO.
+    - Acknowledge the event by asserting core_irq_ack_i and setting core_irq_ack_id_i to 11.
+    - The FIFO can store up to 4 events before overflow occurs.
+
+  6. Monitor and handle event errors:
+
+    - Periodically check REG_ERR_0 through REG_ERR_7 for any set error bits.
+    - Each bit corresponds to an event source that experienced an queue overflow.
+    - Clear errors by reading from the corresponding ERR register.
+    - Implement appropriate error recovery mechanisms based on which events had overflow errors.
+
+  7. For dynamic reconfiguration:
+
+    - Event masks can be updated at runtime to change event routing behavior.
+    - Timer event sources can be changed during operation by updating TIMER1_SEL registers.
+    - Software events can be generated at any time by writing to REG_EVENT.
+
+  8. Handle cluster and peripheral events:
+
+    - Monitor cl_event_valid_o and pr_event_valid_o signals.
+    - When valid, read event data from cl_event_data_o or pr_event_data_o.
+    - Acknowledge event processing by asserting cl_event_ready_i or pr_event_ready_i.
+
+Pin Description
+---------------
+.. figure:: apb_event_controller_pin_diagram.png
+   :name: APB_Event_Controller_Pin_Diagram
+   :align: center
+   :alt:
+
+   APB Event Controller Pin Diagram
+
+Clock and Reset
+^^^^^^^^^^^^^^^
+  - HCLK: APB clock input
+  - HRESETn: Active low reset signal
+  - low_speed_clk_i: Low-speed clock input
+
+APB Interface Signals
+^^^^^^^^^^^^^^^^^^^^^
+  - PADDR[11:0]: APB address bus input
+  - PWDATA[31:0]:  APB write data bus input
+  - PWRITE: APB write control input (high for write, low for read)
+  - PSEL: APB peripheral select input
+  - PENABLE: APB enable input
+  - PRDATA: APB write data bus input
+  - PREADY: APB ready output to indicate transfer completion
+  - PSLVERR: APB error response output signal
+
+Peripheral Event Signals
+^^^^^^^^^^^^^^^^^^^^^^^^
+  - per_events_i[159:0]: Peripheral event inputs
+  - pr_event_valid_o: Peripheral event valid output
+  - pr_event_data_o: Peripheral event data output, indicating the event ID
+  - pr_event_ready_i: Peripheral event ready input, indicating readiness to process the event
+
+Fabric Controller Event Signals
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+  - fc_events_o[1:0]: Fabric control event output, directly connected to per_events_i[8:7] (Not connected in current implementation).
+  - core_irq_ack_id_i[4:0]: Core interrupt acknowledge ID input
+  - core_irq_ack_i:  Core interrupt acknowledge input
+  - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO
+
+Cluster Event Signals
+^^^^^^^^^^^^^^^^^^^^^
+  - cl_event_valid_o: Cluster event valid output (Not connected in current implementation).
+  - cl_event_data_o[7:0]: Cluster event data output, indicating the event ID (Not connected in current implementation).
+  - cl_event_ready_i: Cluster event ready input, indicating readiness to process the event (Not connected in current implementation).
+
+Timer Event Signals
+^^^^^^^^^^^^^^^^^^^
+  - timer_event_lo_o: Timer event low output
+  - timer_event_hi_o: Timer event high output
+
+Error Signals
+^^^^^^^^^^^^^
+  - err_event_o: Error event output, indicating queue overflow for any of the input events.
