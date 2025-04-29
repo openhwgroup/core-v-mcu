@@ -86,7 +86,8 @@ System Architecture
 
 Output Channels
 ^^^^^^^^^^^^^^^
-  - FC (Fabric Controller/Core Complex) Channel: Directly routes 2 events to the FC Event Unit(Not connected in current implementation)
+  - FC (Fabric Controller/Core Complex) Channel: Directly routes 2 events to the FC Event Unit(Not connected in current implementation). 
+      FC related events are acccessible through FiFo CSR.
   - CL (Cluster) Channel: Routes events to the Cluster (Not connected in current implementation)
   - PR (Peripheral) Channel: Routes events to uDMA peripherals.
   - Event FIFO: Buffers events for the FC channel
@@ -100,19 +101,19 @@ The SOC Event Controller is programmed through an APB interface with a 4KB addre
 Control Flow
 ^^^^^^^^^^^^
   - Event Generation: Events can be generated from peripherals (160 sources), software (8 sources), or low-speed clock
-  - Event Masking: Events can be selectively masked for each output channel using 256-bit mask registers
+  - Event Masking: Events can be selectively masked for each output channel using 256-bit mask CSRs
   - Event Routing: Events are arbitrated and routed to the appropriate output channels
-  - Error Handling: Event processing errors are detected and reported through error registers
+  - Error Handling: Event processing errors are detected and reported through error CSRs
   - Timer Control: Two timer event signals can be generated from any event source
 
 Programming Interface
 ^^^^^^^^^^^^^^^^^^^^^
   - Software Event Generation: Write to REG_EVENT CSR
-  - Event Masking: Configure FC_MASK, CL_MASK, and PR_MASK registers
+  - Event Masking: Configure FC_MASK, CL_MASK, and PR_MASK CSRs
   - Event Arbitration: The arbiter resolves concurrent events using a parallel prefix network with round-robin priority
-  - Timer Event Selection: Configure TIMER1_SEL_HI and TIMER1_SEL_LO registers
-  - Error Monitoring: Read ERR registers to detect event handling errors
-  - Error Clearing: Clear errors by reading from the corresponding ERR registers
+  - Timer Event Selection: Configure TIMER1_SEL_HI and TIMER1_SEL_LO CSRs
+  - Error Monitoring: Read ERR CSRs to detect event handling errors
+  - Error Clearing: Clear errors by reading from the corresponding ERR CSRs
   - Event FIFO Access: Read from REG_FIFO CSR to retrieve buffered event
 
 APB Event Control CSR
@@ -561,7 +562,7 @@ Follow these steps to properly configure and use the SOC Event Controller IP:
 
   4. Generate software events when needed:
 
-    - Write to REG_EVENT register with bits set for the specific events to trigger.
+    - Write to REG_EVENT CSR with bits set for the specific events to trigger.
     - Only the lower 8 bits are used.
     - Example: Write 0x01 to REG_EVENT to trigger APB event 0.
     - Example: Write 0x80 to REG_EVENT to trigger APB event 7.
@@ -577,13 +578,13 @@ Follow these steps to properly configure and use the SOC Event Controller IP:
 
     - Periodically check REG_ERR_0 through REG_ERR_7 for any set error bits.
     - Each bit corresponds to an event source that experienced an queue overflow.
-    - Clear errors by reading from the corresponding ERR register.
+    - Clear errors by reading from the corresponding ERR CSR.
     - Implement appropriate error recovery mechanisms based on which events had overflow errors.
 
   7. For dynamic reconfiguration:
 
     - Event masks can be updated at runtime to change event routing behavior.
-    - Timer event sources can be changed during operation by updating TIMER1_SEL registers.
+    - Timer event sources can be changed during operation by updating TIMER1_SEL CSRs.
     - Software events can be generated at any time by writing to REG_EVENT.
 
   8. Handle cluster and peripheral events:
@@ -629,7 +630,8 @@ Fabric Controller Event Signals
   - fc_events_o[1:0]: Fabric control event output, directly connected to per_events_i[8:7] (Not connected in current implementation).
   - core_irq_ack_id_i[4:0]: Core interrupt acknowledge ID input
   - core_irq_ack_i:  Core interrupt acknowledge input
-  - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO
+  - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO.
+  - err_event_o: Error event output, indicating queue overflow for any of the input events.
 
 Cluster Event Signals
 ^^^^^^^^^^^^^^^^^^^^^
@@ -643,6 +645,3 @@ Timer Event Signals
   - timer_event_lo_o: Timer event low output
   - timer_event_hi_o: Timer event high output
 
-Error Signals
-^^^^^^^^^^^^^
-  - err_event_o: Error event output, indicating queue overflow for any of the input events.
