@@ -28,12 +28,21 @@ For more details about TCDM interconnect refer `here <https://github.com/openhwg
 Block Diagram
 ~~~~~~~~~~~~~~
 
-.. figure:: ../images/TCDM_Interconnect_block_diagram.png
+.. figure:: ../images/TCDM_block_diagram.png
    :name: TCDM_Interconnect_block_diagram
    :align: center
    :alt: 
 
    TCDM Interconnect block diagram
+
+System Architecture
+~~~~~~~~~~~~~~~~~~~
+.. figure:: ../images/TCDM_Interconnect_block_diagram.png
+   :name: TCDM_Interconnect_block_diagram
+   :align: center
+   :alt: 
+
+   TCDM Interconnect connection diagram
 
 Pin Diagram
 ~~~~~~~~~~~~~~
