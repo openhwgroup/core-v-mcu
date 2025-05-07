@@ -57,6 +57,56 @@ The SOC Event Controller consists of several key components that work together t
   - Event Masking: Configurable masking for each output channel (FC, CL, PR)
   - Timer Event Generator: Selectable event routing to timer outputs
 
+Event Processing Flow
+^^^^^^^^^^^^^^^^^^^^^
+**Event Generation and Collection**
+  - Peripheral events enter the system from external components
+  - APB-triggered events can be generated through software
+  - A low-speed clock edge detector serves as an additional event source
+
+**Event Queuing**
+  - Each event source has a dedicated queue implemented by the soc_event_queue instances
+  - Queues track pending events and report errors when events are missed
+  - The queuing system ensures no events are lost during processing
+  - Each queue can hold up to 4 events before overflow occurs
+
+**Event Arbitration**
+  - The soc_event_arbiter manages the arbitration of events from all sources
+  - The arbiter resolves contention when multiple events occur simultaneously
+
+**Event Masking and Routing**
+  - The event controller uses configurable mask CSRs to control event routing
+  - The masks allow selective blocking of events based on the system's needs
+
+**Event Output Channels**
+  - The event controller routes events to three output channels:
+    - FC (Fabric Controller/Core Complex)
+    - CL (Cluster)
+    - PR (Peripheral)
+  - Each channel can be independently configured to receive specific events
+
+**Event Processing**
+  - The event controller provides ready signals for CL and PR output channel(pr_event_ready_i, cl_event_ready_i)
+  - For FC events, the eeadiness is handled through the event FIFO i.e. an event is available in the FIFO
+  - The event controller is only ready to process(arbitrate and output) the next event when ALL destinations(FC, CL, PR) are ready at same time.
+
+**FC Event FIFO**
+  - The event controller includes a FIFO for buffering events destined for the FC
+  - The FIFO is implemented as a circular buffer with a depth of 4
+  - Events are stored in the FIFO when the FC is busy or unable to process them immediately
+  - The FIFO can be accessed through the APB interface for reading buffered events
+
+**Error Handling**
+  - Each event queue reports errors when events are missed
+  - Error flags are stored in the r_err CSRs
+  - The err_event_o signal provides a consolidated error indicator
+  - Errors can be cleared by reading the corresponding error CSRs
+
+**Timer Event Generation**
+  - The event controller includes two timer outputs (timer_event_lo_o and timer_event_hi_o)
+  - Each timer can be programmed to monitor any event source
+  - The timer source is selected through the r_timer_sel_lo and r_timer_sel_hi CSRs
+
 Event arbitration
 ^^^^^^^^^^^^^^^^^
 The SOC Event Controller uses a sophisticated parallel prefix arbitration scheme to efficiently handle multiple simultaneous event requests.
@@ -641,7 +691,7 @@ Cluster Event Signals
 
 Timer Event Signals
 ^^^^^^^^^^^^^^^^^^^
-  - low_speed_clk_i: Low-speed clock input
+  - low_speed_clk_i: Low-speed clock event input
   - timer_event_lo_o: Timer event low output
   - timer_event_hi_o: Timer event high output
 
