@@ -35,38 +35,68 @@ Block Diagram
 
    TCDM Interconnect block diagram
 
-   It contains 9 master ports and 9 slave ports.
+It contains 9 master ports and 9 slave ports.
    
-   Masters: 
-   - uDMA Subsystem (2 ports)
-   - eFPGA (4 ports)
-   - Core Complex (2 ports)
-   - Debug Module (1 port)
+Masters: 
+- uDMA Subsystem (2 ports)
+- eFPGA (4 ports)
+- Core Complex (2 ports)
+- Debug Module (1 port)
 
-   Slaves: 
-   - Boot ROM
-   - Non-interleaved memory (2 private memory banks)
-   - Interleaved memory (4 banks)
-   - APB peripheral interconnect
-   - eFPGA APB Target 1
+Slaves: 
+- Boot ROM
+- Non-interleaved memory (2 private memory banks)
+- Interleaved memory (4 banks)
+- APB peripheral interconnect
+- eFPGA APB Target
 
-   The masters interfaces are connected to the TCDM Demux, which acts as the central routing module for slave access.
-   This module is responsible for directing data to one of three slave regions: the AXI region, which includes APB peripherals mapped between address range 0x1A100000 to 0x1A300000; 
-   the contiguous slave region, which comprises L2 private memory banks (core-private memory), Boot ROM, and the eFPGA APBT1; and the interleaved slave region, with address ranges spanning from 0x1C010000 to 0x1C090000.
+Master-Slave Communication via TCDM Demux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The uDMA SS, eFPGA, and Core Complex masters connect to the TCDM Demux, which is responsible for routing requests to the correct slave. The slaves fall into three categories based on address regions:
+- AXI Region : For APB peripherals (address range: 0x1A100000 to 0x1A300000)
+- Contiguous Slaves : Includes L2 private memory banks (core memory), Boot ROM, and eFPGA APBT1
+- Interleaved Slaves : Mapped to address range 0x1C010000 to 0x1C090000
 
-   The TCDM Demux integrates an address decoder that inspects each incoming request address and matches it against the configured address ranges for all slave regions. Upon identifying a match, the module generates a slave_id, which is used
-   as a select signal to route the request to the appropriate slave region—AXI, contiguous, or interleaved.
+The TCDM Demux integrates an address decoder that inspects each incoming request address and matches it against the configured address ranges for all slave regions. When the match is found, the module outputs a slave_id, which is used
+as a select line to route the request to the appropriate slave region — AXI, contiguous, or interleaved.
 
-   Within the contiguous crossbar, the data transfer process begins when a master asserts the REQ signal, along with associated control signals such as ADDR, WEN, WDATA, and BE. These signals are bundled into a unified data bus and transmitted to the crossbar.
-   An internal address decoder uses the ADDR signal to derive a port_sel signal, which identifies the specific slave port to target. The crossbar then forwards the request to the appropriate slave.
+Interaction with Contiguous Crossbar
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The contiguous crossbar consists of two primary components:
+1. Address Decoders - One per master (Total of 9)
+2. Single Xbar Module 
 
-   Upon receiving a valid REQ, the selected slave immediately asserts the GNT signal in the same clock cycle to acknowledge the transaction. It then calculates a local address by subtracting its base address from the incoming address and performs the requested read or write operation.
-   In the case of a read, the R_VALID signal is asserted in the following clock cycle to indicate that valid data is ready for return. The GNT signal is automatically deasserted once the master releases the REQ signal.
+Each address decoder receives the ADDR from TCDM demux and checks it against the address ranges of contiguous slaves address. if a match is found, port_sel is generated and sent to the Xbar module's ADDR input.
+Meanwhile the actual request (ADDR, WEN, WDATA and BE) is aggregated into single bundle and forwarded to Xbar's WDATA input.
+
+The Xbar is a multi-master and multi-slave module that includes:
+1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
+2. A dedicated RR arbiter for each slave to handle requests from multiple masters
+
+The address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbiter grants access to one master per cycle using a round-robin (RR) policy.
+Once access is granted, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
+
+When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. For read operations, the r_data and valid signals are updated in the next clock cycle.
+
+Interaction with Interleaved Crossbar
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The interleaved crossbar follows a different mechanism for selecting the target slave. Unlike the contiguous crossbar, it does not use address decoders based on full address ranges.
+Instead, it uses specific address bits (often referred to as bank bits) to determine the destination memory bank. These bits are extracted from the request address and forwarded to the Xbar's ADDR input.
+Each master aggregates its request (ADDR, WEN, WDATA, and BE) into a bundled format and sends it to the crossbar's DATA input.
+
+Internally, the interleaved crossbar also contains a Xbar module that includes:
+1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
+2. A dedicated RR arbiter for each slave to handle requests from multiple masters
+
+As in contiguous cross bar, the address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbitration occurs every clock cycle, ensuring fair access.
+Once master is granted access, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
+
+When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. For read operations, the r_data and valid signals are updated in the next clock cycle.
 
 System Architecture
 ~~~~~~~~~~~~~~~~~~~
 .. figure:: ../images/TCDM_Interconnect_block_diagram.png
-   :name: TCDM_Interconnect_block_diagram
+   :name: TCDM_Interconnect_connection_diagram
    :align: center
    :alt: 
 
