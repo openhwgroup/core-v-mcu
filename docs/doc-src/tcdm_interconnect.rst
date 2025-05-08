@@ -37,13 +37,15 @@ Block Diagram
 
 It contains 9 master ports and 9 slave ports.
    
-Masters: 
+**Masters:** 
+
 - uDMA Subsystem (2 ports)
 - eFPGA (4 ports)
 - Core Complex (2 ports)
 - Debug Module (1 port)
 
-Slaves: 
+**Slaves:** 
+
 - Boot ROM
 - Non-interleaved memory (2 private memory banks)
 - Interleaved memory (4 banks)
@@ -53,6 +55,7 @@ Slaves:
 Master-Slave Communication via TCDM Demux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The uDMA SS, eFPGA, and Core Complex masters connect to the TCDM Demux, which is responsible for routing requests to the correct slave. The slaves fall into three categories based on address regions:
+
 - AXI Region : For APB peripherals (address range: 0x1A100000 to 0x1A300000)
 - Contiguous Slaves : Includes L2 private memory banks (core memory), Boot ROM, and eFPGA APBT1
 - Interleaved Slaves : Mapped to address range 0x1C010000 to 0x1C090000
@@ -63,6 +66,7 @@ as a select line to route the request to the appropriate slave region — AXI, c
 Interaction with Contiguous Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The contiguous crossbar consists of two primary components:
+
 1. Address Decoders - One per master (Total of 9)
 2. Single Xbar Module 
 
@@ -70,6 +74,7 @@ Each address decoder receives the ADDR from TCDM demux and checks it against the
 Meanwhile the actual request (ADDR, WEN, WDATA and BE) is aggregated into single bundle and forwarded to Xbar's WDATA input.
 
 The Xbar is a multi-master and multi-slave module that includes:
+
 1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
 2. A dedicated RR arbiter for each slave to handle requests from multiple masters
 
@@ -85,6 +90,7 @@ Instead, it uses specific address bits (often referred to as bank bits) to deter
 Each master aggregates its request (ADDR, WEN, WDATA, and BE) into a bundled format and sends it to the crossbar's DATA input.
 
 Internally, the interleaved crossbar also contains a Xbar module that includes:
+
 1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
 2. A dedicated RR arbiter for each slave to handle requests from multiple masters
 
