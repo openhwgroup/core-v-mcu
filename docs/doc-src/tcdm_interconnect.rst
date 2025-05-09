@@ -65,6 +65,7 @@ as a select line to route the request to the appropriate slave region — AXI, c
 
 Interaction with Contiguous Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. figure:: ../images/TCDM_Contiguous_Crossbar.png
    :name: TCDM_Contiguous_Crossbar
    :align: center
@@ -92,6 +93,7 @@ When a slave detects the REQ signal, it immediately asserts the GNT signal in th
 
 Interaction with Interleaved Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. figure:: ../images/TCDM_Interleaved_Crossbar.png
    :name: TCDM_Interleaved_Crossbar
    :align: center
