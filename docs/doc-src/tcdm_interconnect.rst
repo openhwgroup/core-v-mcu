@@ -33,7 +33,7 @@ Block Diagram
    :align: center
    :alt: 
 
-   TCDM Interconnect block diagram
+   **TCDM Interconnect block diagram**
 
 It contains 9 master ports and 9 slave ports.
    
@@ -65,6 +65,13 @@ as a select line to route the request to the appropriate slave region — AXI, c
 
 Interaction with Contiguous Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. figure:: ../images/TCDM_Contiguous_Crossbar.png
+   :name: TCDM_Contiguous_Crossbar
+   :align: center
+   :alt: 
+
+   **Contiguous Crossbar**
+
 The contiguous crossbar consists of two primary components:
 
 1. Address Decoders - One per master (Total of 9)
@@ -85,6 +92,13 @@ When a slave detects the REQ signal, it immediately asserts the GNT signal in th
 
 Interaction with Interleaved Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. figure:: ../images/TCDM_Interleaved_Crossbar.png
+   :name: TCDM_Interleaved_Crossbar
+   :align: center
+   :alt: 
+
+   **Interleaved Crossbar**
+
 The interleaved crossbar follows a different mechanism for selecting the target slave. Unlike the contiguous crossbar, it does not use address decoders based on full address ranges.
 Instead, it uses specific address bits (often referred to as bank bits) to determine the destination memory bank. These bits are extracted from the request address and forwarded to the Xbar's ADDR input.
 Each master aggregates its request (ADDR, WEN, WDATA, and BE) into a bundled format and sends it to the crossbar's DATA input.
