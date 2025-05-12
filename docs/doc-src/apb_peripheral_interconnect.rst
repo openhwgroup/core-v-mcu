@@ -21,14 +21,15 @@ APB Peripheral Interconnect
 ===========================
 
 The APB Peripheral Interconnect(Peripheral Bus Wrapper) functions as a central interface hub that enables communication between multiple peripheral devices and the Core Complex of CORE-V-MCU.
-This IP efficiently routes APB transactions from TCDM bus to various peripheral controllers based on address mapping, facilitating organized and structured communication within the CORE-V-MCU.
+This IP is essenitally an APB bus wrapper which works based on APB protocol and efficiently routes APB transactions from TCDM bus to various peripheral controllers based on address mapping, facilitating organized and structured communication within the CORE-V-MCU.
 
 Features
 --------
   - Multiple Peripheral Support: Interfaces with 11 distinct peripheral devices
   - Address-Based Routing: Routes transactions based on predefined address ranges
-  - Request Timeout Handling: Includes request timeout detection and peripheral-specific timeout reporting
-  - Error Reporting: Provides peripheral-specific request timeout reporting via dedicated signals
+  - Request Timeout detection: Includes request timeout detection and peripheral-specific timeout reporting
+  - Request Timeout error reporting: Provides peripheral-specific request timeout reporting via dedicated signals
+  - Address and Data bus: 12-bit address bus and 32-bit data bus, fully compliant with APB protocol
 
 Block Architecture
 ------------------
@@ -42,10 +43,10 @@ The figure below is a high-level block diagram of the APB Peripheral Interconnec
 
    APB Peripheral Interconnect Block Diagram
 
-Normal Operation
-^^^^^^^^^^^^^^^^
+APB Transaction Routing
+^^^^^^^^^^^^^^^^^^^^^^^
 The APB Peripheral Interconnect operates as a bridge between the system bus(TCDM bus) and multiple peripheral devices, allowing for efficient communication and data transfer.
-The normal operation follows:
+The APB transaction routing flow can be summarized as follows:
 
     - Firmware performs read/write operations to specific memory-mapped addresses, Core Complex initiates APB transactions to the APB Peripheral Interconnect.
     - APB Peripheral Interconnect routes these transactions to the appropriate peripheral based on address ranges.
@@ -57,9 +58,9 @@ Timeout Mechanism
 The APB Peripheral Interconnect includes a timeout detection mechanism to handle situations where a peripheral fails to respond within a specified time frame.
 Below is a description of the timeout handling process:
 
-    - The start_rto_o signal is activated when a peripheral is selected, triggering timeout counter in SoC Controller.
-    - If a peripheral doesn't respond within the timeout period, the rto_i input is asserted by SoC Controller.
-    - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond.
+    - The start_rto_o signal is activated when a peripheral is selected based on the address specified in the APB transaction, triggering timeout counter in SoC Controller.
+    - If a peripheral doesn't respond within the timeout period i.e. before the rto_i input is asserted by SoC Controller, a timeout error occurs.
+    - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller.
 
 System Architecture
 -------------------
@@ -74,30 +75,20 @@ The figure below depicts the connections between the CORE-V-MCU and rest of the 
    APB Peripheral Interconnect CORE-V-MCU connections diagram
 
 The APB Peripheral Interconnect provides routing to the following modules:
+                               
+  - APB FLL                                      
+  - APB GPIO                                     
+  - uDMA Subsystem                               
+  - APB SoC Controller                           
+  - APB Advanced Timer                           
+  - APB Event Controller                         
+  - APB I2C Slave                                
+  - APB Timer                                    
+  - eFPGA subsystem                             
+  - APB Debugger 
+  - stdout emulator                                 
 
-+----------------------------+---------------------+---------------------+
-| Peripheral                 | Start Address       | End Address         |                        
-+============================+=====================+=====================+
-| APB FLL                    | 0x1A10_0000         | 0x1A10_0FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB GPIO                   | 0x1A10_1000         | 0x1A10_1FFF         |                        
-+----------------------------+---------------------+---------------------+
-| uDMA Subsystem             | 0x1A10_2000         | 0x1A10_3FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB SoC Controller         | 0x1A10_4000         | 0x1A10_4FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB Advanced Timer         | 0x1A10_5000         | 0x1A10_5FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB Event Controller       | 0x1A10_6000         | 0x1A10_6FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB I2C Slave              | 0x1A10_7000         | 0x1A10_7FFF         |                        
-+----------------------------+---------------------+---------------------+
-| APB Timer                  | 0x1A10_B000         | 0x1A10_BFFF         |                        
-+----------------------------+---------------------+---------------------+
-| eFPGA subsystem            | 0x1A20_0000         | 0x1A2F_FFFF         |                       
-+----------------------------+---------------------+---------------------+
-| APB Debugger               | 0x1A11_0000         | 0x1A11_FFFF         |                         
-+----------------------------+---------------------+---------------------+
+Refer to the Memory map for the complete address mapping of the peripherals(https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html).
 
 Firmware Guidelines
 -------------------
@@ -106,9 +97,8 @@ Although standard memory read/write operations to the APB peripheral devices wil
 
 The following general guidelines should be followed while interacting Peripheral devices through the APB Peripheral Interconnect:
 
-  - Use the appropriate memory-mapped addresses for each peripheral.
   - Access peripheral registers using memory-mapped operations with the correct address calculated as (peripheral_base_address + register_offset).
-  - Ensure that the firmware handles timeout conditions gracefully(Check SoC Controller specs for more details).
+  - Ensure that the firmware handles timeout conditions gracefully(Check SoC Controller specs for more details - https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html).
   - Implement error handling for cases where a peripheral does not respond within the expected time frame.
 
 Pin Description
@@ -150,7 +140,7 @@ APB Master Interfaces
     - stdout_master: APB master interface for Stdout, Not connected
     - i2cs_master: APB master interface for I2C Slave
 
-Note: Each of the above master or slave interfaces has its own set of signals, including address, data, control, and ready signals.
+Note: Each of the above master or slave interfaces has its own set of signals, including address, data, control, and ready signals, which are detailed below.
 
 APB Interface Signals
 ^^^^^^^^^^^^^^^^^^^^^
