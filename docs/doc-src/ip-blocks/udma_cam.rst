@@ -23,8 +23,8 @@ A camera interface is a hardware block that interfaces with different
 image sensor interfaces and generates output that can be used for
 image processing.
 
-FEATURES:
----------
+Features
+--------
    - Supports RGB565, RGB555 ,RGB444, BYPASS_LITEND and BYPASS_BIGEND
      image formats.
 
@@ -39,19 +39,22 @@ FEATURES:
    - There is a vertical sync(VSYNC) input which indicates that one
      entire frame is transmitted. It can be configured for polarity.
 
-THEORY OF OPERATION:
-^^^^^^^^^^^^^^^^^^^^
+Block Architecture
+------------------
      cam_clk_i is a pixel clock which changes on every pixel. Pixel data
      is taken as input through cam_data_i, and cam_hsync_i and
      cam_vsync_i indicate the horizontal and vertical sync value. It
      supports active low reset. It contains a udma dc fifo to store the
      pixel value before sending it to output.
 
-BLOCK DIAGRAM:
-^^^^^^^^^^^^^^^^^^^
+The Figure below is a high-level block diagram of the uDMA UART:-
+.. figure:: udma_cam_image.png
+   :name: uDMA_Camera_Block_Diagram
+   :align: center
+   :alt:
 
-   |image1|
-   
+   uDMA Camera Block Diagram
+
    - Read write input pin, cfg_rwn_i indicates if we want to write to
      the register or read from the register. If the input is high then the
      register is selected for reading and else for writing. Address of the
@@ -155,126 +158,100 @@ BLOCK DIAGRAM:
 
       ○ Data can be read from the fifo through data_rx_data_o.
 
+System Architecture
+-------------------
+
+Programming Model
+------------------
+As with the most peripherals in the uDMA Subsystem, software configuration can be conceptualized into three functions:
+
+- Configure the I/O parameters of the peripheral (e.g. frame size).
+- Configure the uDMA camera data control parameters.
+- Manage the data transfer/reception operation.
+
+uDMA Camera Data Control
+^^^^^^^^^^^^^^^^^^^^^^
+Refer to the Firmware Guidelines section in the current chapter.
+
+Data Transfer Operation
+^^^^^^^^^^^^^^^^^^^^^^^
+Refer to the Firmware Guidelines section in the current chapter.
+
 uDMA CAMERA CSRs
-^^^^^^^^^^^^^^^^^
+----------------
 
-REG_RX_SADDR (Offset = 0x00)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the uDMA CAMERA.
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SADDR
-     - 31:0
-     - RW
-     - 
-     - Address of receive memory buffer:
-   * -
-     - 
-     - 
-     - 
-     - Read: value of pointer until transfer is over, then 0
-   * - 
-     - 
-     - 
-     - 
-     - Write: set memory buffer start address  
-..
+**NOTE:** Several of the uDMA CAMERA CSR are volatile, meaning that their read value may be changed by the hardware.
+For example, writting the *REG_RX_SADDR* CSR will set the address of the receive buffer pointer.
+As data is received, the hardware will update the value of the pointer to indicate the current address.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware.
+These CSRs retain the last value writen by software.
 
-REG_RX_SIZE (Offset = 0x04)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+A CSRs volatility is indicated by its "type".
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 15:0
-     - RW
-     - 0x00
-     - Buffer size in bytes (1MB max)
-   * -
-     - 
-     - 
-     - 
-     - Read: bytes remaining until transfer complete
-   * - 
-     - 
-     - 
-     - 
-     - Write: set number of bytes to transfer
-..
+Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
-REG_RX_CFG (Offset = 0x08)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-    :widths: 10 20 10 10 20
-    :header-rows: 1
+The CSRs REG_RX_SADDR, REG_RX_SIZE specifies the configuration for the transaction on the RX channel. The uDMA Core creates a local copy of this information at its end and use it for current ongoing transaction.
 
-    * - Field
-      - Bits
-      - Type
-      - Default
-      - Description
-    * - CLR
-      - 6:6
-      - WO
-      - 0x00
-      - Clear the receive channel
-    * - PENDING
-      - 5:5
-      - RO
-      - 0x00
-      - Receive transaction is pending
-    * - EN
-      - 4:4
-      - RW
-      - 0x00
-      - Enable the receive channel
-    * - DATASIZE
-      - 2:1
-      - RW
-      - 0X02
-      - Controls uDMA address increment
-    * - 
-      - 
-      - 
-      -
-      - 0x00: increment address by 1 (data is 8 bits)
-        
-        0x01: increment address by 2 (data is 16 bits)
-    * - 
-      - 
-      - 
-      -
-      - 0x02: increment address by 4 (data is 32 bits)
-    * - 
-      - 
-      - 
-      -
-      - 0x03: increment address by 0.
-    * - CONTINUOUS
-      - 0:0
-      - RW
-      - 0x00
-      - 0x0: stop after last transfer for channel
-    * - 
-      - 
-      - 
-      -      
-      - 0x1: after last transfer for channel 
-        
-        reload buffer size and start address and restart channel
-..
+REG_RX_SADDR
+^^^^^^^^^^^^
+- Offset: 0x0
+- Type:   volatile
+
++--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
+| Field  | Bits | Access | Default    | Description                                                                                              |
++========+======+========+============+==========================================================================================================+
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where UART will write the recived data.      |
+|        |      |        |            | Read & write to this CSR access different information.                                                   |
+|        |      |        |            |                                                                                                          |
+|        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction. |
+|        |      |        |            |                                                                                                          |
+|        |      |        |            | **On Read**:  Address of read buffer for the current ongoing transaction. This is the local copy of      |
+|        |      |        |            | information maintained inside the uDMA core.                                                             |
++--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
+
+REG_RX_SIZE
+^^^^^^^^^^^
+
+- Offset: 0x04
+- Type:   volatile
+
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
+| Field |  Bits | Access | Default    | Description                                                                                |
++=======+=======+========+============+============================================================================================+
+| SIZE  |  19:0 |   RW   |    0x0     | Size of Rx buffer(amount of data to be transferred by UART to L2 memory). Read & write     |
+|       |       |        |            | to this CSR access different information.                                                  |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Write**: Size of Rx buffer for next transaction.  It does not impact current ongoing  |
+|       |       |        |            | transaction.                                                                               |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Read**:  Bytes left for current ongoing transaction.  This is the local copy of       |
+|       |       |        |            | information maintained inside the uDMA core.                                               |
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
+
+REG_RX_CFG
+^^^^^^^^^^
+
+- Offset: 0x08
+- Type:   volatile
+
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core             |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,           |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO  |
+|            |       |        |            |   of uDMA Core                                                                     |
+|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory    |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size                         |
+|            |       |        |            |   and start address and restart channel                                            |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_GLOB (Offset = 0x20)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -509,6 +486,112 @@ REG_CAM_VSYNC_POLARITY (Offset = 0x34)
      - 0x1: Active high
 ..
 
-.. |image1| image:: udma_cam_image.png
-   :width: 6.5in
-   :height: 2.83333in
+Firmware Guidelines
+-------------------
+
+Clock Enable, Reset & Configure uDMA UART
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Rx Operation
+^^^^^^^^^^^^
+
+Pin Diagram
+-----------
+The Figure below is a high-level block diagram of the uDMA Camera:-
+
+.. figure:: uDMA_Camera_Pin_Diagram.png
+   :name: uDMA_Camera_Pin_Diagram
+   :align: center
+   :alt:
+
+   uDMA Camera Pin Diagram
+
+Below is categorization of these pins:
+
+Rx channel interface
+^^^^^^^^^^^^^^^^^^^^
+The following pins constitute the Rx channel interface of uDMA UART. uDMA UART uses these pins to write data to interleaved (L2) memory:
+
+- data_rx_datasize_o
+- data_rx_o
+- data_rx_valid_o
+- data_rx_ready_i
+
+These pins reflect the configuration values for the next transaction.
+
+Clock interface
+^^^^^^^^^^^^^^^
+- clk_i
+
+uDMA CORE derives these clock pins. clk_i is used to synchronize Camera with uDAM Core.
+
+Reset interface
+^^^^^^^^^^^^^^^
+- rstn_i
+
+uDMA core issues reset signal to Camera using reset pin.
+
+uDMA UART inerface to read-write CSRs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The following interfaces are used to read and write to Camera CSRs. These interfaces are managed by uDMA Core:
+
+- cfg_data_i
+- cfg_addr_i
+- cfg_valid_i
+- cfg_rwn_i
+- cfg_ready_o
+- cfg_data_o
+
+Rx channel interface
+^^^^^^^^^^^^^^^^^^^^
+The following pins constitute the Rx channel interface of uDMA UART. uDMA UART uses these pins to write data to interleaved (L2) memory:
+
+- data_rx_datasize_o
+- data_rx_o
+- data_rx_valid_o
+- data_rx_ready_i
+
+These pins reflect the configuration values for the next transaction.
+
+uDMA UART Rx channel configuration interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- uDMA UART uses the following pins to share the value of config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG with the uDMA core:-
+
+   - cfg_rx_startaddr_o
+   - cfg_rx_size_o
+   - cfg_rx_continuous_o
+   - cfg_rx_en_o
+   - cfg_rx_clr_o
+
+- UART shares the values present over the below pins as read values of the config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG:
+
+   - cfg_rx_en_i
+   - cfg_rx_pending_i
+   - cfg_rx_curr_addr_i
+   - cfg_rx_bytes_left_i
+
+   These values are updated by the uDMA core and reflects the configuration values for the current ongoing transactions.
+
+Test Interface
+^^^^^^^^^^^^^^
+
+- dft_test_mode_i: Design-for-test mode signal
+- dft_cg_enable_i: Clock gating enable during test
+
+*dft_test_mode_i* is used to put uDMA Camera into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
+
+Camera clock interface
+^^^^^^^^^^^^^^^^^^^^^^
+
+- cam_clk_i
+
+TODO: Add descrition
+
+Camera frame interface
+^^^^^^^^^^^^^^^^^^^^^^
+
+- cam_data_i
+- cam_hsync_i
+- cam_vsync_i
+
+TODO: Add descrition
