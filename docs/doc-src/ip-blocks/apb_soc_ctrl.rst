@@ -52,7 +52,9 @@ The APB SoC Controller IP consists of the following key components:
 Pad Configuration
 ~~~~~~~~~~~~~~~~~
 The controller manages pad multiplexing and configuration for all system IOs. It provides the multiplexing information to the Pad control module, which directly manages the IO pads.
+
 Each pad can be individually configured for:
+
   - Pad multiplexing (selecting the pad function i.e. connecting the I/O to different signals in CORE-V-MCU)
   - Pad electrical configuration (drive strength, pull-up/down, etc.)
 
@@ -66,6 +68,7 @@ Watchdog Timer
 ~~~~~~~~~~~~~~
 A programmable watchdog timer(WDT) runs on the reference clock(ref_clk_i) and resets the system when expired. The watchdog timer is a safety feature designed to detect and recover from system malfunctions.
 Features include:
+
   - Configurable timeout period through the WD_COUNT CSR
   - Hardware-based countdown mechanism operating on the reference clock
   - Enable/disable control via the WD_CONTROL CSR
@@ -109,6 +112,7 @@ eFPGA Interface
 ~~~~~~~~~~~~~~~
 The SoC Controller provides comprehensive management of the embedded FPGA (eFPGA) interface, enabling configuration, control, and monitoring of the eFPGA subsystem.
 Key Features:
+
   - Reset control for the eFPGA quadrants (left bottom, right bottom, right top, left top)
   - Interface enabling/disabling for various eFPGA connections (TCDM, APB, events)
   - Status monitoring and CSR access for eFPGA operations
@@ -188,6 +192,7 @@ JTAG Interface
 ~~~~~~~~~~~~~~
 The SoC Controller provides an interface to the JTAG debug port, enabling bidirectional communication and control for system-level debugging.
 Key Features:
+
   - 8-bit JTAG register interface 
   - Bidirectional communication through JTAGREG CSR
   - Synchronization of incoming JTAG signals to the system clock
@@ -206,6 +211,7 @@ Soft Reset Mechanism
 ~~~~~~~~~~~~~~~~~~~~
 The soft reset mechanism allows the SoC Controller to reset all APB client peripherals connected to the APB bus without requiring a full system reset. This feature is useful for recovering from peripheral malfunctions or reinitializing peripherals during runtime.
 Key Features:
+
   - Resets all APB client peripherals to their default states.
   - Allows reconfiguration of peripherals without a full system reset.
   - Provides a mechanism to reinitialize APB peripherals through APB interface.
@@ -254,13 +260,13 @@ Programming View Model
 The APB SOC Controller is memory-mapped at a base address defined by the system. All CSRs are accessible via standard APB read/write operations.
 
 CSR Access
-^^^^^^^^^^^
+~~~~~~~~~~
 CSRs are accessed using 32-bit reads and writes over the APB bus. The address space is organized as follows:
   - Base CSRs: 0x000 - 0x0FC
   - Pad configuration CSRs: 0x400 - 0x4C0
 
 Programming Sequence
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 Typical programming sequences include:
   - Read system information from INFO CSR
   - Configure boot address and fetch enable
@@ -282,7 +288,7 @@ A CSRs volatility is indicated by its "type".
 Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
 INFO
-^^^^
+~~~~
   - Address Offset = 0x0000
   - Type: non-volatile
 
@@ -295,7 +301,7 @@ INFO
 +----------------+-----------+------------+-------------+----------------------------------+
 
 FCBOOT
-^^^^^^
+~~~~~~
   - Address Offset = 0x0004
   - Type: non-volatile
 
@@ -306,7 +312,7 @@ FCBOOT
 +----------------+-----------+------------+-------------+----------------------------------+
 
 FCFETCH
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x0008
   - Type: non-volatile
 
@@ -319,7 +325,7 @@ FCFETCH
 +----------------+-----------+------------+-------------+------------------------------------+
 
 BUILD_DATE
-^^^^^^^^^^
+~~~~~~~~~~
   - Address Offset = 0x000C
   - Type: non-volatile
 
@@ -334,7 +340,7 @@ BUILD_DATE
 +-------------+----------+------------+-------------+--------------------+
 
 BUILD_TIME
-^^^^^^^^^^
+~~~~~~~~~~
   - Address Offset = 0x0010
   - Type: non-volatile
 
@@ -349,7 +355,7 @@ BUILD_TIME
 +---------------+----------+------------+-------------+---------------------+
 
 WCFGFUN
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x0060
   - type: non-volatile
 
@@ -370,7 +376,7 @@ WCFGFUN
 +-------------+----------+------------+-------------+------------------------------+
 
 RCFGFUN
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x0064
   - type: volatile
   - Only IO_PAD bit is writable, that allows reading particular IO pad configuration on subsequent reads
@@ -392,7 +398,7 @@ RCFGFUN
 +-------------+----------+------------+-------------+------------------------------+
 
 JTAGREG
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x0074
   - Type: volatile
 
@@ -409,7 +415,7 @@ JTAGREG
 +---------------+----------+------------+-------------+--------------------------+
 
 BOOTSEL
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x00C4
   - Type: volatile
 
@@ -433,7 +439,7 @@ BOOTSEL
 +-------------+----------+------------+-------------+-----------------------------------------+
 
 CLKSEL
-^^^^^^
+~~~~~~
   - Address Offset = 0x00C8
   - Type: volatile
 
@@ -454,7 +460,7 @@ CLKSEL
 +-----------+----------+------------+-------------+--------------------------------+
 
 WD_COUNT
-^^^^^^^^
+~~~~~~~~
   - Address Offset = 0x00D0
   - Type: volatile
 
@@ -467,7 +473,7 @@ WD_COUNT
 +-----------+----------+------------+-------------+-------------------------------------+
 
 WD_CONTROL
-^^^^^^^^^^
+~~~~~~~~~~
   - Address Offset = 0x00D4
   - Type: volatile
 
@@ -486,7 +492,7 @@ WD_CONTROL
 +-----------------+----------+------------+-----------+----------------------------------------+
 
 RESET_REASON
-^^^^^^^^^^^^
+~~~~~~~~~~~~
   - Address Offset = 0x00D8
   - Type: volatile
   - The CSR will get cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
@@ -500,7 +506,7 @@ RESET_REASON
 +-----------+----------+------------+-------------+----------------------------------------+
 
 RTO_PERIPHERAL_ERROR
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
   - Address Offset = 0x00E0
   - Type: volatile
   - Configured from peripheral_rto_i pin
@@ -538,7 +544,7 @@ RTO_PERIPHERAL_ERROR
 +-------------+----------+------------+-------------+----------------------------------------+
 
 READY_TIMEOUT_COUNT
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
   - Address Offset = 0x00E4
   - Type: volatile
 
@@ -553,7 +559,7 @@ READY_TIMEOUT_COUNT
 +-------------+----------+------------+-------------+----------------------------------------+
 
 RESET_TYPE1_EFPGA
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
   - Address Offset = 0x00E8
   - Type: non-volatile
 
@@ -570,7 +576,7 @@ RESET_TYPE1_EFPGA
 +-------------+----------+------------+-------------+-----------------------------------+
 
 ENABLE_IN_OUT_EFPGA
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
   - Address Offset = 0x00EC
   - Type: non-volatile
 
@@ -593,7 +599,7 @@ ENABLE_IN_OUT_EFPGA
 +--------------+----------+------------+-------------+----------------------------------------+
 
 EFPGA_CONTROL_IN
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
   - Address Offset = 0x00F0
   - Type: non-volatile
 
@@ -605,7 +611,7 @@ EFPGA_CONTROL_IN
 +-----------------+----------+------------+-------------+----------------------------------+
 
 EFPGA_STATUS_OUT
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
   - Address Offset = 0x00F4
   - Type: volatile
 
@@ -617,7 +623,7 @@ EFPGA_STATUS_OUT
 +-----------------+----------+------------+-------------+----------------------------------+
 
 EFPGA_VERSION
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
   - Address Offset = 0x00F8
   - Type: volatile
 
@@ -629,7 +635,7 @@ EFPGA_VERSION
 +-----------------+----------+------------+-------------+----------------------------------+
 
 SOFT_RESET
-^^^^^^^^^^
+~~~~~~~~~~
   - Address Offset = 0x00FC
   - Type: volatile
   - This CSR is a write-only strobe i.e. the write value is ignored
@@ -642,7 +648,7 @@ SOFT_RESET
 +-----------------+----------+------------+-------------+----------------------------------+
 
 IO_CTRL
-^^^^^^^
+~~~~~~~
   - Address Offset = 0x0400**
   - I/O control supports two functions:
       -  I/O configuration
@@ -669,7 +675,7 @@ Firmware Guidelines
 --------------------
 
 Initialization Sequence
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
   - Read System Information
       - Read the INFO CSR at offset 0x00 from the SOC_CTRL_BASE address.
       - Extract the number of cores from bits [31:16] of the read value.
@@ -702,7 +708,7 @@ Initialization Sequence
       - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL CSR at offset 0xF0.
 
 Ready Timeout Management
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
   - Initialization:
       - Set the desired timeout value by writing to the RTO_COUNT CSR at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
       - The timeout value should be long enough to accommodate longest legitimate time a peripheral might take to respond with an additional margin.
@@ -713,7 +719,7 @@ Ready Timeout Management
       - Write any value to the RTO_PERIPHERAL CSR to clear the timeout indication i.e. to clear which peripheral caused the timeout. The write value is ignored.
 
 Watchdog Management
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
   - Watchdog Initialization
       - Determine the appropriate timeout value based on your system requirements.
       - Write this value to the WD_COUNT CSR before enabling the watchdog.
@@ -738,7 +744,7 @@ Watchdog Management
       - Implement appropriate post-reset actions, such as logging the event and the system status(various CSRs across CORE-V-MCU system) through software for diagnosis i.e. the software reads and stores CSRs values.
 
 Soft Reset Procedure
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
   - Prepare for Reset
       - Complete any pending operations and save critical state if needed.
       - Save any necessary state information if required for recovery after the reset.
@@ -760,7 +766,7 @@ Soft Reset Procedure
       - Reinitialize the affected APB peripherals as needed.
 
 JTAG communication
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
   - Write to external device
       - Write the data to the JTAGREG CSR through the APB bus.
       - The written value will be available on the soc_jtag_reg_o output port.
@@ -781,14 +787,14 @@ The figure below represents the input and output pins for the APB SoC Controller
    APB SoC Controller Pin Diagram
 
 Clock and Reset
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
   - HCLK: APB system clock input, generated by APB PLL.
   - HRESETn: Active-low system reset signal for initializing CSRs and logic
   - ref_clk_i: Reference clock input, used for watchdog operations, generated by APB PLL.
   - soft_reset_o: Soft reset output, triggered by writing to SOFT_RESET CSR.
 
 APB Interface
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
   - PADDR[11:0]: APB address bus input
   - PWDATA[31:0]: APB write data bus input
   - PWRITE: APB write enable signal
@@ -799,30 +805,30 @@ APB Interface
   - PSLVERR: APB slave error output
 
 Boot and Configuration
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
   - sel_fll_clk_i: FLL clock selection input status pin; its value is captured in CLKSEL CSR for monitoring.
   - bootsel_i: Boot select input status pin; its value is captured in BOOTSEL CSR for monitoring.
   - fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller); controlled via FCBOOT CSR.
   - fc_fetchen_o: Fetch enable output for FC; controlled via FCFETCH CSR.
   
 Watchdog Interface
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
   - wd_expired_o: Watchdog expired output signal, triggered when watchdog counter reaches 1
   - stoptimer_i: Timer stop input signal, triggered by core complex
   - rstpin_ni: Active-low reset pin input for resetting watchdog
 
 Pad Configuration Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
   - pad_cfg_o[47:0][5:0]: Pad configuration output signals; controlled via IO_CTRL CSRs or WCFGFUN CSR.
   - pad_mux_o[47:0][1:0]: Pad multiplexing output signals; controlled via IO_CTRL CSRs or WCFGFUN CSR.
 
 JTAG Interface
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
   - soc_jtag_reg_i[7:0]: JTAG CSR input status pin; its value is captured in JTAGREG CSR for monitoring.
   - soc_jtag_reg_o[7:0]: JTAG CSR output; driven by JTAGREG CSR
 
 eFPGA Interface
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
   - control_in[31:0]: Control output to peripherals; driven by EFPGA_CONTROL CSR
   - clk_gating_dc_fifo_o: Clock gating for DC FIFO to eFPGA, always 1 as per current implementation
   - reset_type1_efpga_o[3:0]: Reset signals for eFPGA; driven by RESET_TYPE1_EFPGA CSR
@@ -839,7 +845,7 @@ eFPGA Interface
   - dmactive_i: Debug mode active input status pin; its value is captured in BOOTSEL CSR for monitoring.
 
 Ready Timeout Interface
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
   - rto_o: Ready timeout output signal provided to Peripheral Interconnect; asserted when ready timeout count reaches 0. 
   - start_rto_i: Start ready timeout input controlled by Peripheral Interconnect; triggers the ready timeout counter. 
   - peripheral_rto_i[10:0]: Peripheral ready timeout input provided by Peripheral Interconnect; indicates which peripheral caused the timeout.
