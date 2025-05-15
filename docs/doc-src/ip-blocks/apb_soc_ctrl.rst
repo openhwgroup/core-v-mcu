@@ -60,7 +60,7 @@ These configurations can be accessed through two methods:
   - Directly through the IO_CTRL CSRs (0x400 - 0x4C0)
   - Through the WCFGFUN and RCFGFUN CSRs (0x60 and 0x64).
 
-Note: Pad multiplexing details can be found in the IO Assignment document.(https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/io_assignment_tables.html)
+Note: Pad multiplexing details can be found in the `IO Assignment document <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/io_assignment_tables.html>`_.
 
 Watchdog Timer
 ~~~~~~~~~~~~~~
@@ -153,8 +153,6 @@ Timeout Detection Flow
       - The rto_o signal is asserted to indicate a timeout.
       - The peripheral interconnect updates which peripheral caused timeout through peripheral_rto_i signals, which is then stored in the RTO_PERIPHERAL_ERROR CSR.
       - The timeout event is acknowledged and cleared by writing any data to the RTO_PERIPHERAL_ERROR CSR (the write value is ignored and the CSR is cleared).
-      - 
-
 
 Timeout Management
 ^^^^^^^^^^^^^^^^^^
@@ -276,11 +274,12 @@ APB SoC Controller CSRs
 
 Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the SoC Controller.
 
-NOTE: Several of the SoC Controller CSR are volatile, meaning that their read value may be changed by the hardware. For example, writting the RX_SADDR CSR will set the address of the receive buffer pointer. As data is received, the hardware will update the value of the pointer to indicate the current address. As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value writen by software.
-
+NOTE: Several of the SoC Controller CSR are volatile, meaning that their read value may be changed by the hardware.
+For example, writting the RCFGFUN CSR will set the I/O port to be read. A subsequent read will return the configuration of the I/O port.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value writen by software.
 A CSRs volatility is indicated by its "type".
 
-Details of CSR access type are explained here.
+Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
 INFO
 ^^^^
@@ -373,6 +372,7 @@ WCFGFUN
 RCFGFUN
 ^^^^^^^
   - Address Offset = 0x0064
+  - type: volatile
   - Only IO_PAD bit is writable, that allows reading particular IO pad configuration on subsequent reads
 
 +-------------+----------+------------+-------------+------------------------------+
@@ -711,7 +711,6 @@ Ready Timeout Management
       - When a timeout is detected, identify the source peripheral through RTO_PERIPHERAL_ERROR CSR.
       - Take appropriate recovery actions for the affected peripheral
       - Write any value to the RTO_PERIPHERAL CSR to clear the timeout indication i.e. to clear which peripheral caused the timeout. The write value is ignored.
-          - This resets the peripheral timeout indicators but doesn't affect the timeout counter
 
 Watchdog Management
 ^^^^^^^^^^^^^^^^^^^
@@ -767,7 +766,6 @@ JTAG communication
       - The written value will be available on the soc_jtag_reg_o output port.
   - Read from external device
       - The external JTAG device writes the data on soc_jtag_reg_i input port.
-      - There is double synchronization for the input signal to prevent metastability.
       - Post synchronization, the data can be read from the JTAGREG CSR through the APB bus.
 
 Pin Diagram
