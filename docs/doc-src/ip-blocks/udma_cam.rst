@@ -196,6 +196,7 @@ The CSRs REG_RX_SADDR, REG_RX_SIZE specifies the configuration for the transacti
 
 REG_RX_SADDR
 ^^^^^^^^^^^^
+
 - Offset: 0x0
 - Type:   volatile
 
@@ -248,243 +249,118 @@ REG_RX_CFG
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| DATASIZE   |   2:1 |   RW   |    0x2     | Controls uDMA address increment for each transfer from L2 memory                   |
+|            |       |        |            |- 0x0: increment address by 1 (data is 8 bits)                                      |
+|            |       |        |            |- 0x1: increment address by 2 (data is 16 bits)                                     |
+|            |       |        |            |- 0x02: increment address by 4 (data is 32 bits)                                    |
+|            |       |        |            |- 0x03: increment address by 0                                                      |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
 |            |       |        |            | - 0x1: after last transfer for channel, reload buffer size                         |
 |            |       |        |            |   and start address and restart channel                                            |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
-REG_CAM_CFG_GLOB (Offset = 0x20)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-  :widths: 10 20 10 10 20
-  :header-rows: 1
+REG_CAM_CFG_GLOB
+^^^^^^^^^^^^^^^^
 
-  * - Field
-    - Bits
-    - Type
-    - Default
-    - Description
-  * - EN
-    - 31:31
-    - RW
-    - 0x00
-    - Enable data RX from camera interface
-  * - 
-    - 
-    - 
-    - 
-    - Enable/disable only happens at start of frame
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: disable
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: enable
-  * - SHIFT
-    - 14:11
-    - RW
-    - 0x00
-    - Number of bits to right shift final pixel value
-  * - 
-    - 
-    - 
-    - 
-    - Note: not used if FORMAT == BYPASS
-  * - FORMAT
-    - 10:8
-    - RW
-    - 0x00
-    - Input frame format:
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: RGB565
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: RGB555
-  * - 
-    - 
-    - 
-    - 
-    - 0x2: RGB444
-  * - 
-    - 
-    - 
-    - 
-    - 0x4: BYPASS_LITTLEEND
-  * - 
-    - 
-    - 
-    - 
-    - 0x5: BYPASS_BIGEND
-  * - FRAMEWINDOW_EN
-    - 7:7
-    - RW
-    - 0x00
-    - Windowing enable:
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: disable
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: enable
-..
-  
-REG_CAM_CFG_LL (Offset = 0x24)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+- Offset: 0x20
+- Type:   volatile
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 15:0
-     - RW
-     - 0x00
-     - Buffer size in bytes (1MB max)
-   * -
-     - 
-     - 
-     - 
-     - Read: bytes remaining until transfer complete
-   * - 
-     - 
-     - 
-     - 
-     - Write: set number of bytes to transfer
-..
++----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
+| Field          |  Bits | Access | Default    | Description                                                                         |
++================+=======+========+============+=====================================================================================+
+| EN             | 31:31 |   RW   |    0x0     | Enable data RX from camera interface, Enable/disable only happens at start of frame |
+|                |       |        |            | - 0x0: disable                                                                      |
+|                |       |        |            | - 0x1: enable                                                                       |
++----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
+| SHIFT          | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value                                     |
+|                |       |        |            | Note: not used if FORMAT == BYPASS                                                  |
++----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
+| FORMAT         |  10:8 |   RW   |    0x0     | Input frame format:                                                                 |
+|                |       |        |            | - 0x0: RGB565                                                                       |
+|                |       |        |            | - 0x1: RGB555                                                                       |
+|                |       |        |            | - 0x2: RGB444                                                                       |
+|                |       |        |            | - 0x4: BYPASS_LITTLEEND                                                             |
+|                |       |        |            | - 0x5: BYPASS_BIGEND                                                                |
++----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
+| FRAMEWINDOW_EN |  7:7  |   RW   |    0x0     | Windowing enable:                                                                   |
+|                |       |        |            | 0x0: disable                                                                        |
+|                |       |        |            | 0x1: enable                                                                         |
++----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 
-REG_CAM_CFG_UR (Offset = 0x28)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+REG_CAM_CFG_LL
+^^^^^^^^^^^^^^
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 31:16
-     - RW
-     - 0x00
-     - Y coordinate of upper right corner of window.
-   * - FRAMEWINDOW_URX
-     - 15:0
-     - RW
-     - 0X00
-     - X coordinate of upper right corner of window.
-..
+- Offset: 0x24
+- Type:   volatile
 
-REG_CAM_CFG_SIZE (Offset = 0x2C)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| SIZE       |  15:0 |   RW   |    0x0     | Buffer size in bytes (1MB max)                                                     |
+|            |   5:5 |   RO   |    0x0     | - Read: bytes remaining until transfer complete                                    |
+|            |       |        |            | - Write: set number of bytes to transfery                                          |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - ROWLEN
-     - 31:16
-     - RW
-     - 0x00
-     - N-1 where N is the number of horizontal pixels
-   * -
-     - 
-     - 
-     - 
-     - (used in window mode)
-..
+REG_CAM_CFG_UR
+^^^^^^^^^^^^^^
+
+- Offset: 0x28
+- Type:   volatile
+
++-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                                                        |
++=================+=======+========+============+====================================================================================+
+| SIZE            | 31:16 |   RW   |    0x0     | Y coordinate of upper right corner of window.                                      |
++-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| FRAMEWINDOW_URX | 15:0  |   RO   |    0x0     | X coordinate of upper right corner of window.                                      |
++-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
+
+REG_CAM_CFG_SIZE
+^^^^^^^^^^^^^^^^
+
+- Offset: 0x2C
+- Type:   volatile
+
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| ROWLEN     | 31:16 |   RW   |    0x0     | N-1 where N is the number of horizontal pixels (used in window mode)               |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_FILTER (Offset = 0x30)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - R_COEFF
-     - 23:16
-     - RW
-     - 0x00
-     - Coefficent that multiplies R component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-   * - G_COEFF
-     - 15:8
-     - RW
-     - 0x00
-     - Coefficent that multiplies G component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-   * - B_COEFF
-     - 7:0
-     - RW
-     - 0x00
-     - Coefficent that multiplies B component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-..
+- Offset: 0x30
+- Type:   volatile
 
-REG_CAM_VSYNC_POLARITY (Offset = 0x34)
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| R_COEFF    |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core             |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| G_COEFF    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,           |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO  |
+|            |       |        |            |   of uDMA Core                                                                     |
+|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory    |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| B_COEFF    |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+
+
+REG_CAM_VSYNC_POLARITY (Offset = )
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - VSYNC_POLARITY
-     - 0:0
-     - RW
-     - 0x00
-     - Set vsync polarity:
-   * -
-     - 
-     - 
-     - 
-     - 0x0: Active low
-   * -
-     - 
-     - 
-     - 
-     - 0x1: Active high
-..
+- Offset: 0x34
+- Type:   volatile
+
++----------------+-------+--------+------------+---------------------------------+
+| Field          |  Bits | Access | Default    | Description                     |
++================+=======+========+============+=================================+
+| VSYNC_POLARITY |   0:0 |   RW   |    0x0     | Set vsync polarity:             |
+|                |       |        |            | - 0x0: Active low               |
+|                |       |        |            | - 0x0: Active high              |
++----------------+-------+--------+------------+---------------------------------+
 
 Firmware Guidelines
 -------------------
