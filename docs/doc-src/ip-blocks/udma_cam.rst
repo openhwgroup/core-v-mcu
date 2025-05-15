@@ -195,11 +195,12 @@ REG_RX_CFG
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| DATASIZE   |   2:1 |   RW   |    0x2     |Controls uDMA address increment for each transfer from L2 memory                    |
-|            |       |        |            |- 0x0: increment address by 1 (data is 8 bits)                                      |
-|            |       |        |            |- 0x1: increment address by 2 (data is 16 bits)                                     |
-|            |       |        |            |- 0x02: increment address by 4 (data is 32 bits)                                    |
-|            |       |        |            |- 0x03: increment address by 0                                                      |
+| DATASIZE   |   2:1 |   RW   |    0x2     | Controls uDMA address increment for each transfer from L2 memory                   |
+|            |       |        |            |                                                                                    |
+|            |       |        |            | - 0x0: increment address by 1 (data is 8 bits)                                     |
+|            |       |        |            | - 0x1: increment address by 2 (data is 16 bits)                                    |
+|            |       |        |            | - 0x02: increment address by 4 (data is 32 bits)                                   |
+|            |       |        |            | - 0x03: increment address by 0                                                     |
 |            |       |        |            |                                                                                    |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
@@ -216,25 +217,28 @@ REG_CAM_CFG_GLOB
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 | Field          |  Bits | Access | Default    | Description                                                                         |
 +================+=======+========+============+=====================================================================================+
-| EN             | 31:31 |   RW   |    0x0     |Enable data RX from camera interface, Enable/disable only happens at start of frame  |
-|                |       |        |            |- 0x0: disable                                                                       |
-|                |       |        |            |- 0x1: enable                                                                        |
+| EN             | 31:31 |   RW   |    0x0     | Enable data RX from camera interface, Enable/disable only happens at start of frame |
+|                |       |        |            |                                                                                     |
+|                |       |        |            | - 0x0: disable                                                                      |
+|                |       |        |            | - 0x1: enable                                                                       |
 |                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 | SHIFT          | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                                    |
 |                |       |        |            | Note: not used if FORMAT == BYPASS                                                  |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 | FORMAT         |  10:8 |   RW   |    0x0     |Input frame format:                                                                  |
-|                |       |        |            |- 0x0: RGB565                                                                        |
-|                |       |        |            |- 0x1: RGB555                                                                        |
-|                |       |        |            |- 0x2: RGB444                                                                        |
-|                |       |        |            |- 0x4: BYPASS_LITTLEEND                                                              |
-|                |       |        |            |- 0x5: BYPASS_BIGEND                                                                 |
+|                |       |        |            |                                                                                     |
+|                |       |        |            | - 0x0: RGB565                                                                       |
+|                |       |        |            | - 0x1: RGB555                                                                       |
+|                |       |        |            | - 0x2: RGB444                                                                       |
+|                |       |        |            | - 0x4: BYPASS_LITTLEEND                                                             |
+|                |       |        |            | - 0x5: BYPASS_BIGEND                                                                |
 |                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
-| FRAMEWINDOW_EN |  7:7  |   RW   |    0x0     |Windowing enable:                                                                    |
-|                |       |        |            |- 0x0: disable                                                                       |
-|                |       |        |            |- 0x1: enable                                                                        |
+| FRAMEWINDOW_EN |  7:7  |   RW   |    0x0     | Windowing enable:                                                                   |
+|                |       |        |            |                                                                                     |
+|                |       |        |            | - 0x0: disable                                                                      |
+|                |       |        |            | - 0x1: enable                                                                       |
 |                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 
@@ -247,9 +251,10 @@ REG_CAM_CFG_LL
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | Field      |  Bits | Access | Default    | Description                                                                        |
 +============+=======+========+============+====================================================================================+
-| SIZE       |  15:0 |   RW   |    0x0     |Buffer size in bytes (1MB max)                                                      |
-|            |       |        |            |- Read: bytes remaining until transfer complete                                     |
-|            |       |        |            |- Write: set number of bytes to transfer                                            |
+| SIZE       |  15:0 |   RW   |    0x0     | Buffer size in bytes (1MB max)                                                     |
+|            |       |        |            |                                                                                    |
+|            |       |        |            | **Read:** bytes remaining until transfer complete                                  |
+|            |       |        |            | **Write:** set number of bytes to transfer                                         |
 |            |       |        |            |                                                                                    |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
@@ -305,7 +310,8 @@ REG_CAM_VSYNC_POLARITY
 +----------------+-------+--------+------------+---------------------------------+
 | Field          |  Bits | Access | Default    | Description                     |
 +================+=======+========+============+=================================+
-| VSYNC_POLARITY |   0:0 |   RW   |    0x0     |Set vsync polaritym              |
+| VSYNC_POLARITY |   0:0 |   RW   |    0x0     | Set vsync polarit               |
+|                |       |        |            |                                 |
 |                |       |        |            |- 0x0: Active low                |
 |                |       |        |            |- 0x0: Active high               |
 |                |       |        |            |                                 |
