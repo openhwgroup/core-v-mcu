@@ -54,7 +54,7 @@ The Figure below is a high-level block diagram of the uDMA UART:-
 - Data in the REG_RX_CFG is passed through cfg_rx_continuous_o, cfg_rx_en_o, cfg_rx_clr_o and data_rx_datasize_o.
 
 **Frame counter**
-	- Frame counter is incremented at start of frame if frame drop is enabled.
+   - Frame counter is incremented at start of frame if frame drop is enabled.
    - Counter is reset if the counter value reaches frame drop value or frame drop is disabled.
    - Frame drop enable status and frame drop value can be read from REG_CAM_CFG_GLOB.
    - Non zero frame counter value indicates a valid frame.
@@ -82,8 +82,8 @@ The Figure below is a high-level block diagram of the uDMA UART:-
    - Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
 
 **IMAGE FORMAT: BYPASS_LITEND, BYPASS_BIGEND**
-   - These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V. Luma represents the brightness of the image and chroma
-   conveys the color information of the picture.
+   - These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V.
+   - Luma represents the brightness of the image and chroma conveys the color information of the picture.
    - YUV pixel value can be read from cam_data_i.
    - Filter is not valid.
 
@@ -206,6 +206,7 @@ REG_RX_CFG
 | CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
 |            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address          |
 |            |       |        |            |     and restart channel                                                            |
+|            |       |        |            |                                                                                    |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_GLOB
