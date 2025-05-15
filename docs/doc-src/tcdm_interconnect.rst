@@ -40,7 +40,7 @@ address decoders and arbiters to direct requests to the correct slave.
 
    **TCDM Interconnect block diagram**
 
-The TCDM interconnect supports 9 master ports and 9 slave ports
+The TCDM interconnect supports 9 master ports and 9 slave ports.
    
 **Masters:** 
 
@@ -91,8 +91,8 @@ Meanwhile the actual request (ADDR, WEN, WDATA and BE) is aggregated into single
 
 The Xbar is a multi-master and multi-slave module that includes:
 
-1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
-2. A dedicated RR arbiter for each slave to handle requests from multiple masters
+1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel.
+2. A dedicated RR arbiter for each slave to handle requests from multiple masters.
 
 The address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbiter grants access to one master per cycle using a round-robin (RR) policy.
 Once access is granted, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
@@ -116,8 +116,8 @@ Each master aggregates its request (ADDR, WEN, WDATA, and BE) into a bundled for
 
 Internally, the interleaved crossbar also contains a Xbar module that includes:
 
-1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel
-2. A dedicated RR arbiter for each slave to handle requests from multiple masters
+1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel.
+2. A dedicated RR arbiter for each slave to handle requests from multiple masters.
 
 As in contiguous cross bar, the address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbitration occurs every clock cycle, ensuring fair access.
 Once master is granted access, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
@@ -139,7 +139,7 @@ The AXI crossbar is designed to efficiently route transactions from multiple mas
 - **AXI Multiplexer**: There is one AXI MUX per slave. It merges response channels( write response and read) coming from multiple masters targeting that slave. The mux includes RR arbitration logic to forward one valid response at a time to the master.
 
 The AXI Demux handles the actual routing of transactions to the correct slave based on the decoder's selection signals received from Write/Read Address decoder. For write transactions, the selection is stored in a FIFO to ensure data consistency throughout burst transfers.
-Once the slave complete processing the requests, the read and write responses are sent back to the crossbar. The AXI_Mux is then used to arbitrate and merge these responses from all slaves and return them to the originating master.
+Once the slave complete processing the requests, the read and write responses are sent back to the crossbar. Since multiple masters may target the same slave, their responses are funneled through a shared interface. The axi_mux, instantiated per slave, merges these responses and uses RR arbitration to decide which master's response to forward at any given time.
 
 System Architecture
 ~~~~~~~~~~~~~~~~~~~
