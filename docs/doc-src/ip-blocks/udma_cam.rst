@@ -54,47 +54,47 @@ The Figure below is a high-level block diagram of the uDMA UART:-
 - Data in the REG_RX_CFG is passed through cfg_rx_continuous_o, cfg_rx_en_o, cfg_rx_clr_o and data_rx_datasize_o.
 
 **Frame counter**
-	○ Frame counter is incremented at start of frame if frame drop is enabled.
-    ○ Counter is reset if the counter value reaches frame drop value or frame drop is disabled.
-    ○ Frame drop enable status and frame drop value can be read from REG_CAM_CFG_GLOB.
-    ○ Non zero frame counter value indicates a valid frame.
+	- Frame counter is incremented at start of frame if frame drop is enabled.
+   - Counter is reset if the counter value reaches frame drop value or frame drop is disabled.
+   - Frame drop enable status and frame drop value can be read from REG_CAM_CFG_GLOB.
+   - Non zero frame counter value indicates a valid frame.
 
 **WINDOWING**
-    ○ Window of interest can be selected by using the windowing feature.
-    ○ Its enable or disable status can be read from REG_CAM_CFG_GLOB.
-    ○ Coordinates of the window can be written to and read from REG_CAM_CFG_LL and REG_CAM_CFG_UR.
-    ○ A pixel is valid only if it is inside the window of interest if windowing is enabled.
-    ○ If windowing is disabled, pixels will be valid for every valid frame.
+   - Window of interest can be selected by using the windowing feature.
+   - Its enable or disable status can be read from REG_CAM_CFG_GLOB.
+   - Coordinates of the window can be written to and read from REG_CAM_CFG_LL and REG_CAM_CFG_UR.
+   - A pixel is valid only if it is inside the window of interest if windowing is enabled.
+   - If windowing is disabled, pixels will be valid for every valid frame.
 
 **Row counter and column counter**
-    ○ Counts the row and column at every camera clock.
-    ○ Counter is reset at the start of the frame.
-    ○ These counter values are used when windowing is enabled to check the validity of pixels.
-    ○ Column counter is incremented at posedge of cam_clk_i. Column ends when the column counter reaches ROWLEN, which resets the counter value. ROWLEN value can be read from REG_CAM_CFG_SIZE.
-    ○ Row counter is incremented at the end of each column.
+   - Counts the row and column at every camera clock.
+   - Counter is reset at the start of the frame.
+   - These counter values are used when windowing is enabled to check the validity of pixels.
+   - Column counter is incremented at posedge of cam_clk_i. Column ends when the column counter reaches ROWLEN, which resets the counter value. ROWLEN value can be read from REG_CAM_CFG_SIZE.
+   - Row counter is incremented at the end of each column.
 
 **IMAGE FORMAT**
-    ○ RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
-    ○ RGB555: Five bits of data is allocated for all the color components.
-    ○ RGB444: Four bits of data is allocated for all the color components.
-    ○ R, G, B pixel values can be read from cam_data_i.
-    ○ Filter values for R, G, B can be obtained by multiplying their respective pixel values by their coefficients. Coefficient can be read from REG_CAM_CFG_FILTER.
-    ○ Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
+   - RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
+   - RGB555: Five bits of data is allocated for all the color components.
+   - RGB444: Four bits of data is allocated for all the color components.
+   - R, G, B pixel values can be read from cam_data_i.
+   - Filter values for R, G, B can be obtained by multiplying their respective pixel values by their coefficients. Coefficient can be read from REG_CAM_CFG_FILTER.
+   - Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
 
 **IMAGE FORMAT: BYPASS_LITEND, BYPASS_BIGEND**
-    ○ These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V. Luma represents the brightness of the image and chroma
-    conveys the color information of the picture.
-    ○ YUV pixel value can be read from cam_data_i.
-    ○ Filter is not valid.
+   - These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V. Luma represents the brightness of the image and chroma
+   conveys the color information of the picture.
+   - YUV pixel value can be read from cam_data_i.
+   - Filter is not valid.
 
 **Vertical sync**
-    ○ Polarity can be read from REG_CAM_VSYNC_POLARITY..
-    ○ A start of frame is marked by high current vsync value and low previous vsync.
+   - Polarity can be read from REG_CAM_VSYNC_POLARITY..
+   - A start of frame is marked by high current vsync value and low previous vsync.
 
 **udma_dc_fifo**
-    ○ RGB or YUV pixel values are sent as input udma_dc_fifo.
-    ○ Valid output is passed through data_rx_valid_o if there is data in fifo to be read.
-    ○ Data can be read from the fifo through data_rx_data_o.
+   - RGB or YUV pixel values are sent as input udma_dc_fifo.
+   - Valid output is passed through data_rx_valid_o if there is data in fifo to be read.
+   - Data can be read from the fifo through data_rx_data_o.
 
 System Architecture
 -------------------
@@ -200,10 +200,11 @@ REG_RX_CFG
 |            |       |        |            |- 0x1: increment address by 2 (data is 16 bits)                                     |
 |            |       |        |            |- 0x02: increment address by 4 (data is 32 bits)                                    |
 |            |       |        |            |- 0x03: increment address by 0                                                      |
+|            |       |        |            |                                                                                    |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
-|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size                         |
-|            |       |        |            |   and start address and restart channel                                            |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address          |
+|            |       |        |            |     and restart channel                                                            |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_GLOB
@@ -218,6 +219,7 @@ REG_CAM_CFG_GLOB
 | EN             | 31:31 |   RW   |    0x0     |Enable data RX from camera interface, Enable/disable only happens at start of frame  |
 |                |       |        |            |- 0x0: disable                                                                       |
 |                |       |        |            |- 0x1: enable                                                                        |
+|                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 | SHIFT          | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                                    |
 |                |       |        |            | Note: not used if FORMAT == BYPASS                                                  |
@@ -228,10 +230,12 @@ REG_CAM_CFG_GLOB
 |                |       |        |            |- 0x2: RGB444                                                                        |
 |                |       |        |            |- 0x4: BYPASS_LITTLEEND                                                              |
 |                |       |        |            |- 0x5: BYPASS_BIGEND                                                                 |
+|                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 | FRAMEWINDOW_EN |  7:7  |   RW   |    0x0     |Windowing enable:                                                                    |
 |                |       |        |            |- 0x0: disable                                                                       |
 |                |       |        |            |- 0x1: enable                                                                        |
+|                |       |        |            |                                                                                     |
 +----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_LL
@@ -246,6 +250,7 @@ REG_CAM_CFG_LL
 | SIZE       |  15:0 |   RW   |    0x0     |Buffer size in bytes (1MB max)                                                      |
 |            |       |        |            |- Read: bytes remaining until transfer complete                                     |
 |            |       |        |            |- Write: set number of bytes to transfer                                            |
+|            |       |        |            |                                                                                    |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_UR
@@ -300,9 +305,10 @@ REG_CAM_VSYNC_POLARITY
 +----------------+-------+--------+------------+---------------------------------+
 | Field          |  Bits | Access | Default    | Description                     |
 +================+=======+========+============+=================================+
-| VSYNC_POLARITY |   0:0 |   RW   |    0x0     |Set vsync polarity:              |
+| VSYNC_POLARITY |   0:0 |   RW   |    0x0     |Set vsync polaritym              |
 |                |       |        |            |- 0x0: Active low                |
 |                |       |        |            |- 0x0: Active high               |
+|                |       |        |            |                                 |
 +----------------+-------+--------+------------+---------------------------------+
 
 Firmware Guidelines
