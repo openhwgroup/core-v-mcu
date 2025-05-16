@@ -19,9 +19,7 @@
 
 uDMA CAMERA
 ===========
-A camera interface is a hardware block that interfaces with different
-image sensor interfaces and generates output that can be used for
-image processing.
+A camera interface is a hardware block that interfaces with different image sensor interfaces and generates output that can be used for image processing.
 
 Features
 --------
@@ -30,11 +28,12 @@ Features
 - Parallel data input line for carrying pixel data.
 - There is a horizontal sync(HSYNC) input which indicates one line of the frame is transmitted.
 - There is a vertical sync(VSYNC) input which indicates that one entire frame is transmitted. It can be configured for polarity.
+- Supports active low reset.
 
 Block Architecture
 ------------------
 cam_clk_i is a pixel clock which changes on every pixel. Pixel data is taken as input through cam_data_i, and cam_hsync_i and cam_vsync_i indicate the horizontal and vertical sync value.
-It supports active low reset. It contains a udma dc fifo to store the pixel value before sending it to output.
+It contains a udma dc fifo to store the pixel value before sending it to output.
 
 The Figure below is a high-level block diagram of the uDMA UART:-
 
@@ -45,13 +44,45 @@ The Figure below is a high-level block diagram of the uDMA UART:-
 
    uDMA Camera Block Diagram
 
-- Read write input pin, cfg_rwn_i indicates if we want to write to the CSR or read from the CSR. If the input is high then the  CSR is selected for reading and else for writing.
--  Address of the CSR is provided through cfg_addr_i.
-- Value read through the CSR is provided as output through cfg_data_o. 
-- cfg_data_i writes values to CSR.
-- Data in CSR REG_RX_SADDR is passed through cfg_rx_startaddr_o.
-- Data in CSR REG_RX_SIZE is passed through cfg_rx_size_o.
-- Data in the REG_RX_CFG is passed through cfg_rx_continuous_o, cfg_rx_en_o, cfg_rx_clr_o and data_rx_datasize_o.
+Dual-clock(DC) TX and RX FIFO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The uDMA core operates using the system clock, while the uDMA UART operates using both the system clock and the peripheral clock. To ensure the uDMA UART and core are properly synchronized, dual-clock FIFOs are used in the uDMA UART.
+These are 4-depth FIFOs and can store 8-bit wide data. It is implemented using circular FIFO.
+
+Below diagram shows the interfaces of DC FIFO: 
+
+.. figure:: uDMA_UART_Dual_clock_fifo.png
+   :name: uDMA_UART_Dual_clock_fifo
+   :align: center
+   :alt:
+
+   Dual clock FIFO
+
+For Rx operation, source(src_*) interfaces shown in above diagram operate at peripheral clock and destination(dst_*) interfaces operate using system clock.
+
+For Tx operation, source interfaces shown in above diagram operate at system clock and destination interfaces operate using peripheral clock. 
+
+**Pop operation**
+
+The DC FIFO asserts the dst_valid_o (valid) signal to indicate that valid data is available on the data lines. A module waiting for data should read the data lines only when valid pin is high and drive the dst_ready_i (ready)
+signal to high and reset it in next clock cycle. When DC FIFO receives an active ready signal, indicating that the data has been read, it updates the data lines with new data if FIFO is not empty. 
+If the FIFO is empty, the dst_valid_o signal is deasserted.
+
+**Push operation**
+
+The DC FIFO asserts the src_ready_o (ready) signal when there is available space to accept incoming data. When an active src_valid_i (valid) signal is received, the data is written into the FIFO.
+The src_ready_o signal is kept asserted as long as the FIFO has space for more data. IF the DC FIFO is full, push operation will be stalled until the FIFO has empty space and valid line is high.
+A module tranmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
+
+During Camera receive (Rx) operation, the RX DC FIFO is written internally by the uDMA Camera with the data received from the external device and read by the uDMA core.
+
+RX operation
+^^^^^^^^^^^^
+
+The uDMA camera communicates with external device using below pins:
+
+receives the pixel data 
 
 **Frame counter**
    - Frame counter is incremented at start of frame if frame drop is enabled.
@@ -95,6 +126,10 @@ The Figure below is a high-level block diagram of the uDMA UART:-
    - RGB or YUV pixel values are sent as input udma_dc_fifo.
    - Valid output is passed through data_rx_valid_o if there is data in fifo to be read.
    - Data can be read from the fifo through data_rx_data_o.
+
+CSR Access
+^^^^^^^^^^
+
 
 System Architecture
 -------------------
@@ -215,33 +250,46 @@ REG_CAM_CFG_GLOB
 - Offset: 0x20
 - Type:  non-volatile
 
-+----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
-| Field          |  Bits | Access | Default    | Description                                                                         |
-+================+=======+========+============+=====================================================================================+
-| EN             | 31:31 |   RW   |    0x0     | Enable data RX from camera interface, Enable/disable only happens at start of frame |
-|                |       |        |            |                                                                                     |
-|                |       |        |            | - 0x0: disable                                                                      |
-|                |       |        |            | - 0x1: enable                                                                       |
-|                |       |        |            |                                                                                     |
-+----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
-| SHIFT          | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                                    |
-|                |       |        |            | Note: not used if FORMAT == BYPASS                                                  |
-+----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
-| FORMAT         |  10:8 |   RW   |    0x0     |Input frame format:                                                                  |
-|                |       |        |            |                                                                                     |
-|                |       |        |            | - 0x0: RGB565                                                                       |
-|                |       |        |            | - 0x1: RGB555                                                                       |
-|                |       |        |            | - 0x2: RGB444                                                                       |
-|                |       |        |            | - 0x4: BYPASS_LITTLEEND                                                             |
-|                |       |        |            | - 0x5: BYPASS_BIGEND                                                                |
-|                |       |        |            |                                                                                     |
-+----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
-| FRAMEWINDOW_EN |  7:7  |   RW   |    0x0     | Windowing enable:                                                                   |
-|                |       |        |            |                                                                                     |
-|                |       |        |            | - 0x0: disable                                                                      |
-|                |       |        |            | - 0x1: enable                                                                       |
-|                |       |        |            |                                                                                     |
-+----------------+-------+--------+------------+-------------------------------------------------------------------------------------+
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| Field            |  Bits | Access | Default    | Description                                                            |
++==================+=======+========+============+========================================================================+
+| EN               | 31:31 |   RW   |    0x0     | Enable data RX from camera interface, Enable/disable only happens      |
+|                  |       |        |            | at start of frame                                                      |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            | - 0x0: disable                                                         |
+|                  |       |        |            | - 0x1: enable                                                          |
+|                  |       |        |            |                                                                        |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| SHIFT            | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                       |
+|                  |       |        |            | Note: not used if FORMAT == BYPASS                                     |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| FORMAT           |  10:8 |   RW   |    0x0     |Input frame format:                                                     |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            | - 0x0: RGB565                                                          |
+|                  |       |        |            | - 0x1: RGB555                                                          |
+|                  |       |        |            | - 0x2: RGB444                                                          |
+|                  |       |        |            | - 0x4: BYPASS_LITTLEEND                                                |
+|                  |       |        |            | - 0x5: BYPASS_BIGEND                                                   |
+|                  |       |        |            |                                                                        |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| FRAMESLICE_EN    |  7:7  |   RW   |    0x0     | Frame Slicing (Windowing) enable:                                      |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            | - 0x0: disable                                                         |
+|                  |       |        |            | - 0x1: enable                                                          |
+|                  |       |        |            |                                                                        |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| FRAMEDROP_VALUE  |  6:1  |   RW   |    0x0     | Frame Drop value:                                                      |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            |                                                                        |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
+| FRAMEDROP_EN     |  0:0  |   RW   |    0x0     | Frame Drop enable:                                                     |
+|                  |       |        |            |                                                                        |
+|                  |       |        |            | - 0x0: disable                                                         |
+|                  |       |        |            | - 0x1: enable                                                          |
+|                  |       |        |            |                                                                        |
++------------------+-------+--------+------------+------------------------------------------------------------------------+
 
 REG_CAM_CFG_LL
 ^^^^^^^^^^^^^^
@@ -249,15 +297,13 @@ REG_CAM_CFG_LL
 - Offset: 0x24
 - Type:   volatile
 
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| Field      |  Bits | Access | Default    | Description                                                                        |
-+============+=======+========+============+====================================================================================+
-| SIZE       |  15:0 |   RW   |    0x0     | Buffer size in bytes (1MB max)                                                     |
-|            |       |        |            |                                                                                    |
-|            |       |        |            | **Read:** bytes remaining until transfer complete                                  |
-|            |       |        |            | **Write:** set number of bytes to transfer                                         |
-|            |       |        |            |                                                                                    |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
++-----------------+-------+--------+------------+------------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                          |
++=================+=======+========+============+======================================================+
+| FRAMESLICE_LLY  | 31:16 |   RW   |    0x0     | Y coordinate of Lower left corner of Frame.        |
++-----------------+-------+--------+------------+------------------------------------------------------+
+| FRAMESLICE_LLX  | 15:0  |   RW   |    0x0     | X coordinate of Lower left corner of Frame.        |
++-----------------+-------+--------+------------+------------------------------------------------------+
 
 REG_CAM_CFG_UR
 ^^^^^^^^^^^^^^
@@ -265,13 +311,13 @@ REG_CAM_CFG_UR
 - Offset: 0x28
 - Type:   non-volatile
 
-+-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| Field           |  Bits | Access | Default    | Description                                                                        |
-+=================+=======+========+============+====================================================================================+
-| SIZE            | 31:16 |   RW   |    0x0     | Y coordinate of upper right corner of window.                                      |
-+-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| FRAMEWINDOW_URX | 15:0  |   RW   |    0x0     | X coordinate of upper right corner of window.                                      |
-+-----------------+-------+--------+------------+------------------------------------------------------------------------------------+
++-----------------+-------+--------+------------+-------------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                           |
++=================+=======+========+============+=======================================================+
+| FRAMESLICE_URY  | 31:16 |   RW   |    0x0     | Y coordinate of upper right corner of Frame.          |
++-----------------+-------+--------+------------+-------------------------------------------------------+
+| FRAMEWINDOW_URX | 15:0  |   RW   |    0x0     | X coordinate of upper right corner of Frame.          |
++-----------------+-------+--------+------------+-------------------------------------------------------+
 
 REG_CAM_CFG_SIZE
 ^^^^^^^^^^^^^^^^
@@ -291,15 +337,15 @@ REG_CAM_CFG_FILTER
 - Offset: 0x30
 - Type:   volatile
 
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| Field      |  Bits | Access | Default    | Description                                                                        |
-+============+=======+========+============+====================================================================================+
-| R_COEFF    |   6:6 |   RW   |    0x0     | Coefficent that multiplies R component, Note: not used if FORMAT == BYPASS         |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| G_COEFF    |   5:5 |   RW   |    0x0     | Coefficent that multiplies G component, Note: not used if FORMAT == BYPASS         |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| B_COEFF    |   4:4 |   RW   |    0x0     | Coefficent that multiplies B component, Note: not used if FORMAT == BYPASS         |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits   | Access | Default    | Description                                                                        |
++============+=========+========+============+====================================================================================+
+| R_COEFF    |   23:16 |   RW   |    0x0     | Coefficent that multiplies R component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| G_COEFF    |   15:8  |   RW   |    0x0     | Coefficent that multiplies G component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| B_COEFF    |   7:0   |   RW   |    0x0     | Coefficent that multiplies B component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
 
 
 REG_CAM_VSYNC_POLARITY
