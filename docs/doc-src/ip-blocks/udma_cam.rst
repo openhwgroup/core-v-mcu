@@ -44,11 +44,11 @@ The Figure below is a high-level block diagram of the uDMA UART:-
 
    uDMA Camera Block Diagram
 
-Dual-clock(DC) TX and RX FIFO
+Dual-clock(DC) RX FIFO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The uDMA core operates using the system clock, while the uDMA UART operates using both the system clock and the peripheral clock. To ensure the uDMA UART and core are properly synchronized, dual-clock FIFOs are used in the uDMA UART.
-These are 4-depth FIFOs and can store 8-bit wide data. It is implemented using circular FIFO.
+The uDMA core operates using the system clock, while the uDMA Camera operates using both the system clock and the peripheral clock. To ensure the uDMA UART and core are properly synchronized, dual-clock FIFOs are used in the uDMA Camera.
+These are 8-depth FIFOs and can store 16-bit wide data. It is implemented using circular FIFO.
 
 Below diagram shows the interfaces of DC FIFO: 
 
@@ -60,8 +60,6 @@ Below diagram shows the interfaces of DC FIFO:
    Dual clock FIFO
 
 For Rx operation, source(src_*) interfaces shown in above diagram operate at peripheral clock and destination(dst_*) interfaces operate using system clock.
-
-For Tx operation, source interfaces shown in above diagram operate at system clock and destination interfaces operate using peripheral clock. 
 
 **Pop operation**
 
@@ -80,37 +78,91 @@ During Camera receive (Rx) operation, the RX DC FIFO is written internally by th
 RX operation
 ^^^^^^^^^^^^
 
+ RX operation is enable using 
+
 The uDMA camera communicates with external device using below pins:
 
-receives the pixel data 
+uDMA core reads 8 bits of information from external device in a cycle.  and stores it in its internal DC FIFO. uDMA camera communicates 16 bit of information to uDMA core in each clock cycle.
 
-**Frame counter**
-   - Frame counter is incremented at start of frame if frame drop is enabled.
-   - Counter is reset if the counter value reaches frame drop value or frame drop is disabled.
-   - Frame drop enable status and frame drop value can be read from REG_CAM_CFG_GLOB.
-   - Non zero frame counter value indicates a valid frame.
+uDMA camera pushes the pixel data onto DC FIFO. Pixel data is transmitted to uDMA core. 
 
-**WINDOWING**
-   - Window of interest can be selected by using the windowing feature.
-   - Its enable or disable status can be read from REG_CAM_CFG_GLOB.
-   - Coordinates of the window can be written to and read from REG_CAM_CFG_LL and REG_CAM_CFG_UR.
-   - A pixel is valid only if it is inside the window of interest if windowing is enabled.
-   - If windowing is disabled, pixels will be valid for every valid frame.
+Frame Dropping
+^^^^^^^^^^^^^^
+The uDMA Camera supports frame dropping, which allows selective skipping of incoming frames. Frame dropping can be configured via the ``FRAMEDROP_EN`` and ``FRAMEDROP_VALUE`` fields in the ``REG_CAM_CFG_GLOB`` control and status register (CSR).
+When frame dropping is enabled and the uDMA Camera is configured to receive data from an external source, it uses an internal frame counter to track received frames. The frame counter increments on each new frame. Once it reaches the value specified in ``FRAMEDROP_VALUE``, it is reset to zero, allowing the next frame to be stored.
+Frames are considered valid and written to L2 memory only when the frame counter value is zero. If the frame counter is non-zero, the corresponding frames are treated as dropped and are not stored in L2 memory. The counter is also reset under the following conditions:
 
-**Row counter and column counter**
-   - Counts the row and column at every camera clock.
-   - Counter is reset at the start of the frame.
-   - These counter values are used when windowing is enabled to check the validity of pixels.
-   - Column counter is incremented at posedge of cam_clk_i. Column ends when the column counter reaches ROWLEN, which resets the counter value. ROWLEN value can be read from REG_CAM_CFG_SIZE.
-   - Row counter is incremented at the end of each column.
+- A reset signal is received by the uDMA Camera
+- Frame dropping is disabled
 
-**IMAGE FORMAT**
-   - RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
-   - RGB555: Five bits of data is allocated for all the color components.
-   - RGB444: Four bits of data is allocated for all the color components.
-   - R, G, B pixel values can be read from cam_data_i.
-   - Filter values for R, G, B can be obtained by multiplying their respective pixel values by their coefficients. Coefficient can be read from REG_CAM_CFG_FILTER.
-   - Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
+Frame Slicing
+^^^^^^^^^^^^^
+The uDMA Camera supports frame slicing(windowing), which allows selective slicing of incoming frames. Frame slicing can be enabled via the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` control and status register (CSR). The size of the sliced frame can be configured using ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR.
+``REG_CAM_CFG_LL`` CSR is used to select lower left cordinates of frame and ``REG_CAM_CFG_UR`` is used to select upper right cordinates.
+
+If frame slicing is enabled, the current pixel is processed only if it lies within the configured frame slice region, based on the following conditions:
+- The current row  is greater than or equal to the frame slice's lower-left Y-coordinate(``FRAMESLICE_LLY``).
+- The current row is less than or equal to the frame slice's upper-right Y-coordinate(``FRAMESLICE_URY``).
+- The current column is greater than or equal to the frame slice's lower-left X-coordinate(``FRAMESLICE_LLX``).
+- The current column is less than or equal to the frame slice's upper-right X-coordinate(``FRAMESLICE_URY``).
+
+If Frame slicing is enabled, pixels outside this region are excluded from processing.
+
+IMAGE FORMAT
+^^^^^^^^^^^^
+The following image format is supported by uDMA Core: -
+
+- RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
+- RGB555: Five bits of data is allocated for each(R,G and B) the color components.
+- RGB444: Four bits of data is allocated for each(R,G and B) the color components.
+- BYPASS_LITEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
+- BYPASS_BIGEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
+
+Pixel Data Sampling Mechanism
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pixel data from the external device arives arrives serially over the ``cam_data_i`` pin using two clock cycles per pixel (16-bit RGB565 format over an 8-bit interface).
+
+A full pixel is received over two consecutive clock cycles:
+
+**First cycle (odd clocks: 1, 3, 5, ...):**
+
+- The value from ``cam_data_i`` is captured and stored in a temporary register, let's say ``MSB``
+- This value will be used in the next clock cycle.
+
+**Second cycle (even clocks: 2, 4, 6, ...):**
+
+- A new value is received from ``cam_data_i`` (this is the LSB of the pixel).
+- The full 16-bit pixel is reconstructed using:
+  
+  - ``MSB`` (from previous cycle)
+  - ``cam_data_i`` (current cycle)
+
+
+uDMA extract the RGB component form incoming pixel using below rule: -
+
+- RGB565
+   Red component = {MSB[7:3],3'b000}
+   Green component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   Blue component = {cam_data_i[4:0], 3'b000}
+- RGB555
+   Red component = {MSB[6:2],3'b000}
+   Green component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   Blue component = {cam_data_i[4:0], 3'b000}
+- RGB444
+   Red component = {MSB[3:0],4'b0000}
+   Green component = {cam_data_i[7:4],4'b0000}
+   Blue component = {cam_data_i[3:0],4'b0000}
+- BYPASS_LITEND
+   YUV = {MSB[7:0],cam_data_i[7:0]}
+- BYPASS_BIGEND
+   YUV = {cam_data_i[7:0],MSB[7:0]}
+
+In the above representation, MSB represent the value of cam_data_i pin in the alternate clock cycle i.e. 1,3,5 etc. Pixel data from the external device is read during each clock cycle.
+When first clock is recived data fron cam_data_i is stored in store in MSB(a local varaible), however the value will be reflected in the next clock cycle. In the second clock cycle data will be used from cam_data_i input pin and MSB will have cam_data_i data from the previous clock. 
+
+- Filter values for R, G, B can be obtained by multiplying their respective pixel values by their coefficients. Coefficient can be read from REG_CAM_CFG_FILTER.
+- Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
 
 **IMAGE FORMAT: BYPASS_LITEND, BYPASS_BIGEND**
    - These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V.
@@ -121,15 +173,6 @@ receives the pixel data
 **Vertical sync**
    - Polarity can be read from REG_CAM_VSYNC_POLARITY..
    - A start of frame is marked by high current vsync value and low previous vsync.
-
-**udma_dc_fifo**
-   - RGB or YUV pixel values are sent as input udma_dc_fifo.
-   - Valid output is passed through data_rx_valid_o if there is data in fifo to be read.
-   - Data can be read from the fifo through data_rx_data_o.
-
-CSR Access
-^^^^^^^^^^
-
 
 System Architecture
 -------------------
@@ -297,13 +340,13 @@ REG_CAM_CFG_LL
 - Offset: 0x24
 - Type:   volatile
 
-+-----------------+-------+--------+------------+------------------------------------------------------+
-| Field           |  Bits | Access | Default    | Description                                          |
-+=================+=======+========+============+======================================================+
++-----------------+-------+--------+------------+----------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                        |
++=================+=======+========+============+====================================================+
 | FRAMESLICE_LLY  | 31:16 |   RW   |    0x0     | Y coordinate of Lower left corner of Frame.        |
-+-----------------+-------+--------+------------+------------------------------------------------------+
++-----------------+-------+--------+------------+----------------------------------------------------+
 | FRAMESLICE_LLX  | 15:0  |   RW   |    0x0     | X coordinate of Lower left corner of Frame.        |
-+-----------------+-------+--------+------------+------------------------------------------------------+
++-----------------+-------+--------+------------+----------------------------------------------------+
 
 REG_CAM_CFG_UR
 ^^^^^^^^^^^^^^
@@ -325,11 +368,11 @@ REG_CAM_CFG_SIZE
 - Offset: 0x2C
 - Type:   non-volatile
 
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| Field      |  Bits | Access | Default    | Description                                                                        |
-+============+=======+========+============+====================================================================================+
-| ROWLEN     | 31:16 |   RW   |    0x0     | N-1 where N is the number of horizontal pixels (used in window mode)               |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
++------------+-------+--------+------------+-------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                             |
++============+=======+========+============+=========================================================================+
+| ROWLEN     | 31:16 |   RW   |    0x0     | Defines the number of pixels that constitute a single row in the frame. |
++------------+-------+--------+------------+-------------------------------------------------------------------------+
 
 REG_CAM_CFG_FILTER
 ^^^^^^^^^^^^^^^^^^
