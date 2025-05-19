@@ -65,7 +65,7 @@ Each component of the uDMA camera is discussed in greater detail in the followin
 
 Clock MUX
 ^^^^^^^^^
-The uDMA core includes a clock multiplexer used to select the input clock source. If dft_test_mode_i is low, the clock multiplexer outputs the peripheral clock; otherwise, it outputs the system clock.
+The uDMA core includes a clock multiplexer used to select the input clock source. If dft_test_mode_i is low, the clock multiplexer outputs the peripheral(cam_clk_i) clock; otherwise, it outputs the system(clk_i) clock.
 
 
 Dual-clock(DC) RX FIFO
@@ -335,7 +335,7 @@ REG_RX_CFG
 |            |       |        |            |                                                                                                 |
 +------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
 | CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                                     |
-|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address  and restart channel  |                                                          |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address  and restart channel  |
 |            |       |        |            |                                                                                                 |
 +------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
 
