@@ -314,31 +314,30 @@ REG_RX_CFG
 - Offset: 0x08
 - Type:   volatile
 
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| Field      |  Bits | Access | Default    | Description                                                                        |
-+============+=======+========+============+====================================================================================+
-| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core             |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,           |
-|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO  |
-|            |       |        |            |   of uDMA Core                                                                     |
-|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory    |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| DATASIZE   |   2:1 |   RW   |    0x2     | Controls uDMA address increment for each transfer from L2 memory                   |
-|            |       |        |            |                                                                                    |
-|            |       |        |            | - 0x0: increment address by 1 (data is 8 bits)                                     |
-|            |       |        |            | - 0x1: increment address by 2 (data is 16 bits)                                    |
-|            |       |        |            | - 0x02: increment address by 4 (data is 32 bits)                                   |
-|            |       |        |            | - 0x03: increment address by 0                                                     |
-|            |       |        |            |                                                                                    |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
-| CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
-|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address          |
-|            |       |        |            |     and restart channel                                                            |
-|            |       |        |            |                                                                                    |
-+------------+-------+--------+------------+------------------------------------------------------------------------------------+
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                                     |
++============+=======+========+============+=================================================================================================+
+| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core                          |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,                        |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO               |
+|            |       |        |            |   of uDMA Core                                                                                  |
+|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                                  |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| DATASIZE   |   2:1 |   RW   |    0x2     | Controls uDMA address increment for each transfer from L2 memory                                |
+|            |       |        |            |                                                                                                 |
+|            |       |        |            | - 0x0: increment address by 1 (data is 8 bits)                                                  |
+|            |       |        |            | - 0x1: increment address by 2 (data is 16 bits)                                                 |
+|            |       |        |            | - 0x02: increment address by 4 (data is 32 bits)                                                |
+|            |       |        |            | - 0x03: increment address by 0                                                                  |
+|            |       |        |            |                                                                                                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                                     |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address  and restart channel  |                                                          |
+|            |       |        |            |                                                                                                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
 
 REG_CAM_CFG_GLOB
 ^^^^^^^^^^^^^^^^
@@ -346,46 +345,44 @@ REG_CAM_CFG_GLOB
 - Offset: 0x20
 - Type:  non-volatile
 
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| Field            |  Bits | Access | Default    | Description                                                            |
-+==================+=======+========+============+========================================================================+
-| EN               | 31:31 |   RW   |    0x0     | Enable data RX from camera interface, Enable/disable only happens      |
-|                  |       |        |            | at start of frame                                                      |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            | - 0x0: disable                                                         |
-|                  |       |        |            | - 0x1: enable                                                          |
-|                  |       |        |            |                                                                        |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| SHIFT            | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                       |
-|                  |       |        |            | Note: not used if FORMAT == BYPASS                                     |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| FORMAT           |  10:8 |   RW   |    0x0     |Input frame format:                                                     |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            | - 0x0: RGB565                                                          |
-|                  |       |        |            | - 0x1: RGB555                                                          |
-|                  |       |        |            | - 0x2: RGB444                                                          |
-|                  |       |        |            | - 0x4: BYPASS_LITTLEEND                                                |
-|                  |       |        |            | - 0x5: BYPASS_BIGEND                                                   |
-|                  |       |        |            |                                                                        |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| FRAMESLICE_EN    |  7:7  |   RW   |    0x0     | Frame Slicing (Windowing) enable:                                      |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            | - 0x0: disable                                                         |
-|                  |       |        |            | - 0x1: enable                                                          |
-|                  |       |        |            |                                                                        |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| FRAMEDROP_VALUE  |  6:1  |   RW   |    0x0     | Frame Drop value:                                                      |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            |                                                                        |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
-| FRAMEDROP_EN     |  0:0  |   RW   |    0x0     | Frame Drop enable:                                                     |
-|                  |       |        |            |                                                                        |
-|                  |       |        |            | - 0x0: disable                                                         |
-|                  |       |        |            | - 0x1: enable                                                          |
-|                  |       |        |            |                                                                        |
-+------------------+-------+--------+------------+------------------------------------------------------------------------+
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| Field            |  Bits | Access | Default    | Description                                                                |
++==================+=======+========+============+============================================================================+
+| EN               | 31:31 |   RW   |    0x0     | Enable camera RX operation, When this bit is enabled, camera starts        |
+|                  |       |        |            | accepting new frames from external device.                                 |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| SHIFT            | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                           |
+|                  |       |        |            | Note: not used if FORMAT == BYPASS                                         |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FORMAT           |  10:8 |   RW   |    0x0     |Input frame format:                                                         |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: RGB565                                                              |
+|                  |       |        |            | - 0x1: RGB555                                                              |
+|                  |       |        |            | - 0x2: RGB444                                                              |
+|                  |       |        |            | - 0x4: BYPASS_LITTLEEND                                                    |
+|                  |       |        |            | - 0x5: BYPASS_BIGEND                                                       |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMESLICE_EN    |  7:7  |   RW   |    0x0     | Enable/Disable Frame Slicing (Windowing)                                   |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMEDROP_VALUE  |  6:1  |   RW   |    0x0     | Frame Drop value. Number of frames to be dropped before pushing data onto  |
+|                  |       |        |            | RX DC FIFO                                                                 |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMEDROP_EN     |  0:0  |   RW   |    0x0     | Enable/Disable Frame Drop                                                  |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
 
 REG_CAM_CFG_LL
 ^^^^^^^^^^^^^^
