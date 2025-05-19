@@ -24,10 +24,13 @@ A camera interface is a hardware block that interfaces with different image sens
 Features
 --------
 - Supports RGB565, RGB555 ,RGB444, BYPASS_LITEND and BYPASS_BIGEND image formats.
-- Allows windowing. It allows users to select a range of interest in the picture. It can be disabled by the user.
-- Parallel data input line for carrying pixel data.
+- Supports Frame slicing. It allows users to select a range of interest in the picture.
+- Supports Frame dropping. It allows users to select a number of frames that can dropped before storing it in L2 memory.
+- Supports Grayscaling. It allows users to update RGB coefficient in the pixel before storing it in L2 memory.
+- Supports variable row len. Number od pixels in a row can be defined by ``REG_CAM_CFG_SIZE`` CSR.
+- Parallel data input line for carrying frame data.
 - There is a horizontal sync(HSYNC) input which indicates one line of the frame is transmitted.
-- There is a vertical sync(VSYNC) input which indicates that one entire frame is transmitted. It can be configured for polarity.
+- There is a vertical sync(VSYNC) input which indicates that one entire frame is transmitted. Polarity of ``cam_vsync_i`` signal can defined using ``REG_CAM_VSYNC_POLARITY`` CSR.
 - Supports active low reset.
 
 Block Architecture
@@ -45,7 +48,7 @@ The Figure below is a high-level block diagram of the uDMA camera:-
 
    uDMA camera Block Diagram
 
-In the block diagram above, the DATA lines at the boundary of the uDMA camera are 32 bits wide, whereas other DATA lines are only 16 bits wide. The DATASIZE pin is 2 bits wide. The valid values for the DATASIZE pin are:
+In the block diagram above, the DATA lines at the boundary of the uDMA camera are 32 bits wide, whereas other DATA lines are only 16 bits wide. The DATASIZE pin is 2 bits wide and ``DATASIZE`` bit of ``REG_RX_CFG`` define the value of this pin. The valid values for the DATASIZE pin are:
 
 - 0x0: 1-byte transfer
 - 0x1: 2-byte transfer
@@ -119,7 +122,7 @@ A full pixel is received over two consecutive clock cycles:
 
 **First cycle (odd clocks: 1, 3, 5, ...):**
 
-- The value from ``cam_data_i`` is captured and stored in a temporary register, let's say ``MSB``
+- The value from ``cam_data_i`` is captured and stored in a temporary CSR, let's say ``MSB``
 - This value will be used in the next clock cycle.
 
 **Second cycle (even clocks: 2, 4, 6, ...):**
@@ -142,7 +145,7 @@ Each of these operation are discussed in the following sections: -
 
 **Frame Dropping**
 
-The uDMA Camera supports frame dropping, which allows selective skipping of incoming frames. Frame dropping can be configured via the ``FRAMEDROP_EN`` and ``FRAMEDROP_VALUE`` fields in the ``REG_CAM_CFG_GLOB`` control and status register (CSR).
+The uDMA Camera supports frame dropping, which allows selective skipping of incoming frames. Frame dropping can be configured via the ``FRAMEDROP_EN`` and ``FRAMEDROP_VALUE`` fields in the ``REG_CAM_CFG_GLOB`` control and status CSR.
 When frame dropping is enabled and the uDMA Camera is configured to receive data from an external source, it uses an internal frame counter to track received frames. The frame counter increments on each new frame. Once it reaches the value specified in ``FRAMEDROP_VALUE``, it is reset to zero, allowing the next frame to be stored.
 Frames are considered valid and written to L2 memory only when the frame counter value is zero. If the frame counter is non-zero, the corresponding frames are treated as dropped and are not stored in L2 memory. The counter is also reset under the following conditions:
 
@@ -151,7 +154,7 @@ Frames are considered valid and written to L2 memory only when the frame counter
 
 **Frame Slicing**
 
-The uDMA Camera supports frame slicing(windowing), which allows selective slicing of incoming frames. Frame slicing can be enabled via the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` control and status register (CSR). The size of the sliced frame can be configured using ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR.
+The uDMA Camera supports frame slicing(windowing), which allows selective slicing of incoming frames. Frame slicing can be enabled via the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` control and status CS. The size of the sliced frame can be configured using ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR.
 ``REG_CAM_CFG_LL`` CSR is used to select lower left cordinates of frame and ``REG_CAM_CFG_UR`` is used to select upper right cordinates.
 
 If frame slicing is enabled, the current pixel is processed only if it lies within the configured frame slice region, based on the following conditions:
@@ -222,7 +225,7 @@ uDMA camera generates below interrupts during the RX operation:
 Rx interrupt is automatically cleared by uDMA Core in the next clock cycle.
 
 The event bridge forwards interrupt over dedicated line to the APB event controller for processing. Each interrupt has its own dedicated line.
-Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
+Users can mask these interrupts through the APB event controller's control and status CSRs.
 
 System Architecture
 -------------------
@@ -463,20 +466,20 @@ Firmware Guidelines
 Rx Operation
 ^^^^^^^^^^^^
 
-- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA camera. It acts as a soft reset for uDMA camera.
-- Configure uDMA camera's ``REG_CAM_CFG_FILTER`` CSR with values of R, G and B coefficient in the RGB pixel.
+- Configure uDMA Core's ``PERIPH_RESET CSR`` to issue a reset signal to uDMA camera. It acts as a soft reset for uDMA camera.
+- Configure uDMA camera's ``REG_CAM_CFG_FILTER`` CSR to define the values of R, G and B coefficient in the RGB pixel.
 - Configure uDMA camera's ``REG_CAM_VSYNC_POLARITY`` CSR to define the number of pixels that constitute a single row in the frame.
-- Configure uDMA camera's ``REG_CAM_CFG_SIZE`` CSR to select the active level of ``cam_vsync_i`` input signal.
+- Configure uDMA camera's ``REG_CAM_CFG_SIZE`` CSR to define the active level of ``cam_vsync_i`` input signal.
 - Configure camera Operation using  REG_CAM_CFG_GLOB CSR. Refer to the CSR details for detailed information.
 - If frame slicing is enabled by setting the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR to define the lower-left and upper-right corners of the sliced frame.
 - If frame dropping is enabled by setting the ``FRAMEDROP_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``FRAMEDROP_VALUE`` bit of the same CSR with the value indicating the number of frames to drop.
-- Configure RX channel using RX_CFG CSR. Refer to the CSR details for detailed information.
+- Configure RX channel using ``RX_CFG CSR``. Refer to the CSR details for detailed information.
 - For each transaction:
-   - Update uDMA camera's RX_SADDR CSR with an interleaved(L2) memory address. camera will write the data to the this memory address for transmission.
-   - Configure uDMA camera's RX_SIZE CSR with the size of data that camera needs to transmit. uDMA camera will copy the transmit RX_SIZE bytes of data to RX_SADDR location of interleaved memory.
-- While Rx operation is ongoing, the RX_BUSY bit of the STATUS CSR will be set.
-- Upon receiving the data from external device uDMA camera will set the RX_DATA_VALID bit to high.
-- Received data can also be read using the RX_DATA CSR. When there is no valid data, the RX_DATA_VALID bit will be cleared.
+   - Update uDMA camera's ``RX_SADDR CSR`` with an interleaved(L2) memory address. camera will write the data to the this memory address for transmission.
+   - Configure uDMA camera's ``RX_SIZE`` CSR with the size of data that camera needs to transmit. uDMA camera will copy the transmit RX_SIZE bytes of data to RX_SADDR location of interleaved memory.
+- While Rx operation is ongoing, the ``RX_BUSY`` bit of the ``STATUS`` CSR will be set.
+- Upon receiving the data from external device uDMA camera will set the ``RX_DATA_VALID`` bit to high.
+- Received data can also be read using the ``RX_DATA`` CSR. When there is no valid data, the ``RX_DATA_VALID`` bit will be cleared.
 
 Pin Diagram
 -----------
