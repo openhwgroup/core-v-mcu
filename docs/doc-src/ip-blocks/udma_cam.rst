@@ -140,8 +140,8 @@ Before pushing the data onto uDMA camera internal FIFO, uDMA camera does followi
 
 Each of these operation are discussed in the following sections: -
 
-Frame Dropping
-^^^^^^^^^^^^^^
+**Frame Dropping**
+
 The uDMA Camera supports frame dropping, which allows selective skipping of incoming frames. Frame dropping can be configured via the ``FRAMEDROP_EN`` and ``FRAMEDROP_VALUE`` fields in the ``REG_CAM_CFG_GLOB`` control and status register (CSR).
 When frame dropping is enabled and the uDMA Camera is configured to receive data from an external source, it uses an internal frame counter to track received frames. The frame counter increments on each new frame. Once it reaches the value specified in ``FRAMEDROP_VALUE``, it is reset to zero, allowing the next frame to be stored.
 Frames are considered valid and written to L2 memory only when the frame counter value is zero. If the frame counter is non-zero, the corresponding frames are treated as dropped and are not stored in L2 memory. The counter is also reset under the following conditions:
@@ -149,8 +149,8 @@ Frames are considered valid and written to L2 memory only when the frame counter
 - A reset signal is received by the uDMA Camera
 - Frame dropping is disabled
 
-Frame Slicing
-^^^^^^^^^^^^^
+**Frame Slicing**
+
 The uDMA Camera supports frame slicing(windowing), which allows selective slicing of incoming frames. Frame slicing can be enabled via the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` control and status register (CSR). The size of the sliced frame can be configured using ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR.
 ``REG_CAM_CFG_LL`` CSR is used to select lower left cordinates of frame and ``REG_CAM_CFG_UR`` is used to select upper right cordinates.
 
@@ -212,6 +212,17 @@ Upon detecting the valid signal, the uDMA core initiates arbitration. If the uDM
 After receiving ready signal RX DC FIFO will update the valid and data pin will new value. In the next clock cycle uDMA Core will deassert the ready pin.
 
 .. note:: The uDMA CORE RX channel will only respond to uDMA camera requests when it is enabled via the EN bit in the RX_CFG channel configuration CSR.
+
+Interrupt
+^^^^^^^^^
+
+uDMA camera generates below interrupts during the RX operation:
+- Rx channel interrupt: Raised by uDMA core's Rx channel after pushing last byte of RX_SIZE bytes into core RX FIFO.
+
+Rx interrupt is automatically cleared by uDMA Core in the next clock cycle.
+
+The event bridge forwards interrupt over dedicated line to the APB event controller for processing. Each interrupt has its own dedicated line.
+Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
 
 System Architecture
 -------------------
@@ -449,11 +460,23 @@ REG_CAM_VSYNC_POLARITY
 Firmware Guidelines
 -------------------
 
-Clock Enable, Reset & Configure uDMA camera
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 Rx Operation
 ^^^^^^^^^^^^
+
+- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA camera. It acts as a soft reset for uDMA camera.
+- Configure uDMA camera's ``REG_CAM_CFG_FILTER`` CSR with values of R, G and B coefficient in the RGB pixel.
+- Configure uDMA camera's ``REG_CAM_VSYNC_POLARITY`` CSR to define the number of pixels that constitute a single row in the frame.
+- Configure uDMA camera's ``REG_CAM_CFG_SIZE`` CSR to select the active level of ``cam_vsync_i`` input signal.
+- Configure camera Operation using  REG_CAM_CFG_GLOB CSR. Refer to the CSR details for detailed information.
+- If frame slicing is enabled by setting the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR to define the lower-left and upper-right corners of the sliced frame.
+- If frame dropping is enabled by setting the ``FRAMEDROP_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``FRAMEDROP_VALUE`` bit of the same CSR with the value indicating the number of frames to drop.
+- Configure RX channel using RX_CFG CSR. Refer to the CSR details for detailed information.
+- For each transaction:
+   - Update uDMA camera's RX_SADDR CSR with an interleaved(L2) memory address. camera will write the data to the this memory address for transmission.
+   - Configure uDMA camera's RX_SIZE CSR with the size of data that camera needs to transmit. uDMA camera will copy the transmit RX_SIZE bytes of data to RX_SADDR location of interleaved memory.
+- While Rx operation is ongoing, the RX_BUSY bit of the STATUS CSR will be set.
+- Upon receiving the data from external device uDMA camera will set the RX_DATA_VALID bit to high.
+- Received data can also be read using the RX_DATA CSR. When there is no valid data, the RX_DATA_VALID bit will be cleared.
 
 Pin Diagram
 -----------
