@@ -32,28 +32,49 @@ Features
 
 Block Architecture
 ------------------
-cam_clk_i is a pixel clock which changes on every pixel. Pixel data is taken as input through cam_data_i, and cam_hsync_i and cam_vsync_i indicate the horizontal and vertical sync value.
-It contains a udma dc fifo to store the pixel value before sending it to output.
 
-The Figure below is a high-level block diagram of the uDMA UART:-
+uDMA camera is a peripheral function of the uDMA subsystem. As such, its CSRs are not directly accessible via the APB bus. Rather, the control plane interface to the uDMA camera is managed by the uDMA core within the uDMA subsystem.
+This is transparent to the programmer as all uDMA camera CSRs appear within the uDMA Subsystem's memory region. As is the case for all uDMA subsystem peripherals, I/O operations are controlled by the uDMA core. This is not transparent to the programmer.
 
-.. figure:: udma_cam_image.png
-   :name: uDMA_Camera_Block_Diagram
+The Figure below is a high-level block diagram of the uDMA camera:-
+
+.. figure:: uDMA_Camera_Block_Diagram.png
+   :name: uDMA_camera_Block_Diagram
    :align: center
    :alt:
 
-   uDMA Camera Block Diagram
+   uDMA camera Block Diagram
+
+In the block diagram above, the DATA lines at the boundary of the uDMA camera are 32 bits wide, whereas other DATA lines are only 16 bits wide. The DATASIZE pin is 2 bits wide. The valid values for the DATASIZE pin are:
+
+- 0x0: 1-byte transfer
+- 0x1: 2-byte transfer
+- 0x2: 4-byte transfer
+
+When transmitting data to the uDMA Core, the uDMA camera pads bits [31:16] with 0x0.
+
+uDMA camera uses the Rx channel interface to store the data received from the external camera device to the interleaved (L2) memory.
+Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Rx channel functionality of uDMA Core.
+
+Pixel data is taken as input from external device through ``cam_data_i``. ``cam_hsync_i`` and ``cam_vsync_i`` indicates the horizontal and vertical sync value.
+
+Each component of the uDMA camera is discussed in greater detail in the following sections.
+
+Clock MUX
+^^^^^^^^^
+The uDMA core includes a clock multiplexer used to select the input clock source. If dft_test_mode_i is low, the clock multiplexer outputs the peripheral clock; otherwise, it outputs the system clock.
+
 
 Dual-clock(DC) RX FIFO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The uDMA core operates using the system clock, while the uDMA Camera operates using both the system clock and the peripheral clock. To ensure the uDMA UART and core are properly synchronized, dual-clock FIFOs are used in the uDMA Camera.
+The uDMA core operates using the system clock, while the uDMA Camera operates using both the system clock and the peripheral clock. To ensure the uDMA camera and core are properly synchronized, dual-clock FIFOs are used in the uDMA Camera.
 These are 8-depth FIFOs and can store 16-bit wide data. It is implemented using circular FIFO.
 
 Below diagram shows the interfaces of DC FIFO: 
 
-.. figure:: uDMA_UART_Dual_clock_fifo.png
-   :name: uDMA_UART_Dual_clock_fifo
+.. figure:: uDMA_camera_Dual_clock_fifo.png
+   :name: uDMA_camera_Dual_clock_fifo
    :align: center
    :alt:
 
@@ -78,13 +99,46 @@ During Camera receive (Rx) operation, the RX DC FIFO is written internally by th
 RX operation
 ^^^^^^^^^^^^
 
- RX operation is enable using 
+The RX operation of uDMA camera includes reading the data from external device and store it into L2 memory. The ``EN`` bit of ``REG_CAM_CFG_GLOB`` CSR is used to enable uDMA camera to recieve data from external device.
 
-The uDMA camera communicates with external device using below pins:
+When an external device want to transmit a frame to uDMA camera, it asserts ``cam_vsync_i`` signal. A frame consists of multiple pixels. The polarity of ``cam_vsync_i`` is decoded as per ``VSYNC_POLARITY`` bitfield value of ``REG_CAM_VSYNC_POLARITY`` CSR.
+After transmitting a horizontal-row(pixel) of a frame, external device sends a ``cam_hsync_i`` signal.
 
-uDMA core reads 8 bits of information from external device in a cycle.  and stores it in its internal DC FIFO. uDMA camera communicates 16 bit of information to uDMA core in each clock cycle.
+Frame data from the external device arives arrives serially over the ``cam_data_i`` pin using two clock cycles per pixel (16-bit format over an 8-bit interface).
+A ``cam_hsync_i`` signal indicates valid data on ``cam_data_i`` lines.
 
-uDMA camera pushes the pixel data onto DC FIFO. Pixel data is transmitted to uDMA core. 
+The following image format is supported by uDMA Core: -
+
+- RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
+- RGB555: Five bits of data is allocated for each(R,G and B) the color components.
+- RGB444: Four bits of data is allocated for each(R,G and B) the color components.
+- BYPASS_LITEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
+- BYPASS_BIGEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
+
+A full pixel is received over two consecutive clock cycles:
+
+**First cycle (odd clocks: 1, 3, 5, ...):**
+
+- The value from ``cam_data_i`` is captured and stored in a temporary register, let's say ``MSB``
+- This value will be used in the next clock cycle.
+
+**Second cycle (even clocks: 2, 4, 6, ...):**
+
+- A new value is received from ``cam_data_i`` (this is the LSB of the pixel).
+
+The full 16-bit pixel is reconstructed using:
+  
+  - ``MSB`` (from previous cycle)
+  - ``cam_data_i`` (current cycle)
+
+Before pushing the data onto uDMA camera internal FIFO, uDMA camera does following operation on received frame: -
+
+- Frame Dropping
+- Frame Slicing
+- uDMA camera Pixel Arrangement
+- Greyscalling and coefficent update
+
+Each of these operation are discussed in the following sections: -
 
 Frame Dropping
 ^^^^^^^^^^^^^^
@@ -101,82 +155,67 @@ The uDMA Camera supports frame slicing(windowing), which allows selective slicin
 ``REG_CAM_CFG_LL`` CSR is used to select lower left cordinates of frame and ``REG_CAM_CFG_UR`` is used to select upper right cordinates.
 
 If frame slicing is enabled, the current pixel is processed only if it lies within the configured frame slice region, based on the following conditions:
-- The current row  is greater than or equal to the frame slice's lower-left Y-coordinate(``FRAMESLICE_LLY``).
+- The current row is greater than or equal to the frame slice's lower-left Y-coordinate(``FRAMESLICE_LLY``).
 - The current row is less than or equal to the frame slice's upper-right Y-coordinate(``FRAMESLICE_URY``).
 - The current column is greater than or equal to the frame slice's lower-left X-coordinate(``FRAMESLICE_LLX``).
 - The current column is less than or equal to the frame slice's upper-right X-coordinate(``FRAMESLICE_URY``).
 
 If Frame slicing is enabled, pixels outside this region are excluded from processing.
 
-IMAGE FORMAT
-^^^^^^^^^^^^
-The following image format is supported by uDMA Core: -
-
-- RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
-- RGB555: Five bits of data is allocated for each(R,G and B) the color components.
-- RGB444: Four bits of data is allocated for each(R,G and B) the color components.
-- BYPASS_LITEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
-- BYPASS_BIGEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
-
-Pixel Data Sampling Mechanism
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Pixel data from the external device arives arrives serially over the ``cam_data_i`` pin using two clock cycles per pixel (16-bit RGB565 format over an 8-bit interface).
-
-A full pixel is received over two consecutive clock cycles:
-
-**First cycle (odd clocks: 1, 3, 5, ...):**
-
-- The value from ``cam_data_i`` is captured and stored in a temporary register, let's say ``MSB``
-- This value will be used in the next clock cycle.
-
-**Second cycle (even clocks: 2, 4, 6, ...):**
-
-- A new value is received from ``cam_data_i`` (this is the LSB of the pixel).
-- The full 16-bit pixel is reconstructed using:
-  
-  - ``MSB`` (from previous cycle)
-  - ``cam_data_i`` (current cycle)
-
-
-uDMA extract the RGB component form incoming pixel using below rule: -
+**uDMA camera Pixel Arrangement**
+The uDMA camera organizes the incoming pixel stream into image data based on its supported formats. Arrangement logic is discussed below: -
 
 - RGB565
-   Red component = {MSB[7:3],3'b000}
-   Green component = {MSB[2:0],cam_data_i[7:5], 2'b00}
-   Blue component = {cam_data_i[4:0], 3'b000}
+   - Red_component = {MSB[7:3],3'b000}
+   - Green_component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   - Blue_component = {cam_data_i[4:0], 3'b000}
+
 - RGB555
-   Red component = {MSB[6:2],3'b000}
-   Green component = {MSB[2:0],cam_data_i[7:5], 2'b00}
-   Blue component = {cam_data_i[4:0], 3'b000}
+   - Red_component = {MSB[6:2],3'b000}
+   - Green_component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   - Blue_component = {cam_data_i[4:0], 3'b000}
+
 - RGB444
-   Red component = {MSB[3:0],4'b0000}
-   Green component = {cam_data_i[7:4],4'b0000}
-   Blue component = {cam_data_i[3:0],4'b0000}
+   - Red_component = {MSB[3:0],4'b0000}
+   - Green_component = {cam_data_i[7:4],4'b0000}
+   - Blue_component = {cam_data_i[3:0],4'b0000}
+
 - BYPASS_LITEND
-   YUV = {MSB[7:0],cam_data_i[7:0]}
+   - YUV_Pixel = {MSB[7:0],cam_data_i[7:0]}
+
 - BYPASS_BIGEND
-   YUV = {cam_data_i[7:0],MSB[7:0]}
+   - YUV_Pixel = {cam_data_i[7:0],MSB[7:0]}
 
-In the above representation, MSB represent the value of cam_data_i pin in the alternate clock cycle i.e. 1,3,5 etc. Pixel data from the external device is read during each clock cycle.
-When first clock is recived data fron cam_data_i is stored in store in MSB(a local varaible), however the value will be reflected in the next clock cycle. In the second clock cycle data will be used from cam_data_i input pin and MSB will have cam_data_i data from the previous clock. 
 
-- Filter values for R, G, B can be obtained by multiplying their respective pixel values by their coefficients. Coefficient can be read from REG_CAM_CFG_FILTER.
-- Filter values for all the pixels are added and then shifted right to get the final pixel value which is then passed to fifo. Number of bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
+**Greyscalling and coefficent update**
+Now that we have 16-bit pixel data in form of RGB and YUV format, grey scalling is perfomed on RGB pixels.
 
-**IMAGE FORMAT: BYPASS_LITEND, BYPASS_BIGEND**
-   - These image formats are used for YUV images. In the YUV image a color is described as a Y component(luma) and two chroma components U and V.
-   - Luma represents the brightness of the image and chroma conveys the color information of the picture.
-   - YUV pixel value can be read from cam_data_i.
-   - Filter is not valid.
+The ``R_COEFF``, ``G_COEFF`` and ``B_COEFF`` bits ``REG_CAM_CFG_FILTER`` CSR is used to update the RGB Coefficent in RGB pixel. 
 
-**Vertical sync**
-   - Polarity can be read from REG_CAM_VSYNC_POLARITY..
-   - A start of frame is marked by high current vsync value and low previous vsync.
+- Red_component = Red_component * 'R_COEFF'
+- Green_component = Green_component * 'G_COEFF'
+- Blue_component = Blue_component * 'B_COEFF'
+
+After updating the coefficent of R, G and B component of the pixel, each component is added to generate pixel information.
+``RGB_Pixel = Red component + Green component + Blue component``
+
+Please note greyscalling is not applicable for YUV pixels.
+
+After Greyscalling, RGB pixel undergoes pixel shifting. The ``SHIFT`` bit of ``REG_CAM_CFG_GLOB`` CSR is used to configure shift value. 
+Shifting is done as per the below rule: -
+``RGB_Pixel >= ((0 <= SHIFT_bit_val <= 9) ? SHIFT_bit_val : 0)``
+
+The uppper bits of 16 bit pixel will be padded with zero.
+
+uDMA camera pushes the refined pixel data onto DC FIFO. Pixel data is transmitted to uDMA core. uDMA FIFO, when it has data, raises valid signal and updates the data lines with pixel data. The data line is 16 bit wide.
+Upon detecting the valid signal, the uDMA core initiates arbitration. If the uDMA core channel wins the arbitration and the core’s RX FIFO has sufficient space to accommodate the incoming data, it read the data lines and asserts a ready signal back to the camera indicating data is read.
+After receiving ready signal RX DC FIFO will update the valid and data pin will new value. In the next clock cycle uDMA Core will deassert the ready pin.
+
+.. note:: The uDMA CORE RX channel will only respond to uDMA camera requests when it is enabled via the EN bit in the RX_CFG channel configuration CSR.
 
 System Architecture
 -------------------
-The figure below shows how the uDMA UART interfaces with the rest of the CORE-V-MCU components and the external UART device:-
+The figure below shows how the uDMA camera interfaces with the rest of the CORE-V-MCU components and the external camera device:-
 
 .. figure:: uDMA-Camera-system-Connection-Diagram.png
    :name: uDMA-Camera-CORE-V-MCU-Connection-Diagram
@@ -191,7 +230,7 @@ As with the most peripherals in the uDMA Subsystem, software configuration can b
 
 - Configure the I/O parameters of the peripheral (e.g. frame size).
 - Configure the uDMA camera data control parameters.
-- Manage the data transfer/reception operation.
+- Manage the data reception operation.
 
 uDMA Camera Data Control
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -227,7 +266,7 @@ REG_RX_SADDR
 +--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
 | Field  | Bits | Access | Default    | Description                                                                                              |
 +========+======+========+============+==========================================================================================================+
-| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where UART will write the recived data.      |
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where camera will write the recived data.    |
 |        |      |        |            | Read & write to this CSR access different information.                                                   |
 |        |      |        |            |                                                                                                          |
 |        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction. |
@@ -245,7 +284,7 @@ REG_RX_SIZE
 +-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
 | Field |  Bits | Access | Default    | Description                                                                                |
 +=======+=======+========+============+============================================================================================+
-| SIZE  |  19:0 |   RW   |    0x0     | Size of Rx buffer(amount of data to be transferred by UART to L2 memory). Read & write     |
+| SIZE  |  19:0 |   RW   |    0x0     | Size of Rx buffer(amount of data to be transferred by camera to L2 memory). Read & write   |
 |       |       |        |            | to this CSR access different information.                                                  |
 |       |       |        |            |                                                                                            |
 |       |       |        |            | **On Write**: Size of Rx buffer for next transaction.  It does not impact current ongoing  |
@@ -410,7 +449,7 @@ REG_CAM_VSYNC_POLARITY
 Firmware Guidelines
 -------------------
 
-Clock Enable, Reset & Configure uDMA UART
+Clock Enable, Reset & Configure uDMA camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Rx Operation
@@ -431,7 +470,7 @@ Below is categorization of these pins:
 
 Rx channel interface
 ^^^^^^^^^^^^^^^^^^^^
-The following pins constitute the Rx channel interface of uDMA UART. uDMA UART uses these pins to write data to interleaved (L2) memory:
+The following pins constitute the Rx channel interface of uDMA camera. uDMA camera uses these pins to write data to interleaved (L2) memory:
 
 - data_rx_datasize_o
 - data_rx_o
@@ -452,7 +491,7 @@ Reset interface
 
 uDMA core issues reset signal to Camera using reset pin.
 
-uDMA UART inerface to read-write CSRs
+uDMA camera inerface to read-write CSRs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following interfaces are used to read and write to Camera CSRs. These interfaces are managed by uDMA Core:
 
@@ -465,7 +504,7 @@ The following interfaces are used to read and write to Camera CSRs. These interf
 
 Rx channel interface
 ^^^^^^^^^^^^^^^^^^^^
-The following pins constitute the Rx channel interface of uDMA UART. uDMA UART uses these pins to write data to interleaved (L2) memory:
+The following pins constitute the Rx channel interface of uDMA camera. uDMA camera uses these pins to write data to interleaved (L2) memory:
 
 - data_rx_datasize_o
 - data_rx_o
@@ -474,9 +513,9 @@ The following pins constitute the Rx channel interface of uDMA UART. uDMA UART u
 
 These pins reflect the configuration values for the next transaction.
 
-uDMA UART Rx channel configuration interface
+uDMA camera Rx channel configuration interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-- uDMA UART uses the following pins to share the value of config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG with the uDMA core:-
+- uDMA camera uses the following pins to share the value of config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG with the uDMA core:-
 
    - cfg_rx_startaddr_o
    - cfg_rx_size_o
@@ -484,7 +523,7 @@ uDMA UART Rx channel configuration interface
    - cfg_rx_en_o
    - cfg_rx_clr_o
 
-- UART shares the values present over the below pins as read values of the config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG:
+- camera shares the values present over the below pins as read values of the config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG:
 
    - cfg_rx_en_i
    - cfg_rx_pending_i
@@ -500,19 +539,17 @@ Test Interface
 - dft_cg_enable_i: Clock gating enable during test
 
 *dft_test_mode_i* is used to put uDMA Camera into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
+*dft_cg_enable_i* pin is not used in the uDMA camera block.
 
 Camera clock interface
 ^^^^^^^^^^^^^^^^^^^^^^
 
 - cam_clk_i
 
-TODO: Add descrition
+External device derives the clock pins. clk_i is used to synchronize Camera with the exteral device.
 
 Camera frame interface
 ^^^^^^^^^^^^^^^^^^^^^^
-
-- cam_data_i
-- cam_hsync_i
-- cam_vsync_i
-
-TODO: Add descrition
+- cam_data_i : Camera pixel data input. Carries pixel data from the camera sensor. Data is valid during active cam_hsync_i.
+- cam_hsync_i : Horizontal sync input. Indicates the horizontal line of pixel data.
+- cam_vsync_i : Vertical sync input. Signals the start of a new frame. Helps align frame boundaries for image processing.
