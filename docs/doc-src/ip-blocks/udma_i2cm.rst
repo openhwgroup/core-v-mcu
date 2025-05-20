@@ -51,28 +51,114 @@ Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/
 
 Dual clock FIFO
 ~~~~~~~~~~~~~~~
-The uDMA core operates on the system clock, while the uDMA I2C uses both the system clock and the peripheral clock.
-To manage synchronization between I2C and uDMA Core, the uDMA I2C uses dual-clock FIFOs — 4-depth buffers capable of storing 8-bit data. Seperated FIFOs are used for transmit (TX) and receive (RX) operation.
-The I2C communicates with external devices via SDA(serial Data) and SCL(serial clock) lines. Data sent to or received from exernal device over I2C bus is transferred from or to the dual-clock FIFO.
-These FIFOs handle synchronization by aligning the data and control signal (like ready, valid etc.) to system clock domain used by uDMA core's Rx/Tx channels.
-Once synchronized, the uDMA I2C reads from or writes to the dual-clock FIFO and exchange data with core's RX and TX channels.
+The uDMA core operates using the system clock, while the uDMA I2C operates using both the system clock and the peripheral clock.
+To ensure the uDMA I2C and core are properly synchronized, dual-clock FIFOs are used in the uDMA I2C. These are 4-depth FIFOs and can store 8-bit wide data.
+It is implemented using circular FIFO.
+
+Below diagram shows the interfaces of DC FIFO:
+
+.. figure:: uDMA_I2C_Dual_clock_fifo.png
+   :name: uDMA_I2C_Dual_clock_fifo
+   :align: center
+   :alt:
+
+   Dual clock FIFO
+
+For Rx operation, source(src_*) interfaces shown in above diagram operate at peripheral clock and destination(dst_*) interfaces operate using system clock.
+
+For Tx operation, source interfaces shown in above diagram operate at system clock and destination interfaces operate using peripheral clock. 
+
+**Pop operation**
+
+The DC FIFO asserts the dst_valid_o (valid) signal to indicate that valid data is available on the data lines. A module waiting for data should read the data lines only when valid pin is high and drive the dst_ready_i (ready)
+signal to high and reset it in next clock cycle. When DC FIFO receives an active ready signal, indicating that the data has been read, it updates the data lines with new data if FIFO is not empty. 
+If the FIFO is empty, the dst_valid_o signal is deasserted.
+
+**Push operation**
+
+The DC FIFO asserts the src_ready_o (ready) signal when there is available space to accept incoming data. When an active src_valid_i (valid) signal is received, the data is written into the FIFO.
+The src_ready_o signal is kept asserted as long as the FIFO has space for more data. IF the DC FIFO is full, push operation will be stalled until the FIFO has empty space and valid line is high.
+A module tranmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
+
+During I2C transmit (Tx) operation, the TX DC FIFO is read internally by the I2C to transmit data to an external device and written by the TX FIFO.
+During I2C receive (Rx) operation, the RX DC FIFO is written internally by the I2C with the data received from the external device and read by the uDMA core.
+
+TX FIFO
+^^^^^^^
+
+uDMA I2C has a TX FIFO to store the received data from uDMA core. It forwards the data read from L2 memory to the TX DC FIFO. uDMA I2C on TX path, read the data from TX DC FIFO and transmits it to external device.
+It is a 2-depth FIFO and can store 8-bit wide data. Below diagram shows the interfaces of TX FIFO: 
+
+.. figure:: uDMA_I2C_TX_FIFO.png
+   :name: uDMA_I2C_TX_FIFO
+   :align: center
+   :alt:
+
+   TX FIFO
+
+TX FIFO operates using system clock. clr_i pin is hardcoded with value 0x0.
+
+**Pop operation**
+
+The read interface of the TX FIFO is connected to the TX DC FIFO.
+The TX DC FIFO raises ready(ready_i) signal if its FIFO has space. If data is available, TX FIFO asserts the valid_o signal and update the data lines with data.
+TX FIFO will update the valid signal and data lines at each clock cycle. If the ready signal is high, data lines will be update with new data, otherwise, data lines will show the last transferred byte.
+If the TX FIFO is empty, the valid_o signal remains deasserted, indicating that no valid data is present on the output lines.
+
+**Push operation**
+
+The write interface of the TX FIFO is extended to uDMA Core. TX FIFO write operation is performed with the help of req(req_o) and ready(ready_o) signal.
+The TX FIFO keeps the ready_o (ready) signal high until the TX FIFO is full. TX FIFO raises a req_o signal when it has enough space in FIFO i.e. ready_o is high, and the pending requests at uDMA core does not exceed the depth of TX FIFO.
+TX FIFO recieves a gnt(gnt_i) signal from the uDMA core confirming that the request is accepted. When it recieves the valid signal from uDMA core and the FIFO is not full, TX FIFO pushes the data coming from uDMA core.
+TX tries to read data at each clock cycle until TX FIFO has space and valid pin is high.
 
 TX Operation
 ~~~~~~~~~~~~
-To initiate a data transmission to an external I2C device, the uDMA I2C must be configured using the TX_SADDR, TX_SIZE and TX_CFG control registers.
-The uDMA I2C asserts request signal to uDMA core's Tx channel and when its TX FIFO has space, also asserts a ready signal to indicate it is ready to receive data from L2 memory.
-Once the request is made, uDMA core arbitrates among all Tx channel requests and grants access to one of them. If the I2C is granted access and the ready signal is active, uDMA core reads data from L2 memory through TCDM interconnect and pushes it to I2C Tx FIFO.
-After receiving the data, I2C decodes the instructions from it (Refer to the read/write command sequence example given below) and processes it.
-The data may contain both write-to-slave or read-from-slave instructions. 
-- If it's a *write* instruction, the data from internal FIFO is sent to external device over the I2C Bus.
-- If it's a *read* instruction, the I2C reads data from the external device over the I2C Bus and stores it in the internal FIFO for later retrieval by the core.
+
+To transmit data to an external I2C device, the uDMA I2C must be configured using the TX_SADDR, TX_SIZE and TX_CFG control registers.
+Following steps are performed to read the transmit data from L2 memory: -
+
+**Read data into TX FIFO from L2 memory**
+
+To initiate a read operation from L2 memory, the TX FIFO asserts both the READY and REQ signals to the uDMA core, indicating its readiness to receive data. A high READY signal signifies that the
+TX FIFO has available space, while a high REQ signal confirms that the FIFO can accept data from the uDMA core and that the number of pending transactions does not exceed its capacity. The TX FIFO
+internally maintains a counter to track unserved transactions from the core.
+
+Upon receiving the REQ signal and if the I2C TX channel is enabled, the uDMA core initiates arbitration. If the I2C TX channel wins arbitration, the core issues a GNT (grant) signal to the uDMA I2C.
+Once data is successfully read from L2 memory, the uDMA core asserts a VALID signal along with the data for transmission to the I2C.
+
+The uDMA I2C writes this data into the TX FIFO and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core deasserts the VALID signal in the following
+clock cycle and reasserts it only when new data is available for transmission. Since tha FIFO is initially empty, both READY and REQ signal are asserted at power up.
+
+**Read data into TX DC FIFO from TX FIFO**
+
+To read data from TX FIFO, TX DC FIFO will assert the ready signal. TX FIFO, when it has data, asserts the valid signal and update the data lines of DC FIFO with the valid data. Valid signal will keep asserted until TX FIFO has data.
+The data transmission from TX FIFO to DC FIFO is synchronized using system clock. TX DC FIFO will deassert the ready signal when it is full. TX FIFO will only update the data lines with valid data when it has data available is FIFO and the ready signal is high.
+
+**Read data from DC TX FIFO**
+
+When the valid signal is enabled, I2C will read the data from DC TX FIFO into its local variable. The uDMA I2C will raise ready signal to TX DC FIFO indicating that it can accept more data.
+In the next clock cycle, the TX DC FIFO checks whether it has data or not and raises a valid signal and udpate data lines accordingly. The uDMA I2C deasserts the READY signal and starts processing the data(store in local variable).
+
+The uDMA I2C decodes the received data, which includes both command instructions and the actual data to be transferred (e.g., refer to the read/write command sequence example below), and processes it accordingly.
+
+The command may be either **write-to-slave** or **read-from-slave** commands:
+- For a *write* command, the data following the write instruction is transmitted to the external device over the I2C bus.
+- For a *read* command, I2C reads the data from the external device over the I2C bus and stored in the internal RX DC FIFO, from where it can be retrieved later by the uDMA core.
+
+After each byte is decoded and processed, and if valid signal is still asserted, I2C will again read the data from DC TX FIFO to its local variable and perform the aforementioned steps. The data read operation of Tx component from uDMA UART is synchronized using peripheral clock.
+
 
 RX Operation
 ~~~~~~~~~~~~
-To read data from an external device into I2C's internal RX FIFO, a TX operation must be performed to issue a *read instruction*, as explained above.
-To transmit this data to L2 memory, the uDMA I2C must be configured using the RX_SADDR, RX_SIZE and RX_CFG control registers.
-Once the I2C receives the requested data from external data, it asserts valid signal to uDMA core's RX channel.The uDMA core then arbitrates access among all RX channels.
-If the uDMA I2C is granted access, the uDMA core sends a ready-high signal back to the I2C and reads the data. Finally, uDMA core writes the received data into L2 memory through TCDM Interconnect.
+To read the data from an external device into I2C's internal RX DC FIFO, a TX operation must be performed to issue a *read instruction*, as explained above.
+
+To transmit the data received from the external device to L2 memory, the uDMA I2C must be configured using the RX_SADDR, RX_SIZE and RX_CFG control registers.
+
+Once the data is read from the external device, I2C pushes it to the RX DC FIFO and asserts the VALID signal. This valid signal is propogated to the uDMA core.
+
+Upon detectnig the valid signal, the uDMA core initiates arbitration. If the uDMA I2C channel wins the arbitration and the core’s RX FIFO has sufficient space to accommodate the incoming data, it read the data from the RX DC FIFO and asserts a ready signal back to the I2C indicating data is read.
+After receiving ready signal RX DC FIFO will update the valid and data pin with new value. In the next clock cycle uDMA Core will deassert the ready pin. 
 
 Theory of Operation
 -------------------
@@ -101,15 +187,27 @@ I2C controller state machine
 
 I2C Master controller operates through disctinct states, each handling a specific part of I2C transaction process:
 
-- I2C_ST_WAIT_FOR_CMD :- Also known as the *idle* state. Initially, the controller starts here and waits for commands. Based on the received command, it transitions to the corresponding operational state. 
-- I2C_ST_WAIT:- Holds the controller in a delay state for a specified number of cycles before returning to *idle* state.
-- I2C_ST_WAIT_EV:- Waits for one of the external events to be triggered. Upon receiving the specified events, it transitions back to *idle* state.
-- I2C_ST_REPEAT: stores the repeat count, indicating how many times the next applicable command should to be repeated.
-- I2C_ST_WRTIE:- Starts a new I2C transfer by sending the slave address on the bus. It also determines the direction of data transfer (read or write). 
-- I2C_ST_GET_DATA:- Reads data from the slave and sends ACK or NACK after each byte based on the command received. If in repeat mode, it continues this operation for the specified number of bytes and stores the read data into its internal RX FIFO.
-- I2C_ST_SEND_DATA: Sends data bytes to the slave and waits for an acknowledgment (ACK) after each transmission. If in repeat mode, it continues this operation for the specified number of bytes. The data to be written is taken from the internal TX FIFO.
-- I2C_ST_STOP:- Sends a STOP condition on the I2C bus, signaling the end of current transaction. Once completed, it returns to *idle* state.
+- ``I2C_ST_WAIT_FOR_CMD`` :- Also known as the *idle* state. Initially, the controller starts here and waits for commands. Based on the received command, it transitions to the corresponding operational state. 
+- ``I2C_ST_WAIT``:- Holds the controller in a delay state for a specified number of cycles before returning to *idle* state.
+- ``I2C_ST_WAIT_EV``:- Waits for one of the external events to be triggered. Upon receiving the specified events, it transitions back to *idle* state.
+- ``I2C_ST_REPEAT``: stores the repeat count, indicating how many times the next applicable command should to be repeated.
+- ``I2C_ST_WRTIE``:- Starts a new I2C transfer by sending the slave address on the bus. It also determines the direction of data transfer (read or write). 
+- ``I2C_ST_GET_DATA``:- Reads data from the slave and sends ACK or NACK after each byte based on the command received. If in repeat mode, it continues this operation for the specified number of bytes and stores the read data into its internal RX FIFO.
+- ``I2C_ST_SEND_DATA``: Sends data bytes to the slave and waits for an acknowledgment (ACK) after each transmission. If in repeat mode, it continues this operation for the specified number of bytes. The data to be written is taken from the internal TX FIFO.
+- ``I2C_ST_STOP``:- Sends a STOP condition on the I2C bus, signaling the end of current transaction. Once completed, it returns to *idle* state.
 
+
+System Architecture
+-------------------
+
+The figure below shows how the uDMA I2C interfaces with the rest of the CORE-V-MCU components and the external I2C Slave device:-
+
+.. figure:: uDMA_I2C_CORE_V_MCU_Connection_Diagram.png
+   :name: uDMA_I2C_CORE_V_MCU_Connection_Diagram
+   :align: center
+   :alt:
+
+   uDMA I2C CORE-V-MCU Connection Diagram
 
 Programming Model
 -----------------
