@@ -46,6 +46,12 @@ The figure below is the high-level block diagram of the uDMA I2C:-
 
    uDMA I2C Block Diagram
 
+In the block diagram above, the DATA lines at the boundary of the uDMA I2C are 8 bits wide. The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x0. The valid values for the DATASIZE pin are:
+
+- 0x0: 1-byte transfer
+- 0x1: 2-byte transfer
+- 0x2: 4-byte transfer
+
 uDMA I2C uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external device. uDMA I2C uses the Rx channel interface to store the data received from the external device in interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
@@ -78,7 +84,7 @@ If the FIFO is empty, the dst_valid_o signal is deasserted.
 
 The DC FIFO asserts the src_ready_o (ready) signal when there is available space to accept incoming data. When an active src_valid_i (valid) signal is received, the data is written into the FIFO.
 The src_ready_o signal is kept asserted as long as the FIFO has space for more data. IF the DC FIFO is full, push operation will be stalled until the FIFO has empty space and valid line is high.
-A module tranmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
+A module transmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
 
 During I2C transmit (Tx) operation, the TX DC FIFO is read internally by the I2C to transmit data to an external device and written by the TX FIFO.
 During I2C receive (Rx) operation, the RX DC FIFO is written internally by the I2C with the data received from the external device and read by the uDMA core.
@@ -115,7 +121,7 @@ TX tries to read data at each clock cycle until TX FIFO has space and valid pin 
 TX Operation
 ~~~~~~~~~~~~
 
-To transmit data to an external I2C device, the uDMA I2C must be configured using the TX_SADDR, TX_SIZE and TX_CFG control registers.
+To transmit data to an external I2C device, the uDMA I2C must be configured using the TX_SADDR, TX_SIZE and TX_CFG CSRs.
 Following steps are performed to read the transmit data from L2 memory: -
 
 **Read data into TX FIFO from L2 memory**
@@ -153,11 +159,11 @@ RX Operation
 ~~~~~~~~~~~~
 To read the data from an external device into I2C's internal RX DC FIFO, a TX operation must be performed to issue a *read instruction*, as explained above.
 
-To transmit the data received from the external device to L2 memory, the uDMA I2C must be configured using the RX_SADDR, RX_SIZE and RX_CFG control registers.
+To transmit the data received from the external device to L2 memory, the uDMA I2C must be configured using the RX_SADDR, RX_SIZE and RX_CFG CSRs.
 
 Once the data is read from the external device, I2C pushes it to the RX DC FIFO and asserts the VALID signal. This valid signal is propogated to the uDMA core.
 
-Upon detectnig the valid signal, the uDMA core initiates arbitration. If the uDMA I2C channel wins the arbitration and the core’s RX FIFO has sufficient space to accommodate the incoming data, it read the data from the RX DC FIFO and asserts a ready signal back to the I2C indicating data is read.
+Upon detecting the valid signal, the uDMA core initiates arbitration. If the uDMA I2C channel wins the arbitration and the core’s RX FIFO has sufficient space to accommodate the incoming data, it read the data from the RX DC FIFO and asserts a ready signal back to the I2C indicating data is read.
 After receiving ready signal RX DC FIFO will update the valid and data pin with new value. In the next clock cycle uDMA Core will deassert the ready pin. 
 
 Theory of Operation
