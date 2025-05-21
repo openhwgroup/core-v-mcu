@@ -52,6 +52,9 @@ In the block diagram above, the DATA lines at the boundary of the uDMA I2C are 8
 - 0x1: 2-byte transfer
 - 0x2: 4-byte transfer
 
+The data from the TX DC FIFO, which is sent by uDMA Core, is first decoded by the I2C controller to determine whether it is a command or regular data (Refer to I2C controller state machine for detailed information). If it is identified as data, it is directly forwarded to the I2C bus controller.
+If it is a command, the I2C controller processes it by generating the appropriate control signals to I2C bus controller as specified by the command.
+
 uDMA I2C uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external device. uDMA I2C uses the Rx channel interface to store the data received from the external device in interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
