@@ -134,7 +134,7 @@ Upon receiving the REQ signal and if the I2C TX channel is enabled, the uDMA cor
 Once data is successfully read from L2 memory, the uDMA core asserts a VALID signal along with the data for transmission to the I2C.
 
 The uDMA I2C writes this data into the TX FIFO and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core deasserts the VALID signal in the following
-clock cycle and reasserts it only when new data is available for transmission. Since tha FIFO is initially empty, both READY and REQ signal are asserted at power up.
+clock cycle and reasserts it only when new data is available for transmission. Since the FIFO is initially empty, both READY and REQ signal are asserted at power up.
 
 **Read data into TX DC FIFO from TX FIFO**
 
@@ -149,6 +149,7 @@ In the next clock cycle, the TX DC FIFO checks whether it has data or not and ra
 The uDMA I2C decodes the received data, which includes both command instructions and the actual data to be transferred (e.g., refer to the read/write command sequence example below), and processes it accordingly.
 
 The command may be either **write-to-slave** or **read-from-slave** commands:
+
 - For a *write* command, the data following the write instruction is transmitted to the external device over the I2C bus.
 - For a *read* command, I2C reads the data from the external device over the I2C bus and stored in the internal RX DC FIFO, from where it can be retrieved later by the uDMA core.
 
