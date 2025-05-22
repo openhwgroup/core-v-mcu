@@ -30,7 +30,7 @@ Features
   - JTAG CSR access for debug and configuration
   - Boot address and fetch enable control for the Fabric Controller (FC)
   - eFPGA control and configuration interface
-  - Ready timeout monitoring for system level recovery
+  - Ready timeout monitoring for system-level recovery
   - System information and status CSRs
   - Soft reset capability for all APB Client Peripherals
   - Build date and time information
@@ -55,32 +55,53 @@ The controller manages pad multiplexing and configuration for all system IOs. It
 
 Each pad can be individually configured for:
 
-  - Pad multiplexing (selecting the pad function i.e. connecting the I/O to different signals in CORE-V-MCU)
-  - Pad electrical configuration (drive strength, pull-up/down, etc. These configurations are not implemented in the current design)
+  - Pad multiplexing (selecting the pad function, i.e. connecting the I/O to different signals in CORE-V-MCU)
+  - Pad electrical configuration (drive strength, pull-up/down, etc. These configurations are not implemented in the current design.)
 
-These configurations can be accessed through two methods:
+These configurations can be accessed through two methods, which can be used as per user preference:
   - Directly through the IO_CTRL CSRs (0x400 - 0x4C0)
+      - Individual CSR for each pad, allowing direct access to the pad configuration.
+      - Each CSR is 32 bits wide, with the following fields:
+          - PADMUX specifies the pad multiplexing configuration
+          - PADCFG specifies the electrical configuration of the pad(TBD)
+
   - Through the WCFGFUN and RCFGFUN CSRs (0x60 and 0x64).
+      - WCFGFUN CSR is used to configure the pad multiplexing and electrical configuration.
+          - The IO_PAD field in WCFGFUN CSR specifies the pad index to be configured.
+          - The PADMUX field in WCFGFUN CSR specifies the pad multiplexing configuration.
+          - The PADCFG field in WCFGFUN CSR specifies the electrical configuration of the pad(TBD).
+
+      - RCFGFUN CSR is used to read the current configuration of a specific pad.
+          - The IO_PAD field in RCFGFUN CSR specifies the pad index to be read.
+          - The PADMUX field in RCFGFUN CSR specifies the current pad multiplexing configuration.
+          - The PADCFG field in RCFGFUN CSR specifies the current electrical configuration of the pad(TBD).
+          - To use RCFGFUN CSR, the IO_PAD field must be set to the pad index of interest, and then a read operation is performed.
+          - The read operation will return the current configuration of the specified pad.
 
 Note: Pad multiplexing details can be found in the `IO Assignment document <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/io_assignment_tables.html>`_.
 
 Watchdog Timer
 ~~~~~~~~~~~~~~
 A programmable watchdog timer(WDT) runs on the reference clock(ref_clk_i) and resets the system when expired. The watchdog timer is a safety feature designed to detect and recover from system malfunctions.
-Features include:
-
-  - Configurable timeout period through the WD_COUNT CSR
-  - Hardware-based countdown mechanism operating on the reference clock
-  - Enable/disable control via the WD_CONTROL CSR
-  - Refresh mechanism using a magic value (0x6699) written to WD_CONTROL
 
 Initialization and Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - On system power-up, the watchdog timer is disabled by default.
-  - Software must configure the timeout value by writing to the WD_COUNT CSR.
+  - The timeout period of the watchdog timer can be configured using the WD_COUNT CSR. The default value of WD_COUNT is 0x8000
       - Note: WD_COUNT is only writable when the watchdog is disabled.
   - The watchdog is enabled by setting the ENABLE_STATUS (bit 31) in the WD_CONTROL CSR.
-  - After enabling, the watchdog timer begins counting down on every positive edge of the reference clock(ref_clk_i).
+  - After enabling, the watchdog timer begins counting down from the value set in the  WD_COUNT CSR and decrements on each positive edge of the reference clock (ref_clk_i), given that the stoptimer_i signal is not asserted.
+  - If the stoptimer_i signal is asserted, the watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
+
+Expiration
+^^^^^^^^^^
+  - The watchdog timer is considered expired when the counter reaches one.
+  - When the watchdog timer expires, the following occurs:
+      - The wd_expired_o signal is asserted for one clock cycle to indicate the expiration.
+      - The reset reason is set to 2'b11 in the RESET_REASON CSR, indicating a watchdog expiration.
+      - A system-wide reset is triggered.
+      - The system-wide reset is received in the SoC Controller as well through the HRESETn signal, which is deasserted for one clock cycle.
+      - This resets all the CSRs and output pins(including wd_expired_o) in the SoC Controller, including the WD_CONTROL and WD_COUNT CSRs, thereby disabling the watchdog timer and setting the WD_COUNT CSR to its default value of 0x8000.
 
 Servicing the Watchdog
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -88,30 +109,39 @@ Servicing the Watchdog
      - This operation is referred to as "servicing" the watchdog.
   - Servicing resets the counter to the value configured in WD_COUNT.
 
-Expiration and Reset Behavior
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - Once enabled, the watchdog cannot be disabled except by a hardware reset i.e.:
-      - The whole SoC Controller is resetted by deasserting HRESETn pin.
-      - Only the watchdog timer is reset by deasserting the rstpin_ni pin.
-  - Hard reset behaviour
-      - When rstpin_ni is deasserted, then the watchdog timer is set to it's default value of 0x8000.
-      - The reset reason is recorded in the RESET_REASON CSR with the value 1, indicating a hard reset.
-      - After this, the watchdog timer will only start counting down from the configured value in WD_COUNT CSR upon servicing.
-  - If the watchdog counter reaches zero, the following occurs:
-      - The wd_expired_o signal is asserted for one cycle of the reference clock.
-      - A system-wide reset is triggered.
-      - The reset reason is recorded in the RESET_REASON CSR with the value 2, indicating a watchdog reset.
-  - The reset reason is cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
+Resetting/Updating Watchdog Timer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Once the watchdog timer is enabled, it can be reset or updated in the following scenarios:
+  - A watchdog reset request is received, i.e. rstpin_ni is asserted.
+  - ENABLE_STATUS bit of WD_CONTROL is set. 
+  - The WD_VALUE bit of WD_CONTROL is set to x6699.
 
-Debugging
-^^^^^^^^^
-  - The WDT can be paused during debug sessions via the stoptimer_i input signal, improving debuggability by preventing timeouts during breakpoints.
-  - The WDT will be paused when the stoptimer_i signal is asserted and will resume counting when deasserted.
+  - If a reset request is initiated via the rstpin_ni pin, then the watchdog timer is set to its default value of 0x8000.
+      - The reset reason is recorded in the RESET_REASON CSR with the value 1.
+  - If the ENABLE_STATUS bit WD_CONTROL register is set, then the counter value will be updated with the WD_COUNT register value.
+  - If the WD_VALUE bit WD_CONTROL register is set to x6699, then the counter value will be updated with the WD_COUNT register value.
+
+Disabling the Watchdog Timer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Once enabled, the watchdog timer cannot be disabled. However, it can be effectively disabled by performing a system reset, i.e. deasserting the HRESETn signal.
+
+Pausing the Watchdog Timer
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+The watchdog timer can be paused in the following scenarios:
+  - A request to stop the timer is received, i.e., stoptimer_i is asserted.
+      - The watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
+      - When the stoptimer_i signal is deasserted, the watchdog timer will resume counting down from its current value.
+
+  - A watchdog reset request is received, i.e., rstpin_ni is deasserted.
+      - The watchdog timer will be reset to its default value of 0x8000.
+      - The reset reason is recorded in the RESET_REASON CSR with the value 1.
+      - The watchdog timer will not start counting down until the rstpin_ni signal is asserted again.
+
 
 eFPGA Interface
 ~~~~~~~~~~~~~~~
 The SoC Controller provides comprehensive management of the embedded FPGA (eFPGA) interface, enabling configuration, control, and monitoring of the eFPGA subsystem.
-Key Features:
+Key features:
 
   - Reset control for the eFPGA quadrants (left bottom, right bottom, right top, left top)
   - Interface enabling/disabling for various eFPGA connections (TCDM, APB, events)
@@ -120,108 +150,95 @@ Key Features:
 
 Initialization and Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - On system reset, all eFPGA interfaces are disabled by default and has to be explicitly enabled.
+  - On system reset, all eFPGA interfaces are disabled by default and have to be explicitly enabled.
   - Interfaces are enabled via the ENABLE_IN_OUT_EFPGA CSR and are communicated through various enable signals to the eFPGA.
-  - Reset control is asserted and deasserted through the RESET_TYPE1_EFPGA CSR, which allows resetting of individual eFPGA quadrants and is communicated through the 4 bit reset_type1_efpga_o signal.
-  - Additional features are controlled through the EFPGA_CONTROL CSR and the same is communicated through 32 bit control_in signal.
+  - Reset control is asserted and deasserted through the RESET_TYPE1_EFPGA CSR, which allows resetting of individual eFPGA quadrants and is communicated through the 4-bit reset_type1_efpga_o signal.
+  - Additional features are controlled through the EFPGA_CONTROL CSR and the same is communicated through the 32-bit control_in signal.
 
 Monitoring
 ^^^^^^^^^^
-  - The EFPGA_STATUS CSR provides visibility into the operational state of the eFPGA. The 32 bit status signals(status_out) from eFPGA are made available on this CSR, to make them accessible through APB interface.
-  - The EFPGA_VERSION CSR allows software to determine the eFPGA IP version. The 8 bit version signals(version) from eFPGA are made available on this CSR, to make them accessible through APB interface.
+  - The EFPGA_STATUS CSR provides visibility into the operational state of the eFPGA. The 32-bit status signals(status_out) from eFPGA are made available on this CSR to make them accessible through the APB interface.
+  - The EFPGA_VERSION CSR allows software to determine the eFPGA IP version. The 8-bit version signals(version) from eFPGA are made available on this CSR to make them accessible through the APB interface.
 
 Power Management
 ^^^^^^^^^^^^^^^^
   - Clock gating can be selectively applied to eFPGA-related FIFOs and is provided through the clk_gating_dc_fifo_o signal to eFPGA.
-      - Note: As per current design clk_gating_dc_fifo_o is always set to 1.
+      - Note: As per current design, clk_gating_dc_fifo_o is always set to 1.
 
 Ready Timeout Mechanism
 ~~~~~~~~~~~~~~~~~~~~~~~
-The Ready Timeout (RTO) mechanism is a system protection feature that monitors bus transactions and detects when a peripheral does not respond within an expected time frame.
+The Ready Timeout (RTO) mechanism is a system protection feature that monitors bus transaction timeouts.
 The SoC Controller generates a timeout signal (rto_o) when a peripheral fails to respond within the specified time limit.
-It enhances system robustness by preventing indefinite stalls caused by unresponsive peripherals.
+It improves system robustness by preventing the bus from stalling indefinitely due to unresponsive peripherals.
 
-The RTO mechanism is segregated into two IPs, the SoC Controller and the Peripheral Interconnect. 
-  - The Peripheral Interconnect IP is responsible generating the ready signal(start_rto_i) and informing which peripheral casued timeout through peripheral_rto_i signal.
-  - The SoC Controller houses the timeout counter and the CSRs for configuring the timeout period and monitoring the status of peripherals.
+The RTO mechanism is segregated into two IPs, the SoC Controller and the SoC Peripheral Interconnect.
 
-Timeout Detection Flow
-^^^^^^^^^^^^^^^^^^^^^^
-  - Software configures the timeout threshold by writing to the RTO_COUNT CSR.
-  - When a bus transaction starts, the peripheral interconnect asserts the start_rto_i signal and the timeout counter begins to decrement.
+Operation
+^^^^^^^^^
+  - When a bus transaction starts, the SoC peripheral interconnect asserts the start_rto_i pin on the SoC Controller.
+  - The SoC Controller, when its start_rto_i pin is asserted, starts counting down from the value set in the RTO_COUNT CSR and decrements on each positive edge of the system clock (HCLK).
   - The counter starts counting down from the value set in the RTO_COUNT CSR and decrements on each positive edge of the system clock(HCLK).
-  - If the peripheral responds before the counter reaches zero:
-      - The peripheral interconnect deasserts the start_rto_i signal.
-      - The counter is reloaded, and no timeout is signaled.
-  - If the counter reaches zero:
-      - The rto_o signal is asserted to indicate a timeout.
-      - The peripheral interconnect updates which peripheral caused timeout through peripheral_rto_i signals, which is then stored in the RTO_PERIPHERAL_ERROR CSR.
-      - The timeout event is acknowledged and cleared by writing any data to the RTO_PERIPHERAL_ERROR CSR (the write value is ignored and the CSR is cleared).
-
-Timeout Management
-^^^^^^^^^^^^^^^^^^
-  - Software can monitor the RTO_PERIPHERAL CSR to detect which peripherals have timed out.
-  - To acknowledge and clear a timeout event, software writes to the same CSR.
+  - The RTO_COUNT CSR of the SoC controller defines the timeout threshold.
+  - If the SoC Peripheral Interconnect deasserts the start_rto_i signal before the SOC controller timeout counter reaches zero, then the counter is reloaded, and no timeout is signalled.
+  - If the SOC Peripheral Interconnect fails to respond by deasserting the start_rto_i signal before the SOC controller timeout counter reaches zero, then the SOC controller asserts an rto_o signal to the SOC Peripheral Interconnect to indicate a timeout.
+  - The SOC Peripheral Interconnect, when its rto_i is asserted, drives the peripheral_rto_i pin of the SOC Peripheral Interconnect to indicate which peripheral caused the timeout.
+  - The SOC peripheral controller captures the faulty peripheral information in RTO_PERIPHERAL CSR to indicate which core-v-mcu peripheral caused the timeout.
+  - The RTO_PERIPHERAL CSR consists of 9 bits, each bit representing a specific peripheral. When the peripheral_rto_i pin is updated, the values of the corresponding bits in the RTO_PERIPHERAL CSR are set to 1.
+  - In the next clock cycle, the SoC controller deasserts the rto_o signal.
+  - The SoC Peripheral Interconnect, when its rto_i is deasserted, clears the peripheral_rto_i pin.
+  - The RTO_PERIPHERAL CSR is clear-on-write, i.e. writing to this CSR will clear it, and the write value is ignored.
 
 Boot Control
 ~~~~~~~~~~~~
-The boot control mechanism manages the system boot process, determining the behavior of the Fabric Controller/Core-Complex during reset and initial execution.
+The boot control mechanism manages the system boot process, determining the behaviour of the Fabric Controller/Core-Complex during reset and initial execution.
 It allows flexible configuration of boot address, fetch control, and boot mode selection.
 This mechanism enables software and hardware to coordinate system boot through configurable registers and external signals, supporting multiple boot modes and sources.
 
 Boot Address Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
   - On system reset, the default boot address is set to 0x1A000080.
-  - Software can modify the boot address by writing a new value to FCBOOT CSR.
+  - The boot address can be modified by writing a new value to the FCBOOT CSR.
 
 Fetch Control
 ^^^^^^^^^^^^^
-  - The Fabric Controller/Core-Complex's activity is gated by the fc_fetchen_o signal i.e. allowing dynamic enable/disable of instruction fetch.
+  - The Fabric Controller/Core-Complex's activity is gated by the fc_fetchen_o signal, i.e. allowing dynamic enable/disable of instruction fetch.
+      - The default value of fc_fetchen_o is ,1 i.e instruction fetch is enabled.
   - This signal is controlled through the FCFETCH CSR.
 
 Boot Mode Selection
 ^^^^^^^^^^^^^^^^^^^
+Boot mode defines how and from where a system loads the code needed to start operating.
   - Boot mode is influenced by external hardware signals:
       - bootsel_i: Selects between different boot paths.
           - 1 = SPI boot
           - 0 = Host mode via I2Cs
       - dmactive_i: Indicates debug mode active status.
-  - The selected boot mode and current boot status, as well as the debug mode status are captured in the BOOTSEL CSR.
+  - The selected boot mode and current boot status, as well as the debug mode status, are captured in the BOOTSEL CSR.
 
 JTAG Interface
 ~~~~~~~~~~~~~~
 The SoC Controller provides an interface to the JTAG debug port, enabling bidirectional communication and control for system-level debugging.
-Key Features:
+Key features:
 
-  - 8-bit JTAG register interface 
-  - Bidirectional communication through JTAGREG CSR
-  - Synchronization of incoming JTAG signals to the system clock
-
-Signal Synchronization
-^^^^^^^^^^^^^^^^^^^^^^
-  - External JTAG signals are synchronized to the internal system clock(HCLK) to ensure reliable data exchange.
+  - Bidirectional communication through 8-bit-wide JTAG_REG_IN and JTAG_REG_OUT bitfields of JTAGREG CSR
+  - External JTAG signals are synchronised to the internal system clock (HCLK) to ensure reliable data exchange.
 
 Data Access and Communication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - The upper bits of JTAGREG are updated with incoming JTAG data from external device through soc_jtag_reg_i port.
-  - The lower bits of JTAGREG can be written by software to transmit data to the external JTAG device through soc_jtag_reg_i port.
-  - This bidirectional access enables debug communication, such as status reporting, control signaling, or debug-triggered behaviors.
+  - The upper bits of JTAGREG are updated with incoming JTAG data from an external device through the soc_jtag_reg_i port.
+  - The lower bits of JTAGREG can be written by software to transmit data to the external JTAG device through the soc_jtag_reg_i port.
+  - This bidirectional access enables debug communication, such as status reporting, control signalling, or debug-triggered behaviours.
 
 Soft Reset Mechanism
 ~~~~~~~~~~~~~~~~~~~~
-The soft reset mechanism allows the SoC Controller to reset all APB client peripherals connected to the APB bus without requiring a full system reset. This feature is useful for recovering from peripheral malfunctions or reinitializing peripherals during runtime.
-Key Features:
+The soft reset mechanism allows the SoC Controller to reset all APB client peripherals connected to the APB bus without requiring a full system reset. This feature is useful for recovering from peripheral malfunctions or reinitialising peripherals during runtime.
 
-  - Resets all APB client peripherals to their default states.
-  - Allows reconfiguration of peripherals without a full system reset.
-  - Provides a mechanism to reinitialize APB peripherals through APB interface.
-  - Triggered by writing to the SOFT_RESET CSR.
-
-Operation:
+Operation
+^^^^^^^^^
   - Writing any value to the SOFT_RESET CSR (at offset 0x00FC) initiates the soft reset sequence.
   - The write value is ignored, as the CSR acts as a write-only strobe.
   - Upon triggering, the soft_reset_o signal is asserted, propagating the reset to all APB client peripherals.
-  - APB client peripheral include the following:
+  - APB client peripheral includes the following:
       - I2C Slave
       - Event Controller
       - Advanced Timer
@@ -231,21 +248,36 @@ Operation:
       - uDMA subsystem
       - eFPGA subsystem
   - The SoC Controller itself is only partially reset, retaining WDT and Boot Control configurations.
-  - The following CSRs in SoC Controller are reset to their default values:
+  - The following CSRs in the SoC Controller are reset to their default values:
       - WCFGFUN
       - RCFGFUN
       - IO_CTRL (0x400-0x4C0)
       - RESET_TYPE1_EFPGA
       - ENABLE_IN_OUT_EFPGA
       - EFPGA_CONTROL_IN
-      - RTO_PERIPHERAL_ERROR
+      - RTO_PERIPHERAL
       - READY_TIMEOUT_COUNT
-  - The reset signal(soft_reset_o) is deasserted once the reset sequence is complete.
+  - The following output pins, which are controlled through the CSRs, are reset to reflect their default values:
+      - pad_mux_o
+      - pad_cfg_o
+      - reset_type1_efpga_o
+      - clk_gating_dc_fifo_o
+      - enable_udma_efpga_o
+      - enable_events_efpga_o
+      - enable_apb_efpga_o
+      - enable_tcdm3_efpga_o
+      - enable_tcdm2_efpga_o
+      - enable_tcdm1_efpga_o
+      - enable_tcdm0_efpga_o
+      - control_in
+  - The reset signal(soft_reset_o) is deasserted when:
+      - The system reset is issued due to the HRESETn signal being deasserted.
+      - The pos-edge of the HCLK signal is encountered.
 
 System Architecture
 -------------------
 
-The figure below depicts the connections between the SoC Controller and rest of the modules in CORE-V-MCU:-
+The figure below depicts the connections between the SoC Controller and the rest of the modules in CORE-V-MCU:-
 
 .. figure:: apb_soc_controller_soc_connections.png
    :name: APB_SOC_Controller_SoC_Connections
@@ -261,7 +293,7 @@ The APB SOC Controller is memory-mapped at a base address defined by the system.
 
 CSR Access
 ~~~~~~~~~~
-CSRs are accessed using 32-bit reads and writes over the APB bus. The address space is organized as follows:
+CSRs are accessed using 32-bit reads and writes over the APB bus. The address space is organised as follows:
   - Base CSRs: 0x000 - 0x0FC
   - Pad configuration CSRs: 0x400 - 0x4C0
 
@@ -278,12 +310,12 @@ Typical programming sequences include:
 APB SoC Controller CSRs
 -----------------------
 
-Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the SoC Controller.
+Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for the peripheral domain address of the SoC Controller.
 
 NOTE: Several of the SoC Controller CSR are volatile, meaning that their read value may be changed by the hardware.
-For example, writting the RCFGFUN CSR will set the I/O port to be read. A subsequent read will return the configuration of the I/O port.
-As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value writen by software.
-A CSRs volatility is indicated by its "type".
+For example, writing the RCFGFUN CSR will set the I/O port to be read. A subsequent read will return the configuration of the I/O port.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value written by the software.
+A CSR's volatility is indicated by its "type".
 
 Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
@@ -320,6 +352,7 @@ FCFETCH
 | **Field**      | **Bits**  | **Access** | **Default** | **Description**                    |
 +================+===========+============+=============+====================================+
 |   ENABLE       |   0:0     |    RW      |     0x1     | Fetch enable bit                   |
+|                |           |            |             |                                    |
 |                |           |            |             | Signals FC to initiate instruction |
 |                |           |            |             | fetching and processing            |        
 +----------------+-----------+------------+-------------+------------------------------------+
@@ -329,30 +362,30 @@ BUILD_DATE
   - Address Offset = 0x000C
   - Type: non-volatile
 
-+-------------+----------+------------+-------------+--------------------+
-| **Field**   | **Bits** | **Access** | **Default** | **Description**    |
-+=============+==========+============+=============+====================+
-|   YEAR      |  31:16   |     RO     |     0x0     |   Year in BCD      |
-+-------------+----------+------------+-------------+--------------------+
-|   MONTH     |   15:8   |     RO     |     0x0     |   Month in BCD     |
-+-------------+----------+------------+-------------+--------------------+
-|   DAY       |   7:0    |     RO     |     0x0     |   Day in BCD       |
-+-------------+----------+------------+-------------+--------------------+
++-------------+----------+------------+-------------+----------------------------------------+
+| **Field**   | **Bits** | **Access** | **Default** | **Description**                        |
++=============+==========+============+=============+========================================+
+|   YEAR      |  31:16   |     RO     |     0x0     |   Year in binary-coded decimal format  |
++-------------+----------+------------+-------------+----------------------------------------+
+|   MONTH     |   15:8   |     RO     |     0x0     |   Month in binary-coded decimal format |
++-------------+----------+------------+-------------+----------------------------------------+
+|   DAY       |   7:0    |     RO     |     0x0     |   Day in binary-coded decimal format   |
++-------------+----------+------------+-------------+----------------------------------------+
 
 BUILD_TIME
 ~~~~~~~~~~
   - Address Offset = 0x0010
   - Type: non-volatile
 
-+---------------+----------+------------+-------------+---------------------+
-| **Field**     | **Bits** | **Access** | **Default** | **Description**     |
-+===============+==========+============+=============+=====================+
-|   HOUR        |   23:16  |     RO     |     0x0     |   Hour in BCD       |
-+---------------+----------+------------+-------------+---------------------+
-|   MINUTES     |   15:8   |     RO     |     0x0     |   Minutes in BCD    |
-+---------------+----------+------------+-------------+---------------------+
-|   SECONDS     |   7:0    |     RO     |     0x0     |   Seconds in BCD    |
-+---------------+----------+------------+-------------+---------------------+
++---------------+----------+------------+-------------+------------------------------------------+
+| **Field**     | **Bits** | **Access** | **Default** | **Description**                          |
++===============+==========+============+=============+==========================================+
+|   HOUR        |   23:16  |     RO     |     0x0     |   Hour in binary-coded decimal format    |
++---------------+----------+------------+-------------+------------------------------------------+
+|   MINUTES     |   15:8   |     RO     |     0x0     |   Minutes in binary-coded decimal format |
++---------------+----------+------------+-------------+------------------------------------------+
+|   SECONDS     |   7:0    |     RO     |     0x0     |   Seconds in binary-coded decimal format |
++---------------+----------+------------+-------------+------------------------------------------+
 
 WCFGFUN
 ~~~~~~~
@@ -364,7 +397,8 @@ WCFGFUN
 +=============+==========+============+=============+==============================+
 | RESERVED    | 31:30    |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
-| PADCFG      | 29:24    |    RW      |    0x0      | Pad configuration (TBD)      |
+| PADCFG      | 29:24    |    RW      |    0x1      | Pad electrical configuration |
+|             |          |            |             |  (TBD)                       |
 +-------------+----------+------------+-------------+------------------------------+
 | RESERVED    | 23:18    |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
@@ -372,21 +406,21 @@ WCFGFUN
 +-------------+----------+------------+-------------+------------------------------+
 | RESERVED    | 15:6     |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
-| IO_PAD      | 5:0      |    RW      |    0x0      | IO pad index                 |
+| IO_PAD      | 5:0      |    RW      |    0x0      | IO pad index to be configured|
 +-------------+----------+------------+-------------+------------------------------+
 
 RCFGFUN
 ~~~~~~~
   - Address Offset = 0x0064
   - type: volatile
-  - Only IO_PAD bit is writable, that allows reading particular IO pad configuration on subsequent reads
 
 +-------------+----------+------------+-------------+------------------------------+
 | **Field**   | **Bits** | **Access** | **Default** | **Description**              |
 +=============+==========+============+=============+==============================+
 | RESERVED    | 31:30    |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
-| PADCFG      | 29:24    |    RO      |    0x0      | Pad configuration (TBD)      |
+| PADCFG      | 29:24    |    RO      |    0x1      | Pad electrical configuration |
+|             |          |            |             |  (TBD)                       |
 +-------------+----------+------------+-------------+------------------------------+
 | RESERVED    | 23:18    |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
@@ -394,7 +428,7 @@ RCFGFUN
 +-------------+----------+------------+-------------+------------------------------+
 | RESERVED    | 15:6     |    RO      |    0x0      | Reserved                     |
 +-------------+----------+------------+-------------+------------------------------+
-| IO_PAD      | 5:0      |    RW      |    0x0      | IO pad index                 |
+| IO_PAD      | 5:0      |    RW      |    0x0      | IO pad index to be read      |
 +-------------+----------+------------+-------------+------------------------------+
 
 JTAGREG
@@ -407,8 +441,8 @@ JTAGREG
 +===============+==========+============+=============+==========================+
 | RESERVED      | 31:16    |    RO      |    0x0      | Reserved                 |
 +---------------+----------+------------+-------------+--------------------------+
-| JTAG_REG_IN   | 15:8     |    RO      |    0x0      | synchronized data input  |
-|               |          |            |             | from soc_jtag_reg_i port |
+| JTAG_REG_IN   | 15:8     |    RO      |    0x0      | shows the data present   |
+|               |          |            |             | at soc_jtag_reg_i port   |
 +---------------+----------+------------+-------------+--------------------------+
 | JTAG_REG_OUT  | 7:0      |    RW      |    0x0      | data to be driven on     |
 |               |          |            |             | soc_jtag_reg_o port      |
@@ -422,20 +456,21 @@ BOOTSEL
 +-------------+----------+------------+-------------+-----------------------------------------+
 | **Field**   | **Bits** | **Access** | **Default** | **Description**                         |
 +=============+==========+============+=============+=========================================+
-| BOOTSEL     |   0:0    | RO         |             | Selected Boot device                    |
+| BOOTSEL     |   0:0    | RO         |             | Selected boot device                    |
 |             |          |            |             |  1=SPI                                  |
 |             |          |            |             |  0=Host mode via I2Cs                   |
 |             |          |            |             |                                         | 
 |             |          |            |             | Configured from bootsel_i pin on reset  |
 +-------------+----------+------------+-------------+-----------------------------------------+
-| DMACTIVE    | 1:1      | RO         |             | DMA active value                        |
-|             |          |            |             | Configured from dmactive_i pin on reset |
+| DMACTIVE    | 1:1      | RO         | 0x0         | DMA active value                        |
+|             |          |            |             |                                         |
+|             |          |            |             | configured from dmactive_i pin on reset |
 +-------------+----------+------------+-------------+-----------------------------------------+
 | RESERVED    | 29:2     | RO         | 0x0         | Reserved                                |
 +-------------+----------+------------+-------------+-----------------------------------------+
 | BOOTSEL_IN  | 30       | RO         |             | Current status of bootsel_i pin         |
 +-------------+----------+------------+-------------+-----------------------------------------+
-| DMACTIVE_IN | 31       | RO         |             | Current status of dmactive_i pin        |
+| DMACTIVE_IN | 31       | RO         | 0x0         | Current status of dmactive_i pin        |
 +-------------+----------+------------+-------------+-----------------------------------------+
 
 CLKSEL
@@ -446,7 +481,7 @@ CLKSEL
 +-----------+----------+------------+-------------+--------------------------------+
 | **Field** | **Bits** | **Access** | **Default** | **Description**                |
 +===========+==========+============+=============+================================+
-|   S       |   0:0    |   RO       |             |   This CSR contains            |  
+|   SELECT  |   0:0    |   RO       |  0x1        |   This CSR contains            |  
 |           |          |            |             |   whether the system clock     |
 |           |          |            |             |   is coming from               |
 |           |          |            |             |   the FLL or the FLL is        |
@@ -468,8 +503,9 @@ WD_COUNT
 | **Field** | **Bits** | **Access** | **Default** | **Description**                     |
 +===========+==========+============+=============+=====================================+
 |   COUNT   |   30:0   |   RW       |   0x8000    |   Watchdog timer initial value      |
-|           |          |            |             |   Only writable before Watchdog is  |
-|           |          |            |             |   enabled                           |
+|           |          |            |             |                                     |
+|           |          |            |             |   Only writable when Watchdog is    |
+|           |          |            |             |   disabled                          |
 +-----------+----------+------------+-------------+-------------------------------------+
 
 WD_CONTROL
@@ -477,19 +513,27 @@ WD_CONTROL
   - Address Offset = 0x00D4
   - Type: volatile
 
-+-----------------+----------+------------+-----------+----------------------------------------+
-| **Field**       | **Bits** | **Access** |**Default**| **Description**                        |
-+=================+==========+============+===========+========================================+
-|  ENABLE_STATUS  |   31:31  |   RW       |   0x0     |   1=Watchdog Enabled,                  |
-|                 |          |            |           |                                        |
-|                 |          |            |           |   0=Watchdog not enabled.              |
-|                 |          |            |           |                                        |
-|                 |          |            |           |   Note: once enabled, cannot be        |
-|                 |          |            |           |   disabled                             |
-+-----------------+----------+------------+-----------+----------------------------------------+
-|  WD_VALUE       |   15:0   |   RW       |           |  Set to 0x6699 to reset watchdog when  |
-|                 |          |            |           |  enabled, read current WD value        |
-+-----------------+----------+------------+-----------+----------------------------------------+
++-----------------+----------+------------+-----------+-------------------------------------------+
+| **Field**       | **Bits** | **Access** |**Default**| **Description**                           |
++=================+==========+============+===========+===========================================+
+|  ENABLE_STATUS  |   31:31  |   RW       |   0x0     |   1=Watchdog Enabled,                     |
+|                 |          |            |           |                                           |
+|                 |          |            |           |   0=Watchdog not enabled.                 |
+|                 |          |            |           |                                           |
+|                 |          |            |           |   Note: Once enabled, can only be         |
+|                 |          |            |           |   disabled through deasserting HRESETn    |
+|                 |          |            |           |   i.e. resetting the whole SoC Controller |
++-----------------+----------+------------+-----------+-------------------------------------------+
+|  WD_VALUE       |   15:0   |   RW       | 0x8000    |  Read & write to this bitfield access     |
+|                 |          |            |           |  different information.                   |
+|                 |          |            |           |                                           |
+|                 |          |            |           |  Read: Current value of watchdog timer    |
+|                 |          |            |           |                                           |
+|                 |          |            |           |  Write: Write to this bitfield are not    |
+|                 |          |            |           |  captured. If the value is 0x6699, then   |
+|                 |          |            |           |  the watchdog timer is reset. Any other   |
+|                 |          |            |           |  value does not have any impact.          |
++-----------------+----------+------------+-----------+-------------------------------------------+
 
 RESET_REASON
 ~~~~~~~~~~~~
@@ -505,8 +549,8 @@ RESET_REASON
 |           |          |            |             |   2'b11=Watchdog expired               |
 +-----------+----------+------------+-------------+----------------------------------------+
 
-RTO_PERIPHERAL_ERROR
-~~~~~~~~~~~~~~~~~~~~
+RTO_PERIPHERAL
+~~~~~~~~~~~~~~
   - Address Offset = 0x00E0
   - Type: volatile
   - Configured from peripheral_rto_i pin
@@ -566,13 +610,13 @@ RESET_TYPE1_EFPGA
 +-------------+----------+------------+-------------+-----------------------------------+
 | **Field**   | **Bits** | **Access** | **Default** | **Description**                   |
 +=============+==========+============+=============+===================================+
-| RESET_LB    |   3:3    | RW         | 0x0         | Reset eFPGA Left Bottom Quadrant  |
+| RESET_LB    |   3:3    | RW         | 0x0         | Reset eFPGA left bottom quadrant  |
 +-------------+----------+------------+-------------+-----------------------------------+
-| RESET_RB    |   2:2    | RW         | 0x0         | Reset eFPGA Right Bottom Quadrant |
+| RESET_RB    |   2:2    | RW         | 0x0         | Reset eFPGA right bottom quadrant |
 +-------------+----------+------------+-------------+-----------------------------------+
-| RESET_RT    |   1:1    | RW         | 0x0         | Reset eFPGA Right Top Quadrant    |
+| RESET_RT    |   1:1    | RW         | 0x0         | Reset eFPGA right top quadrant    |
 +-------------+----------+------------+-------------+-----------------------------------+
-| RESET_LT    |   0:0    | RW         | 0x0         | Reset eFPGA Left Top Quadrant     |
+| RESET_LT    |   0:0    | RW         | 0x0         | Reset eFPGA left top quadrant     |
 +-------------+----------+------------+-------------+-----------------------------------+
 
 ENABLE_IN_OUT_EFPGA
@@ -619,6 +663,7 @@ EFPGA_STATUS_OUT
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
 |EFPGA_CONTROL_OUT|   31:0   | RO         |             | Status from eFPGA                |
+|                 |          |            |             |                                  |
 |                 |          |            |             | Configured from status_out pin   |
 +-----------------+----------+------------+-------------+----------------------------------+
 
@@ -631,6 +676,7 @@ EFPGA_VERSION
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
 |EFPGA_VERSION    |    7:0   | RO         |             | EFPGA version info               |
+|                 |          |            |             |                                  |
 |                 |          |            |             | Configured from version pin      |
 +-----------------+----------+------------+-------------+----------------------------------+
 
@@ -643,13 +689,14 @@ SOFT_RESET
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
-| SOFT_RESET      |    0:0   | WO         |             | Write only strobe to reset all   |
+| SOFT_RESET      |    0:0   | WO         | 0x0         | Write only strobe to reset all   |
 |                 |          |            |             | APB clients                      |
 +-----------------+----------+------------+-------------+----------------------------------+
 
 IO_CTRL
 ~~~~~~~
-  - Address Offset = 0x0400**
+  - Address Offset = 0x0400 to 0x04C0
+  - Type: non-volatile
   - I/O control supports two functions:
       -  I/O configuration
       -  I/O function selection
@@ -661,118 +708,149 @@ dependent and are TBD. I/O selection (MUX) controls the select field of
 a mux that connects the I/O to different signals in the device.
 
 Each port is individually addressable at offset + IO_PORT * 4. For
-example, the IO_CTRL CSR for IO_PORT 8 is at offset 0x0420.
+example, the IO_CTRL CSR for IO_PORT 8 is at offset 0x0420(0x400 + 8 * 4).
 
-+-------------+----------+------------+-------------+-------------------------+
-| **Field**   | **Bits** | **Access** | **Default** | **Description**         |
-+=============+==========+============+=============+=========================+
-| CFG         |   13:8   | RW         | 0x00        | Pad configuration (TBD) |
-+-------------+----------+------------+-------------+-------------------------+
-| MUX         |   1:0    | RW         | 0x00        | Mux select              |
-+-------------+----------+------------+-------------+-------------------------+
++-------------+----------+------------+-------------+------------------------------------+
+| **Field**   | **Bits** | **Access** | **Default** | **Description**                    |
++=============+==========+============+=============+====================================+
+| CFG         |   13:8   | RW         | 0x1         | Pad electrical configuration (TBD) |
++-------------+----------+------------+-------------+------------------------------------+
+| MUX         |   1:0    | RW         | 0x00        | Pad mux configuration              |
++-------------+----------+------------+-------------+------------------------------------+
 
 Firmware Guidelines
 --------------------
 
 Initialization Sequence
 ~~~~~~~~~~~~~~~~~~~~~~~
-  - Read System Information
-      - Read the INFO CSR at offset 0x00 from the SOC_CTRL_BASE address.
-      - Extract the number of cores from bits [31:16] of the read value.
-      - Extract the number of clusters from bits [15:0] of the read value.
-      - Use this information to properly configure system resources. A few use cases are:
-          - Resource Initialization: Software can read the core/cluster count to dynamically allocate memory structures and initialize only the hardware resources that actually exist on the chip variant.
-          - Workload Distribution: Task schedulers can use this information to optimize thread distribution across available cores and clusters, balancing performance against power consumption.
-  - Configure Boot Parameters
-      - Write the desired boot address to the FCBOOT CSR at offset 0x04.
-      - The fetch enable bit of FCFETCH CSR at offset 0x08 is enabled by default i.e. the Fabric Control/Core-Complex will start fetching instruction from the provided address.
-  - Configure IO Pads
-      - For each IO pad that needs configuration:
-          - Determine the IO pad index (0 to 47).
-          - Select the appropriate multiplexer value for the desired function.
-          - Determine the electrical pad configuration ( TBD ).
-          - Combine these values: IO index in bits [5:0], multiplexer in bits [17:16], and configuration in bits [29:24].
-          - Write this combined value to the WCFGFUN CSR at offset 0x60.
-      - Alternatively, configure pads directly through their dedicated addresses:
-          - Calculate the pad CSR address: 0x400 + (IO_PORT * 4).
-          - Write the multiplexer value to bits [1:0] and configuration to bits [13:8].
-  - Configure eFPGA
-      - Reset particular eFPGA Quadrant by writing to the RESET_TYPE1_EFPGA CSR at offset 0xE8.
-      - Enable the desired interfaces by writing to ENABLE_IN_OUT_EFPGA CSR at offset 0xEC:
-          - Bit 0: Enable TCDM0 interface
-          - Bit 1: Enable TCDM1 interface
-          - Bit 2: Enable TCDM2 interface
-          - Bit 3: Enable TCDM3 interface
-          - Bit 4: Enable APB interface
-          - Bit 5: Enable events interface
-      - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL CSR at offset 0xF0.
+
+Read System Information
+^^^^^^^^^^^^^^^^^^^^^^^
+  - Read the INFO CSR at offset 0x00 from the SOC_CTRL_BASE address.
+  - Extract the number of cores from bits [31:16] of the read value.
+  - Extract the number of clusters from bits [15:0] of the read value.
+  - Use this information to properly configure system resources. A few use cases are:
+      - Resource Initialization: Software can read the core/cluster count to dynamically allocate memory structures and initialize only the hardware resources that actually exist on the chip variant.
+      - Workload Distribution: Task schedulers can use this information to optimize thread distribution across available cores and clusters, balancing performance against power consumption.
+
+Configure Boot Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Write the desired boot address to the FCBOOT CSR at offset 0x04.
+  - The fetch enable bit of FCFETCH CSR at offset 0x08 is enabled by default i.e. the Fabric Control/Core-Complex will start fetching instructions from the provided address.
+
+Configure IO Pads
+^^^^^^^^^^^^^^^^^
+  - For each IO pad that needs configuration:
+      - Determine the IO pad index (0 to 47).
+      - Select the appropriate multiplexer value for the desired function.
+      - Determine the electrical pad configuration ( TBD ).
+      - Combine these values: IO index in bits [5:0], multiplexer in bits [17:16], and configuration in bits [29:24].
+      - Write this combined value to the WCFGFUN CSR at offset 0x60.
+  - Alternatively, configure pads directly through their dedicated addresses:
+      - Calculate the pad CSR address: 0x400 + (IO_PORT * 4).
+      - Write the multiplexer value to bits [1:0] and the configuration to bits [13:8].
+
+Configure eFPGA
+^^^^^^^^^^^^^^^
+  - Reset particular eFPGA Quadrant by writing to the RESET_TYPE1_EFPGA CSR at offset 0xE8.
+  - Enable the desired interfaces by writing to ENABLE_IN_OUT_EFPGA CSR at offset 0xEC:
+      - Bit 0: Enable TCDM0 interface
+      - Bit 1: Enable TCDM1 interface
+      - Bit 2: Enable TCDM2 interface
+      - Bit 3: Enable TCDM3 interface
+      - Bit 4: Enable APB interface
+      - Bit 5: Enable events interface
+  - Set additional control parameters(as per eFPGA design) by writing to the EFPGA_CONTROL CSR at offset 0xF0.
 
 Ready Timeout Management
 ~~~~~~~~~~~~~~~~~~~~~~~~
-  - Initialization:
-      - Set the desired timeout value by writing to the RTO_COUNT CSR at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
-      - The timeout value should be long enough to accommodate longest legitimate time a peripheral might take to respond with an additional margin.
-      - The default value after reset is 0x000FF.
-  - Error Handling:
-      - When a timeout is detected, identify the source peripheral through RTO_PERIPHERAL_ERROR CSR.
-      - Take appropriate recovery actions for the affected peripheral
-      - Write any value to the RTO_PERIPHERAL CSR to clear the timeout indication i.e. to clear which peripheral caused the timeout. The write value is ignored.
+
+Initialization
+^^^^^^^^^^^^^^
+  - Set the desired timeout value by writing to the RTO_COUNT CSR at offset 0xE4.(only bits [19:4] are used, with the 4 LSBs always set to 0xF)
+  - The timeout value should be long enough to accommodate the longest legitimate time a peripheral might take to respond, with an additional margin.
+  - The default value of RTO_COUNT is 0x000FF.
+
+Error Handling
+^^^^^^^^^^^^^^
+  - When a timeout is detected, identify the source peripheral through the RTO_PERIPHERAL_ERROR CSR.
+  - Take appropriate recovery actions for the affected peripheral
+  - Write any value to the RTO_PERIPHERAL CSR to clear the timeout indication, i.e. to clear which peripheral caused the timeout. The write value is ignored.
 
 Watchdog Management
 ~~~~~~~~~~~~~~~~~~~
-  - Watchdog Initialization
-      - Determine the appropriate timeout value based on your system requirements.
-      - Write this value to the WD_COUNT CSR before enabling the watchdog.
-      - The timeout value can be calculated while keeping the following considerations:
-          - The timeout should exceed the longest critical section in the code.
-          - The timeout should be shorter than the maximum time you can tolerate a system hang.
-          - There should be a safety margin to account for unexpected delays. It is recommended to set the timeout value to 1.5x to 2x above your calculated minimum.
-          - Since the timeout value is in clock cycles, the below formula can be used to calculate the timeout value:
-              - timeout_value = (timeout_in_seconds * ref_clk_frequency) - 1
-          - For example, if the reference clock frequency is 100MHz and you want a timeout of 2 seconds, the calculation would be:
-              - timeout_value = (2 * 100,000,000) - 1 = 199,999,999
-          - This would set the watchdog to timeout/expire after 2 seconds.
-  - Watchdog Enabling
-      - Enable the watchdog by writing 0x80000000 to the WD_CONTROL CSR.
-  - Regular Servicing
-      - Establish a reliable mechanism to service the watchdog at regular intervals.
-          - This can be a dedicated high priority timer service task running at regular intervals in case of RTOS which is supported by CORE-V-MCU. 
-      - The servicing interval(timeperiod between each subsequent servicing) should be typically between 0.5% to 0.75% of the watchdog timeout value.
-      - To service the watchdog, write 0x00006699 to the WD_CONTROL CSR.
-  - Watchdog Recovery Handling
+
+Watchdog Initialization
+^^^^^^^^^^^^^^^^^^^^^^^
+  - Determine the appropriate timeout value based on your system requirements.
+  - Write this value to the WD_COUNT CSR before enabling the watchdog.
+  - The example below demonstrates the timeout calculation:
+      - timeout_value = (timeout_in_seconds * ref_clk_frequency) - 1
+      - For example, if the reference clock frequency is 100MHz and you want a timeout of 2 seconds, the calculation would be:
+          - timeout_value = (2 * 100,000,000) - 1 = 199,999,999
+      - This would set the watchdog to timeout/expire after 2 seconds.
+
+Watchdog Enabling
+^^^^^^^^^^^^^^^^^
+  - Enable the watchdog by writing 0x80000000 to the WD_CONTROL CSR.
+
+Regular Servicing
+^^^^^^^^^^^^^^^^^ 
+    - The servicing interval(time period between each subsequent servicing) should be typically between 0.5% to 0.75% of the watchdog timeout value.
+    - To service the watchdog, write 0x00006699 to the WD_CONTROL CSR.
+
+Watchdog Recovery Handling
+^^^^^^^^^^^^^^^^^^^^^^^^^^
       - After a watchdog reset, read the reset reason through the RESET_REASON CSR.
-      - Implement appropriate post-reset actions, such as logging the event and the system status(various CSRs across CORE-V-MCU system) through software for diagnosis i.e. the software reads and stores CSRs values.
+      - Since a system wide reset has occured, reconfigure all CSRs and external signals across CORE-V-MCU as per your needs. 
 
 Soft Reset Procedure
 ~~~~~~~~~~~~~~~~~~~~
-  - Prepare for Reset
-      - Complete any pending operations and save critical state if needed.
-      - Save any necessary state information if required for recovery after the reset.
-  - Trigger Reset
-      - Write any value to the SOFT_RESET CSR at offset 0xFC(the write value is ignored).
-      - The system will immediately begin the reset sequence.
-      - The below CSR will be reset to their default values
-          - WCFGFUN
-          - RCFGFUN
-          - IO_CTRL (0x400-0x4C0)
-          - RESET_TYPE1_EFPGA
-          - ENABLE_IN_OUT_EFPGA
-          - EFPGA_CONTROL_IN
-          - RTO_PERIPHERAL_ERROR
-          - READY_TIMEOUT_COUNT
-    - The reset signal will propagate to other APB Client peripherals.
-  - Post-Reset Actions
-      - The system will automatically reinitialize the APB peripherals to their default states.
-      - Reinitialize the affected APB peripherals as needed.
+
+Prepare for Reset
+^^^^^^^^^^^^^^^^^
+  - Complete any pending operations and save the critical state if needed.
+  - Save any necessary state information if required for recovery after the reset.
+
+Trigger Reset
+^^^^^^^^^^^^^
+  - Write any value to the SOFT_RESET CSR at offset 0xFC(the write value is ignored).
+  - The system will immediately begin the reset sequence.
+  - The below CSR will be reset to its default values
+      - WCFGFUN
+      - RCFGFUN
+      - IO_CTRL (0x400-0x4C0)
+      - RESET_TYPE1_EFPGA
+      - ENABLE_IN_OUT_EFPGA
+      - EFPGA_CONTROL_IN
+      - RTO_PERIPHERAL_ERROR
+      - READY_TIMEOUT_COUNT
+  - The reset signal will propagate to following APB Client peripherals:
+      - I2C Slave
+      - Event Controller
+      - Advanced Timer
+      - GPIO
+      - Timer
+      - FLL
+      - uDMA subsystem
+      - eFPGA subsystem
+
+Post-Reset Actions
+^^^^^^^^^^^^^^^^^^
+  - The system will automatically reinitialize the APB peripherals to their default states.
 
 JTAG communication
 ~~~~~~~~~~~~~~~~~~
-  - Write to external device
-      - Write the data to the JTAGREG CSR through the APB bus.
-      - The written value will be available on the soc_jtag_reg_o output port.
-  - Read from external device
-      - The external JTAG device writes the data on soc_jtag_reg_i input port.
-      - Post synchronization, the data can be read from the JTAGREG CSR through the APB bus.
+
+Write to the external device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - Write the data to the JTAG_REG_OUT bitfield of JTAGREG CSR through the APB bus.
+  - The written value will be available on the soc_jtag_reg_o output port.
+
+Read from the external device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - The external JTAG device writes the data on the soc_jtag_reg_i input port.
+  - Post synchronization, the data can be read from the JTAG_REG_in bitfield of JTAGREG CSR through the APB bus.
 
 Pin Diagram
 -----------
@@ -806,10 +884,11 @@ APB Interface
 
 Boot and Configuration
 ~~~~~~~~~~~~~~~~~~~~~~
-  - sel_fll_clk_i: FLL clock selection input status pin; its value is captured in CLKSEL CSR for monitoring; always high in current implementation.
+  - sel_fll_clk_i: FLL clock selection input status pin; its value is captured in CLKSEL CSR for monitoring; always high in the current implementation.
   - bootsel_i: Boot select input status pin; its value is captured in BOOTSEL CSR for monitoring; provided by external device.
   - fc_bootaddr_o[31:0]: Boot address output for FC (Fabric Controller); controlled via FCBOOT CSR; provided to Core-Complex/Fabric Controller.
   - fc_fetchen_o: Fetch enable output for FC; controlled via FCFETCH CSR; provided to Core-Complex/Fabric Controller.
+  - dmactive_i: Debug mode active input status pin; its value is captured in BOOTSEL CSR for monitoring.
   
 Watchdog Interface
 ~~~~~~~~~~~~~~~~~~
@@ -842,10 +921,10 @@ eFPGA Interface
 
   - status_out[31:0]: Status input signals from eFPGA; its value is captured in EFPGA_STATUS_OUT CSR for monitoring.
   - version[7:0]: eFPGA version input status pin; its value is captured in EFPGA_VERSION CSR for monitoring.
-  - dmactive_i: Debug mode active input status pin; its value is captured in BOOTSEL CSR for monitoring.
 
 Ready Timeout Interface
 ~~~~~~~~~~~~~~~~~~~~~~~
   - rto_o: Ready timeout output signal provided to Peripheral Interconnect; asserted when ready timeout count reaches 0. 
   - start_rto_i: Start ready timeout input controlled by Peripheral Interconnect; triggers the ready timeout counter. 
   - peripheral_rto_i[10:0]: Peripheral ready timeout input provided by Peripheral Interconnect; indicates which peripheral caused the timeout.
+
