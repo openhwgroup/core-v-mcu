@@ -21,11 +21,11 @@ APB Peripheral Interconnect
 ===========================
 
 The APB Peripheral Interconnect(Peripheral Bus Wrapper) functions as a central interface hub that enables communication between multiple peripheral devices and the Core Complex of CORE-V-MCU.
-This IP is essenitally an APB bus wrapper which works based on APB protocol and efficiently routes APB transactions from TCDM bus to various peripheral controllers based on address mapping, facilitating organized and structured communication within the CORE-V-MCU.
+This IP is essenitally an APB bus wrapper which works based on APB protocol and efficiently routes APB transactions from TCDM Interconnect to various peripheral controllers based on address mapping, facilitating organized and structured communication within the CORE-V-MCU.
 
 Features
 --------
-  - Multiple Peripheral Support: Interfaces with 11 distinct peripheral devices
+  - Multiple Peripheral Support: Interfaces with 11 distinct peripheral devices to provide memory-mapped access
   - Address-Based Routing: Routes transactions based on predefined address ranges
   - Request Timeout detection: Includes request timeout detection and peripheral-specific timeout reporting
   - Request Timeout error reporting: Provides peripheral-specific request timeout reporting via dedicated signals
@@ -45,13 +45,27 @@ The figure below is a high-level block diagram of the APB Peripheral Interconnec
 
 APB Transaction Routing
 ^^^^^^^^^^^^^^^^^^^^^^^
-The APB Peripheral Interconnect operates as a bridge between the system bus(TCDM bus) and multiple peripheral devices, allowing for efficient communication and data transfer.
+The APB Peripheral Interconnect operates as a bridge between the TCDM Interconnect and multiple peripheral devices, allowing for efficient communication and data transfer.
 The APB transaction routing flow can be summarized as follows:
 
-    - Firmware performs read/write operations to specific memory-mapped addresses, Core Complex initiates APB transactions to the APB Peripheral Interconnect.
-    - APB Peripheral Interconnect routes these transactions to the appropriate peripheral based on address ranges.
-    - Peripherals respond through the wrapper back to the requesting master.
-    - If a peripheral fails to respond, the integrated timeout detection mechanism activates and reports which peripheral has timed out.
+    - Firmware performs read/write operations to specific memory-mapped addresses, Core Complex initiates APB transactions to the APB Peripheral Interconnect via TCDM Interconnect.
+    - The APB peripheral interconnect accepts the transaction coming from TCDM at the apb_slave interface.
+    - The APB Peripheral Interconnect provides routing to the following peripherals:
+        - APB FLL                                      
+        - APB GPIO                                     
+        - uDMA Subsystem                               
+        - APB SoC Controller                           
+        - APB Advanced Timer                           
+        - APB Event Controller                         
+        - APB I2C Slave                                
+        - APB Timer                                    
+        - eFPGA subsystem                             
+        - APB Debugger 
+        - stdout emulator  
+    - APB Peripheral Interconnect routes these transactions received from TCDM interconnect to the peripherals based on address ranges and raises a start_rto_o signal to the SOC controller. Refer to the `memory map <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html>`_ for the complete address mapping of the peripherals. 
+    - APB Peripheral Interconnect uses the <peripheralName>_master (e.g., soc_ctrl_master, etc.) interface to forward the transaction to the peripherals.
+    - Both master and slave interfaces of the APB peripheral are designed using the APB protocol.
+    - If a peripheral fails to respond to APB interconnect within a predefined time, the integrated timeout detection mechanism activates and reports which peripheral has timed out. The timeout mechanism is discussed in the Timeout Mechanism section.
 
 Timeout Mechanism
 ^^^^^^^^^^^^^^^^^
@@ -59,8 +73,49 @@ The APB Peripheral Interconnect includes a timeout detection mechanism to handle
 Below is a description of the timeout handling process:
 
     - The start_rto_o signal is activated when a peripheral is selected based on the address specified in the APB transaction, triggering timeout counter in SoC Controller.
-    - If a peripheral doesn't respond within the timeout period i.e. before the rto_i input is asserted by SoC Controller, a timeout error occurs.
-    - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller.
+    - The SoC Controller has RTO_COUNT CSR that can be used to decide the timeout period. The default value of RTO_COUNT is 0xFF.
+    - If a peripheral doesn't respond within the timeout period i.e. before the rto_i input is asserted by SoC Controller for one clock cycle, a timeout error occurs.
+    - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller's RTO_PERIPHERAL CSR.(Check `SoC Controller <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html>`_ specs for more details)
+    - The peripheral_rto_o signal is cleared after one clock cycle.
+
+The peripheral_rto_o signal to peripheral mapping can be found below:
+
++-----------------+----------+-------------+----------------------------------------+
+| Peripheral      | **Bit**  | **Default** | **Description**                        |
++=================+==========+=============+========================================+
+| APB debugger    |   10:10  | 0x0         | 1 indicates that the debugger          |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| stdout emulator |   9:9    | 0x0         | 1 indicates that the stdout emulator   |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| Core-Complex    |   8:8    | 0x0         | 1 indicates that the FC/Core-Complex   |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| APB TIMER       |   7:7    | 0x0         | 1 indicates that the Timer interface   |
+|                 |          |             | caused a ready timeout                 |
++-----------------+----------+-------------+----------------------------------------+
+| APB I2CS        |   6:6    | 0x0         | 1 indicates that the I2CS interface    |
+|                 |          |             | caused a ready timeout                 |
++-----------------+----------+-------------+----------------------------------------+
+| APB EVENT CTRL  |   5:5    | 0x0         | 1 indicates that the Event Controller  |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| APB ADV TIMER   |   4:4    | 0x0         | 1 indicates that the Advanced Timer    |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| APB SOC CONTROL |   3:3    | 0x0         | 1 indicates that the SoC Controller    |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| uDMA subsystem  |   2:2    | 0x0         | 1 indicates that the uDMA Subsystem    |
+|                 |          |             | interface caused a ready timeout       |
++-----------------+----------+-------------+----------------------------------------+
+| APB GPIO        |   1:1    | 0x0         | 1 indicates that the GPIO interface    |
+|                 |          |             | caused a ready timeout                 |
++-----------------+----------+-------------+----------------------------------------+
+| APB FLL         |   0:0    | 0x0         | 1 indicates that the FLL interface     |
+|                 |          |             | caused a ready timeout                 |
++-----------------+----------+-------------+----------------------------------------+
 
 System Architecture
 -------------------
@@ -74,21 +129,7 @@ The figure below depicts the connections between the CORE-V-MCU and rest of the 
 
    APB Peripheral Interconnect CORE-V-MCU connections diagram
 
-The APB Peripheral Interconnect provides routing to the following modules:
-                               
-  - APB FLL                                      
-  - APB GPIO                                     
-  - uDMA Subsystem                               
-  - APB SoC Controller                           
-  - APB Advanced Timer                           
-  - APB Event Controller                         
-  - APB I2C Slave                                
-  - APB Timer                                    
-  - eFPGA subsystem                             
-  - APB Debugger 
-  - stdout emulator                                 
-
-Refer to the Memory map for the complete address mapping of the peripherals(https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html).
+Note: The stdout emulator is only used during synthesis and does not correspond to an actual hardware block.
 
 Firmware Guidelines
 -------------------
@@ -98,7 +139,7 @@ Although standard memory read/write operations to the APB peripheral devices wil
 The following general guidelines should be followed while interacting Peripheral devices through the APB Peripheral Interconnect:
 
   - Access peripheral registers using memory-mapped operations with the correct address calculated as (peripheral_base_address + register_offset).
-  - Ensure that the firmware handles timeout conditions gracefully(Check SoC Controller specs for more details - https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html).
+  - Ensure that the firmware handles timeout conditions gracefully(Check `SoC Controller <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html>`_ specs for more details).
   - Implement error handling for cases where a peripheral does not respond within the expected time frame.
 
 Pin Description
@@ -124,7 +165,7 @@ Ready Timeout Signals
 
 APB Slave Interface
 ^^^^^^^^^^^^^^^^^^^
-    - apb_slave: APB slave interface, connected with TCDM bus
+    - apb_slave: APB slave interface, connected with TCDM Interconnect
 
 APB Master Interfaces
 ^^^^^^^^^^^^^^^^^^^^^
