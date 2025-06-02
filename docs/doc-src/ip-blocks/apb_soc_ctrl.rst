@@ -78,6 +78,29 @@ These configurations can be accessed through two methods, which can be used as p
           - To use RCFGFUN CSR, the IO_PAD field must be set to the pad index of interest, and then a read operation is performed.
           - The read operation will return the current configuration of the specified pad.
 
+An example of using the WCFGFUN and RCFGFUN CSRs for pad multiplexing is as follows:
+
+  - If you want to configure the pad with index 12, there are 4 possible configurations for the pad multiplexing, i.e. 00, 01, 10, and 11.
+  - In the case of pad with index 12, the 4 multiplexing configurations are:
+      - 00: GPIO pin 0
+      - 01: UART 1 RX pin
+      - 10: GPIO pin 5
+      - 11: eFPGA IO pin 5
+
+  - Let's suppose you want to configure the pad with index 12 to be used as UART 1 RX pin.
+  - You can do this by writing the following value to the WCFGFUN CSR:
+      - WCFGFUN = 0x00000001
+          - PADMUX = 0x01 (UART 1 RX pin)
+          - IO_PAD = 0x0C (pad index 12)
+          - PADCFG = 0x01 (electrical configuration, which is not implemented in the current design)
+  - After writing the WCFGFUN CSR, you can read the RCFGFUN CSR to verify the configuration:
+      - First you will have to set the IO_PAD field in RCFGFUN CSR to 0x0C (pad index 12).
+      - Then you can read the RCFGFUN CSR, which will return the following value:
+          - RCFGFUN = 0x00000001
+              - PADMUX = 0x01 (UART 1 RX pin)
+              - IO_PAD = 0x0C (pad index 12)
+              - PADCFG = 0x01 (electrical configuration, which is not implemented in the current design)
+
 Note: Pad multiplexing details can be found in the `IO Assignment document <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/io_assignment_tables.html>`_.
 
 Watchdog Timer
@@ -86,12 +109,12 @@ A programmable watchdog timer(WDT) runs on the reference clock(ref_clk_i) and re
 
 Initialization and Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - On system power-up, the watchdog timer is disabled by default.
-  - The timeout period of the watchdog timer can be configured using the WD_COUNT CSR. The default value of WD_COUNT is 0x8000
-      - Note: WD_COUNT is only writable when the watchdog is disabled.
-  - The watchdog is enabled by setting the ENABLE_STATUS (bit 31) in the WD_CONTROL CSR.
-  - After enabling, the watchdog timer begins counting down from the value set in the  WD_COUNT CSR and decrements on each positive edge of the reference clock (ref_clk_i), given that the stoptimer_i signal is not asserted.
-  - If the stoptimer_i signal is asserted, the watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
+- On system power-up, the watchdog timer is disabled by default.
+- The timeout period of the watchdog timer can be configured using the WD_COUNT CSR. The default value of WD_COUNT is 0x8000
+    - Note: WD_COUNT is only writable when the watchdog is disabled.
+- The watchdog is enabled by setting the ENABLE_STATUS (bit 31) in the WD_CONTROL CSR.
+- After enabling, the watchdog timer begins counting down from the value set in the  WD_COUNT CSR and decrements on each positive edge of the reference clock (ref_clk_i), given that the stoptimer_i signal is not asserted.
+- If the stoptimer_i signal is asserted, the watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
 
 Expiration
 ^^^^^^^^^^
@@ -100,30 +123,27 @@ Expiration
       - The wd_expired_o signal is asserted for one clock cycle to indicate the expiration.
       - The reset reason is set to 2'b11 in the RESET_REASON CSR, indicating a watchdog expiration.
       - A system-wide reset is triggered.
-      - The system-wide reset is received in the SoC Controller as well through the HRESETn signal, which is deasserted for one clock cycle.
+      - The system-wide reset is received in the SoC Controller as well through the HRESETn signal.
       - This resets all the CSRs and output pins(including wd_expired_o) in the SoC Controller, including the WD_CONTROL and WD_COUNT CSRs, thereby disabling the watchdog timer and setting the WD_COUNT CSR to its default value of 0x8000.
 
 Servicing the Watchdog
 ^^^^^^^^^^^^^^^^^^^^^^
-  - To prevent expiration, software must periodically write the magic value 0x6699 to the WD_CONTROL CSR.
-     - This operation is referred to as "servicing" the watchdog.
-  - Servicing resets the counter to the value configured in WD_COUNT.
+  - Periodically resetting the watchdog timer is essential to prevent it from expiring, this is known as servicing the watchdog.
+  - To prevent expiration(servicing the watchdog timer), software must periodically write the magic value 0x6699 to the WD_CONTROL CSR.
+  - The watchdog can also be serviced by setting the ENABLE_STATUS bit in the WD_CONTROL CSR.
+  - Servicing resets the counter to the value configured in WD_COUNT CSR and the watchdog timer continues counting down from that value.
+
 
 Resetting/Updating Watchdog Timer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Once the watchdog timer is enabled, it can be reset or updated in the following scenarios:
-  - A watchdog reset request is received, i.e. rstpin_ni is asserted.
-  - ENABLE_STATUS bit of WD_CONTROL is set. 
-  - The WD_VALUE bit of WD_CONTROL is set to x6699.
+Once the watchdog timer is enabled, it can be reset or updated only if the watchdog reset request is received, i.e. rstpin_ni is asserted.
 
   - If a reset request is initiated via the rstpin_ni pin, then the watchdog timer is set to its default value of 0x8000.
       - The reset reason is recorded in the RESET_REASON CSR with the value 1.
-  - If the ENABLE_STATUS bit WD_CONTROL register is set, then the counter value will be updated with the WD_COUNT register value.
-  - If the WD_VALUE bit WD_CONTROL register is set to x6699, then the counter value will be updated with the WD_COUNT register value.
 
 Disabling the Watchdog Timer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Once enabled, the watchdog timer cannot be disabled. However, it can be effectively disabled by performing a system reset, i.e. deasserting the HRESETn signal.
+Once enabled, the watchdog timer cannot be disabled. However, it can be effectively disabled by performing a system reset, i.e. asserting the HRESETn signal.
 
 Pausing the Watchdog Timer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -132,7 +152,7 @@ The watchdog timer can be paused in the following scenarios:
       - The watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
       - When the stoptimer_i signal is deasserted, the watchdog timer will resume counting down from its current value.
 
-  - A watchdog reset request is received, i.e., rstpin_ni is deasserted.
+  - A watchdog reset request is received, i.e., rstpin_ni is asserted.
       - The watchdog timer will be reset to its default value of 0x8000.
       - The reset reason is recorded in the RESET_REASON CSR with the value 1.
       - The watchdog timer will not start counting down until the rstpin_ni signal is asserted again.
@@ -271,7 +291,7 @@ Operation
       - enable_tcdm0_efpga_o
       - control_in
   - The reset signal(soft_reset_o) is deasserted when:
-      - The system reset is issued due to the HRESETn signal being deasserted.
+      - The system reset is issued due to the HRESETn signal being asserted.
       - The pos-edge of the HCLK signal is encountered.
 
 System Architecture
@@ -521,7 +541,7 @@ WD_CONTROL
 |                 |          |            |           |   0=Watchdog not enabled.                 |
 |                 |          |            |           |                                           |
 |                 |          |            |           |   Note: Once enabled, can only be         |
-|                 |          |            |           |   disabled through deasserting HRESETn    |
+|                 |          |            |           |   disabled through asserting HRESETn      |
 |                 |          |            |           |   i.e. resetting the whole SoC Controller |
 +-----------------+----------+------------+-----------+-------------------------------------------+
 |  WD_VALUE       |   15:0   |   RW       | 0x8000    |  Read & write to this bitfield access     |
