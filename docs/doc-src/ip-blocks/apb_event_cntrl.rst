@@ -66,7 +66,8 @@ Input event sources
       - per_events_i[111:0] are used for uDMA events, per_events_i[127:112] are used for eFPGA cluster events and per_events_i[159:128] are used for GPIO events
   - **APB Events**
       - Up to 32 APB-generated events can be configured, with 8 currently implemented
-      - APB events are generated through software writes to the REG_EVENT CSR
+      - APB events are generated through software writes to the EVENT CSR
+      - Each bit in the EVENT CSR corresponds to an APB event source
   - **Low-Speed Clock Events**
       - Additional event source for low-speed clock detection(reference clock provided by the APB FLL IP)
 
@@ -83,29 +84,29 @@ The below table shows the mapping of the event sources to the input vector:
    +=====================+================+=======================+=======================+======================================+
    | low_speed_clk_i     | 0              | APB FLL               | ref_clk_i             | low-speed clock(ref_clk) from APB FLL|
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 0         | 1              | REG_EVENT             | REG_EVENT[0]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 0                  |
+   | APB Event 0         | 1              | EVENT                 | EVENT    [0]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 0                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 1         | 2              | REG_EVENT             | REG_EVENT[1]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 1                  |
+   | APB Event 1         | 2              | EVENT                 | EVENT    [1]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 1                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 2         | 3              | REG_EVENT             | REG_EVENT[2]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 2                  |
+   | APB Event 2         | 3              | EVENT                 | EVENT    [2]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 2                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 3         | 4              | REG_EVENT             | REG_EVENT[3]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 3                  |
+   | APB Event 3         | 4              | EVENT                 | EVENT    [3]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 3                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 4         | 5              | REG_EVENT             | REG_EVENT[4]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 4                  |
+   | APB Event 4         | 5              | EVENT                 | EVENT    [4]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 4                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 5         | 6              | REG_EVENT             | REG_EVENT[5]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 5                  |
+   | APB Event 5         | 6              | EVENT                 | EVENT    [5]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 5                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 6         | 7              | REG_EVENT             | REG_EVENT[6]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 6                  |
+   | APB Event 6         | 7              | EVENT                 | EVENT    [6]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 6                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
-   | APB Event 7         | 8              | REG_EVENT             | REG_EVENT[7]          | Software generated events through    |
-   |                     |                |                       |                       | REG_EVENT CSR bit 7                  |
+   | APB Event 7         | 8              | EVENT                 | EVENT    [7]          | Software generated events through    |
+   |                     |                |                       |                       | EVENT CSR's bit 7                    |
    +---------------------+----------------+-----------------------+-----------------------+--------------------------------------+
    | per_events_i[0]     | 9              | uDMA Core             | rx_lin_events_o[0]    | RX channel events from uDMA UART 0   |
    |                     |                |                       |                       | coming through uDMA Core             |   
@@ -302,7 +303,7 @@ Event Queues
   - The events are popped from the queue when the arbiter grants the event for processing
   - Each queue can hold up to 4 events before overflow occurs
   - The queue reports errors when it overflows resulting in missed events
-  - The REG_ERR* registrers are used to report the overflow errors
+  - The ERR_* registrers are used to report the overflow errors
 
 Event arbiter
 ~~~~~~~~~~~~~
@@ -322,6 +323,7 @@ In the context of the arbiter, it's used to determine which request should be gr
 Here's how it works in this arbiter:
 
   - **Initial Setup**: The arbiter has a one-hot priority vector (a vector of size equal to total number of input events i.e. 160, out of which only one position is high, rest all are low) that indicates which request has the highest priority in the current arbitration cycle.
+      - By default, when the arbiter starts, the first event in the vector is set to high, indicating it has the highest priority.
   - **Prefix Computation**: The algorithm computes "generate"(g) and "propagate"(p) vectors through multiple levels of logic:
       - Initially, the one-hot priority vector is loaded into the first generate level (g[0])
       - The inverted request vector (with circular shift) is loaded into the first propagate level (p[0])
@@ -376,47 +378,134 @@ Event Masking
       - 1 = Masked/Blocked (event will not be routed)
       - 0 = Enabled (event will be routed)
   - By default, all mask bits are set to 1 (masked), meaning no events are routed until explicitly configured.
+  - When an output is granted and the an output channel is ready, the event is routed only if the corresponding mask bit is 0 (unmasked) in the respective channel's mask CSR.
+  - For example, let's say that an event from the GPIO peripheral needs to be routed to the cluster(eFPGA) channel, then the respective mask bit in the CL_MASK_* CSR must be set to 0 (unmasked) for that event ID and it should be set to 1 (masked) in the FC_MASK_* and PR_MASK_* CSRs to prevent routing to those channels.
 
 Output Event Processing
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The event controller manages event distribution through three dedicated output channels:
+The **Event Controller** handles the distribution of system events via three dedicated output channels. Each channel is independently managed and can receive any of the 169 input events, depending on configuration and runtime conditions.
 
-  - FC (Fabric Controller/Core Complex) Channel: Directly routes 2 high-priority events to the FC Event Unit(Not connected in current implementation). 
-      - Event FIFO: Buffers events for the FC channel
-      - FIFO Depth: 4 entries
-      - The Core can read the events through the REG_FIFO CSR
-  - CL (Cluster) Channel: Routes events to the Cluster/eFPGA (Not connected in current implementation)
-  - PR (Peripheral) Channel: Routes events to uDMA peripherals.
+Output Channels Overview
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Any of the 169 input events can be routed to any of the three output channels.
-Each channel has its own data path and control signals to ensure efficient event routing based on event type and system configuration.
-The events are routed to the output in the below manner:
+- **FC Channel (Fabric Controller / Core Complex):**
+    - Routes high-priority events to the FC Event Unit through fc_events_o pin. *(Note: not connected in current implementation)*
+    - Valid Events are also buffered in a **FIFO** (First-In-First-Out) queue:
+        - **Depth:** 4 entries
+        - **Accessed via:** ``FIFO`` CSR
+    - Events are read by the Fabric Controller through the APB interface.
+    - The Core-Complex can acknowledge events by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 3``.
 
-  - The same event ID (corresponding to the position of the granted event in the event vector) is written to the data output pins of the corresponding channel:
-      - cl_event_data_o for Cluster events
-      - pr_event_data_o for Peripheral events
-      - FIFO data input for Fabric Controller events(only if the event is valid)
-  - This occurs when:
-      - The respective ready signal (pr_event_ready_i or cl_event_ready_i) is asserted, OR
-      - There is available space in the FC FIFO, AND
-      - The arbiter grants the output signal for the event
-  - The ready signals indicate whether the output channels are ready to accept new events
-  - The valid signal for each channel are then asserted only when:
-      - The event is granted by the arbiter, AND
-      - That particular event is unmasked in the channel's corresponding MASK register
-  - In case of the FC events, the event is only pushed to the FIFO if the FIFO is not full and the event is unmasked in the FC_MASK register, i.e. the event is cl_event_valid_o
-  - The Fabric Controller can read the events from the FIFO through the APB interface i.e. REG_FIFO CSR, 
-  - The Fabric control aseerts the core_irq_ack_i signals and makes the core_irq_ack_id_i to 3 to indicate the readiness to read an event
-      - When the above conditions are met, the events is popped from the FIFO and written on the REG_FIFO CSR, making it available for the Fabric Controller to read.
+- **CL Channel (Cluster / eFPGA):**
+    - Intended for routing events to the cluster or eFPGA logic. *(Note: not connected in current implementation)*
+    - Uses ``cl_event_data_o`` to send event IDs to the eFPGA subsystem.
+    - Uses ``cl_event_ready_i`` to check readiness for event processing, ensuring the eFPGA is ready to accept events.
+    - Uses ``cl_event_valid_o`` to signal that a valid event ID is available for processing.
+
+- **PR Channel (Peripheral):**
+    - Used to forward events to **uDMA subsystem**.
+    - Uses ``pr_event_data_o`` to send event IDs to the uDMA subsystem.
+    - Uses ``pr_event_ready_i`` to check readiness for event processing, ensuring the uDMA subsystem is ready to accept events.
+    - Uses ``pr_event_valid_o`` to signal that a valid event ID is available for processing.
+
+
+Event Routing Process
+^^^^^^^^^^^^^^^^^^^^^
+
+The output routing for incoming events follows the steps below:
+
+1. **Event Queueing:**
+   - All incoming events (169 in total) are first captured and stored in their respective queue inside the Event Controller.
+
+2. **Arbitration:**
+   - An internal **arbiter** evaluates all queued events.
+   - Based on priority, the arbiter selects and **grants** one event for output processing.
+
+3. **Event ID Placement on Output Channels:**
+   - The **event ID** (based on its position in the input event vector) is provisionally placed on:
+      - ``cl_event_data_o`` (eFPGA subsystem)
+      - ``pr_event_data_o`` (uDMA subsystem)
+      - FC FIFO (if space is available and the event is not masked)
+
+4. **Mask Register Evaluation:**
+   - The event is checked against the **MASK CSRs** of each output channel:
+      - ``FC_MASK_*``, ``CL_MASK_*``, and ``PR_MASK_*``
+   - If the event is **masked for all output channels**, it is **popped** from the queue. The controller proceeds to the next event.
+
+5. **Output Channel Readiness Check:**
+   - For each output channel where the event is **unmasked**, the controller checks if the corresponding channel is **ready**:
+      - ``pr_event_ready_i`` for PR channel
+      - ``cl_event_ready_i`` for CL channel
+      - **FC Channel:** Ready if FIFO is not full
+
+6. **Valid Signal Assertion:**
+   - If the event is **unmasked and granted**, the corresponding **valid signal** for that output channel is asserted.
+   - This signals that the output channel may process the event ID.
+
+7. **Event Dequeueing (Pop):**
+   - If any valid output channel has accepted the event, it is **popped** from the event queue.
+
+Fabric Controller Event Handling
+--------------------------------
+
+The Fabric Controller can read events as follows:
+- Whenever a valid event is present for FC channel, it is pushed onto the FC FIFO.
+- The FC FIFO is a 4-entry queue that holds events until they are read by the Fabric Controller.
+- The Core-Complex/Fabric Controller can read the FIFO through the ``FIFO`` CSR.
+- Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 3``.
+- The event is then popped from the FC FIFO and next event is placed on the ``FIFO`` CSR.
+
+Example: Routing a uDMA UART RX Event (Event ID 15) to Core Complex
+-------------------------------------------------------------------
+
+Let’s walk through an example where a **UART peripheral receives data**, triggering a **uDMA RX event** which needs to be routed to the Core-Complex/Fabric Controller (FC) for processing:
+
+**Source Event:**
+
+- **uDMA UART RX Event**
+- **Event ID:** 15
+- **Input Pin:** ``per_events_i[6]``
+
+Event Routing Flow:
+
+1. **Event Detection:**
+    - ``per_events_i[6]`` is asserted, triggering internal event ID 15.
+
+2. **Event Queueing and Arbitration:**
+    - Event 15 is captured and queued by the controller.
+    - The arbiter processes all the available input events in the top of the 169 input event queues and eventually grants event 15(uDMA RX event) for output.
+
+3. **Event ID Placement:**
+    - Event ID 15 is placed on ``pr_event_data_o``, ``cl_event_data_o``.
+
+4. **Mask Evaluation:**
+    - ``FC_MASK_0``'s bit 15 is set (unmasked), meaning it is valid for the FC channel.
+    - ``PR_MASK_0``'s bit 15 and ``CL_MASK_0``'s bit 15 will be unset(masked),as the event is only meant for Core-Complex in this example.
+
+5. **Channel Readiness:**
+    - If the FC FIFO has available space, then the FC channel is considered ready to accept event.
+
+6. **Valid Signal Assertion:**
+    - Because the granted event is unmasked for FC channel and the FIFO is ready to accept the event The event is popped from the internal event queue.
+    - It is pushed into the FC FIFO.
+    - The first event in the FC FIFO is placed on the ``FIFO`` CSR.
+
+7. **Core Reads Event:**
+    - The Core-Complex reads the event from the FC FIFO through the ``FIFO`` CSR.
+    - The event is acknowledged by the Core-Complex by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 3``.
+    - The event is then popped from the FC FIFO, and the next event is placed on the ``FIFO`` CSR.
+
 
 Timer Event Generation
 ~~~~~~~~~~~~~~~~~~~~~~
   - The event controller includes two timer outputs (timer_event_lo_o and timer_event_hi_o)
-  - Each timer can be programmed to monitor any any of the 169 event sources
-  - The timer source is selected through the REG_TIMER1_SEL_HI and REG_TIMER1_SEL_LO CSRs
+  - Each timer output can be programmed to monitor any any of the 169 event sources.
+  - The timer source is selected through the TIMER1_SEL_HI and TIMER1_SEL_LO CSRs, by writing the event ID of the desired source.
   - When a timer source is selected, the input event at the chosen event location(event ID) in the combined input event vector is directly driven to the timer output signals.
+  - Whatever the value of the selected input sources is, the same is reflected on the timer outputs(timer_event_lo_o and timer_event_hi_o).
   - The timer outputs is consumed by the APB Timer IP, used as input trigger for the timer.
+  - The same events are also placed into the input event queues, so that they can be routed to the output channels as well.
 
 System Architecture
 -------------------
@@ -441,13 +530,13 @@ Control Flow
 
 Programming Interface
 ~~~~~~~~~~~~~~~~~~~~~
-  - Software Event Generation: Write to REG_EVENT CSR
+  - Software Event Generation: Write to EVENT CSR
   - Event Masking: Configure FC_MASK, CL_MASK, and PR_MASK CSRs
   - Event Arbitration: The arbiter resolves concurrent events using a parallel prefix network with round-robin priority
   - Timer Event Selection: Configure TIMER1_SEL_HI and TIMER1_SEL_LO CSRs
   - Error Monitoring: Read ERR CSRs to detect event handling errors
   - Error Clearing: Clear errors by reading from the corresponding ERR CSRs
-  - Event FIFO Access: Read from REG_FIFO CSR to retrieve buffered event
+  - Event FIFO Access: Read from FIFO CSR to retrieve buffered event
 
 APB Event Control CSR
 ---------------------
@@ -456,468 +545,468 @@ Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/doc
 
 The APB Event Controller has a 4KB address space and the CSR interface designed using the APB protocol. There are 24 32-bit CSRs for event masking, 8 CSRs each for FC, CL and PR channels i.e. 256 bits per channel, giving the ability to mask 256 events per channel. 
 However, only 169 events are implemented in the current version of the design, Hence only the first 169 bits across the 8 CSRs (from 0th to 5th CSR) of the mask CSRs are functional.
-The same applies for the REG_ERR* CSRs, which are used to report overflow errors for the event queues. The REG_ERR* CSRs are 32 bits wide and only the first 169 bits across the 8 CSRs (from 0th to 5th CSR) are functional in the current version of the design.
+The same applies for the ERR_* CSRs, which are used to report overflow errors for the event queues. The ERR_* CSRs are 32 bits wide and only the first 169 bits across the 8 CSRs (from 0th to 5th CSR) are functional in the current version of the design.
 
 NOTE: Several of the Event Controller CSR are volatile, meaning that their read value may be changed by the hardware.
-For example, the REG_ERR0 CSR will specify if any of queue for event IDs 0-31 have overflow error, these registers are not writable and read return the error status and then clear the register.
+For example, the ERR_0 CSR will specify if any of queue for event IDs 0-31 have overflow error, these CSRs are not writable and read return the error status and then clear the CSR.
 As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value writen by software.
 A CSRs volatility is indicated by its "type".
 
 Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
-REG_EVENT
-~~~~~~~~~
+EVENT    
+~~~~~
   - Offset: 0x00
   - Type: non-volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_EVENT        | 7:0  | WO     | 0x00    | 8 bits of software-          |
+| EVENT            | 7:0  | WO     | 0x00    | 8 bits of software-          |
 |                  |      |        |         | generated event.             |
 +------------------+------+--------+---------+------------------------------+
 
-REG_FC_MASK_0
-~~~~~~~~~~~~~
+FC_MASK_0
+~~~~~~~~~
   - Offset: 0x04
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_0    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 0-31 of core complex  |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_1
-~~~~~~~~~~~~~
+FC_MASK_1
+~~~~~~~~~
   - Offset: 0x08
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_1    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 32-63 of core complex |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_2
-~~~~~~~~~~~~~
+FC_MASK_2
+~~~~~~~~~
   - Offset: 0x0C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_2    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 64-95 of core complex |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_3
-~~~~~~~~~~~~~
+FC_MASK_3
+~~~~~~~~~
   - Offset: 0x10
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_3    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 96-127 of core complex|
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_4
-~~~~~~~~~~~~~
+FC_MASK_4
+~~~~~~~~~
   - Offset: 0x14
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_4    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 128-159 of            |
 |                  |      |        |            | core complex (1=mask event). |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_5
-~~~~~~~~~~~~~
+FC_MASK_5
+~~~~~~~~~
   - Offset: 0x18
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_5    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 160-191 of            |
 |                  |      |        |            | core complex (1=mask event). |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_6
-~~~~~~~~~~~~~
+FC_MASK_6
+~~~~~~~~~
   - Offset: 0x1C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_6    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 192-223 of            |
 |                  |      |        |            | core complex (1=mask event). |
 +------------------+------+--------+------------+------------------------------+
 
-REG_FC_MASK_7
-~~~~~~~~~~~~~
+FC_MASK_7
+~~~~~~~~~
   - Offset: 0x20
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_FC_MASK_7    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 224-255 of            |
 |                  |      |        |            | core complex (1=mask event). |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_0
-~~~~~~~~~~~~~
+CL_MASK_0
+~~~~~~~~~
   - Offset: 0x24
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_0    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 0-31 of cluster       |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_1
-~~~~~~~~~~~~~
+CL_MASK_1
+~~~~~~~~~
   - Offset: 0x28
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_1    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 32-63 of cluster      |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_2
-~~~~~~~~~~~~~
+CL_MASK_2
+~~~~~~~~~
   - Offset: 0x2C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_2    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 64-95 of cluster      |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_3
-~~~~~~~~~~~~~
+CL_MASK_3
+~~~~~~~~~
   - Offset: 0x30
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_3    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 96-127 of cluster     |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_4
-~~~~~~~~~~~~~
+CL_MASK_4
+~~~~~~~~~
   - Offset: 0x34
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_4    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 128-159 of cluster    |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_5
-~~~~~~~~~~~~~
+CL_MASK_5
+~~~~~~~~~
   - Offset: 0x38
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_5    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 160-191 of cluster    |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_6
-~~~~~~~~~~~~~
+CL_MASK_6
+~~~~~~~~~
   - Offset: 0x3C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_6    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 192-223 of cluster    |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_CL_MASK_7
-~~~~~~~~~~~~~
+CL_MASK_7
+~~~~~~~~~
   - Offset: 0x40
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_CL_MASK_7    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 224-255 of cluster    |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_0
-~~~~~~~~~~~~~
+PR_MASK_0
+~~~~~~~~~
   - Offset: 0x44
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_0    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 0-31 of peripheral    |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_1
-~~~~~~~~~~~~~
+PR_MASK_1
+~~~~~~~~~
   - Offset: 0x48
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_1    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 32-63 of peripheral   |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_2
-~~~~~~~~~~~~~
+PR_MASK_2
+~~~~~~~~~
   - Offset: 0x4C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_2    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 64-95 of peripheral   |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_3
-~~~~~~~~~~~~~
+PR_MASK_3
+~~~~~~~~~
   - Offset: 0x50
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_3    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 96-127 of peripheral  |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_4
-~~~~~~~~~~~~~
+PR_MASK_4
+~~~~~~~~~
   - Offset: 0x54
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_4    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 128-159 of peripheral |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_5
-~~~~~~~~~~~~~
+PR_MASK_5
+~~~~~~~~~
   - Offset: 0x58
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_5    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 160-191 of peripheral |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_6
-~~~~~~~~~~~~~
+PR_MASK_6
+~~~~~~~~~
   - Offset: 0x5C
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_6    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 192-223 of peripheral |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_PR_MASK_7
-~~~~~~~~~~~~~
+PR_MASK_7
+~~~~~~~~~
   - Offset: 0x60
   - Type: non-volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_PR_MASK_7    | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
+| MASK             | 31:0 | RW     | 0xFFFFFFFF | Individual masks for         |
 |                  |      |        |            | events 224-255 of peripheral |
 |                  |      |        |            | (1=mask event).              |
 +------------------+------+--------+------------+------------------------------+
 
-REG_ERR_0
-~~~~~~~~~
+ERR_0
+~~~~~
   - Offset: 0x64
   - Type: volatile
   
 +------------------+------+--------+------------+------------------------------+
 | Field            | Bits | Access | Default    | Description                  |
 +==================+======+========+============+==============================+
-| REG_ERR_0        | 31:0 | R1C    | 0x00       | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00       | Error bits for event queue   |
 |                  |      |        |            | overflow for events 0-31.    |
 +------------------+------+--------+------------+------------------------------+
 
-REG_ERR_1
-~~~~~~~~~
+ERR_1
+~~~~~
   - Offset: 0x68
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_1        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 32-63.   |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_2
-~~~~~~~~~
+ERR_2
+~~~~~
   - Offset: 0x6C
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_2        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 64-95.   |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_3
-~~~~~~~~~
+ERR_3
+~~~~~
   - Offset: 0x70
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_3        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 96-127.  |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_4
-~~~~~~~~~
+ERR_4
+~~~~~
   - Offset: 0x74
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_4        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 128-159. |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_5
-~~~~~~~~~
+ERR_5
+~~~~~
   - Offset: 0x78
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_5        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 160-191. |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_6
-~~~~~~~~~
+ERR_6
+~~~~~
   - Offset: 0x7C
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_6        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 192-223. |
 +------------------+------+--------+---------+------------------------------+
 
-REG_ERR_7
-~~~~~~~~~
+ERR_7
+~~~~~
   - Offset: 0x80
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_ERR_7        | 31:0 | R1C    | 0x00    | Error bits for event queue   |
+| ERR              | 31:0 | R1C    | 0x00    | Error bits for event queue   |
 |                  |      |        |         | overflow for events 224-255. |
 +------------------+------+--------+---------+------------------------------+
 
-REG_TIMER1_SEL_HI
-~~~~~~~~~~~~~~~~~
+TIMER1_SEL_HI
+~~~~~~~~~~~~~
   - Offset: 0x84
   - Type: non-volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_TIMER1_SEL_HI| 7:0  | RW     | 0x00    | Specifies which event should |
-|                  |      |        |         | be routed to the lo timer.   |
+| SELECT           | 7:0  | RW     | 0x00    | Specifies which event should |
+|                  |      |        |         | be routed to the hi timer.   |
 +------------------+------+--------+---------+------------------------------+
 
-REG_TIMER1_SEL_LO
-~~~~~~~~~~~~~~~~~
+TIMER1_SEL_LO
+~~~~~~~~~~~~~
   - Offset: 0x88
   - Type: non-volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_TIMER1_SEL_LO| 7:0  | RW     | 0x00    | Specifies which event should |
-|                  |      |        |         | be routed to the hi timer.   |
+| SELECT           | 7:0  | RW     | 0x00    | Specifies which event should |
+|                  |      |        |         | be routed to the lo timer.   |
 +------------------+------+--------+---------+------------------------------+
 
-REG_FIFO
-~~~~~~~~
+FIFO
+~~~~
   - Offset: 0x90
   - Type: volatile
   
 +------------------+------+--------+---------+------------------------------+
 | Field            | Bits | Access | Default | Description                  |
 +==================+======+========+=========+==============================+
-| REG_FIFO         | 7:0  | RO     | 0x00    | ID of triggering event for   |
+| EVENT            | 7:0  | RO     | 0x00    | ID of triggering event for   |
 |                  |      |        |         | interrupt handler.           |
 +------------------+------+--------+---------+------------------------------+
 
@@ -929,9 +1018,9 @@ Configuring Peripheral Event Output Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   -Configure Peripheral Event Masks:
-      - Write to registers REG_PR_MASK_0 through REG_PR_MASK_7 to specify which events should be routed to peripherals.
+      - Write to CSRs PR_MASK_0 through PR_MASK_7 to specify which events should be routed to peripherals.
       - Set mask bits to 0 to enable events, 1 to block events (mask bits are active high).
-      - Each register controls 32 events, with REG_PR_MASK_0 controlling events 0-31, REG_PR_MASK_1 controlling events 32-63, and so on.
+      - Each CSR controls 32 events, with PR_MASK_0 controlling events 0-31, PR_MASK_1 controlling events 32-63, and so on.
 
   - Handle Peripheral Event Flow Control:
       - Ensure peripheral components(uDMA subsystem) assert the pr_event_ready_i signal when ready to receive events.
@@ -943,9 +1032,9 @@ Configuring Cluster Events Output Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - Configure Cluster Event Masks:
-      - Write to registers REG_CL_MASK_0 through REG_CL_MASK_7 to specify which events should be routed to the cluster.
+      - Write to CSRs CL_MASK_0 through CL_MASK_7 to specify which events should be routed to the cluster.
       - Set mask bits to 0 to enable events, 1 to block events (mask bits are active high).
-      - Each register controls 32 events, with REG_CL_MASK_0 controlling events 0-31, REG_CL_MASK_1 controlling events 32-63, and so on.
+      - Each CSR controls 32 events, with CL_MASK_0 controlling events 0-31, CL_MASK_1 controlling events 32-63, and so on.
 
   - Manage Cluster Event Flow Control:
       - Ensure that the Cluster(eFPGA) asserts cl_event_ready_i signal to indicate when ready to accept events.
@@ -957,13 +1046,13 @@ Configuring Fabric Controller Output Events Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - Configure Fabric Controller Event Masks:
-      - Write to registers REG_FC_MASK_0 through REG_FC_MASK_7 to specify which events should be routed to the Fabric Controller.
+      - Write to CSRs FC_MASK_0 through FC_MASK_7 to specify which events should be routed to the Fabric Controller.
       - Set mask bits to 0 to enable events, 1 to block events (mask bits are active high).
-      - Each register controls 32 events, with REG_FC_MASK_0 controlling events 0-31, REG_FC_MASK_1 controlling events 32-63, and so on.
+      - Each CSR controls 32 events, with FC_MASK_0 controlling events 0-31, FC_MASK_1 controlling events 32-63, and so on.
 
   - Monitor and Process FC Events through FIFO:
       - Ensure that Core-Complex/Fabric Controller monitors the event_fifo_valid_o signal to detect when events are available in the FIFO.
-      - Read the event ID from REG_FIFO CSR using the APB interface when an event is available.
+      - Read the event ID from FIFO CSR using the APB interface when an event is available.
       - Acknowledge the event by asserting core_irq_ack_i and setting core_irq_ack_id_i to 11.
       - This acknowledgment mechanism ensures proper event consumption from the FIFO.
 
@@ -977,8 +1066,8 @@ Configuring Timer Output Event Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - Configure Timer Event Sources:
-      - Write to REG_TIMER1_SEL_LO with the event index (0-169) that should trigger the timer low signal.
-      - Write to REG_TIMER1_SEL_HI with the event index (0-169) that should trigger the timer high signal.
+      - Write to TIMER1_SEL_LO with the event index (0-169) that should trigger the timer low signal.
+      - Write to TIMER1_SEL_HI with the event index (0-169) that should trigger the timer high signal.
       - These configurations determine which events will control the timer's behavior.
 
   - Valid Event Range:
@@ -994,12 +1083,12 @@ Handling Errors
 
   - Initialize Error Handling:
       - Clear any pending errors during initialization.
-      - Read from REG_ERR_0 through REG_ERR_7 to clear existing error flags.
+      - Read from ERR_0 through ERR_7 to clear existing error flags.
       - This ensures a clean state before beginning normal operation.
 
   - Monitor for Errors:
       - Monitor the err_event_o signal to detect queue overflow errors.
-      - When err_event_o is high, check REG_ERR_0 through REG_ERR_7 for set error bits.
+      - When err_event_o is high, check ERR_0 through ERR_7 for set error bits.
       - Each bit corresponds to an event source that experienced a queue overflow.
       - Regular monitoring helps detect and address errors before they cause system issues.
 
