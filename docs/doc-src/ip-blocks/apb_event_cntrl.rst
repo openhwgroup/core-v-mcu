@@ -395,7 +395,7 @@ Output Channels Overview
         - **Depth:** 4 entries
         - **Accessed via:** ``FIFO`` CSR
     - Events are read by the Fabric Controller through the APB interface.
-    - The Core-Complex can acknowledge events by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 3``.
+    - The Core-Complex can acknowledge events by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 11``.
 
 - **CL Channel (Cluster / eFPGA):**
     - Intended for routing events to the cluster or eFPGA logic. *(Note: not connected in current implementation)*
@@ -453,7 +453,7 @@ The Fabric Controller can read events as follows:
 - Whenever a valid event is present for FC channel, it is pushed onto the FC FIFO.
 - The FC FIFO is a 4-entry queue that holds events until they are read by the Fabric Controller.
 - The Core-Complex/Fabric Controller can read the FIFO through the ``FIFO`` CSR.
-- Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 3``.
+- Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
 - The event is then popped from the FC FIFO and next event is placed on the ``FIFO`` CSR.
 
 Example: Routing a uDMA UART RX Event (Event ID 15) to Core Complex
@@ -493,7 +493,7 @@ Event Routing Flow:
 
 7. **Core Reads Event:**
     - The Core-Complex reads the event from the FC FIFO through the ``FIFO`` CSR.
-    - The event is acknowledged by the Core-Complex by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 3``.
+    - The event is acknowledged by the Core-Complex by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 11``.
     - The event is then popped from the FC FIFO, and the next event is placed on the ``FIFO`` CSR.
 
 
