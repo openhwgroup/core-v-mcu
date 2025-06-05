@@ -61,14 +61,12 @@ The figure below is a high-level block diagram of the I2C Slave:-
 
 Below is a brief description of the 3 sub-modules:
 
-APB SLAVE INTERFACE:
-^^^^^^^^^^^^^^^^^^^^
+**APB Slave Interface**
 
 Responsible for APB communication: passing information to and from the I2C CSR module through the APB interface.
 It handles the APB protocol, including address decoding, data transfer, and control signal generation.
 
-I2C PERIPHERAL CSRs:
-^^^^^^^^^^^^^^^^^^^^
+**I2C PERIPHERAL CSR**
 
 The I2C peripheral CSR assigns values to CSRs and drives the interrupt port for APB and I2C. It takes input from the APB slave interface and the I2C peripheral interface.
 The CSRs manage the I2C device address, enabling/disabling the I2C slave, and configuring timing parameters for I2C operations and FIFO management.
@@ -81,8 +79,7 @@ This module also instantiates two FIFOs:
 
 Both FIFOs are 256 bytes deep and 8 bits wide, allowing for efficient burst data transfer between the I2C and APB interfaces.
 
-I2C PERIPHERAL INTERFACE:
-^^^^^^^^^^^^^^^^^^^^^^^^^
+**I2C PERIPHERAL INTERFACE**
 
 It handles all I2C protocol operations, including detecting start/stop conditions, address recognition,
 data transmission/reception, sending ACK/NACK signals, and managing SDA and SCL timing with line filtering.
@@ -104,13 +101,17 @@ Debounce Length
 
 The I2C slave module includes a debounce mechanism to filter out noise on the SDA and SCL lines. 
 Debouncing is the process of ensuring that a signal is stable before it is considered valid i.e., it prevents false triggering due to noise or glitches on the I2C lines.
+It is particularly important in I2C communication, where the SDA and SCL lines can be susceptible to noise, especially in electrically noisy environments.
 The debounce length is configurable through the I2CS_DEBOUNCE_LENGTH CSR, which specifies the number of system clock cycles over which the I2C lines should be debounced.
+
+**Note**: In the current implementation the debounce length is not used.
 
 SCL and SDA Delay Length
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Delay length is the sampling rate of the SCL and SDA lines, this is used to filter out noise on the I2C lines.
-The I2C Slave uses counters that count up to these delay values before sampling the SCL and SDA lines. Only when the counter reaches the specified delay length does it take a new sample of the respective I2C line.
+The I2C Slave uses counters that count up to these delay values at every clock cycle before sampling the SCL and SDA lines. Only when the counter reaches the specified delay length does it take a new sample of the respective I2C line.
+If the SCL or SDA line remain stable for 3 consecutive samples, the I2C Slave considers the line stable and valid for processing.
 This creates a low-pass filtering effect that removes high-frequency noise while preserving the actual I2C signal transitions.
 
 **Configuration:**
@@ -191,9 +192,8 @@ I2C Interface Interrupts
 The `i2c_interrupt_o` signal is generated for the external I2C master device. The following conditions can trigger this interrupt:
 
 - Availability of a new single-byte message from the APB to the I2C interface.
-- Write flags of the I2C-to-APB FIFO reaching specific levels (e.g., FIFO becoming full), indicating available space in the FIFO.
-- Read flags of the APB-to-I2C FIFO reaching specific levels (e.g., FIFO becoming empty), indicating pending data for the I2C master to process.
-- Interrupt sources can be selectively enabled for up to 8 different levels of both read and write flags.
+- Write flags of the I2C-to-APB FIFO reaching specific levels configured via INTERRUPT_FIFO_I2C_TO_APB_WRITE_FLAGS_SELECT CSR, indicating available space in the FIFO.
+- Read flags of the APB-to-I2C FIFO reaching specific levels configured via INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT CSR, indicating pending data for the I2C master to process.
 
 APB Interface Interrupts
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -201,9 +201,8 @@ APB Interface Interrupts
 The `apb_interrupt_o` signal is generated for the CORE-V-MCU core complex. The following conditions can trigger this interrupt:
 
 - Availability of a new single-byte message from the I2C to the APB interface.
-- Write flags of the APB-to-I2C FIFO reaching specific levels (e.g., FIFO becoming full), indicating available space in the FIFO.
-- Read flags of the I2C-to-APB FIFO reaching specific levels (e.g., FIFO becoming empty), indicating pending data for the APB master to process.
-- Interrupt sources can be selectively enabled for up to 8 different levels of both read and write flags.
+- Write flags of the APB-to-I2C FIFO reaching specific levels configured via INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT CSR, indicating available space in the FIFO.
+- Read flags of the I2C-to-APB FIFO reaching specific levels configured via INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT CSR, indicating pending data for the APB master to process.
 
 Interrupt Configuration and Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -211,8 +210,10 @@ Interrupt Configuration and Handling
 - Interrupts can be enabled or disabled through the `I2C_INTERRUPT_ENABLE` and `APB_INTERRUPT_ENABLE` CSRs.
 - The interrupt status can be monitored using the `I2C_INTERRUPT_STATUS` and `APB_INTERRUPT_STATUS` CSRs.
 - Specific interrupt conditions for FIFO read and write flags can be configured using the `INTERRUPT_FIFO_I2C_TO_APB_*_FLAGS_SELECT` and `INTERRUPT_FIFO_APB_TO_I2C_*_FLAGS_SELECT` CSRs.
-- Once an interrupt is triggered, it is automatically cleared when the corresponding condition is resolved, ensuring efficient interrupt management.
-
+- Once an interrupt is triggered, it is automatically cleared when the corresponding condition(message availability, read flag, write flag) is resolved, ensuring efficient interrupt management.
+    - If an interrupt is triggered due to a new single-byte message, the status bit in the respective CSR (MSG_I2C_TO_APB_STATUS or MSG_APB_TO_I2C_STATUS) is cleared by hardware when the message is read.
+    - If an interrupt is triggered due to FIFO read flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_READ_FLAGS or FIFO_APB_TO_I2C_READ_FLAGS) is cleared by hardware when the FIFO is read until the the read flags change state.
+    - If an interrupt is triggered due to FIFO write flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_WRITE_FLAGS or FIFO_APB_TO_I2C_WRITE_FLAGS) is cleared by hardware when the FIFO is written until the write flags change state.
 
 I2C STATES:
 ~~~~~~~~~~~
@@ -287,7 +288,7 @@ Programming View Model
 ----------------------
 
 FIFO Usage
-^^^^^^^^^^
+~~~~~~~~~~
 The module employs two First-In, First-Out (FIFO) buffers to handle burst data transfer between the APB and I2C interfaces.
 
   - I2C-to-APB FIFO: 
@@ -305,7 +306,7 @@ For details, please refer to the 'Firmware Guidelines'.
 
 
 Data Flow
-^^^^^^^^^
+~~~~~~~~~
 
 Write Operation from I2C Master and Read from APB Master:
   - I2C Master sends START condition(drives SDA line low when SCL is high)
@@ -348,7 +349,7 @@ Write Operation from APB Master and Read from I2C Master:
 For details, please refer to the 'Firmware Guidelines'.
 
 Interrupt Generation
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 The I2C Slave provides interrupt generation for both APB and I2C interfaces.
 
 The i2c_interrupt goes to the external I2C master device, and is generated in the following conditions:
@@ -376,7 +377,7 @@ The CSRs of the I2C slave are 8 bit registers mapped to a 32 bit APB data bus, t
 Since the APB bus is of 32 bit, the APB addresses are 4x the I2C addresses.
 
 I2CS_DEV_ADDRESS
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x0
   - APB type: non-volatile
@@ -393,7 +394,7 @@ I2CS_DEV_ADDRESS
 +----------------------+----------+------------------+------------------+------------+------------------------------+
 
 I2CS_ENABLE
-^^^^^^^^^^^
+~~~~~~~~~~~
 
   - APB Offset: 0X4
   - APB type: non-volatile
@@ -417,7 +418,7 @@ I2CS_ENABLE
 +----------------------+----------+------------------+------------------+------------+------------------------------+
 
 I2CS_DEBOUNCE_LENGTH
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x8
   - APB type: non-volatile
@@ -435,7 +436,7 @@ I2CS_DEBOUNCE_LENGTH
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 I2CS_SCL_DELAY_LENGTH
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0xC
   - APB type: non-volatile
@@ -453,7 +454,7 @@ I2CS_SCL_DELAY_LENGTH
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 I2CS_SDA_DELAY_LENGTH
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x10
   - APB type: non-volatile
@@ -472,7 +473,7 @@ I2CS_SDA_DELAY_LENGTH
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_I2C_TO_APB
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
   - APB Offset: 0x40
   - APB type: volatile
@@ -491,7 +492,7 @@ MSG_I2C_TO_APB
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_I2C_TO_APB_STATUS
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x44
   - APB type: volatile
@@ -510,7 +511,7 @@ MSG_I2C_TO_APB_STATUS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_APB_TO_I2C
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
   - APB Offset: 0x48
   - APB type: non-volatile
@@ -529,7 +530,7 @@ MSG_APB_TO_I2C
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 MSG_APB_I2C_STATUS
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x4C
   - APB type: volatile
@@ -548,7 +549,7 @@ MSG_APB_I2C_STATUS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_WRITE_DATA_PORT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x80
   - APB type: NA
@@ -570,7 +571,7 @@ FIFO_I2C_TO_APB_WRITE_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_READ_DATA_PORT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x084
   - APB type: volatile
@@ -594,7 +595,7 @@ FIFO_I2C_TO_APB_READ_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_FLUSH
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x088
   - APB type: volatile
@@ -616,7 +617,7 @@ FIFO_I2C_TO_APB_FLUSH
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_WRITE_FLAGS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x08C
   - APB type: volatile
@@ -639,7 +640,7 @@ FIFO_I2C_TO_APB_WRITE_FLAGS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_I2C_TO_APB_READ_FLAGS
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x90
   - APB type: volatile
@@ -662,7 +663,7 @@ FIFO_I2C_TO_APB_READ_FLAGS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_WRITE_DATA_PORT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0XC0
   - APB type: non-volatile
@@ -685,7 +686,7 @@ FIFO_APB_TO_I2C_WRITE_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_READ_DATA_PORT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0XC4
   - APB type: NA
@@ -709,7 +710,7 @@ FIFO_APB_TO_I2C_READ_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_FLUSH
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0XC8
   - APB type: volatile
@@ -731,7 +732,7 @@ FIFO_APB_TO_I2C_FLUSH
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_WRITE_FLAGS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0XCC
   - APB type: volatile
@@ -754,7 +755,7 @@ FIFO_APB_TO_I2C_WRITE_FLAGS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_READ_FLAGS
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0XD0
   - APB type: volatile
@@ -777,7 +778,7 @@ FIFO_APB_TO_I2C_READ_FLAGS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 I2C_INTERRUPT_STATUS
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x100
   - APB type: volatile
@@ -819,7 +820,7 @@ I2C_INTERRUPT_STATUS
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 I2C_INTERRUPT_ENABLE
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x104
   - APB type: volatile
@@ -858,7 +859,7 @@ I2C_INTERRUPT_ENABLE
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 INTERRUPT_FIFO_I2C_TO_APB_WRITE_FLAGS_SELECT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x108
   - APB type: volatile
@@ -929,7 +930,7 @@ INTERRUPT_FIFO_I2C_TO_APB_WRITE_FLAGS_SELECT
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
 INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x10C
   - APB type: volatile
@@ -998,7 +999,7 @@ INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
 APB_INTERRUPT_STATUS
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x140
   - APB type: volatile
@@ -1037,7 +1038,7 @@ APB_INTERRUPT_STATUS
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
 APB_INTERRUPT_ENABLE
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x144
   - APB type: non-volatile
@@ -1077,7 +1078,7 @@ APB_INTERRUPT_ENABLE
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
 INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x148
   - APB type: non-volatile
@@ -1148,7 +1149,7 @@ INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT
 +----------------------+----------+------------------+------------------+------------+----------------------------+
 
 INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   - APB Offset: 0x14C
   - APB type: non-volatile
@@ -1220,7 +1221,7 @@ Firmware Guidelines
 -------------------
 
 Initialization
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
   - Set the I2C device address in the I2C device address CSR.
   - Configure appropriate debounce and delay values for SCL and SDA lines through I2CS_DEBOUNCE_LENGTH, I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH registers.
@@ -1403,12 +1404,12 @@ The figure below represents the input and output pins for the I2C Slave:-
    I2C Slave Pin Diagram
 
 Clock and Reset Signals
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
   - apb_pclk_i: System clock input
   - apb_presetn_i: Active-low reset input
 
 APB Interface Signals
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
   - apb_paddr_i[11:0]: APB address bus input
   - apb_psel_i: APB peripheral select input
   - apb_penable_i: APB enable input
@@ -1418,13 +1419,13 @@ APB Interface Signals
   - apb_prdata_o[31:0]: APB read data bus output
 
 I2C Interface Signals
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
   - i2c_scl_i: I2C clock input
   - i2c_sda_i: I2C data input
   - i2c_sda_o: I2C data output
   - i2c_sda_oe: I2C data output enable (active high)
 
 Interrupt Signals
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
   - i2c_interrupt_o: I2C interrupt request output, connects to external I2C master
   - apb_interrupt_o: APB interrupt request output, connects to Core Complex 
