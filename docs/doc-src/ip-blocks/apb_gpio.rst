@@ -69,7 +69,7 @@ Open-Drain Operation
 The GPIO module supports open-drain operation for pins configured as outputs. Open-drain is a specific output driver configuration where the GPIO pin can either pull the signal to ground (logic '0') or release it to a high-impedance state,
 but cannot actively drive it to a high voltage level (logic '1'). This configuration requires an external pull-up resistor to achieve a logic '1' state.
 
-The external pull-up resistor (typically 1kΩ to 10kΩ) must be connected between the GPIO pin and the desired high-voltage level (VDD).
+The external pull-up resistor must be connected between the GPIO pin and the desired high-voltage level (VDD).
 Without this pull-up resistor, the pin will remain in an undefined state when not actively driven low.
 
 Input Synchronization
@@ -77,10 +77,48 @@ Input Synchronization
 Metastability refers to an unstable state in which the signal fails to settle into a stable low or high level within a required time.
 A dual-stage synchronizer in the GPIO module prevents metastability issues when sampling external inputs by synchronizing them to the system clock domain.
 This synchronizer consists of two flip-flops in series, which helps to ensure that any glitches or transient signals on the GPIO inputs are filtered out before being processed by the rest of the system.
-This synchronization process ensures that the GPIO inputs are stable and reliable when read by the system, preventing false triggering of events or interrupts.
+
+When a pin is configured as an input, the input signal is sampled by the first flip-flop, and the output of this flip-flop is then sampled by the second flip-flop.
+The output of the second flip-flop is the synchronized signal that is used by the GPIO module.
+
+Pin Direction Control
+~~~~~~~~~~~~~~~~~~~~~
+The GPIO module allows each pin to be configured as either an input, output, or open-drain.
+- **Input**: The pin reads external signals and provides them to the system.
+- **Output**: The pin drives external devices by setting the pin high or low.
+- **Open-Drain**: The pin can pull the signal low or leave it in a high-impedance state, requiring an external pull-up resistor to achieve a high state.
+
+The pin direction is controlled through the SETDIR CSR, which allows the software to set the direction for each pin individually.
+The direction of each of the 32 pins is also reflected in the gpio_dir output signal, which indicates whether each pin is configured as an input (0) or output (1).
+
+In case when a pin is configured as an open-drain output, the value of the gpio_dir signal will be opposite to the actual output value.
+For example, if the pin is configured as an open-drain output and the output value is high (1), the gpio_dir signal will indicate low (0).
+Similarly, if the pin is configured as an open-drain output and the output value is low (0), the gpio_dir signal will indicate high (1).
+
+GPIO Input
+~~~~~~~~~~
+- The GPIO module reads external signals through the gpio_in input signal.
+- The value of these signals post synchronisation is made available on the PIN0 CSR (address 0x010), allowing the software to read the status of the GPIO pins configured as inputs.
+- Each bit in the PIN0 CSR corresponds to a GPIO pin(bit 0 for GPIO pin 0, bit 1 for GPIO pin 1, and so on), where a bit value of 1 indicates a high state and 0 indicates a low state.
+- In this register, if a pin is configured as output, the value of the corresponding bit will be 0, as the input value is not applicable for output pins.
+- The synchronized input signals are then provided to the gpio_in_sync output signal, which is used by the Advanced Timer module for external event processing.
+
+GPIO Output
+~~~~~~~~~~~
+- The GPIO module drives external devices through the gpio_out output signal.
+- The output value of each pin can be controlled by writing to the OUT0 CSR (address 0x020), allowing the software to control the state of the GPIO pins configured as outputs.
+- Each bit in the OUT0 CSR corresponds to a GPIO pin(bit 0 for GPIO pin 0, bit 1 for GPIO pin 1, and so on), where a bit value of 1 sets the pin high and a bit value of 0 sets it low.
+- The gpio_out output signal reflects the current output state of the GPIO pins configured as outputs.
+- If a pin is configured as an input, the corresponding bit in the OUT0 CSR will be 0, as the output value is not applicable for input pins.
+
+- The GPIO module also provides the SETGPIO, CLRGPIO, and TOGGPIO CSRs to set, clear, or toggle the output state of individual pins.
+- The SETGPIO CSR (address 0x000) sets a specified pin high.
+- The CLRGPIO CSR (address 0x004) sets a specified pin low.
+- The TOGGPIO CSR (address 0x008) toggles the state of a specified pin.
+
  
-Interrupt Generation Logic
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Interrupt Generation
+~~~~~~~~~~~~~~~~~~~~
 This section describes how GPIO pins generate interrupts and the differences between edge-triggered and level-triggered behavior.
 
 Interrupt Capability
@@ -89,14 +127,34 @@ GPIO pins can be used to receive interrupts from external devices. Interrupts ca
 
 Interrupt Types
 ^^^^^^^^^^^^^^^
-The interrupt logic detects events based on the configured type for each pin:
+The interrupt logic detects events based on the configured type for each of the 32 pins:
 
 - **Edge-triggered**: Detects rising or falling edges
 - **Level-triggered**: Detects active-high or active-low levels
 
+The interrupt type for each pin is configured through the SETINT CSR (address 0x03C), which allows the software to specify the desired interrupt behavior.
+- The interrupt type is specified using bits [19:17]:
+  - 000: Active-Low level detection
+  - 001: Falling edge detection
+  - 010: Rising edge detection
+  - 011: Both edges detection
+  - 100: Active-High level detection
+- The interrupt enable status is specified using bit [16]:
+  - 0: Disable interrupt for the pin
+  - 1: Enable interrupt for the pin
+- The pin number is specified using bits [6:0], allowing the software to configure interrupts for individual pins.
+
+For example, to configure GPIO pin 0 for rising edge detection, the software would write the following values to the SETINT CSR:
+```
+SETINT = (0b010 << 17) | (1 << 16) | (0 << 6)
+```
+This sets the interrupt type to rising edge detection, enables the interrupt, and selects GPIO pin 0.
+
 Interrupt Signal Behavior
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-When an event occurs on a pin configured for interrupts, the interrupt logic generates an output interrupt signal.  
+When an event occurs on an input pin configured for interrupts, the interrupt logic asserts the corresponding interrupt signal for that pin.
+This signal is represented by the `interrupt` output signal, which is a 32-bit vector where each bit corresponds to a GPIO pin.
+For example, if GPIO pin 0 is configured for interrupts and an event occurs, the `interrupt[0]` signal will be asserted (set to high).
 This signal remains high for one clock cycle to indicate the event, after which it is cleared.  
 
 The interrupt signal is captured by the APB Event Controller for further processing.  
@@ -117,14 +175,6 @@ To prevent repeated triggering from persistent level conditions, the APB GPIO di
 The APB master must acknowledge the interrupt by writing to the INTACK CSR.  
 
 Once acknowledged, the GPIO can reassert the interrupt signal if the level condition still holds true.
-
-Summary
-^^^^^^^
-- Both edge-triggered and level-triggered interrupts are signaled through the same interrupt pins.
-- In both cases, the interrupt signal output from the GPIO remains high for only one clock cycle.
-- For level-triggered interrupts, the APB master must acknowledge the interrupt via INTACK to allow new interrupts to be generated.
-- Edge-triggered interrupts do not require explicit acknowledgment, as they are automatically cleared.
-
 
 System Architecture
 -------------------
@@ -200,7 +250,11 @@ SETGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Access   | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to set high             |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin index, which will be    |
+|                |              |          |             | set high                         |
+|                |              |          |             |                                  |
+|                |              |          |             | Only pins configured as outputs  |
+|                |              |          |             | can be set high                  |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 CLRGPIO
@@ -211,7 +265,11 @@ CLRGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Access   | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to set low              |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin index, which will be    |
+|                |              |          |             | set low                          |
+|                |              |          |             |                                  |
+|                |              |          |             | Only pins configured as outputs  |
+|                |              |          |             | can be set low                   |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 TOGGPIO
@@ -222,7 +280,11 @@ TOGGPIO
 +----------------+--------------+----------+-------------+----------------------------------+
 | Field          | Bits         | Access   | Default     | Description                      |
 +================+==============+==========+=============+==================================+
-| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin to toggle               |
+| PIN_SELECT     | [6:0]        | WO       | 0x0         | GPIO pin index, which will be    |
+|                |              |          |             | toggled                          |
+|                |              |          |             |                                  |
+|                |              |          |             | Only pins configured as outputs  |
+|                |              |          |             | can be toggled                   |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 PIN0
@@ -347,19 +409,30 @@ RDSTAT
 | Field          | Bits         | Access   | Default     | Description                      |
 +================+==============+==========+=============+==================================+
 | DIR            | [25:24]      | RO       | 0x0         | Direction configuration for      |
-|                |              |          |             | selected pin                     |
+|                |              |          |             | pin selected via SETSEL CSR      |
 +----------------+--------------+----------+-------------+----------------------------------+
 | INT_TYPE       | [19:17]      | RO       | 0x0         | Interrupt type configuration for |
-|                |              |          |             | selected pin                     |
+|                |              |          |             | pin selected via SETSEL CSR      |
+|                |              |          |             |                                  |
+|                |              |          |             | Only valid when DIR value is 00  |
 +----------------+--------------+----------+-------------+----------------------------------+
 | INT_EN         | [16]         | RO       | 0x0         | Interrupt enable status for      |
-|                |              |          |             | selected pin                     |
+|                |              |          |             | pin selected via SETSEL CSR      |
+|                |              |          |             |                                  |
+|                |              |          |             | Only valid when DIR value is 00  |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_IN         | [12]         | RO       | 0x0         | Input value of selected pin      |
+| PIN_IN         | [12]         | RO       | 0x0         | Input value of pin selected via  |
+|                |              |          |             | SETSEL CSR                       |
+|                |              |          |             |                                  |
+|                |              |          |             | Only valid when DIR value is 00  |
 +----------------+--------------+----------+-------------+----------------------------------+
-| PIN_OUT        | [8]          | RO       | 0x0         | Output value of selected pin     |
+| PIN_OUT        | [8]          | RO       | 0x0         | Output value of pin selected via |
+|                |              |          |             | SETSEL CSR                       |
+|                |              |          |             |                                  |
+|                |              |          |             | Only valid when DIR value is 01  |
 +----------------+--------------+----------+-------------+----------------------------------+
 | PIN_SELECT     | [6:0]        | RO       | 0x0         | Currently selected pin number    |
+|                |              |          |             | selected via SETSEL CSR          |
 +----------------+--------------+----------+-------------+----------------------------------+
 
 SETDIR
