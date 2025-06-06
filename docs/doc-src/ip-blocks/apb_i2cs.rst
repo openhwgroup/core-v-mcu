@@ -375,6 +375,15 @@ APB I2C Slave CSRs:
 
 The CSRs of the I2C slave are 8 bit registers mapped to a 32 bit APB data bus, the same CSRs can be accessed by the I2C interface as well.
 Since the APB bus is of 32 bit, the APB addresses are 4x the I2C addresses.
+For example, the I2CS_ENABLE CSR is at APB address 0x4, but at I2C address 0x1.
+Similarly, the I2CS_SCL_DELAY_LENGTH CSR is at APB address 0xC, but at I2C address 0x3.
+
+Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for the peripheral domain address of the I2C Slave which is used for APB bus addressing.
+NOTE: Several of the I2C Slave CSR are volatile, meaning that their read value may be changed by the hardware.
+For example, writing the FIFO_I2C_TO_APB_FLUSH CSR the value will be ignored and the FIFO will be flushed, but reading the CSR will return 0x0.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value written by the software.
+A CSR's volatility is indicated by its "type".
+In I2C Slave the volatility of a CSR will also depend on the mode of access, i.e., whether it is accessed through the APB interface or the I2C interface.
 
 I2CS_DEV_ADDRESS
 ~~~~~~~~~~~~~~~~
