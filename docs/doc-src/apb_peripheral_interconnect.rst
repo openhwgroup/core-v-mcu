@@ -65,7 +65,7 @@ The APB transaction routing flow can be summarized as follows:
 - APB Peripheral Interconnect routes these transactions received from TCDM interconnect to the peripherals based on address ranges and raises a start_rto_o signal to the SOC controller. Refer to the `memory map <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html>`_ for the complete address mapping of the peripherals. 
 - APB Peripheral Interconnect uses the <peripheralName>_master (e.g., soc_ctrl_master, etc.) interface to forward the transaction to the peripherals.
 - Both master and slave interfaces of the APB peripheral are designed using the APB protocol.
-- If a peripheral fails to respond to APB interconnect within a predefined time, the integrated timeout detection mechanism activates and reports which peripheral has timed out. The timeout mechanism is discussed in the Timeout Mechanism section.
+- If a peripheral fails to respond to APB interconnect within a predefined time i.e. the rto_i signal is asserted before the psel signal of the <peripheralName>_master interface, the integrated timeout detection mechanism activates and reports which peripheral has timed out. The timeout mechanism is discussed in the Timeout Mechanism section.
 
 Timeout Mechanism
 ^^^^^^^^^^^^^^^^^
@@ -74,7 +74,8 @@ Below is a description of the timeout handling process:
 
     - The start_rto_o signal is activated when a peripheral is selected based on the address specified in the APB transaction, triggering timeout counter in SoC Controller.
     - The SoC Controller has RTO_COUNT CSR that can be used to decide the timeout period. The default value of RTO_COUNT is 0xFF.
-    - If a peripheral doesn't respond within the timeout period i.e. before the rto_i input is asserted by SoC Controller for one clock cycle, a timeout error occurs.
+    - If a peripheral doesn't respond within the timeout period  i.e., the rto_i signal is asserted before the psel signal of the <peripheralName>_master interface, a timeout error occurs.
+    - The rto_i signal deasserted after one cycle.
     - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller's RTO_PERIPHERAL CSR.(Check `SoC Controller <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html>`_ specs for more details)
     - The peripheral_rto_o signal is cleared after one clock cycle.
 
