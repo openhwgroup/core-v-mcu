@@ -134,29 +134,25 @@ Servicing the Watchdog
   - Servicing resets the counter to the value configured in WD_COUNT CSR and the watchdog timer continues counting down from that value.
 
 
-Resetting/Updating Watchdog Timer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Once the watchdog timer is enabled, it can be reset or updated only if the watchdog reset request is received, i.e. rstpin_ni is asserted.
+Resetting Watchdog Timer
+^^^^^^^^^^^^^^^^^^^^^^^^
+Once the watchdog timer is enabled, it can be reset or updated only if the watchdog reset request is received, i.e. rstpin_ni is asserted and deasserted.
 
   - If a reset request is initiated via the rstpin_ni pin, then the watchdog timer is set to its default value of 0x8000.
-      - The reset reason is recorded in the RESET_REASON CSR with the value 1.
+  - The reset reason is recorded in the RESET_REASON CSR with the value 1.
+  - The watchdog timer will not start counting down until the rstpin_ni signal is deasserted.
 
 Disabling the Watchdog Timer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Once enabled, the watchdog timer cannot be disabled. However, it can be effectively disabled by performing a system reset, i.e. asserting the HRESETn signal.
 
-Pausing the Watchdog Timer
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-The watchdog timer can be paused in the following scenarios:
-  - A request to stop the timer is received, i.e., stoptimer_i is asserted.
-      - The watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
-      - When the stoptimer_i signal is deasserted, the watchdog timer will resume counting down from its current value.
+Stopping the Watchdog Timer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The watchdog timer can be stopped when the stoptimer_i signal is asserted.
+  - When the stoptimer_i signal is asserted, the watchdog timer stops counting down and holds its current value.
+  - The watchdog timer resumes counting down from the held value when the stoptimer_i signal is deasserted.
 
-  - A watchdog reset request is received, i.e., rstpin_ni is asserted.
-      - The watchdog timer will be reset to its default value of 0x8000.
-      - The reset reason is recorded in the RESET_REASON CSR with the value 1.
-      - The watchdog timer will not start counting down until the rstpin_ni signal is asserted again.
-
+This allows to stop the watchdog timer temporarily without resetting it.
 
 eFPGA Interface
 ~~~~~~~~~~~~~~~
