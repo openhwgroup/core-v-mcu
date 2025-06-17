@@ -77,7 +77,7 @@ Below is a description of the timeout handling process:
     - If a peripheral doesn't respond within the timeout period  i.e., the rto_i signal is asserted before the psel signal of the <peripheralName>_master interface, a timeout error occurs.
     - The SoC Controller deasserts the rto_i signal after one cycle.
     - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller's RTO_PERIPHERAL CSR.(Check `SoC Controller <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html>`_ specs for more details)
-    - The peripheral_rto_o signal is cleared after one clock cycle.
+    - The peripheral_rto_o signal is cleared after one clock cycle, i.e. once the rto_i signal has been deasserted.
 
 The peripheral_rto_o signal to peripheral mapping can be found below:
 
