@@ -1,6 +1,6 @@
 ..
    Copyright (c) 2023 OpenHW Group
-   Copyright (c) 2024 CircuitSutra
+   Copyright (c) 2025 CircuitSutra
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -75,7 +75,7 @@ Below is a description of the timeout handling process:
     - The start_rto_o signal is activated when a peripheral is selected based on the address specified in the APB transaction, triggering timeout counter in SoC Controller.
     - The SoC Controller has RTO_COUNT CSR that can be used to decide the timeout period. The default value of RTO_COUNT is 0xFF.
     - If a peripheral doesn't respond within the timeout period  i.e., the rto_i signal is asserted before the psel signal of the <peripheralName>_master interface, a timeout error occurs.
-    - The rto_i signal deasserted after one cycle.
+    - The SoC Controller deasserts the rto_i signal after one cycle.
     - When a timeout occurs, the peripheral_rto_o signals indicate which specific peripheral failed to respond, which then can be read through the SoC Controller's RTO_PERIPHERAL CSR.(Check `SoC Controller <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/ip-blocks/apb_soc_ctrl.html>`_ specs for more details)
     - The peripheral_rto_o signal is cleared after one clock cycle.
 
@@ -130,7 +130,7 @@ The figure below depicts the connections between the CORE-V-MCU and rest of the 
 
    APB Peripheral Interconnect CORE-V-MCU connections diagram
 
-Note: The stdout emulator is only used during synthesis and does not correspond to an actual hardware block.
+Note: The stdout emulator is only used during simulation and does not correspond to an actual hardware block.
 
 Firmware Guidelines
 -------------------
