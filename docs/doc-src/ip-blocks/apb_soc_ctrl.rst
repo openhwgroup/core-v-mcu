@@ -1,7 +1,7 @@
 
 ..
    Copyright (c) 2023 OpenHW Group
-   Copyright (c) 2024 CircuitSutra
+   Copyright (c) 2025 CircuitSutra
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -115,6 +115,7 @@ Initialization and Configuration
 - The watchdog is enabled by setting the ENABLE_STATUS (bit 31) in the WD_CONTROL CSR.
 - After enabling, the watchdog timer begins counting down from the value set in the  WD_COUNT CSR and decrements on each positive edge of the reference clock (ref_clk_i), given that the stoptimer_i signal is not asserted.
 - If the stoptimer_i signal is asserted, the watchdog timer will be paused and will not decrement until the stoptimer_i signal is deasserted.
+- The stoptimer_i is asserted by the Core-Complex when the Core is in debug mode.
 
 Expiration
 ^^^^^^^^^^
@@ -149,6 +150,7 @@ Once enabled, the watchdog timer cannot be disabled. However, it can be effectiv
 Stopping the Watchdog Timer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The watchdog timer can be stopped when the stoptimer_i signal is asserted.
+  - The stoptimer_i is asserted by the Core-Complex when the Core is in debug mode.
   - When the stoptimer_i signal is asserted, the watchdog timer stops counting down and holds its current value.
   - The watchdog timer resumes counting down from the held value when the stoptimer_i signal is deasserted.
 
@@ -555,12 +557,11 @@ RESET_REASON
 ~~~~~~~~~~~~
   - Address Offset = 0x00D8
   - Type: volatile
-  - The CSR will get cleared when the APB bus is in waiting state, i.e. after a read or write is performed.
 
 +-----------+----------+------------+-------------+----------------------------------------+
 | **Field** | **Bits** | **Access** | **Default** | **Description**                        |
 +===========+==========+============+=============+========================================+
-|   REASON  |   1:0    |   RW       |     0x0     |   2'b01= reset pin(rstpin_ni) asserted | 
+|   REASON  |   1:0    |   RC       |     0x0     |   2'b01= reset pin(rstpin_ni) asserted | 
 |           |          |            |             |                                        |
 |           |          |            |             |   2'b11=Watchdog expired               |
 +-----------+----------+------------+-------------+----------------------------------------+
@@ -570,36 +571,35 @@ RTO_PERIPHERAL
   - Address Offset = 0x00E0
   - Type: volatile
   - Configured from peripheral_rto_i pin
-  - Writing to this CSR will clear it (the write value is ignored)
 
 +-------------+----------+------------+-------------+----------------------------------------+
 | **Field**   | **Bits** | **Access** | **Default** | **Description**                        |
 +=============+==========+============+=============+========================================+
-|   FCB_RTO   |   8:8    | RW         | 0x0         | 1 indicates that the FCB interface     |
+|   FCB_RTO   |   8:8    | RWC        | 0x0         | 1 indicates that the FCB interface     |
 |             |          |            |             | caused a ready timeout                 |
 +-------------+----------+------------+-------------+----------------------------------------+
-| TIMER_RTO   |   7:7    | RW         | 0x0         | 1 indicates that the TIMER interface   |
+| TIMER_RTO   |   7:7    | RWC        | 0x0         | 1 indicates that the TIMER interface   |
 |             |          |            |             | caused a ready timeout                 |
 +-------------+----------+------------+-------------+----------------------------------------+
-| I2CS_RTO    |   6:6    | RW         | 0x0         | 1 indicates that the I2CS interface    |
+| I2CS_RTO    |   6:6    | RWC        | 0x0         | 1 indicates that the I2CS interface    |
 |             |          |            |             | caused a ready timeout                 |
 +-------------+----------+------------+-------------+----------------------------------------+
-|EVENT_GEN_RTO|   5:5    | RW         | 0x0         | 1 indicates that the EVENT GENERATOR   |
+|EVENT_GEN_RTO|   5:5    | RWC        | 0x0         | 1 indicates that the EVENT GENERATOR   |
 |             |          |            |             | interface caused a ready timeout       |
 +-------------+----------+------------+-------------+----------------------------------------+
-|ADV_TIMER_RTO|   4:4    | RW         | 0x0         | 1 indicates that the ADVANCED TIMER    |
+|ADV_TIMER_RTO|   4:4    | RWC        | 0x0         | 1 indicates that the ADVANCED TIMER    |
 |             |          |            |             | interface caused a ready timeout       |
 +-------------+----------+------------+-------------+----------------------------------------+
-|SOC_CONTROL_R|   3:3    | RW         | 0x0         | 1 indicates that the SOC CONTROL       |
+|SOC_CONTROL_R|   3:3    | RWC        | 0x0         | 1 indicates that the SOC CONTROL       |
 |TO           |          |            |             | interface caused a ready timeout       |
 +-------------+----------+------------+-------------+----------------------------------------+
-|UDMA_RTO     |   2:2    | RW         | 0x0         | 1 indicates that the UDMA CONTROL      |
+|UDMA_RTO     |   2:2    | RWC        | 0x0         | 1 indicates that the UDMA CONTROL      |
 |             |          |            |             | interface caused a ready timeout       |
 +-------------+----------+------------+-------------+----------------------------------------+
-|GPIO_RTO     |   1:1    | RW         | 0x0         | 1 indicates that the GPIO interface    |
+|GPIO_RTO     |   1:1    | RWC        | 0x0         | 1 indicates that the GPIO interface    |
 |             |          |            |             | caused a ready timeout                 |
 +-------------+----------+------------+-------------+----------------------------------------+
-|FLL_RTO      |   0:0    | RW         | 0x0         | 1 indicates that the FLL interface     |
+|FLL_RTO      |   0:0    | RWC        | 0x0         | 1 indicates that the FLL interface     |
 |             |          |            |             | caused a ready timeout                 |
 +-------------+----------+------------+-------------+----------------------------------------+
 
@@ -700,12 +700,11 @@ SOFT_RESET
 ~~~~~~~~~~
   - Address Offset = 0x00FC
   - Type: volatile
-  - This CSR is a write-only strobe i.e. the write value is ignored
 
 +-----------------+----------+------------+-------------+----------------------------------+
 | **Field**       | **Bits** | **Access** | **Default** | **Description**                  |
 +=================+==========+============+=============+==================================+
-| SOFT_RESET      |    0:0   | WO         | 0x0         | Write only strobe to reset all   |
+| SOFT_RESET      |    0:0   | WC         | 0x0         | Write only strobe to reset all   |
 |                 |          |            |             | APB clients                      |
 +-----------------+----------+------------+-------------+----------------------------------+
 
