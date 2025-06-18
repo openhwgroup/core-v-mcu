@@ -81,9 +81,16 @@ Both FIFOs are 256 bytes deep and 8 bits wide, allowing for efficient burst data
 
 **I2C PERIPHERAL INTERFACE**
 
-It handles all I2C protocol operations, including detecting start/stop conditions, address recognition,
-data transmission/reception, sending ACK/NACK signals, and managing SDA and SCL timing with line filtering.
-It passes information to and from the I2C CSR module.
+It handles all I2C protocol operations, including detecting Start and Stop conditions, address recognition, data transmission and reception,
+sending ACK/NACK signals, and managing the timing of the SDA (Serial Data) and SCL (Serial Clock) lines with built-in line filtering.
+Communication with the external I2C master occurs over these two lines, forming the I2C bus. 
+The module exchanges information with the internal I2C PERIPHERAL CSR block and drives or samples data on the SDA line in coordination with SCL timing, in response to master requests.
+
+**Note**: In I2C Slave module the SDA line is divided into 3 signals - 
+
+- i2c_sda_i: Carries the input data from the I2C master to the slave.
+- i2c_sda_o: Carries the output data from the slave to the I2C master.
+- i2c_sda_oe: Output enable signal that indicates when i2c_sda_o is actively driving the SDA line. This signal is asserted (high) when the slave is transmitting data.
 
 I2C Device Address
 ~~~~~~~~~~~~~~~~~~
@@ -113,6 +120,7 @@ Delay length is the sampling rate of the SCL and SDA lines, this is used to filt
 The I2C Slave uses counters that count up to these delay values at every clock cycle before sampling the SCL and SDA lines. Only when the counter reaches the specified delay length does it take a new sample of the respective I2C line.
 If the SCL or SDA line remain stable for 3 consecutive samples, the I2C Slave considers the line stable and valid for processing.
 This creates a low-pass filtering effect that removes high-frequency noise while preserving the actual I2C signal transitions.
+The SCL and SDA length can be configured through the I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH CSRs respectively.
 
 **Configuration:**
   - Shorter delay lengths = faster sampling = less filtering (suitable for clean, high-speed buses)
@@ -123,43 +131,47 @@ Communication Between I2C and APB Interfaces
 
 The I2C Slave module facilitates seamless communication between the I2C and APB interfaces, enabling data exchange in both single-byte and burst modes. The communication is managed through FIFOs and CSRs, ensuring efficient and reliable data transfer.
 
-Single-Byte Communication Data Flow
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**APB to I2C**:
+Single-Byte TX Operation flow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - APB master writes data to MSG_APB_TO_I2C CSR.
   - Status bit in MSG_APB_TO_I2C_STATUS CSR is set by hardware.
   - Output interrupt i2c_interrupt_o is raised if the interrupt is enabled in the I2C_INTERRUPT_ENABLE CSR and associated bit in I2C_INTERRUPT_STATUS is set.
-  - I2C master reads CSR MSG_APB_TO_I2C to retrieve data.
+  - I2C master initiates a read request over the bus with the address of MSG_APB_TO_I2C CSR, requesting the data of the CSR.
+  - I2C slave responds to this request by retrieving the data from the MSG_APB_TO_I2C CSR and putting it on the I2C bus, delivering it to the master.
   - Status bit in MSG_APB_TO_I2C_STATUS and I2C_INTERRUPT_STATUS is cleared by hardware and the interrupt is lowered.
 
-**I2C to APB**:
-  - I2C master writes data to MSG_I2C_TO_APB CSR.
+FIFO-Based Multi-Byte TX Operation flow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - I2C master initiates a write request with the addrress of MSG_I2C_TO_APB CSR and the data to be written.
+  - I2C slave retrives the CSR address and data from the bus and writes it to the respective CSR(MSG_I2C_TO_APB CSR in this case).
   - Status bit in MSG_I2C_TO_APB_STATUS CSR is set by hardware.
   - Output interrupt apb_interrupt_o is raised if the interrupt is enabled in the APB_INTERRUPT_ENABLE CSR and associated bit in APB_INTERRUPT_STATUS is set.
   - APB master reads MSG_I2C_TO_APB CSR to retrieve data.
   - Status bit in MSG_I2C_TO_APB_STATUS and APB_INTERRUPT_STATUS is cleared by hardware and the interrupt is lowered.
 
-FIFO-Based Multi-Byte Communication Data Flow
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**APB to I2C**:
+Single-Byte RX Operation flow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   - APB master writes data to FIFO_APB_TO_I2C_WRITE_DATA_PORT CSR.
   - The data is pushed in the APB to I2C FIFO by the hardware.
   - FIFO status is reflected in FIFO_APB_TO_I2C_WRITE_FLAGS CSR.
   - Interrupt can be generated based on FIFO status.
-  - I2C master reads data from FIFO_APB_TO_I2C_READ_DATA_PORT CSR.
+  - I2C master initiates a read request over the bus with the address of FIFO_APB_TO_I2C_READ_DATA_PORT CSR, requesting the data of the CSR.
+  - I2C slave responds to this request by retrieving the data from the FIFO_APB_TO_I2C_READ_DATA_PORT CSR and putting it on the I2C bus, delivering it to the master.
   - The data is popped from the APB to I2C FIFO by the hardware.
   - FIFO status is updated in FIFO_APB_TO_I2C_READ_FLAGS CSR.
 
-**I2C to APB**:
-  - I2C master writes data to FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR.
+FIFO-Based Multi-Byte RX Operation flow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - I2C master initiates a write request with the addrress of FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR and the data to be written.
+  - I2C slave retrives the CSR address and data from the bus and writes it to the respective CSR(FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR in this case).
   - The data is pushed in the I2C to APB FIFO by the hardware.
   - FIFO status is reflected in FIFO_I2C_TO_APB_WRITE_FLAGS CSR.
   - Interrupt can be generated based on FIFO status.
   - APB master reads data from FIFO_I2C_TO_APB_READ_DATA_PORT CSR.
   - The data is popped from the I2C to APB FIFO by the hardware.
   - FIFO status is updated in FIFO_I2C_TO_APB_READ_FLAGS CSR.
+
+**Note**: Refer to the I2C states section below for a detailed understanding of I2C operations.
 
 Flags and Interrupts
 ^^^^^^^^^^^^^^^^^^^^
@@ -172,7 +184,6 @@ The I2C Slave module uses flags and interrupts to ensure efficient communication
   - **Write Flags:**
       - Indicate the available space in the FIFO.
       - Accessible through `FIFO_I2C_TO_APB_WRITE_FLAGS` and `FIFO_APB_TO_I2C_WRITE_FLAGS` CSRs.
-
   - **Interrupts:**
       - Generated based on FIFO thresholds or new message availability.
       - Configurable through `I2C_INTERRUPT_ENABLE` and `APB_INTERRUPT_ENABLE` CSRs.
@@ -215,9 +226,68 @@ Interrupt Configuration and Handling
     - If an interrupt is triggered due to FIFO read flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_READ_FLAGS or FIFO_APB_TO_I2C_READ_FLAGS) is cleared by hardware when the FIFO is read until the the read flags change state.
     - If an interrupt is triggered due to FIFO write flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_WRITE_FLAGS or FIFO_APB_TO_I2C_WRITE_FLAGS) is cleared by hardware when the FIFO is written until the write flags change state.
 
-I2C STATES:
-~~~~~~~~~~~
+I2C Operation
+~~~~~~~~~~~~~
 
+The Start and Stop conditions define the beginning and end of a data transfer on the I2C bus.
+These conditions are signaled by the I2C master and recognized by all devices connected to the bus.
+
+  - START Condition: A Start condition is generated by the master to initiate communication. It is defined by a high-to-low transition on the SDA line while the SCL line remains high. This signals all connected devices to listen for an incoming address and possible data.
+  - STOP Condition: A Stop condition is generated by the master to terminate communication. It is defined by a low-to-high transition on the SDA line while the SCL line remains high. This indicates the end of the current transfer and releases the bus for other operations.
+
+An important aspect of the I2C slave module is that the I2C master must be aware of the CSR (Control and Status Register) addresses within the slave in order to enable proper communication—such as sending single-byte messages from the I2C master to the APB master, configuring I2C interrupts, and other control operations.
+
+I2C Frame Format
+^^^^^^^^^^^^^^^^
+The I2C protocol uses a standard message format for communication between a master and one or more slave devices.
+Each transaction begins with a START condition and ends with a STOP condition.
+The frame format differs slightly depending on whether the master intends to perform a write or a read operation.
+
+I2C Write Frame
+^^^^^^^^^^^^^^^
+Used when the master writes data to a slave register (e.g., CSR access).
+
+**Format**::
+
+    [START] → [Slave Address + Write (0)] → [ACK] → [Register Address]
+    → [ACK] → [Data Byte(s)] → [ACK] → [STOP]
+
+**Description**:
+
+- **START**: Initiated by the master to signal the beginning of a transfer.
+- **Slave Address + Write Bit (0)**: 7-bit address followed by a 0 bit indicating a write.
+- **ACK**: Acknowledge from the slave.
+- **Register Address**: Address of the internal register (CSR) within the slave.
+- **Data Byte(s)**: One or more bytes of data to be written.
+- **STOP**: Indicates the end of the transfer.
+
+I2C Read Frame
+^^^^^^^^^^^^^^
+Used when the master reads data from a register inside the slave.
+
+**Format**::
+
+    [START] → [Slave Address + Write (0)] → [ACK] → [Register Address] → [ACK] 
+    → [STOP] → [START] → [Slave Address + Read (1)] → [ACK] 
+    → [Data Byte(s)] → [NACK] → [STOP]
+
+**Description**:
+
+- The master first writes the **register address** it wants to read from.
+- A **STOP** condition is issued after writing the register address.
+- A new **START** condition is then initiated to begin the read phase.
+- The master sends the slave address with the **Read bit (1)**.
+- The slave responds with data byte(s).
+- The master sends **NACK** after the final byte to indicate the end of reading.
+- **STOP** concludes the transaction.
+
+Notes
+^^^^^
+- Each data transfer is acknowledged by the receiver (ACK - logic 0) or not acknowledged (NACK - logic 1).
+- CSR access involves this two-phase transaction: write address → read data.
+
+I2C STATES
+~~~~~~~~~~
 .. figure:: apb_i2cs_fsm_diagram.png
    :name: I2C_Slave_FSM_Diagram
    :align: center
@@ -225,7 +295,7 @@ I2C STATES:
 
    I2C Slave FSM Diagram
 
-- I2C slave has 10 states:
+- I2C slave has 10 states, :
 
    - ST_IDLE:
       - Initially, the slave is in this state.
@@ -234,18 +304,20 @@ I2C STATES:
    - ST_DEVADDR:
       - The slave enters this state after detecting the START sequence and when I2C is enabled through the I2C enable CSR.
       - The slave receives the device address and transfer type (read/write).
-      - The transfer stops if the received device address does not match the configured address in the I2C device address CSR.
+      - 8 bits are sent by the master over the SDA line(i2c_sda_i), in which the first 7 represents the I2C slave device address and the 8th bit represents transfer type(1: Read, 0: Write).
+      - If the received device address does not match the configured address in the I2C device address CSR, the slave stops processing and the transaction is ignored. 
 
    - ST_DEVADDRACK:
-      - The slave enters this state after receiving the I2C device address and sends an acknowledgment.
+      - The slave enters this state after receiving the successfully validating the I2C device address and sends an acknowledgment.
       - i2c_sda_o is driven low to indicate a successful acknowledgement.
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
       - A read operation sets the I2C state to ST_REGRDATA.
       - A write operation sets the I2C state to ST_REGADDR.
 
    - ST_REGADDR:
-      - If the master wants to write, the slave comes to this state.
-      - The slave receives the CSR address inside the device where the master wants to write.
+      - The slave comes to this state when the master writes the CSR address.
+      - The I2C master sends the address of the target CSR located inside the I2C slave device over the SDA line(i2c_sda_i). 
+      - The slave receives this address to determine which register the master intends to write to.
 
    - ST_REGADDRACK:
       - After successfully receiving the CSR address, the slave enters this state and sends an acknowledgment.
@@ -253,7 +325,9 @@ I2C STATES:
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    - ST_REGWDATA:
-      - After sending an acknowledgment, the slave enters this state and writes data to the CSR.
+      - The slave enters this state if the master wants to write data to CSR.
+      - Master sends the data to be written to the CSR over the SDA line(i2c_sda_i).
+      - The slaves receives the data and then writes it to the intended CSR.
 
    - ST_REGWDATAACK:
       - After successfully writing the data, an acknowledgment bit is sent.
@@ -261,8 +335,8 @@ I2C STATES:
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
    - ST_REGRDATA:
-      - The slave enters this state if the master wants to read data.
-      - The slave device places the data from the last addressed CSR onto the i2c_sda_o line.
+      - The slave enters this state if the master wants to read data from CSR.
+      - The slave device places the data from the last addressed CSR(from the previous transaction) onto the i2c_sda_o line.
 
    - ST_REGRDATAACK:
       - After a successful read, an acknowledgment is received.
@@ -271,6 +345,8 @@ I2C STATES:
 
    - ST_WTSTOP:
       - The slave enters this state if there are no more transactions or if the transfer is to be stopped.
+
+**Note**: The master can stop the communication at any point during any of the above states by sending a stop condition. Whenever a stop condition is received the I2C slave goes into IDLE state.
 
 System Architecture
 -------------------
@@ -287,88 +363,64 @@ The figure below depicts the connections between the I2C Slave and rest of the m
 Programming View Model
 ----------------------
 
-FIFO Usage
-~~~~~~~~~~
-The module employs two First-In, First-Out (FIFO) buffers to handle burst data transfer between the APB and I2C interfaces.
+CSR Interaction
+~~~~~~~~~~~~~~~
 
-  - I2C-to-APB FIFO: 
-      - Buffers data received from the I2C interface before it's read by the APB interface. 
-      - The I2C master needs to write data on the FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR, which is then pushed on this FIFO.
-      - The APB master can then read the FIFO_I2C_TO_APB_READ_DATA_PORT CSR in order to retrieve the data, which is then popped from the FIFO.
-      - There are read and write flag registers showing the current status of FIFO and can be accessed by both I2C and APB interfaces.
-  - APB-to-I2C FIFO: 
-      - Buffers data written by the APB interface before it's transmitted via the I2C interface.
-      - The APB master needs to write data on the FIFO_APB_TO_I2C_WRITE_DATA_PORT CSR, which is then pushed on this FIFO.
-      - The I2C master can then read the FIFO_APB_TO_I2C_READ_DATA_PORT CSR in order to retrieve the data, which is then popped from the FIFO.
-      - There are read and write flag registers showing the current status of FIFO and can be accessed by both I2C and APB interfaces.
+The CSRs are categorized based on their functionality:
 
-For details, please refer to the 'Firmware Guidelines'.
+1. **Configuration CSRs**:
 
+  - Used to set up the I2C Slave module, including device address, debounce length, and delay parameters.
+  - Example: `I2CS_DEV_ADDRESS`, `I2CS_ENABLE`, `I2CS_DEBOUNCE_LENGTH`.
 
-Data Flow
-~~~~~~~~~
+2. **FIFO Management CSRs**:
 
-Write Operation from I2C Master and Read from APB Master:
-  - I2C Master sends START condition(drives SDA line low when SCL is high)
-  - I2C Master sends device address with write bit (0)
-  - Slave acknowledges
-  - I2C Master sends CSR address
-      - MSG_I2C_TO_APB CSR for single byte
-      - FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR for multi-byte transfer
-  - Slave acknowledges
-  - I2C Master sends data byte
-  - Slave acknowledges
-  - I2C Master may send more data bytes with acknowledgment after each, or send STOP condition
-  - Flags and interrupt signals are updated accordingly.
-  - The APB master can read the data from the appropriate CSR
-      - MSG_I2C_TO_APB for single byte message
-      - FIFO_I2C_TO_APB_READ_DATA_PORT CSR for multi-byte transfer
-  - Flags and interrupt signals are updated accordingly.
+  - Facilitate data transfer between I2C and APB interfaces using FIFOs.
+  - Example: `FIFO_I2C_TO_APB_WRITE_DATA_PORT`, `FIFO_APB_TO_I2C_READ_DATA_PORT`.
 
+3. **Interrupt Control CSRs**:
 
-Write Operation from APB Master and Read from I2C Master:
-  - The APB master will write data on the appropriate CSR
-      - MSG_APB_TO_I2C for single byte message
-      - FIFO_APB_TO_I2C_WRITE_DATA_PORT CSR for multi-byte transfer
-  - Flags and interrupt signals are updated accordingly.
-  - I2C Master sends START condition
-  - I2C Master sends device address with write bit (0)
-  - Slave acknowledges
-  - I2C Master sends CSR address
-      - MSG_APB_TO_I2C for single byte message
-      - FIFO_APB_TO_I2C_READ_DATA_PORT CSR for multi-byte transfer
-  - Slave acknowledges
-  - I2C Master sends repeated START
-  - I2C Master sends device address with read bit (1)
-  - Slave acknowledges
-  - Slave sends data byte
-  - I2C Master sends ACK to request more data or NACK to indicate last byte
-  - I2C Master sends STOP condition
-  - Flags and interrupt signals are updated accordingly.
+  - Enable and configure interrupts for efficient communication.
+  - Example: `I2C_INTERRUPT_ENABLE`, `APB_INTERRUPT_ENABLE`.
 
-For details, please refer to the 'Firmware Guidelines'.
+4. **Status CSRs**:
 
-Interrupt Generation
+  - Provide real-time information about the module's state, including FIFO flags and interrupt status.
+  - Example: `FIFO_I2C_TO_APB_READ_FLAGS`, `I2C_INTERRUPT_STATUS`.
+
+Programming Guidelines
+~~~~~~~~~~~~~~~~~~~~~~
+
+1. **Initialization**:
+
+  - Configure the device address, debounce length, and delay parameters.
+  - Enable the I2C Slave module and flush FIFOs.
+
+2. **Data Transfer**:
+
+  - Use single-byte or multi-byte communication modes based on application requirements.
+  - Monitor FIFO flags to ensure proper data handling.
+
+3. **Interrupt Handling**:
+
+  - Enable interrupts for specific conditions.
+  - Service interrupts by reading/writing appropriate CSRs.
+
+4. **FIFO Management**:
+
+  - Flush FIFOs when necessary to reset their state.
+  - Monitor FIFO flags to prevent overflow or underflow.
+
+RX and TX Operations
 ~~~~~~~~~~~~~~~~~~~~
-The I2C Slave provides interrupt generation for both APB and I2C interfaces.
 
-The i2c_interrupt goes to the external I2C master device, and is generated in the following conditions:
-  - The availability of a new single-byte message from the APB to I2C.
-  - The write flags of the I2C-to-APB FIFO reaching certain levels (e.g., FIFO becoming full),
-    indicating how much space is currently available in FIFO.
-  - The read flags of the APB-to-I2C FIFO reaching certain levels (e.g., FIFO becoming empty),
-    indicating how much items APB master had written that the I2C master still has to process.
-  - Interrupts can be triggered for 8 different levels of both read and write flags, and these interrupt sources can be selectively enabled. 
+**RX Operation**:
+  - For single-byte RX, monitor the `MSG_I2C_TO_APB_STATUS` CSR for new message availability and read the data from `MSG_I2C_TO_APB`.
+  - For multi-byte RX, monitor the `FIFO_I2C_TO_APB_READ_FLAGS` CSR for available data and read from `FIFO_I2C_TO_APB_READ_DATA_PORT`.
 
-The apb_interrupt goes to the core complex block of CORE-V-MCU, and is generated in the following conditions:
-  - The availability of a new single-byte message from the I2C to APB.
-  - The write flags of the APB-to-I2C FIFO reaching certain levels (e.g., FIFO becoming full),
-    indicating how much space is currently available in FIFO.
-  - The read flags of the I2C-to-APB FIFO reaching certain levels (e.g., FIFO becoming empty),
-    indicating how much items I2C master had written that the APB master still has to process.
-  - Interrupts can be triggered for 8 different levels of both read and write flags, and these interrupt sources can be selectively enabled.
-
-For details, please refer to the 'Firmware Guidelines'.
+**TX Operation**:
+  - For single-byte TX, write the data to `MSG_APB_TO_I2C`.
+  - For multi-byte TX, monitor the `FIFO_APB_TO_I2C_WRITE_FLAGS` CSR for available space and write data to `FIFO_APB_TO_I2C_WRITE_DATA_PORT`.
 
 APB I2C Slave CSRs:
 --------------------
@@ -568,8 +620,8 @@ FIFO_I2C_TO_APB_WRITE_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
 +======================+==========+==================+==================+============+=============================+
-| I2C_APB_WRITE_DA     | 31:0     | --               | WO               | 0x0        | This is the write data port |
-| TA_PORT              |          |                  |                  |            | for the I2C to APB fifo.    |
+| I2C_APB_WRITE_DA     | 7:0      | --               | WO               | 0x0        | Not accessible by APB       |
+| TA_PORT              |          |                  |                  |            | interface                   |
 |                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | The I2C slave writes to this|
 |                      |          |                  |                  |            | CSR when it wants to send   |
@@ -591,8 +643,8 @@ FIFO_I2C_TO_APB_READ_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
 +======================+==========+==================+==================+============+=============================+
-| I2C_APB_READ_DA      | 31:0     | RO               | --               | 0x0        | This is the read data port  |
-| TA_PORT              |          |                  |                  |            | for the I2C to APB fifo.    |
+| I2C_APB_READ_DA      | 7:0      | RO               | --               | 0x0        | Not accessible by I2C       |
+| TA_PORT              |          |                  |                  |            | interface                   |
 |                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | The APB master reads from   |
 |                      |          |                  |                  |            | this CSR when it wants to   |
@@ -634,19 +686,30 @@ FIFO_I2C_TO_APB_WRITE_FLAGS
   - I2C Offset: 0x23
   - I2C type: volatile
 
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
-| Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
-+======================+==========+==================+==================+============+=============================+
-| RESERVED             | 7:3      | --               | --               | 0x0        | RESERVED                    |
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
-| FLAGS                | 2:0      | RO               | RO               | 0x0        | Represent the number of     |
-|                      |          |                  |                  |            | spaces left in I2C TO APB   |
-|                      |          |                  |                  |            | FIFO in flags format.       |
-|                      |          |                  |                  |            |                             |
-|                      |          |                  |                  |            | The flags range from 0 to 7 |
-|                      |          |                  |                  |            | indicating different levels |
-|                      |          |                  |                  |            | of available space in FIFO. |
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
++----------------------+----------+------------------+------------------+------------+-----------------------------------------+
+| Field                | Bits     | APB access type  | I2C access type  | Default    | Description                             |
++======================+==========+==================+==================+============+=========================================+
+| RESERVED             | 7:3      | --               | --               | 0x0        | RESERVED                                |
++----------------------+----------+------------------+------------------+------------+-----------------------------------------+
+| FLAGS                | 2:0      | RO               | RO               | 0x0        | Represent the number of                 |
+|                      |          |                  |                  |            | spaces left in I2C TO APB               |
+|                      |          |                  |                  |            | FIFO in flags format.                   |
+|                      |          |                  |                  |            |                                         |
+|                      |          |                  |                  |            | The flags range from 0 to 7             |
+|                      |          |                  |                  |            | indicating different levels             |
+|                      |          |                  |                  |            | of available space in FIFO.             |
+|                      |          |                  |                  |            |                                         |
+|                      |          |                  |                  |            | Flag Value descriptions:                |
+|                      |          |                  |                  |            |                                         |
+|                      |          |                  |                  |            | * 0b000: 128+ spaces available in FIFO  |
+|                      |          |                  |                  |            | * 0b001: 64-127 spaces available in FIFO|
+|                      |          |                  |                  |            | * 0b010: 32-63 spaces available in FIFO |
+|                      |          |                  |                  |            | * 0b011: 8-31 spaces available in FIFO  |
+|                      |          |                  |                  |            | * 0b100: 4-7 spaces available in FIFO   |
+|                      |          |                  |                  |            | * 0b101: 2-3 spaces available in FIFO   |
+|                      |          |                  |                  |            | * 0b110: 1 space available in FIFO      |
+|                      |          |                  |                  |            | * 0b111: FIFO is full                   |
++----------------------+----------+------------------+------------------+------------+-----------------------------------------+
 
 FIFO_I2C_TO_APB_READ_FLAGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -657,19 +720,30 @@ FIFO_I2C_TO_APB_READ_FLAGS
   - I2C Offset: 0x24
   - I2C type: volatile
 
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
-| Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
-+======================+==========+==================+==================+============+=============================+
-| RESERVED             | 7:3      | --               | --               | 0x0        | RESERVED                    |
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
-| FLAGS                | 2:0      | RO               | RO               | 0x0        | Represent the items         |
-|                      |          |                  |                  |            | present in FIFO to read in  |
-|                      |          |                  |                  |            | I2C TO APB FIFO in  flags   |
-|                      |          |                  |                  |            |                             |
-|                      |          |                  |                  |            | The flags range from 0 to 7 |
-|                      |          |                  |                  |            | indicating different levels |
-|                      |          |                  |                  |            | of items present in FIFO.   |
-+----------------------+----------+------------------+------------------+------------+-----------------------------+
++----------------------+----------+------------------+------------------+------------+-----------------------------------+
+| Field                | Bits     | APB access type  | I2C access type  | Default    | Description                       |
++======================+==========+==================+==================+============+===================================+
+| RESERVED             | 7:3      | --               | --               | 0x0        | RESERVED                          |
++----------------------+----------+------------------+------------------+------------+-----------------------------------+
+| FLAGS                | 2:0      | RO               | RO               | 0x0        | Represent the items               |
+|                      |          |                  |                  |            | present in FIFO to read in        |
+|                      |          |                  |                  |            | I2C TO APB FIFO in  flags         |
+|                      |          |                  |                  |            |                                   |
+|                      |          |                  |                  |            | The flags range from 0 to 7       |
+|                      |          |                  |                  |            | indicating different levels       |
+|                      |          |                  |                  |            | of items present in FIFO.         |
+|                      |          |                  |                  |            |                                   |
+|                      |          |                  |                  |            | Flag Value descriptions:          |
+|                      |          |                  |                  |            |                                   |
+|                      |          |                  |                  |            | * 0: FIFO is empty                |
+|                      |          |                  |                  |            | * 1: 1 item present in FIFO       |
+|                      |          |                  |                  |            | * 2: 2-3 items present in FIFO    |
+|                      |          |                  |                  |            | * 3: 4-7 items present in FIFO    |
+|                      |          |                  |                  |            | * 4: 8-31 items present in FIFO   |
+|                      |          |                  |                  |            | * 5: 32-63 items present in FIFO  |
+|                      |          |                  |                  |            | * 6: 64-127 items present in FIFO |
+|                      |          |                  |                  |            | * 7: 127+ items present in FIFO   |
++----------------------+----------+------------------+------------------+------------+-----------------------------------+
 
 FIFO_APB_TO_I2C_WRITE_DATA_PORT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -683,8 +757,8 @@ FIFO_APB_TO_I2C_WRITE_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
 +======================+==========+==================+==================+============+=============================+
-| I2C_APB_WRITE_DA     | 31:0     | WO               | --               | 0x0        | This is the write data      |
-| TA_PORT              |          |                  |                  |            | port for the APB to I2C FIFO|
+| I2C_APB_WRITE_DA     | 7:0      | WO               | --               | 0x0        | Not accessible by I2C       |
+| TA_PORT              |          |                  |                  |            | interface                   |
 |                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | The APB master writes to    |
 |                      |          |                  |                  |            | this CSR when it wants to   |
@@ -706,8 +780,8 @@ FIFO_APB_TO_I2C_READ_DATA_PORT
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 | Field                | Bits     | APB access type  | I2C access type  | Default    | Description                 |
 +======================+==========+==================+==================+============+=============================+
-| I2C_APB_READ_DA      | 31:0     | --               | RO               | 0x0        | This is the read data       |
-| TA_PORT              |          |                  |                  |            | port for the APB to I2C FIFO|
+| I2C_APB_READ_DA      | 7:0      | --               | RO               | 0x0        | Not accessible by APB       |
+| TA_PORT              |          |                  |                  |            | interface                   |
 |                      |          |                  |                  |            |                             |
 |                      |          |                  |                  |            | The I2C master reads from   |
 |                      |          |                  |                  |            | this CSR when it wants to   |
@@ -761,6 +835,11 @@ FIFO_APB_TO_I2C_WRITE_FLAGS
 |                      |          |                  |                  |            | The flags range from 0 to 7 |
 |                      |          |                  |                  |            | indicating different levels |
 |                      |          |                  |                  |            | of available space in FIFO. |
+|                      |          |                  |                  |            |                             |
+|                      |          |                  |                  |            | NOTE: For flag value        |
+|                      |          |                  |                  |            | description please refer to |
+|                      |          |                  |                  |            | FIFO_I2C_TO_APB_WRITE_FLAGS |
+|                      |          |                  |                  |            | CSR                         |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 FIFO_APB_TO_I2C_READ_FLAGS
@@ -784,6 +863,11 @@ FIFO_APB_TO_I2C_READ_FLAGS
 |                      |          |                  |                  |            | The flags range from 0 to 7 |
 |                      |          |                  |                  |            | indicating different levels |
 |                      |          |                  |                  |            | of items present in FIFO.   |
+|                      |          |                  |                  |            |                             |
+|                      |          |                  |                  |            | NOTE: For flag value        |
+|                      |          |                  |                  |            | description please refer to |
+|                      |          |                  |                  |            | FIFO_I2C_TO_APB_READ_FLAGS  |
+|                      |          |                  |                  |            | CSR                         |
 +----------------------+----------+------------------+------------------+------------+-----------------------------+
 
 I2C_INTERRUPT_STATUS
@@ -1234,48 +1318,33 @@ Initialization
 
   - Set the I2C device address in the I2C device address CSR.
   - Configure appropriate debounce and delay values for SCL and SDA lines through I2CS_DEBOUNCE_LENGTH, I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH registers.
-  - Enable the I2C interface by writing 1 to the I2C enable CSR.
   - Set the appropriate interrupt enable bits in the `APB_INTERRUPT_ENABLE` CSR for APB to I2C communication and `I2C_INTERRUPT_ENABLE` CSR for I2C to APB communication.
   - Configure the FIFO read flags and write flags in `INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT` and `INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT` CSRs respectively, to set the desired interrupt levels.
   - Flush the FIFOs by writing 1 to `FIFO_I2C_TO_APB_FLUSH` and `FIFO_APB_TO_I2C_FLUSH` CSRs to ensure they are empty before starting communication.
+  - Enable the I2C interface by writing 1 to the I2C enable CSR.
+
 
 Single-Byte Communication
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-APB Master Single-Byte Communication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Writing Data to I2C:**
+**TX Operation:**
   - Write the data byte to the `MSG_APB_TO_I2C` CSR.
 
-**Reading Data from I2C:**
+**RX Operation:**
   - Configure the `APB_INTERRUPT_ENABLE` CSR to enable the interrupt for new message availability (Bit 0).
   - Monitor the 'apb_interrupt_o' signal, the signal will be asserted when a new message is available or when the FIFO read flags match the specified pattern.
   - When the signal is asserted check the `MSG_I2C_TO_APB_STATUS` CSR's `NEW_I2C_APB_MSG_AVAIL` bit(Bit 0) to check if the interrupt was generated due to a new message.
   - If it was generated due to new message, read the data byte from the `MSG_I2C_TO_APB` CSR.
   - The status bit in `MSG_I2C_TO_APB_STATUS` is cleared automatically after the data is read.
 
-I2C Master Single-Byte Communication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Multi-Byte Communication
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Writing Data to APB:**
-  - Write the data byte to the `MSG_I2C_TO_APB` CSR.
-
-**Reading Data from APB:**
-  - Configure the `I2C_INTERRUPT_ENABLE` CSR to enable the interrupt for new message availability (Bit 0).
-  - Monitor the 'i2c_interrupt_o' signal, the signal will be asserted when a new message is available or when the FIFO read flags match the specified pattern.
-  - When the signal is asserted check the `MSG_APB_I2C_STATUS` CSR's `NEW_I2C_APB_MSG_AVAIL` bit(Bit 0) to check if the interrupt was generated due to a new message.
-  - If it was generated due to new message, read the data byte from the `MSG_APB_TO_I2C` CSR.
-  - The status bit in `MSG_APB_I2C_STATUS` is cleared automatically after the data is read.
-
-APB Master Multi-Byte Communication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Writing Data to I2C:**
+**TX Operation:**
   - Monitor the `FIFO_APB_TO_I2C_WRITE_FLAGS` CSR to ensure there is space available in the FIFO.
   - If space is available, write the data to the `FIFO_APB_TO_I2C_WRITE_DATA_PORT` CSR.
 
-**Reading Data from I2C:**
+**RX Operation:**
   - Configure the `APB_INTERRUPT_ENABLE` CSR to enable the interrupt for FIFO read flags (Bit 1).
   - Configure the `INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT` CSR to set the read flags for FIFO read interrupts, to the desired values.
       - For example, to generate an interrupt when there are 64-127 items available in the FIFO, set Bit 6 in `INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT`.
@@ -1283,24 +1352,6 @@ APB Master Multi-Byte Communication
   - Monitor the `apb_interrupt_o` signal, the signal will be asserted when the FIFO read flags match the specified pattern.
   - When the signal is asserted, check the `FIFO_I2C_TO_APB_READ_FLAGS` CSR to determine the number of items available in the FIFO.
   - Read the data from the `FIFO_I2C_TO_APB_READ_DATA_PORT` CSR.
-      - 8 Bits of data can be read at a time.
-      - Each read will pop the data from the FIFO and the next data will be available for reading on the CSR port.
-  - The FIFO status(flags) is updated automatically after the data is read.
-
-I2C Master Multi-Byte Communication
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Writing Data to APB:**
-  - Monitor the `FIFO_I2C_TO_APB_WRITE_FLAGS` CSR to ensure there is space available in the FIFO.
-  - If space is available, write the data to the `FIFO_I2C_TO_APB_WRITE_DATA_PORT` CSR.
-**Reading Data from APB:**
-  - Configure the `I2C_INTERRUPT_ENABLE` CSR to enable the interrupt for FIFO read flags (Bit 1).
-  - Configure the `INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT` CSR to set the read flags for FIFO read interrupts, to the desired values.
-      - For example, to generate an interrupt when there are 64-127 items available in the FIFO, set Bit 6 in `INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT`.
-      - Multiple bits can be set to generate interrupts for multiple levels of data availability.
-  - Monitor the `i2c_interrupt_o` signal, the signal will be asserted when the FIFO read flags match the specified pattern.
-  - When the signal is asserted, check the `FIFO_APB_TO_I2C_READ_FLAGS` CSR to determine the number of items available in the FIFO.
-  - Read the data from the `FIFO_APB_TO_I2C_READ_DATA_PORT` CSR.
       - 8 Bits of data can be read at a time.
       - Each read will pop the data from the FIFO and the next data will be available for reading on the CSR port.
   - The FIFO status(flags) is updated automatically after the data is read.
@@ -1318,54 +1369,6 @@ FIFO Operations
       - Use `FIFO_APB_TO_I2C_READ_FLAGS` CSR to check the current read flags for the APB to I2C FIFO.
       - Use `FIFO_I2C_TO_APB_WRITE_FLAGS` CSR to check the current write flags for the I2C to APB FIFO.
       - Use `FIFO_APB_TO_I2C_WRITE_FLAGS` CSR to check the current write flags for the APB to I2C FIFO.
-
-Read Flags
-^^^^^^^^^^
-The table below describes the meanings of the READ flags, which indicate the number of items currently present in the FIFO. The flag values can be checked using the `FIFO_I2C_TO_APB_READ_FLAGS` CSR (for I2C to APB FIFO) or `FIFO_APB_TO_I2C_READ_FLAGS` CSR (for APB to I2C FIFO):
-
-  +------------+----------------------------------+
-  | Flag Value | Description                      |
-  +============+==================================+
-  | 0b000      | FIFO is empty                    |
-  +------------+----------------------------------+
-  | 0b001      | 1 item present in FIFO           |
-  +------------+----------------------------------+
-  | 0b010      | 2-3 items present in FIFO        |
-  +------------+----------------------------------+
-  | 0b011      | 4-7 items present in FIFO        |
-  +------------+----------------------------------+
-  | 0b100      | 8-31 items present in FIFO       |
-  +------------+----------------------------------+
-  | 0b101      | 32-63 items present in FIFO      |
-  +------------+----------------------------------+
-  | 0b110      | 64-127 items present in FIFO     |
-  +------------+----------------------------------+
-  | 0b111      | 127+ items present in FIFO       |
-  +------------+----------------------------------+
-
-Write Flags
-^^^^^^^^^^^
-The table below describes the meanings of the WRITE flags, which indicate the number of spaces currently available in the FIFO. The flag values can be checked using the `FIFO_I2C_TO_APB_WRITE_FLAGS` CSR (for I2C to APB FIFO) or `FIFO_APB_TO_I2C_WRITE_FLAGS` CSR (for APB to I2C FIFO):
-
-  +------------+----------------------------------+
-  | Flag Value | Description                      |
-  +============+==================================+
-  | 0b000      | 128+ spaces available in FIFO    |
-  +------------+----------------------------------+
-  | 0b001      | 64-127 spaces available in FIFO  |
-  +------------+----------------------------------+
-  | 0b010      | 32-63 spaces available in FIFO   |
-  +------------+----------------------------------+
-  | 0b011      | 8-31 spaces available in FIFO    |
-  +------------+----------------------------------+
-  | 0b100      | 4-7 spaces available in FIFO     |
-  +------------+----------------------------------+
-  | 0b101      | 2-3 spaces available in FIFO     |
-  +------------+----------------------------------+
-  | 0b110      | 1 space available in FIFO        |
-  +------------+----------------------------------+
-  | 0b111      | FIFO is full                     |
-  +------------+----------------------------------+
 
 Interrupt Management
 ~~~~~~~~~~~~~~~~~~~~
