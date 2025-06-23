@@ -21,7 +21,7 @@ uDMA UART
 =========
 
 The uDMA UART (Universal Asynchronous Receiver/Transmitter) implements an asynchronous serial communication protocol for both transmission and reception of data. It is designed to provide a simple, efficient, and flexible interface for serial communication.
-Core-V-MCU CV32E40P (v1.0.0) has two uart instances. The uDMA Universal Asynchronous Receiver Transmitter supports most standard options for UART Tx/Rx.
+CORE-V-MCU has two uart instances. The uDMA Universal Asynchronous Receiver Transmitter supports most standard options for UART Tx/Rx.
 
 Features
 --------
@@ -93,6 +93,8 @@ A module transmitting the data to DC FIFO should drive the valid signal low to i
 During UART transmit (Tx) operation, the TX DC FIFO is read internally by the UART to transmit data to an external device and written by the TX FIFO.
 During UART receive (Rx) operation, the RX DC FIFO is written internally by the UART with the data received from the external device and read by the uDMA core or UART DATA register.
 
+Dual-clock (DC) TX and RX FIFO are transparent to users.
+
 TX FIFO
 ^^^^^^^
 
@@ -126,6 +128,8 @@ TX FIFO receives a GNT (gnt_i) signal from the uDMA core confirming that the req
 
 When it receives the valid signal from the uDMA core and the FIFO is not full, the TX FIFO pushes the data coming from the uDMA core. 
 TX tries to read data at each clock cycle until TX FIFO has space and a valid pin is high.
+
+TX FIFO is transparent to users.
 
 RX operation
 ^^^^^^^^^^^^
@@ -213,7 +217,11 @@ uDMA UART generates the following interrupts during the RX operation:
 - Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
 - Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
 
-Rx and Tx interrupts are automatically cleared by uDMA Core in the next clock cycle.
+The RX and TX channel interrupts are cleared by the uDMA core if any of the following conditions occur:
+
+- If a clear request for the RX or TX uDMA core channel is triggered via the CLR bitfield in the respective RX or TX CFG CSR of the uDMA UART.
+- If either the RX or TX uDMA channel is disabled via the CFG CSR of the uDMA UART, or if access is not granted by the uDMA core's arbiter.
+- If continuous mode is enabled for the RX or TX uDMA channel through the CFG CSR of the UART uDMA.
 
 The event bridge forwards interrupts over dedicated lines to the APB event controller for processing. Each interrupt has its own dedicated line.
 Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
@@ -365,7 +373,7 @@ TX_CFG
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Tx channel is enabled and is either receiving data,           |
 |            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Tx FIFO  |
-|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to read from L2 memory      |
+|            |       |        |            | - 0x0 : Tx channel of the uDMA core does not have data to read from L2 memory      |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | EN         |   4:4 |   RW   |    0x0     | Enable the transmit channel of uDMA core to perform Tx operation                   |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
