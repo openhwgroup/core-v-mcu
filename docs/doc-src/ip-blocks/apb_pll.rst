@@ -15,7 +15,7 @@
 
    Level 4
    ^^^^^^^
-.. _apb_fll_if:
+.. _apb_pll:
 
 APB PLL
 =======
@@ -124,13 +124,16 @@ Reset
 
 APB PLL can be reset in the following 3 ways:
 
-**Software Reset via Control Register**
+1. Software Reset via Control Register:
+
 When the RESET bitfield in the REG_CTL CSR is set to '1', only the PLL top module is reset. As a result, clock outputs to all dividers are driven to '0'.
 
-**Global Reset via HRESETn**
-When the HRESETn pin is deasserted (low), all configuration registers are reset, and the PLL top module is also reset. Consequently, clocks to all dividers are driven to '0'.
+2. Global Reset via HRESETn: 
 
-**Local Reset via rst_ni**
+When the HRESETn pin is deasserted (low), all CSRs are reset, and the PLL top module is also reset. Consequently, clocks to all dividers are driven to '0'.
+
+3. Local Reset via rst_ni:
+
 When the rst_ni pin is deasserted (low), all dividers and multiplexers (muxes) are reset. 
 In dividers, the counter and clock are driven to '0'.
 In mux, Bypass bit or select line is driven to '0'.
