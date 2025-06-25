@@ -68,7 +68,7 @@ These CSRs store the configuration for each GPIO pin, including:
 
 Open-Drain Operation
 ~~~~~~~~~~~~~~~~~~~~
-The GPIO module supports open-drain operation for every GPIO pin(will depend on the implementation technology). Open-drain is a specific output driver configuration where the GPIO pin can either pull the signal to ground (logic '0') or release it to a high-impedance state,
+The GPIO module supports open-drain operation for every GPIO output pin(will depend on the implementation technology). Open-drain is a specific output driver configuration where the GPIO pin can either pull the signal to ground (logic '0') or release it to a high-impedance state,
 but cannot actively drive it to a high voltage level (logic '1'). This configuration requires an external pull-up resistor to achieve a logic '1' state.
 
 The external pull-up resistor must be connected between the GPIO pin and the desired high-voltage level (VDD).
@@ -85,14 +85,14 @@ The output of the second flip-flop is the synchronized signal that is used by th
 
 Pin Direction Control
 ~~~~~~~~~~~~~~~~~~~~~
-All the GPIO pins are input by default. The GPIO module allows output and open-drain to be configured individually for each pin.
+GPIO have input, output, and open-drain pins. The GPIO module allows output and open-drain to be configured individually for each output pin.
 
-  - **Input**: The pin reads external signals and provides them to the system; this is the default state and cannot be disabled.
-  - **Output**: The pin drives external devices by setting the pin high or low; If output is enabled for a pin, then the output signals can also be read on the input pins.
+  - **Input**: The pin reads external signals.
+  - **Output**: The pin drives external devices by setting the pin high or low.
   - **Open-Drain**: The pin can pull the signal low or leave it in a high-impedance state, requiring an external pull-up resistor to achieve a high state.
 
-The pin configuration is controlled through the SETDIR CSR, which allows software to individually configure each pin—specifying whether output is enabled and whether the pin operates in open-drain mode.
-The direction/configuration of each of the 32 pins is also reflected in the gpio_dir output signal, which indicates whether output is enabled for each individual pin.
+The pin configuration is controlled through the SETDIR CSR, which allows software to individually configure each output pin—specifying whether output is enabled and whether the pin operates in open-drain mode.
+The direction/configuration of each of the 32 ouput pins is also reflected in the gpio_dir output signal, which indicates whether output is enabled for each individual pin.
 
 In case when a pin is configured as an open-drain output, the value of the gpio_dir signal will be opposite to the actual output value.
 For example, if the pin is configured as an open-drain output and the output value is high (1), the gpio_dir signal will indicate low (0).
@@ -103,8 +103,7 @@ GPIO Input
 - The GPIO module reads external signals through the gpio_in input signal.
 - The value of these signals post synchronisation is made available on the PIN0 CSR (address 0x010), allowing the software to read the status of the GPIO input pins.
 - Each bit in the PIN0 CSR corresponds to a GPIO pin(bit 0 for GPIO pin 0, bit 1 for GPIO pin 1, and so on), where a bit value of 1 indicates a high state and 0 indicates a low state.
-- In this register, if output is enabled for a pin, the value of the corresponding bit will be the same as driven on the output pin.
-- The synchronized input signals are then provided to the gpio_in_sync output signal, which is used by the Advanced Timer module for external event processing.
+- The synchronized input signals are also then provided to the gpio_in_sync output signal, which is used by the Advanced Timer module for external event processing.
 
 GPIO Output
 ~~~~~~~~~~~
@@ -117,7 +116,7 @@ GPIO Output
 - The SETGPIO CSR (address 0x000) sets a specified pin high.
 - The CLRGPIO CSR (address 0x004) sets a specified pin low.
 - The TOGGPIO CSR (address 0x008) toggles the state of a specified pin.
-- The gpio_out output signal reflects the current output state of the GPIO pins with output enabled.
+- The gpio_out output signal reflects the current output state of the GPIO pins with output enabled via DIR bitfield of SETDIR CSR.
 - If a output is not enabled for a pin, the corresponding bit in the OUT0 CSR will be 0, as the output value is not applicable for it.
  
 Interrupt Generation
@@ -126,7 +125,7 @@ This section describes how GPIO pins generate interrupts and the differences bet
 
 Interrupt Capability
 ^^^^^^^^^^^^^^^^^^^^
-GPIO pins can be used to receive interrupts from external devices. Since the output value is also reflected on the corresponding input pin, even software can trigger interrupts by driving a particular output pin.
+GPIO input pins can be used to receive interrupts from external devices. Since the output value is also reflected on the corresponding input pin, even software can trigger interrupts by driving a particular output pin.
 
 Interrupt Types
 ^^^^^^^^^^^^^^^
@@ -151,7 +150,7 @@ The interrupt type for each pin is configured through the SETINT CSR (address 0x
   - 1: Enable interrupt for the pin
 - The pin number is specified using bits [6:0], allowing the software to configure interrupts for individual pins.
 
-For example, to configure GPIO pin 0 for rising edge detection, the software would write the following values to the SETINT CSR:
+For example, to configure GPIO input pin 0 for rising edge detection, the software would write the following values to the SETINT CSR:
 
 ```
 SETINT = (0b010 << 17) | (1 << 16) | (0 << 6)
@@ -184,6 +183,7 @@ To prevent repeated triggering from persistent level conditions, the APB GPIO di
 The APB master must acknowledge the interrupt by writing to the INTACK CSR.  
 
 Once acknowledged, the GPIO can reassert the interrupt signal if the level condition still holds true.
+The above is only valid for level-triggered interrupts, as edge-triggered interrupts are automatically cleared after one clock cycle.
 
 System Architecture
 -------------------
@@ -511,9 +511,9 @@ GPIO Pin Configuration Procedure
 Configuring Pin Direction
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Direction of a pin can be configured by writing to the SETDIR CSR (address 0x038).
-  - To configure as input: All pins are input by default and the input cannot be disabled.
-  - To configure as output: Place a value of 1 in bit [24] along with the pin number in bits [6:0].
-  - To configure as open-drain: Place a value of 1 in bit [25] along with the pin number in bits [6:0].
+  - To configure gpio_in as input: All pins are input by default and the input cannot be disabled.
+  - To configure gpio_out as output: Place a value of 1 in bit [24] along with the pin number in bits [6:0].
+  - To configure gpio_out as open-drain: Place a value of 1 in bit [25] along with the pin number in bits [6:0].
 
 
 Configuring Interrupt Behavior
@@ -636,7 +636,7 @@ GPIO Data Signals
 - gpio_in[31:0]: External GPIO input values from the physical pins; provided by external devices.
 - gpio_in_sync[31:0]: Synchronized version of `gpio_in`, provides the external signals to Advanced timer block.
 - gpio_out[31:0]: Output values driven onto physical GPIO pins, if pin is configured as outputs; provided to external devices.
-- gpio_dir[31:0]: Direction control per pin; 1 = output, 0 = input (or high-impedance for open-drain); provided to external devices.
+- gpio_dir[31:0]: Direction control per pin; provided to external devices.
 
 Interrupt Signals
 ~~~~~~~~~~~~~~~~~
