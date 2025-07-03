@@ -25,7 +25,6 @@ It handles the routing and prioritization of events from peripherals to various 
 
 Features
 --------
-  - Centralized event handling system for CORE-V-MCU
   - Support for multiple event sources:
       - Peripheral events (up to 256 configurable inputs, 160 currently implemented)
       - APB-generated events (up to 32 events, 8 currently implemented)
@@ -36,7 +35,7 @@ Features
       - PR (Peripheral) events
   - Event masking capability for each output channel
   - Timer event generation with selectable event sources
-  - FIFO-based event buffering for each input event
+  - FIFO-based event buffering for each input event with FIFO overflow error reporting
   - Priority-based event arbitration
 
 Block Architecture
@@ -354,7 +353,7 @@ This ensures that after a request at position i is served, the request at positi
 Round-Robin and Parallel Prefix Relationship
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The round-robin priority scheme and parallel prefix algorithm are related but serve different purposes in this arbiter:
-  - The round-robin scheme defines the policy for updating priority after each grant, ensuring fairness over time.
+  - The round-robin scheme defines the policy for updating priority after each grant-ack, ensuring fairness over time.
   - The parallel prefix algorithm is the implementation technique that efficiently applies this policy to determine which request to grant at each cycle.
 
 Arbitration Process
@@ -378,24 +377,31 @@ Event Masking
       - 1 = Masked/Blocked (event will not be routed)
       - 0 = Enabled (event will be routed)
   - By default, all mask bits are set to 1 (masked), meaning no events are routed until explicitly configured.
-  - When an output is granted and the an output channel is ready, the event is routed only if the corresponding mask bit is 0 (unmasked) in the respective channel's mask CSR.
+  - When an output is granted and an output channel is ready, the event is routed only if the corresponding mask bit is 0 (unmasked) in the respective channel's mask CSR.
   - For example, let's say that an event from the GPIO peripheral needs to be routed to the cluster(eFPGA) channel, then the respective mask bit in the CL_MASK_* CSR must be set to 0 (unmasked) for that event ID and it should be set to 1 (masked) in the FC_MASK_* and PR_MASK_* CSRs to prevent routing to those channels.
 
 Output Event Processing
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The **Event Controller** handles the distribution of system events via three dedicated output channels. Each channel is independently managed and can receive any of the 169 input events, depending on configuration and runtime conditions.
+Each event is broadcasted to all channels simultaneously, a channel can ignore the event by masking the event using channel mask CSR.
 
 Output Channels Overview
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 - **FC Channel (Fabric Controller / Core Complex):**
-    - Routes high-priority events to the FC Event Unit through fc_events_o pin. *(Note: not connected in current implementation)*
-    - Valid Events are also buffered in a **FIFO** (First-In-First-Out) queue:
-        - **Depth:** 4 entries
-        - **Accessed via:** ``FIFO`` CSR
-    - Events are read by the Fabric Controller through the APB interface.
-    - The Core-Complex can acknowledge events by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 11``.
+
+FC Channel is responsible to communicate events to the Fabric Controller.
+The APB event controller use following approach to notify events to the Fabric Controller:
+
+  - Pin based high priority event notification: Routes high-priority events to the Fabric Controller through fc_events_o pin. This feature is not implemented in the current version hence out of scope for this manual.
+  - FIFO based event notification: Events are accumulated in FIFO and event_fifo_valid_o signal is raised to notify events to Fabric Controller. 
+
+Whenever a valid event is present for FC channel, it is pushed onto the FC FIFO. The FC FIFO is a 4-entry queue that holds events until they are read by the Fabric Controller.
+When an event is available is the FC FIFO, the APB event controller raises event_fifo_valid_o signal to the Fabric Controller. In response to the signal,  Fabric Controller can read the event ID through the FIFO CSR.
+Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
+The event is then popped from the FC FIFO and next event is placed on the FIFO CSR.
+The event_fifo_valid_o signal is deasserted once the FC FIFO is empty.
 
 - **CL Channel (Cluster / eFPGA):**
     - Intended for routing events to the cluster or eFPGA logic. *(Note: not connected in current implementation)*
@@ -424,17 +430,21 @@ The output routing for incoming events follows the steps below:
 
 3. **Event ID Placement on Output Channels:**
    - The **event ID** (based on its position in the input event vector) is provisionally placed on:
+
       - ``cl_event_data_o`` (eFPGA subsystem)
       - ``pr_event_data_o`` (uDMA subsystem)
       - FC FIFO (if space is available and the event is not masked)
 
 4. **Mask Register Evaluation:**
    - The event is checked against the **MASK CSRs** of each output channel:
+
       - ``FC_MASK_*``, ``CL_MASK_*``, and ``PR_MASK_*``
-   - If the event is **masked for all output channels**, it is **popped** from the queue. The controller proceeds to the next event.
+
+   - If the event is **masked for all output channels**, it is **popped** and **discarded** from the queue. The controller proceeds to the next event.
 
 5. **Output Channel Readiness Check:**
    - For each output channel where the event is **unmasked**, the controller checks if the corresponding channel is **ready**:
+
       - ``pr_event_ready_i`` for PR channel
       - ``cl_event_ready_i`` for CL channel
       - **FC Channel:** Ready if FIFO is not full
@@ -446,20 +456,31 @@ The output routing for incoming events follows the steps below:
 7. **Event Dequeueing (Pop):**
    - If any valid output channel has accepted the event, it is **popped** from the event queue.
 
-Fabric Controller Event Handling
---------------------------------
+FC FIFO
+~~~~~~~
 
-The Fabric Controller can read events as follows:
-- Whenever a valid event is present for FC channel, it is pushed onto the FC FIFO.
-- The FC FIFO is a 4-entry queue that holds events until they are read by the Fabric Controller.
-- The Core-Complex/Fabric Controller can read the FIFO through the ``FIFO`` CSR.
-- Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
-- The event is then popped from the FC FIFO and next event is placed on the ``FIFO`` CSR.
+The FC FIFO is a 4-entry queue, housed within the APB event controller, that holds events until they are read by the Fabric Controller. The FIFO is used to buffer events for the FC channel, allowing the controller to manage event flow efficiently.
+The FIFO is 8 bits wide and holds the event ID of the event that is being routed to the Fabric Controller.
+
+Push operation
+^^^^^^^^^^^^^^
+  - When an event is granted for the FC channel and the FIFO has available space, the event ID is pushed into the FC FIFO.
+  - The FIFO indicates that it has available space by asserting the grant_o signal. The grant_o is an internal signal and is not visible outside the APB event controller.
+  - When the FIFO is full, the grant_o signal is deasserted, indicating that no more events can be pushed into the FIFO until space becomes available.
+
+Pop Operation
+^^^^^^^^^^^^^
+  - The FIFO valid signal ``event_fifo_valid_o`` is asserted when there is at least one event in the FIFO, indicating that the Fabric Controller can read the event.
+  - The events on the top of the FIFO can be read by the Fabric Controller through the FIFO CSR.
+  - The Fabric Controller reads the event ID from the FIFO CSR and acknowledges the event by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
+  - Once the event is acknowledged, it is popped from the FIFO, and the next event (if any) is placed on the FIFO CSR.
+  - If the FIFO was full before the pop operation, the FIFO will now have space available, and the grant_o signal will be asserted again.
+  - The ``event_fifo_valid_o`` signal is deasserted when the FIFO is empty, indicating that there are no more events to read.
 
 Example: Routing a uDMA UART RX Event (Event ID 15) to Core Complex
 -------------------------------------------------------------------
 
-Let’s walk through an example where a **UART peripheral receives data**, triggering a **uDMA RX event** which needs to be routed to the Core-Complex/Fabric Controller (FC) for processing:
+Let’s walk through an example where a **UART peripheral receives data**, triggering a **uDMA RX event** which needs to be routed to the Fabric Controller (FC) for processing:
 
 **Source Event:**
 
@@ -476,24 +497,21 @@ Event Routing Flow:
     - Event 15 is captured and queued by the controller.
     - The arbiter processes all the available input events in the top of the 169 input event queues and eventually grants event 15(uDMA RX event) for output.
 
-3. **Event ID Placement:**
-    - Event ID 15 is placed on ``pr_event_data_o``, ``cl_event_data_o``.
+3. **Mask Evaluation:**
+    - ``FC_MASK_0``'s bit 15 is cleared (unmasked), meaning it is valid for the FC channel.
+    - ``PR_MASK_0``'s bit 15 and ``CL_MASK_0``'s bit 15 will be set(masked),as the event is only meant for Fabric Controller in this example.
 
-4. **Mask Evaluation:**
-    - ``FC_MASK_0``'s bit 15 is set (unmasked), meaning it is valid for the FC channel.
-    - ``PR_MASK_0``'s bit 15 and ``CL_MASK_0``'s bit 15 will be unset(masked),as the event is only meant for Core-Complex in this example.
-
-5. **Channel Readiness:**
+4. **Channel Readiness:**
     - If the FC FIFO has available space, then the FC channel is considered ready to accept event.
 
-6. **Valid Signal Assertion:**
+5. **Valid Signal Assertion:**
     - Because the granted event is unmasked for FC channel and the FIFO is ready to accept the event The event is popped from the internal event queue.
     - It is pushed into the FC FIFO.
     - The first event in the FC FIFO is placed on the ``FIFO`` CSR.
 
-7. **Core Reads Event:**
-    - The Core-Complex reads the event from the FC FIFO through the ``FIFO`` CSR.
-    - The event is acknowledged by the Core-Complex by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 11``.
+6. **Core Reads Event:**
+    - The Fabric Controller reads the event from the FC FIFO through the ``FIFO`` CSR.
+    - The event is acknowledged by the Fabric Controller by asserting ``core_irq_ack_i`` and setting ``core_irq_ack_id_i = 11``.
     - The event is then popped from the FC FIFO, and the next event is placed on the ``FIFO`` CSR.
 
 
@@ -1051,7 +1069,7 @@ Configuring Fabric Controller Output Events Interface
       - Each CSR controls 32 events, with FC_MASK_0 controlling events 0-31, FC_MASK_1 controlling events 32-63, and so on.
 
   - Monitor and Process FC Events through FIFO:
-      - Ensure that Core-Complex/Fabric Controller monitors the event_fifo_valid_o signal to detect when events are available in the FIFO.
+      - Ensure that Fabric Controller monitors the event_fifo_valid_o signal to detect when events are available in the FIFO.
       - Read the event ID from FIFO CSR using the APB interface when an event is available.
       - Acknowledge the event by asserting core_irq_ack_i and setting core_irq_ack_id_i to 11.
       - This acknowledgment mechanism ensures proper event consumption from the FIFO.
@@ -1135,10 +1153,10 @@ Peripheral Event Interface
 Fabric Controller Event Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   - fc_events_o[1:0]: Fabric control event output, directly connected to per_events_i[8:7] (Not connected in current implementation).
-  - core_irq_ack_id_i[4:0]: Core interrupt acknowledge ID input; provided by the Fabric Controller/Core-Complex
-  - core_irq_ack_i:  Core interrupt acknowledge input; provided by the Fabric Controller/Core-Complex
-  - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO; connected to Core-Complex/Fabric Controller
-  - err_event_o: Error event output, indicating queue overflow for any of the input events; connected to Core-Complex/Fabric Controller
+  - core_irq_ack_id_i[4:0]: Core interrupt acknowledge ID input; provided by the Fabric Controller
+  - core_irq_ack_i:  Core interrupt acknowledge input; provided by the Fabric Controller
+  - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO; connected to Fabric Controller
+  - err_event_o: Error event output, indicating queue overflow for any of the input events; connected to Fabric Controller
 
 Cluster Event Interface
 ~~~~~~~~~~~~~~~~~~~~~~~
