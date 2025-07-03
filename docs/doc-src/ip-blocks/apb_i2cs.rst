@@ -72,7 +72,7 @@ The I2C peripheral CSR houses the CSRs of the I2C Slave and drives the interrupt
 The Firmware can access theses CSRs via the APB interface and the external I2C master can access them via the I2C interface.
 The CSRs manage the I2C device address, enabling/disabling the I2C slave, and configuring timing parameters for I2C operations and FIFO management.
 The external I2C master needs to access the CSRs for different parameters related to transmitting such as interrupt configuration, checking FIFO status, and reading/writing data.
-Please refer to the :ref:``I2C Slave CSRs<i2c_slave_csr>`` section below for a detailed description of the CSRs.
+Please refer to the :ref:`I2C Slave CSRs<i2c_slave_csr>` section below for a detailed description of the CSRs.
 
 This module also instantiates two FIFOs:
 
@@ -448,7 +448,7 @@ Since the APB bus is of 32 bit, the APB addresses are 4x the I2C addresses.
 For example, the I2CS_ENABLE CSR is at APB address 0x4, but at I2C address 0x1.
 Similarly, the I2CS_SCL_DELAY_LENGTH CSR is at APB address 0xC, but at I2C address 0x3.
 
-Refer to :ref:``Memory Map <memory_map>`` for the peripheral domain address of the I2C Slave which is used for APB bus addressing.
+Refer to :ref:`Memory Map <memory_map>` for the peripheral domain address of the I2C Slave which is used for APB bus addressing.
 NOTE: Several of the I2C Slave CSR are volatile, meaning that their read value may be changed by the hardware.
 For example, writing the FIFO_I2C_TO_APB_FLUSH CSR the value will be ignored and the FIFO will be flushed, but reading the CSR will return 0x0.
 As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value written by the software.
