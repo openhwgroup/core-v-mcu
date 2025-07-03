@@ -41,12 +41,12 @@ Features
     - 256-byte FIFO depth for each direction
     - Read and write flags to monitor FIFO status.
     - FIFO flush capability
-- I2C enable/disable control
+- I2C operations enable/disable control
 
 Block Architecture
 ------------------
 
-I2C slave contains i2c slave interface and APB slave interface.
+I2C slave contains I2C slave interface and APB slave interface.
 There are FIFOs and CSRs for handling communication with external
 I2C controllers.
 
@@ -84,7 +84,7 @@ Both FIFOs are 256 bytes deep and 8 bits wide, allowing for efficient burst data
 
 **I2C Slave INTERFACE**
 
-It handles all I2C protocol operations, including detecting Start and Stop conditions, address recognition, data transmission and reception,
+It handles all I2C protocol operations, including detecting start and stop conditions, address recognition, data transmission and reception,
 sending ACK/NACK signals, and managing the timing of the SDA (Serial Data) and SCL (Serial Clock) lines with built-in line filtering.
 Communication with the external I2C master occurs over these two lines, forming the I2C bus. 
 The module exchanges information with the internal I2C Peripheral CSR block and drives or samples data on the SDA line in coordination with SCL timing, in response to master requests.
@@ -96,14 +96,14 @@ The module exchanges information with the internal I2C Peripheral CSR block and 
 - i2c_sda_oe: Output enable signal that indicates when i2c_sda_o is actively driving the SDA line. This signal is asserted (high) when the slave is transmitting data.
 
 **Relationship Between I2C and APB Interfaces**
-The role of both the I2C and the APB interfaces is to handle their respective communication protocols and facilitate data transfer between the I2C master and the APB master (CORE-V-MCU core complex) 
+The role of both the I2C and the APB interfaces is to handle their respective communication protocols and facilitate data transfer between the I2C master and the APB master (CORE-V-MCU Core-Complex) 
 through the CSRs housed in the I2C Peripheral CSR block. 
 
 I2C Device Address
 ~~~~~~~~~~~~~~~~~~
 
 The I2C slave device address is a 7-bit address that identifies the slave device on the I2C bus.
-The I2C slave module allows the configuration of this address through the I2CS_DEV_ADDRESS CSR.
+The I2C slave module allows the configuration of this address through the ``I2CS_DEV_ADDRESS`` CSR.
 When an I2C master sends a START condition followed by the device address, the I2C slave checks if the received address matches the configured address in CSR.
 If it matches, the I2C slave acknowledges the address and proceeds with the transaction; otherwise, it ignores the transaction and remains idle.
 
@@ -116,7 +116,7 @@ Debounce Length
 The I2C slave module includes a debounce mechanism to filter out noise on the SDA and SCL lines. 
 Debouncing is the process of ensuring that a signal is stable before it is considered valid i.e., it prevents false triggering due to noise or glitches on the I2C lines.
 It is particularly important in I2C communication, where the SDA and SCL lines can be susceptible to noise, especially in electrically noisy environments.
-The debounce length is configurable through the I2CS_DEBOUNCE_LENGTH CSR, which specifies the number of system clock cycles over which the I2C lines should be debounced.
+The debounce length is configurable through the ``I2CS_DEBOUNCE_LENGTH`` CSR, which specifies the number of system clock cycles over which the I2C lines should be debounced.
 
 **Note**: In the current implementation the debounce length is not used.
 
@@ -124,10 +124,10 @@ SCL and SDA Delay Length
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Delay length is the sampling rate of the SCL and SDA lines, this is used to filter out noise on the I2C lines.
-The I2C Slave uses counters that count up to these delay values at every clock cycle before sampling the SCL and SDA lines. Only when the counter reaches the specified delay length does it take a new sample of the respective I2C line.
-If the SCL or SDA line remain stable for 3 consecutive samples, the I2C Slave considers the line stable and valid for processing.
+The I2C slave uses counters that count up to these delay values at every clock cycle before sampling the SCL and SDA lines. Only when the counter reaches the specified delay length does it take a new sample of the respective I2C line.
+If the SCL or SDA line remain stable for 3 consecutive samples, the I2C slave considers the line stable and valid for processing.
 This creates a low-pass filtering effect that removes high-frequency noise while preserving the actual I2C signal transitions.
-The SCL and SDA length can be configured through the I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH CSRs respectively.
+The SCL and SDA length can be configured through the ``I2CS_SCL_DELAY_LENGTH`` and ``I2CS_SDA_DELAY_LENGTH`` CSRs respectively.
 
 **Configuration:**
   - Shorter delay lengths = faster sampling = less filtering (suitable for clean, high-speed buses)
@@ -140,43 +140,43 @@ The I2C Slave module facilitates seamless communication between the I2C and APB 
 
 Single-Byte TX Operation flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - APB master writes data to MSG_APB_TO_I2C CSR.
-  - Status bit in MSG_APB_TO_I2C_STATUS CSR is set by hardware.
-  - Output interrupt i2c_interrupt_o is raised if the interrupt is enabled in the I2C_INTERRUPT_ENABLE CSR and associated bit in I2C_INTERRUPT_STATUS is set.
-  - I2C master initiates a read request over the bus with the address of MSG_APB_TO_I2C CSR, requesting the data of the CSR.
-  - I2C slave responds to this request by retrieving the data from the MSG_APB_TO_I2C CSR and putting it on the I2C bus, delivering it to the master.
-  - Status bit in MSG_APB_TO_I2C_STATUS and I2C_INTERRUPT_STATUS is cleared by hardware and the interrupt is lowered.
+  - APB master writes data to ``MSG_APB_TO_I2C`` CSR.
+  - Status bit in ``MSG_APB_TO_I2C_STATUS`` CSR is set by hardware.
+  - Output interrupt ``i2c_interrupt_o`` is raised if the interrupt is enabled in the ``I2C_INTERRUPT_ENABLE`` CSR and associated bit in ``I2C_INTERRUPT_STATUS`` is set.
+  - I2C master initiates a read request over the bus with the address of ``MSG_APB_TO_I2C CSR``, requesting the data of the CSR.
+  - I2C slave responds to this request by retrieving the data from the ``MSG_APB_TO_I2C`` CSR and putting it on the I2C bus, delivering it to the external I2C master.
+  - Status bit in ``MSG_APB_TO_I2C_STATUS`` and ``I2C_INTERRUPT_STATUS`` is cleared by hardware and the ``i2c_interrupt_o`` signal is lowered.
 
 Single-Byte RX Operation flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - I2C master initiates a write request with the addrress of MSG_I2C_TO_APB CSR and the data to be written.
-  - I2C slave retrives the CSR address and data from the bus and writes it to the respective CSR(MSG_I2C_TO_APB CSR in this case).
-  - Status bit in MSG_I2C_TO_APB_STATUS CSR is set by hardware.
-  - Output interrupt apb_interrupt_o is raised if the interrupt is enabled in the APB_INTERRUPT_ENABLE CSR and associated bit in APB_INTERRUPT_STATUS is set.
-  - APB master reads MSG_I2C_TO_APB CSR to retrieve data.
-  - Status bit in MSG_I2C_TO_APB_STATUS and APB_INTERRUPT_STATUS is cleared by hardware and the interrupt is lowered.
+  - I2C master initiates a write request with the addrress of ``MSG_I2C_TO_APB`` CSR and the data to be written.
+  - I2C slave retrives the CSR address and data from the APB bus and writes it to the respective CSR( ``MSG_I2C_TO_APB`` CSR in this case).
+  - Status bit in ``MSG_I2C_TO_APB_STATUS`` CSR is set by hardware.
+  - Output interrupt ``apb_interrupt_o`` is raised if the interrupt is enabled in the ``APB_INTERRUPT_ENABLE`` CSR and associated bit in ``APB_INTERRUPT_STATUS`` is set.
+  - APB master reads ``MSG_I2C_TO_APB`` CSR to retrieve data.
+  - Status bit in ``MSG_I2C_TO_APB_STATUS`` and ``APB_INTERRUPT_STATUS`` is cleared by hardware and the ``apb_interrupt_o`` signal is lowered.
 
 FIFO-Based Multi-Byte TX Operation flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - APB master writes data to FIFO_APB_TO_I2C_WRITE_DATA_PORT CSR.
+  - APB master writes data to ``FIFO_APB_TO_I2C_WRITE_DATA_PORT`` CSR.
   - The data is pushed in the APB to I2C FIFO by the hardware.
-  - FIFO status is reflected in FIFO_APB_TO_I2C_WRITE_FLAGS CSR.
-  - Interrupt can be generated based on FIFO status.
-  - I2C master initiates a read request over the bus with the address of FIFO_APB_TO_I2C_READ_DATA_PORT CSR, requesting the data of the CSR.
-  - I2C slave responds to this request by retrieving the data from the FIFO_APB_TO_I2C_READ_DATA_PORT CSR and putting it on the I2C bus, delivering it to the master.
+  - FIFO status is reflected in ``FIFO_APB_TO_I2C_WRITE_FLAGS`` CSR.
+  - Interrupt can be generated based on FIFO status and interrupt configuration.
+  - External I2C master initiates a read request over the bus with the address of ``FIFO_APB_TO_I2C_READ_DATA_PORT`` CSR, requesting the data of the CSR.
+  - I2C slave responds to this request by retrieving the data from the ``FIFO_APB_TO_I2C_READ_DATA_PORT`` CSR and putting it on the I2C bus, delivering it to the external I2C master.
   - The data is popped from the APB to I2C FIFO by the hardware.
-  - FIFO status is updated in FIFO_APB_TO_I2C_READ_FLAGS CSR.
+  - FIFO status is updated in ``FIFO_APB_TO_I2C_READ_FLAGS`` CSR.
 
 FIFO-Based Multi-Byte RX Operation flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  - I2C master initiates a write request with the addrress of FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR and the data to be written.
-  - I2C slave retrives the CSR address and data from the bus and writes it to the respective CSR(FIFO_I2C_TO_APB_WRITE_DATA_PORT CSR in this case).
+  - External I2C master initiates a write request with the addrress of ``FIFO_I2C_TO_APB_WRITE_DATA_PORT`` CSR and the data to be written.
+  - I2C slave retrives the CSR address and data from the bus and writes it to the respective CSR(``FIFO_I2C_TO_APB_WRITE_DATA_PORT`` CSR in this case).
   - The data is pushed in the I2C to APB FIFO by the hardware.
-  - FIFO status is reflected in FIFO_I2C_TO_APB_WRITE_FLAGS CSR.
-  - Interrupt can be generated based on FIFO status.
-  - APB master reads data from FIFO_I2C_TO_APB_READ_DATA_PORT CSR.
+  - FIFO status is reflected in ``FIFO_I2C_TO_APB_WRITE_FLAGS`` CSR.
+  - Interrupt can be generated based on FIFO status and interrupt configuration.
+  - APB master reads data from ``FIFO_I2C_TO_APB_READ_DATA_PORT`` CSR.
   - The data is popped from the I2C to APB FIFO by the hardware.
-  - FIFO status is updated in FIFO_I2C_TO_APB_READ_FLAGS CSR.
+  - FIFO status is updated in ``FIFO_I2C_TO_APB_READ_FLAGS`` CSR.
 
 **Note**: Refer to the I2C states section below for a detailed understanding of I2C operations.
 
@@ -207,20 +207,24 @@ The I2C Slave module provides comprehensive interrupt support for both the I2C a
 I2C Interface Interrupts
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The `i2c_interrupt_o` signal is generated for the external I2C master device. The following conditions can trigger this interrupt:
+The `i2c_interrupt_o` signal is asserted for the external I2C master device to notify of specific coniditons being met. The following conditions can trigger this interrupt:
 
 - Availability of a new single-byte message from the APB to the I2C interface via MSG_APB_TO_I2C CSR.
 - Write flags of the I2C-to-APB FIFO reaching specific levels configured via INTERRUPT_FIFO_I2C_TO_APB_WRITE_FLAGS_SELECT CSR, indicating available space in the FIFO.
 - Read flags of the APB-to-I2C FIFO reaching specific levels configured via INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT CSR, indicating pending data for the I2C master to process.
 
+The `i2c_interrupt_o` signal is deasserted once the external I2C master has performed the necessary read/write operations to clear the interrupt condition.
+
 APB Interface Interrupts
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The `apb_interrupt_o` signal is generated for the CORE-V-MCU core complex. The following conditions can trigger this interrupt:
+The `apb_interrupt_o` signal is asserted for the CORE-V-MCU Core-Complex to notify of specific coniditons being met. The following conditions can trigger this interrupt:
 
 - Availability of a new single-byte message from the I2C to the APB interface via MSG_I2C_TO_APB CSR.
 - Write flags of the APB-to-I2C FIFO reaching specific levels configured via INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT CSR, indicating available space in the FIFO.
 - Read flags of the I2C-to-APB FIFO reaching specific levels configured via INTERRUPT_FIFO_APB_TO_I2C_READ_FLAGS_SELECT CSR, indicating pending data for the APB master to process.
+
+The `apb_interrupt_o` signal is deasserted once the CORE-V-MCU Core-Complex has performed the necessary read/write operations to clear the interrupt condition.
 
 Interrupt Configuration and Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -229,9 +233,9 @@ Interrupt Configuration and Handling
 - The interrupt status can be monitored using the `I2C_INTERRUPT_STATUS` and `APB_INTERRUPT_STATUS` CSRs.
 - Specific interrupt conditions for FIFO read and write flags can be configured using the `INTERRUPT_FIFO_I2C_TO_APB_*_FLAGS_SELECT` and `INTERRUPT_FIFO_APB_TO_I2C_*_FLAGS_SELECT` CSRs.
 - Once an interrupt is triggered, it is automatically cleared when the corresponding condition(message availability, read flag, write flag) is resolved, ensuring efficient interrupt management.
-    - If an interrupt is triggered due to a new single-byte message, the status bit in the respective CSR (MSG_I2C_TO_APB_STATUS or MSG_APB_TO_I2C_STATUS) is cleared by hardware when the message is read by the firmware via MSG_I@C_TO_APB CSR or by the external device via MSG_APB_TO_I2C CSR.
-    - If an interrupt is triggered due to FIFO read flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_READ_FLAGS or FIFO_APB_TO_I2C_READ_FLAGS) is cleared by hardware when the FIFO is read until the the read flags change state.
-    - If an interrupt is triggered due to FIFO write flags, the status bit in the respective CSR (FIFO_I2C_TO_APB_WRITE_FLAGS or FIFO_APB_TO_I2C_WRITE_FLAGS) is cleared by hardware when the FIFO is written until the write flags change state.
+    - If an interrupt is triggered due to a new single-byte message, the status bit in the respective CSR (`MSG_I2C_TO_APB_STATUS` or `MSG_APB_TO_I2C_STATUS`) is cleared by hardware when the message is read by the firmware via `MSG_I2C_TO_APB` CSR or by the external device via `MSG_APB_TO_I2C` CSR.
+    - If an interrupt is triggered due to FIFO read flags, the status bit in the respective CSR (`FIFO_I2C_TO_APB_READ_FLAGS` or `FIFO_APB_TO_I2C_READ_FLAGS`) is cleared by hardware when the FIFO is read until the the read flags change state.
+    - If an interrupt is triggered due to FIFO write flags, the status bit in the respective CSR (`FIFO_I2C_TO_APB_WRITE_FLAGS` or `FIFO_APB_TO_I2C_WRITE_FLAGS`) is cleared by hardware when the FIFO is written until the write flags change state.
 
 I2C Operation
 ~~~~~~~~~~~~~
@@ -241,6 +245,11 @@ These conditions are signaled by the I2C master and recognized by all devices co
 
   - START Condition: A Start condition is generated by the master to initiate communication. It is defined by a high-to-low transition on the SDA line while the SCL line remains high. This signals all connected devices to listen for an incoming address and possible data.
   - STOP Condition: A Stop condition is generated by the master to terminate communication. It is defined by a low-to-high transition on the SDA line while the SCL line remains high. This indicates the end of the current transfer and releases the bus for other operations.
+
+The I2C protocol also enforces the use of ACK (Acknowledge) and NACK (Not Acknowledge) signals to confirm successful data transmission.
+
+  - ACK: After each byte of data is sent, the receiving device must acknowledge receipt by pulling the SDA line low during the next clock pulse. This indicates that the data was received successfully.
+  - NACK: If a device does not acknowledge receipt of data, it leaves the SDA line high during the next clock pulse. This indicates that either the device is not ready to receive more data or that there is no more data to send.
 
 An important aspect of the I2C slave module is that the I2C master must be aware of the CSR (Control and Status Register) addresses within the slave in order to enable proper communication—such as sending single-byte messages from the I2C master to the APB master, configuring I2C interrupts, and other control operations.
 
@@ -252,40 +261,40 @@ The frame format differs slightly depending on whether the master intends to per
 
 I2C Write Frame
 ^^^^^^^^^^^^^^^
-Used when the master writes data to a slave CSR (e.g., CSR access).
+Used when the I2C master writes data to a I2C slave CSR (e.g., CSR access).
 
 **Format**::
 
-    [START] → [Slave Address + Write (0)] → [ACK] → [CSR Address]
+    [START] → [I2C Slave Address + Write (0)] → [ACK] → [CSR Address]
     → [ACK] → [Data Byte(s)] → [ACK] → [STOP]
 
 **Description**:
 
-- **START**: Initiated by the master to signal the beginning of a transfer.
-- **Slave Address + Write Bit (0)**: 7-bit address followed by a 0 bit indicating a write.
-- **ACK**: Acknowledge from the slave.
-- **CSR Address**: Address of the CSR within the slave(e.g. MSG_I2C_TO_APB CSR).
+- **START**: Initiated by the I2C master to signal the beginning of a transfer.
+- **I2C Slave Address + Write Bit (0)**: 7-bit address followed by a 0 bit indicating a write.
+- **ACK**: Acknowledge from the I2C slave.
+- **CSR Address**: Address of the CSR within the I2C slave(e.g. `MSG_I2C_TO_APB CSR`).
 - **Data Byte(s)**: One or more bytes of data to be written.
 - **STOP**: Indicates the end of the transfer.
 
 I2C Read Frame
 ^^^^^^^^^^^^^^
-Used when the master reads data from a CSR inside the slave.
+Used when the I2C master reads data from a CSR inside the I2C slave.
 
 **Format**::
 
-    [START] → [Slave Address + Write (0)] → [ACK] → [CSR Address] → [ACK] 
-    → [STOP] → [START] → [Slave Address + Read (1)] → [ACK] 
+    [START] → [I2C Slave Address + Write (0)] → [ACK] → [CSR Address] → [ACK] 
+    → [STOP] → [START] → [I2C Slave Address + Read (1)] → [ACK] 
     → [Data Byte(s)] → [NACK] → [STOP]
 
 **Description**:
 
-- The master first writes the **CSR address** it wants to read from(e.g. MSG_APB_TO_I2C CSR).
+- The I2C master first writes the **CSR address** it wants to read from(e.g. `MSG_APB_TO_I2C CSR`).
 - A **STOP** condition is issued after writing the CSR address.
 - A new **START** condition is then initiated to begin the read phase.
-- The master sends the slave address with the **Read bit (1)**.
-- The slave responds with data byte(s).
-- The master sends **NACK** after the final byte to indicate the end of reading.
+- The I2C master sends the I2C slave address with the **Read bit (1)**.
+- The I2C slave responds with data byte(s).
+- The I2C master sends **NACK** after the final byte to indicate the end of reading.
 - **STOP** concludes the transaction.
 
 Notes
@@ -304,53 +313,53 @@ I2C STATES
 
 - I2C slave has 10 states, :
 
-   - ST_IDLE:
+   - **ST_IDLE**:
       - Initially, the slave is in this state.
       - The slave may also return to this state if a STOP condition is detected.
 
-   - ST_DEVADDR:
+   - **ST_DEVADDR**:
       - The slave enters this state after detecting the START sequence and when I2C is enabled through the I2C enable CSR.
       - The slave receives the device address and transfer type (read/write).
-      - 8 bits are sent by the master over the SDA line(i2c_sda_i), in which the first 7 represents the I2C slave device address and the 8th bit represents transfer type(1: Read, 0: Write).
+      - 8 bits are sent by the master over the SDA line(`i2c_sda_i`), in which the first 7 represents the I2C slave device address and the 8th bit represents transfer type(1: Read, 0: Write).
       - If the received device address does not match the configured address in the I2C device address CSR, the slave stops processing and the transaction is ignored. 
 
-   - ST_DEVADDRACK:
+   - **ST_DEVADDRACK**:
       - The slave enters this state after successfully validating the I2C device address and sends an acknowledgment.
       - i2c_sda_o is driven low to indicate a successful acknowledgement.
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
       - A read operation sets the I2C state to ST_REGRDATA.
       - A write operation sets the I2C state to ST_REGADDR.
 
-   - ST_REGADDR:
+   - **ST_REGADDR**:
       - The slave comes to this state when the master writes the CSR address.
-      - The I2C master sends the address of the target CSR located inside the I2C slave device over the SDA line(i2c_sda_i). 
+      - The I2C master sends the address of the target CSR located inside the I2C slave device over the SDA line(`i2c_sda_i`). 
       - The slave receives this address to determine which CSR the master intends to write to.
 
-   - ST_REGADDRACK:
+   - **ST_REGADDRACK**:
       - After successfully receiving the CSR address, the slave enters this state and sends an acknowledgment.
       - i2c_sda_o is driven low to indicate a successful acknowledgement.
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
-   - ST_REGWDATA:
+   - **ST_REGWDATA**:
       - The slave enters this state if the master wants to write data to CSR.
-      - Master sends the data to be written to the CSR over the SDA line(i2c_sda_i).
+      - Master sends the data to be written to the CSR over the SDA line(`i2c_sda_i`).
       - The slaves receives the data and then writes it to the intended CSR.
 
-   - ST_REGWDATAACK:
+   - **ST_REGWDATAACK**:
       - After successfully writing the data, an acknowledgment bit is sent.
       - i2c_sda_o is driven low to indicate a successful acknowledgment.
       - The acknowledgment is released by driving i2c_sda_o high before a new transfer.
 
-   - ST_REGRDATA:
+   - **ST_REGRDATA**:
       - The slave enters this state if the master wants to read data from CSR.
       - The slave device places the data from the CSR, whose addressed was received in the previous ST_REGADDR phase, onto the i2c_sda_o line.
 
-   - ST_REGRDATAACK:
+   - **ST_REGRDATAACK**:
       - After a successful read, an acknowledgment is received.
       - If a negative acknowledgment is received, the transfer stops.
       - If a successful acknowledgement is received, then I2C state is set to ST_REGRDATA, and more data is read.
 
-   - ST_WTSTOP:
+   - **ST_WTSTOP**:
       - The slave enters this state if there are no more transactions or if the transfer is to be stopped.
 
 **Note**: The master can stop the communication at any point during any of the above states by sending a stop condition. Whenever a stop condition is received the I2C slave goes into IDLE state.
@@ -439,7 +448,7 @@ Since the APB bus is of 32 bit, the APB addresses are 4x the I2C addresses.
 For example, the I2CS_ENABLE CSR is at APB address 0x4, but at I2C address 0x1.
 Similarly, the I2CS_SCL_DELAY_LENGTH CSR is at APB address 0xC, but at I2C address 0x3.
 
-Refer to  :ref:`Memory Map <memory_map>` for the peripheral domain address of the I2C Slave which is used for APB bus addressing.
+Refer to :ref:`Memory Map <memory_map>` for the peripheral domain address of the I2C Slave which is used for APB bus addressing.
 NOTE: Several of the I2C Slave CSR are volatile, meaning that their read value may be changed by the hardware.
 For example, writing the FIFO_I2C_TO_APB_FLUSH CSR the value will be ignored and the FIFO will be flushed, but reading the CSR will return 0x0.
 As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value written by the software.
@@ -1326,11 +1335,11 @@ Initialization
 ~~~~~~~~~~~~~~~
 
   - Set the I2C device address in the I2C device address CSR.
-  - Configure appropriate debounce and delay values for SCL and SDA lines through I2CS_DEBOUNCE_LENGTH, I2CS_SCL_DELAY_LENGTH and I2CS_SDA_DELAY_LENGTH CSRs.
+  - Configure appropriate debounce and delay values for SCL and SDA lines through `I2CS_DEBOUNCE_LENGTH`, `I2CS_SCL_DELAY_LENGTH` and `I2CS_SDA_DELAY_LENGTH` CSRs.
   - Set the appropriate interrupt enable bits in the `APB_INTERRUPT_ENABLE` CSR for APB to I2C communication and `I2C_INTERRUPT_ENABLE` CSR for I2C to APB communication.
   - Configure the FIFO read flags and write flags in `INTERRUPT_FIFO_I2C_TO_APB_READ_FLAGS_SELECT` and `INTERRUPT_FIFO_APB_TO_I2C_WRITE_FLAGS_SELECT` CSRs respectively, to set the desired interrupt levels.
   - Flush the FIFOs by writing 1 to `FIFO_I2C_TO_APB_FLUSH` and `FIFO_APB_TO_I2C_FLUSH` CSRs to ensure they are empty before starting communication.
-  - Enable the I2C interface by writing 1 to the I2C enable CSR.
+  - Enable the I2C interface by writing 1 to the `I2CS_ENABLE` CSR.
 
 
 Single-Byte Communication
@@ -1341,7 +1350,7 @@ Single-Byte Communication
 
 **RX Operation:**
   - Configure the `APB_INTERRUPT_ENABLE` CSR to enable the interrupt for new message availability (Bit 0).
-  - Monitor the 'apb_interrupt_o' signal, the signal will be asserted when a new message is available or when the FIFO read flags match the specified pattern.
+  - Monitor the `apb_interrupt_o` signal, the signal will be asserted when a new message is available or when the FIFO read flags match the specified pattern.
   - When the signal is asserted check the `MSG_I2C_TO_APB_STATUS` CSR's `NEW_I2C_APB_MSG_AVAIL` bit(Bit 0) to check if the interrupt was generated due to a new message.
   - If it was generated due to new message, read the data byte from the `MSG_I2C_TO_APB` CSR.
   - The status bit in `MSG_I2C_TO_APB_STATUS` is cleared automatically after the data is read.
@@ -1444,4 +1453,4 @@ I2C Interface Signals
 Interrupt Signals
 ~~~~~~~~~~~~~~~~~
   - i2c_interrupt_o: I2C interrupt request output, connects to external I2C master
-  - apb_interrupt_o: APB interrupt request output, connects to Core Complex 
+  - apb_interrupt_o: APB interrupt request output, connects to Core-Complex 
