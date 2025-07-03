@@ -563,7 +563,7 @@ Programming Interface
 APB Event Control CSR
 ---------------------
 
-Refer to  `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the APB Event Controller.
+Refer to :ref:`Memory Map <memory_map>` for peripheral domain address of the APB Event Controller.
 
 The APB Event Controller has a 4KB address space and the CSR interface designed using the APB protocol. There are 24 32-bit CSRs for event masking, 8 CSRs each for FC, CL and PR channels i.e. 256 bits per channel, giving the ability to mask 256 events per channel. 
 However, only 169 events are implemented in the current version of the design, Hence only the first 169 bits across the 8 CSRs (from 0th to 5th CSR) of the mask CSRs are functional.
@@ -574,7 +574,7 @@ For example, the ERR_0 CSR will specify if any of queue for event IDs 0-31 have 
 As the name suggests, the value of non-volatile CSRs is not changed by the hardware. These CSRs retain the last value writen by software.
 A CSRs volatility is indicated by its "type".
 
-Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
+Details of CSR access type are explained :ref:`here <memory_map>`.
 
 EVENT    
 ~~~~~
