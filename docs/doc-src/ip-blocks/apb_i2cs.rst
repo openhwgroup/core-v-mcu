@@ -62,12 +62,14 @@ The figure below is a high-level block diagram of the I2C Slave:-
 
 Below is a brief description of the 3 sub-modules:
 
-**APB Slave Interface**
+APB Slave Interface
+~~~~~~~~~~~~~~~~~~~
 
 Responsible for APB communication: passing information to and from the I2C CSR module through the APB interface.
 It handles the APB protocol, including address decoding, data transfer, and control signal generation.
 
-**I2C Peripheral CSR**
+I2C Peripheral CSR
+~~~~~~~~~~~~~~~~~~
 
 The I2C peripheral CSR houses the CSRs of the I2C Slave and drives the interrupt port for APB and I2C. The CSRs are common to both the APB and I2C interfaces.
 The Firmware can access theses CSRs via the APB interface and the external I2C master can access them via the I2C interface.
@@ -83,7 +85,8 @@ This module also instantiates two FIFOs:
 
 Both FIFOs are 256 bytes deep and 8 bits wide, allowing for efficient burst data transfer between the I2C and APB interfaces.
 
-**I2C Slave INTERFACE**
+I2C Slave Interface
+~~~~~~~~~~~~~~~~~~~
 
 It handles all I2C protocol operations, including detecting start and stop conditions, address recognition, data transmission and reception,
 sending ACK/NACK signals, and managing the timing of the SDA (Serial Data) and SCL (Serial Clock) lines with built-in line filtering.
@@ -96,7 +99,8 @@ The module exchanges information with the internal I2C Peripheral CSR block and 
 - i2c_sda_o: Carries the output data from the slave to the I2C master.
 - i2c_sda_oe: Output enable signal that indicates when i2c_sda_o is actively driving the SDA line. This signal is asserted (high) when the slave is transmitting data.
 
-**Relationship Between I2C and APB Interfaces**
+Relationship Between I2C and APB Interfaces
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The role of both the I2C and the APB interfaces is to handle their respective communication protocols and facilitate data transfer between the I2C master and the APB master (CORE-V-MCU Core-Complex) 
 through the CSRs housed in the I2C Peripheral CSR block. 
 
@@ -1458,6 +1462,13 @@ I2C Interface Signals
   - i2c_sda_i: I2C data input
   - i2c_sda_o: I2C data output
   - i2c_sda_oe: I2C data output enable (active high)
+
+**Note:** At the top level of the CORE-V-MCU, these internal I2C signals map to two external I2C signals provided through IO pads:
+
+- ``i2c_scl_i`` connects directly to ``i2cs_scl`` (clock line)
+- ``i2cs_sda`` (data line) is formed by combining ``i2c_sda_i`` and ``i2c_sda_o``, where ``i2c_sda_oe`` controls the direction:
+  - When ``i2c_sda_oe`` is high: ``i2cs_sda`` outputs ``i2c_sda_o``
+  - When ``i2c_sda_oe`` is low: ``i2cs_sda`` feeds into ``i2c_sda_i``
 
 Interrupt Signals
 ~~~~~~~~~~~~~~~~~
