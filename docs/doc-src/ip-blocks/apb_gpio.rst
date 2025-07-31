@@ -85,18 +85,38 @@ The output of the second flip-flop is the synchronized signal that is used by th
 
 Pin Direction Control
 ~~~~~~~~~~~~~~~~~~~~~
-GPIO have input, output, and open-drain pins. The GPIO module allows output and open-drain to be configured individually for each output pin.
+It is assumed, but not required, that each GPIO pin of the CORE-V-MCU is
+implemented as a bi-directional signal. To enable this, each GPIO signal is
+associated with three ports of the GPIO module:
 
-  - **Input**: The pin reads external signals.
-  - **Output**: The pin drives external devices by setting the pin high or low.
-  - **Open-Drain**: The pin can pull the signal low or leave it in a high-impedance state, requiring an external pull-up resistor to achieve a high state.
+ - **gpio_in**
+ - **gpio_out**
+ - **gpio_dir**
 
-The pin configuration is controlled through the SETDIR CSR, which allows software to individually configure each output pin—specifying whether output is enabled and whether the pin operates in open-drain mode.
-The direction/configuration of each of the 32 ouput pins is also reflected in the gpio_dir output signal, which indicates whether output is enabled for each individual pin.
+These ports are required to be connected to the appropriate IO PADS provided by
+the ASIC or FPGA implementation technology. The purpose of the `gpio_in` and
+`gpio_out` ports is self explainatory, and each can be read or written via CSRs
+(see `APB GPIO CSRs` below). The function of `gpio_dir` is determined by the
+implementation technology. The GPIO module allows `gpio_dir` to be configured
+individually for each output pin, via the two-bit `DIR` field of the `SETDIR`
+CSR. Below is a truth table that illustrates how `SETDIR` allows software to
+configure the value of `gpio_dir`.
 
-In case when a pin is configured as an open-drain output, the value of the gpio_dir signal will be opposite to the actual output value.
-For example, if the pin is configured as an open-drain output and the output value is high (1), the gpio_dir signal will indicate low (0).
-Similarly, if the pin is configured as an open-drain output and the output value is low (0), the gpio_dir signal will indicate high (1).
++-------------+-----------+
+| SETDIR[DIR] | gpio_dir  |
++=============+===========+
+| 2'b00       | 0         |
++-------------+-----------+
+| 2'b01       | 1         |
++-------------+-----------+
+| 2'b10       | !gpio_out |
++-------------+-----------+
+| 2'b11       | !gpio_out |
++-------------+-----------+
+
+Typically, `gpio_dir` is used to drive an active-low output enable of an IO PAD.
+In such cases, writing `SETDIR[DIR][1]` to 1'b0 means that software can write
+`SETDIR[DIR][0]` to enable or disable the output driver of the IO PAD.
 
 GPIO Input
 ~~~~~~~~~~
