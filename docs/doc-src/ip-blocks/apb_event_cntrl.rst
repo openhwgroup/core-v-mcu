@@ -288,7 +288,7 @@ Each input event is allocated an ID. The below table shows the mapping of the ev
 Note: per_events_i[36:111] are not used in current implementation and are not connected anywhere thereby being in an undefined state.
 
 The APB event controller maintains an event queue per event source to store the event from that source.
-Each queue can hold up to 4 events, this means, APB event controller has 169 queues, each having a depth of 4.
+Each queue can hold up to 3 events, this means, APB event controller has 169 queues, each having a depth of 3.
 The APB Timer uses ERR_* CSR to reports errors when a queue overflows occurs and new events of that source will be missed and the err_event_o signal is also asserted to indicate the same.
 A read to the ERR_* CSR can clear the ERR_* CSR and deasserts the err_event_o signal.
 
@@ -373,11 +373,11 @@ Push Operation
 Pop Operation
 ^^^^^^^^^^^^^
   - The FIFO valid signal ``event_fifo_valid_o`` is asserted when there is at least one event in the FIFO, indicating that the Fabric Controller can read the event.
-  - The events in the FIFO can be read by the Fabric Controller through the FIFO CSR.
-  - The Fabric Controller reads the event ID from the FIFO CSR and acknowledges the event by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
-  - Once the event is acknowledged, it is popped from the FIFO, and the next event (if any) is placed on the FIFO CSR.
-  - If the FIFO is full, the grant_o signal is deasserted currently. When the Fabric Controller reads the event and acknowledges it, the event is popped from the FIFO, since the FIFO now has available space, the grant_o signal is asserted again.
-  - The ``event_fifo_valid_o`` signal is deasserted when the FIFO is empty, indicating that there are no more events to read.
+  - The events in the FIFO are exposed to the Fabric Controller through the FIFO CSR.
+  - The Fabric Controller must first acknowledge the interrupt by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``. This signals readiness to process the interrupt.
+  - Once the acknowledgment is received, the event on the top of the FIFO is placed on the FIFO CSR and popped from the FIFO.
+  - If the FIFO was previously full, deassertion of ``grant_o`` prevents new events from being written. After the event is acknowledged and popped, space becomes available, and ``grant_o`` is asserted again.
+  - The ``event_fifo_valid_o`` signal is deasserted when the FIFO becomes empty, indicating there are no more events to read.
 
 Event Routing Process
 ^^^^^^^^^^^^^^^^^^^^^
