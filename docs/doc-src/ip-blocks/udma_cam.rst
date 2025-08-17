@@ -474,9 +474,6 @@ Rx Operation
 - For each transaction:
    - Update uDMA camera's ``RX_SADDR CSR`` with an interleaved(L2) memory address. camera will write the data to the this memory address for transmission.
    - Configure uDMA camera's ``RX_SIZE`` CSR with the size of data that camera needs to transmit. uDMA camera will copy the transmit RX_SIZE bytes of data to RX_SADDR location of interleaved memory.
-- While Rx operation is ongoing, the ``RX_BUSY`` bit of the ``STATUS`` CSR will be set.
-- Upon receiving the data from external device uDMA camera will set the ``RX_DATA_VALID`` bit to high.
-- Received data can also be read using the ``RX_DATA`` CSR. When there is no valid data, the ``RX_DATA_VALID`` bit will be cleared.
 
 Pin Diagram
 -----------
@@ -569,7 +566,7 @@ Camera clock interface
 
 - cam_clk_i
 
-External device derives the clock pins. clk_i is used to synchronize Camera with the exteral device.
+External device derives the clock pins. cam_clk_i is used to synchronize Camera with the exteral device.
 
 Camera frame interface
 ^^^^^^^^^^^^^^^^^^^^^^
