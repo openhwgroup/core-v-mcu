@@ -33,8 +33,7 @@ The major limitation is the lack of support for the full duplex transfers.
 
 Features
 --------
-- Supports SPI mode
-- Supports quad SPI mode
+- Supports both standard SPI and quad SPI mode. The default mode of operation is standard SPI mode.
 - Supports half-duplex
 - Supports interrupts to notify end of receive and transmit operation from L2 memory.
 - Support lsb-first or msb-first operation.
@@ -139,7 +138,7 @@ The actions of the QSPI controller are controlled using a sequence of commands. 
 +=====================+========+================================================================================================+
 | SPI_CMD_CFG         | 0x0    | Configures SPI clock using CPOL, CPHA, and CLKDIV fields.                                      |
 +---------------------+--------+------------------------------------------------------------------------------------------------+
-| SPI_CMD_SOT         | 0x1    | Asserts the Chip Select (CS) line to initiate a transfer.                                      |
+| SPI_CMD_SOT         | 0x1    | Asserts the Chip Select (CS) line to initiate SPIM operation.                                  |
 +---------------------+--------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_SEND_CMD    | 0x2    | Sends a command word of up to 16 bits on the MOSI line.                                        |
 +---------------------+--------+------------------------------------------------------------------------------------------------+
@@ -220,12 +219,10 @@ Commands are engraved in 28th to 31st bit of 32-bit of command data. 32-bit comm
 |                      |        | 0x0: Transmit MSB first                                      |
 |                      |        | 0x1: Transmit LSB first                                      |
 +----------------------+--------+--------------------------------------------------------------+
-| DATA_SIZE            | 19:16  | Command size in bits (N-1)                                   |
-|                      |        | e.g., 0x7 = 8-bit command                                    |
+| COMMAND_DATA_SIZE    | 19:16  | Command size in bits (N-1), e.g., 0x7 = 8-bit command        |
 +----------------------+--------+--------------------------------------------------------------+
-| DATA_VALUE           | 15:0   | Command data to transmit                                     |
-|                      |        | MSB must always be aligned to bit 15                         |
-|                      |        | if command size is less than 16 bits                         |
+| COMMAND_DATA         | 15:0   | Command data to transmit. MSB must always be aligned to bit  |
+|                      |        | 15 if command size is less than 16 bits.                      |
 +----------------------+--------+--------------------------------------------------------------+
 
 +---------------------------+--------+------------------------------------------------------------------+
@@ -416,12 +413,10 @@ Commands are engraved in 28th to 31st bit of 32-bit of command data. 32-bit comm
 
 The Rx and Tx channels of the uDMA core can be configured using either the channel configuration CSRs or the SPI_CMD_SETUP_UCA/SPI_CMD_SETUP_UCS commands. Both methods have equal priority, and any new update will overwrite the previous configuration.
 
-The uDMA controller operates with the help of uDMA SPIM controller whose primary job is to: -
+The uDMA QSPI operates with the help of uDMA SPIM controller whose primary job is to: -
 
 - interact with uDMA Core for L2 memory communications.
-- Configure Tx and Rx modules to perfiorm SPI operation with the external device.
-
-When uDMA QSPI recievd 
+- Configure Tx and Rx modules of uDMA QSPI to perfiorm SPI operation with the external device.
 
 RX operation
 ^^^^^^^^^^^^
@@ -430,11 +425,14 @@ The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 0 dur
 The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_RX_DATA command.
 The input pins, spi_sdiX_o{X = 0 to 3}, will be read based on the LSB field value of the SPI_CMD_RX_DATA command. If LSB is set to 0, then spi_sdi0_o will reflect msb bit else it reflects lsb bit of recived data.
 
+uDMA QSPI after reading the desired number of bits, asserts valid signal of RX DC FIFO. RC DC FIFO when it has enough space samples the data lines at every clock cycle provided that the valid line is asserted.
+RX DC FIFO, when it has data and ready signal is high, asserts the valid line and drive data lines with the data. uDMA core after receiving the valid signal, reads the data and store it into L2 memory.
+
 TX operation
 ^^^^^^^^^^^^
-
-The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx oeration.
+After receing the tx_start signal, uDMA QSPI reads the valid signal. If the valid signal is high then it reads the data lines else it waits for valid signal to go high. After reading the from data lines and confirming assertion of ts_start signal it transmits the data over output, spi_sdoX_o{X = 0 to 3}, lines.
 The uDMA QSPI can be configured to perform either quad SPI transfer(4 bit per cycle) or standard SPI transfer(1 bit per cycle) depending on values of QPI field of SPI_CMD_TX_DATA command.
+The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx oeration. In standard spi mode spi_oe0_o and spi_sdo0_o pins are used, whereas in quad SPI mode all spi_oeX_o{X = 0 to 3} and spi_sdoX_o{X = 0 to 3} pins are used.
 The output pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_TX_DATA command. If LSB is set to 0, then spi_sdo0_o will be updated with msb bit else it is updated with lsb bit of transmit data.
 
 Full duplex operation
