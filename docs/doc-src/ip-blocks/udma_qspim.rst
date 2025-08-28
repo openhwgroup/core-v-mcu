@@ -819,7 +819,6 @@ Clock Enable, Reset & Configure uDMA QSPI
 - Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA QSPI's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA QSPI.
 - Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA QSPI. It acts as a soft reset for uDMA QSPI.
 - Configure QSPI Operation using  SETUP CSR. Refer to the CSR details for detailed information.
-- The DIV bit of QSPI SETUP should be updated with a non-zero value as it is used for buadrate calculation. The baud rate is determined by the period of the ref_clk divided by the value of DIV.
 
 Tx Operation
 ^^^^^^^^^^^^
@@ -839,6 +838,20 @@ The Figure below is a high-level pin diagram of the uDMA:-
    uDMA QSPI Pin Diagram
 
 Below is categorization of these pins:
+
+CMD Tx channel interface
+^^^^^^^^^^^^^^^^^^^^
+The following pins constitute the CMD Tx channel interface of uDMA QSPI. uDMA QSPI uses these pins to read commands from interleaved (L2) memory:
+
+- cmd_req_o
+- cmd_gnt_i
+- cmd_datasize_o
+- cmd_i
+- cmd_valid_i
+- cmd_ready_o
+
+cmd_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
+
 
 Tx channel interface
 ^^^^^^^^^^^^^^^^^^^^
@@ -885,10 +898,9 @@ uDMA QSPI receieves software events generated used in APB event register externa
 
 uDMA QSPI interface to generate interrupt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-- rx_char_event_o
-- err_event_o
+- spi_eot_o
 
-Overflow and Parity error are generated over err_event_o interface. Receive data event will be generated over rx_char_event_o interface.
+uDMA QSPI generates an end of transfer after completion of Tx/Rx operation.
 
 uDMA QSPI inerface to read-write CSRs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -923,6 +935,28 @@ uDMA QSPI Rx channel configuration interface
 
    These values are updated by the uDMA core and reflects the configuration values for the current ongoing transactions.
 
+uDMA QSPI Tx channel cmd-configuration interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- uDMA QSPI uses the following pins to share the value of config CSRs i.e. CMD_SADDR, CMD_SIZE, and CMD_CFG with the uDMA core:-
+
+   - cfg_cmd_startaddr_o
+   - cfg_cmd_size_o
+   - cfg_cmd_datasize_o
+   - cfg_cmd_continuous_o
+   - cfg_cmd_en_o
+   - cfg_cmd_clr_o
+
+  cfg_cmd_datasize_o pin is stubbed.
+
+- QSPI shares the values present over the below pins as read values of the config CSRs i.e. CMD_SADDR, CMD_SIZE, and CMD_CFG:
+
+   - cfg_cmd_en_i
+   - cfg_cmd_pending_i
+   - cfg_cmd_curr_addr_i
+   - cfg_cmd_bytes_left_i
+
+   These values are updated by the uDMA core and reflects the configuration values for the current ongoing transactions.
+
 uDMA QSPI Tx channel configuration interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - uDMA QSPI uses the following pins to share the value of config CSRs i.e. TX_SADDR, TX_SIZE, and TX_CFG with the uDMA core:-
@@ -947,19 +981,29 @@ uDMA QSPI Tx channel configuration interface
 
 uDMA QSPI protocol interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**input pins**
    - spi_sdi0_i
    - spi_sdi1_i
    - spi_sdi2_i
    - spi_sdi3_i
+
+**Ouput clock**
    - spi_clk_o
+
+**Chip select pins**
    - spi_csn0_o
    - spi_csn1_o
    - spi_csn2_o
    - spi_csn3_o
+
+**Output enable pins**
    - spi_oe0_o
    - spi_oe1_o
    - spi_oe2_o
    - spi_oe3_o
+
+**output pins**
    - spi_sdo0_o
    - spi_sdo1_o
    - spi_sdo2_o
@@ -967,3 +1011,13 @@ uDMA QSPI protocol interface
 
    These SPI signals represent a quad-SPI interface with 4 data lines (spi_sdi[0–3]_i for input, spi_sdo[0–3]_o for output, and spi_oe[0–3]_o for output enable).
    It uses a shared clock (spi_clk_o) and four chip select signals (spi_csn[0–3]_o) to control multiple SPI devices independently.
+
+
+Test Interface
+^^^^^^^^^^^^^^
+
+- dft_test_mode_i: Design-for-test mode signal
+- dft_cg_enable_i: Clock gating enable during test
+
+*dft_test_mode_i* is used to put uDMA Camera into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
+*dft_cg_enable_i* pin is not used in the uDMA camera block.
