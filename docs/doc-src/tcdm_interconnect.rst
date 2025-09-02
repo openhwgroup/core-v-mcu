@@ -29,8 +29,14 @@ For more details about TCDM interconnect refer `here <https://github.com/openhwg
 
 Block Architecture
 ~~~~~~~~~~~~~~~~~~
-The figure below shows a high-level block diagram of the TCDM Interconnect. The main components include the L2 Interconnect Demux, Contiguous Crossbar, Interleaved Crossbar, and AXI Bridge.
-The L2 Interconnect Demux identifies the target slave region and routes the request to either the appropriate Crossbar or the AXI Bridge. Internally, both the Crossbars and the AXI Bridge use 
+The TCDM interconnect supports 9 master ports and 9 slave ports. The figure below shows a high-level block diagram of the interconnect, highlighting its main components:
+ 
+- L2 Interconnect Demux
+- Contiguous Crossbar
+- Interleaved Crossbar
+- AXI Bridge
+
+The L2 Interconnect Demux identifies the target slave region and routes the request to appropriate destination - either one of the Crossbars or the AXI Bridge. Internally, both the Crossbars and the AXI Bridge use 
 address decoders and arbiters to direct requests to the correct slave.
 
 .. figure:: ../images/TCDM_Interconnect_block_diagram.png
@@ -40,7 +46,7 @@ address decoders and arbiters to direct requests to the correct slave.
 
    **TCDM Interconnect block diagram**
 
-The TCDM interconnect supports 9 master ports and 9 slave ports.
+
    
 **Masters:** 
 
@@ -57,7 +63,7 @@ The TCDM interconnect supports 9 master ports and 9 slave ports.
 - APB peripheral interconnect
 - eFPGA APB Target
 
-Master-Slave Communication via TCDM Demux
+TCDM (L2 Interface) Demux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The uDMA SS, eFPGA, and Core Complex masters connect to the TCDM Demux, which is responsible for routing requests to the correct slave. The slaves fall into three categories based on address regions:
 
