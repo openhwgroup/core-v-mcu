@@ -68,7 +68,7 @@ The Figure below is a high-level block diagram of the uDMA SDIO:-
 
    uDMA SDIO Block Diagram
 
-In the block diagram above, the DATA lines at the boundary of the uDMA SDIO are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x0. The valid values for the DATASIZE pin are: -
+In the block diagram above, the DATA lines at the boundary of the uDMA SDIO are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x2. The valid values for the DATASIZE pin are: -
 
 - 0x0: 1-byte transfer
 - 0x1: 2-byte transfer
@@ -471,10 +471,10 @@ CMD_OP
 | RSP_TYPE  | 2:0    | W      | 0x0        | Response type expected for the issued operation. This 3-bit field   |
 |           |        |        |            | defines the format or presence of the response data.                |
 |           |        |        |            |                                                                     |
-|           |        |        |            |  - 3'b001: RSP_TYPE_48_CRC , response length will be 48 bit long.       |
-|           |        |        |            |  - 3'b010: RSP_TYPE_48_NOCRC , response length will be 48 bit long.     |
-|           |        |        |            |  - 3'b011: RSP_TYPE_136 , response length will be 136 bit long.         |
-|           |        |        |            |  - 3'b100: RSP_TYPE_48_BSY , response length will be 48 bit long.       |
+|           |        |        |            |  - 3'b001: RSP_TYPE_48_CRC , response length will be 48 bit long.   |
+|           |        |        |            |  - 3'b010: RSP_TYPE_48_NOCRC , response length will be 48 bit long. |
+|           |        |        |            |  - 3'b011: RSP_TYPE_136 , response length will be 136 bit long.     |
+|           |        |        |            |  - 3'b100: RSP_TYPE_48_BSY , response length will be 48 bit long.   |
 |           |        |        |            |                                                                     |
 +-----------+--------+--------+------------+---------------------------------------------------------------------+
 
@@ -514,7 +514,7 @@ DATA_SETUP
 |             |        |        |            | a read operation.                                                   |
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 | EN          | 0:0    | W      | 0x0        | Enable bit. When set to `1`, triggers the start of the configured   |
-|             |        |        |            | transfer. Must be cleared and reset for each new command.           |
+|             |        |        |            | transfer.                                                           |
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 
 REG_START
@@ -522,13 +522,11 @@ REG_START
 - Offset: 0x2C
 - Type:   non-volatile
 
-+--------+--------+--------+------------+---------------------------------------------------------------------+
-| Field  | Bits   | Access | Default    | Description                                                         |
-+========+========+========+============+=====================================================================+
-| START  | 0:0    | W      | 0x0        | Start bit. Writing `1` to this bit initiates the operation          |
-|        |        |        |            | configured by the preceding control fields. This bit is typically   |
-|        |        |        |            | self-cleared by hardware once the operation begins.                 |
-+--------+--------+--------+------------+---------------------------------------------------------------------+
++--------+--------+--------+------------+------------------------------------------------------------------------------+
+| Field  | Bits   | Access | Default    | Description                                                                  |
++========+========+========+============+==============================================================================+
+| START  | 0:0    | W      | 0x0        | Start bit. Writing `1` to this bit initiates the commdand transmit operation |
++--------+--------+--------+------------+------------------------------------------------------------------------------+
 
 REG_RSP0
 ^^^^^^^^
@@ -540,7 +538,6 @@ REG_RSP0
 +=========+=======+========+============+====================================================================+
 |   DATA  |  31:0 |   R    |     0x0    |  Represents the 31:0 bits of RSP data                              |
 +---------+-------+--------+------------+--------------------------------------------------------------------+
-
 
 REG_RSP1
 ^^^^^^^^
@@ -616,14 +613,14 @@ STATUS
 |         |       |        |            | - Bits [23:22] and [31:30] are reserved and should be ignored by software.  |
 |         |       |        |            |      They hold no functional meaning and may be read as zero or undefined.  |
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
-|  ERR    | 1:1   |  RWC   |   0x0      |  Writing any value other than 0x0 clears the bit. Indicates error either    |
+|  ERR    | 1:1   |  RWC   |   0x0      |  Writing any value clears the bit. Indicates error either                   |
 |         |       |        |            |  during data or commdand-response reception.                                |
 |         |       |        |            |                                                                             |
 |         |       |        |            |   - 0x0: STATUS bifield is 0x0                                              |
 |         |       |        |            |   - 0x1: STATUS bitfield is non zero                                        |
 |         |       |        |            |                                                                             |
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
-|  EOT    | 0:0   |  RWC   |   0x0      |  Writing any value other than 0x0 clears the bit.                           |
+|  EOT    | 0:0   |  RWC   |   0x0      |  Writing any value clears the bit.                                          |
 |         |       |        |            |                                                                             |
 |         |       |        |            |  - 0x1: End of transmission (data or command) or reception                  |
 |         |       |        |            |                                                                             |
