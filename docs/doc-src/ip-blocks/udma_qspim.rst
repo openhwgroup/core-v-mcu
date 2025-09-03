@@ -850,8 +850,7 @@ The following pins constitute the CMD Tx channel interface of uDMA QSPI. uDMA QS
 - cmd_valid_i
 - cmd_ready_o
 
-cmd_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
-
+cmd_datasize_o pin is hardcoded to value 0x10. These pins reflect the configuration values for the next transaction.
 
 Tx channel interface
 ^^^^^^^^^^^^^^^^^^^^
@@ -864,7 +863,7 @@ The following pins constitute the Tx channel interface of uDMA QSPI. uDMA QSPI u
 - data_tx_valid_i
 - data_tx_ready_o
 
-data_tx_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
+These pins reflect the configuration values for the next transaction.
 
 Rx channel interface
 ^^^^^^^^^^^^^^^^^^^^
@@ -875,7 +874,7 @@ The following pins constitute the Rx channel interface of uDMA QSPI. uDMA QSPI u
 - data_rx_valid_o
 - data_rx_ready_i
 
- data_rx_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
+ These pins reflect the configuration values for the next transaction.
 
 Clock interface
 ^^^^^^^^^^^^^^^
@@ -894,7 +893,7 @@ uDMA QSPI interface to receive events from uDMA core
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - spi_event_i
 
-uDMA QSPI receieves software events generated used in APB event register external QSPI device on QSPI_rx_i and transmits via QSPI_tx_o.
+uDMA QSPI receives software events generated using APB event generator IP.
 
 uDMA QSPI interface to generate interrupt
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -919,12 +918,9 @@ uDMA QSPI Rx channel configuration interface
 
    - cfg_rx_startaddr_o
    - cfg_rx_size_o
-   - cfg_rx_datasize_o
    - cfg_rx_continuous_o
    - cfg_rx_en_o
    - cfg_rx_clr_o
-
-   cfg_rx_datasize_o pin is stubbed.
 
 - QSPI shares the values present over the below pins as read values of the config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG:
 
@@ -941,12 +937,9 @@ uDMA QSPI Tx channel cmd-configuration interface
 
    - cfg_cmd_startaddr_o
    - cfg_cmd_size_o
-   - cfg_cmd_datasize_o
    - cfg_cmd_continuous_o
    - cfg_cmd_en_o
    - cfg_cmd_clr_o
-
-  cfg_cmd_datasize_o pin is stubbed.
 
 - QSPI shares the values present over the below pins as read values of the config CSRs i.e. CMD_SADDR, CMD_SIZE, and CMD_CFG:
 
@@ -963,12 +956,9 @@ uDMA QSPI Tx channel configuration interface
 
    - cfg_tx_startaddr_o
    - cfg_tx_size_o
-   - cfg_tx_datasize_o
    - cfg_tx_continuous_o
    - cfg_tx_en_o
    - cfg_tx_clr_o
-
-  cfg_tx_datasize_o pin is stubbed.
 
 - QSPI shares the values present over the below pins as read values of the config CSRs i.e. TX_SADDR, TX_SIZE, and TX_CFG:
 
@@ -1019,5 +1009,5 @@ Test Interface
 - dft_test_mode_i: Design-for-test mode signal
 - dft_cg_enable_i: Clock gating enable during test
 
-*dft_test_mode_i* is used to put uDMA Camera into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
-*dft_cg_enable_i* pin is not used in the uDMA camera block.
+*dft_test_mode_i* is used to put uDMA QSPI into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
+*dft_cg_enable_i* pin is not used in the uDMA QSPI block.
