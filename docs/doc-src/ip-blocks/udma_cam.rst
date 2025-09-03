@@ -54,7 +54,7 @@ In the block diagram above, the DATA lines at the boundary of the uDMA camera ar
 - 0x1: 2-byte transfer
 - 0x2: 4-byte transfer
 
-When transmitting data to the uDMA Core, the uDMA camera pads bits [31:16] with 0x0.
+When transmitting data to the uDMA Core, the unintended bytes are padded with 0x0.
 
 uDMA camera uses the Rx channel interface to store the data received from the external camera device to the interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Rx channel functionality of uDMA Core.
