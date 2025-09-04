@@ -263,17 +263,17 @@ The data transmission from TX FIFO to TX DC FIFO is synchronized using system cl
 The I2C controller asserts READY when it can accept data and continuously monitors the TX DC FIFO. When VALID is asserted, it latches the data into a local variable and immediately de-asserts READY , processes the byte and re-asserts READY when ready for next.
 Each byte is interpreted as either a **command** or **data**:
 
-- **Write commands** -  following data bytes are sent to the external device over the I2C bus.
-- **Read command** - trigger the I2C controller to read the data from the external device over the I2C bus and push it into the internal RX DC FIFO, from where it can be retrieved later by the uDMA core.
+ - **Write commands** -  following data bytes are sent to the external device over the I2C bus.
+ - **Read command** - trigger the I2C controller to read the data from the external device over the I2C bus and push it into the internal RX DC FIFO, from where it can be retrieved later by the uDMA core.
 
 The cycle continues until the entire programmed transfer length is executed, ensuring autonomous command execution of I2C transfers.
 
 RX Operation
 ~~~~~~~~~~~~
 
-Unlike a pure write transaction, reading data from an I2C slave requires a **two-step process** :
+Unlike a pure write transaction, reading data from an I2C slave requires a two-step process:
 
-**Issuing a Read Command (via TX path) **
+**Issuing a Read Command (via TX path)**
 
 Before any data can be received from external device, TX channels must be configured such that read command sequence can be fetched from L2 memory (same as described above in Tx Operation).
 The I2C controller then performs the corresponding bus transactions, retrieving data bytes from the addressed slave device.
