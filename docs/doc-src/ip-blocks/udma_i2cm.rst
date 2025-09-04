@@ -271,11 +271,11 @@ The cycle continues until the entire programmed transfer length is executed, ens
 RX Operation
 ~~~~~~~~~~~~
 
-Unlike a pure write transaction, reading data from an I2C slave requires a **two-step process**:
+Unlike a pure write transaction, reading data from an I2C slave requires a **two-step process** :
 
 **Issuing a Read Command (via TX path) **
 
-Before any data can be received from external device, TX channels must be configured such that read command sequence can be fetched from L2 memory (same as described above).
+Before any data can be received from external device, TX channels must be configured such that read command sequence can be fetched from L2 memory (same as described above in Tx Operation).
 The I2C controller then performs the corresponding bus transactions, retrieving data bytes from the addressed slave device.
 
 **NOTE**: Without this initial TX transaction, no data will be placed on the bus by the slave.
@@ -283,12 +283,12 @@ The I2C controller then performs the corresponding bus transactions, retrieving 
 **Transfer Data to L2 Memory** 
 
 Once the read command is acknowledged, the I2C controller shift in data bytes from the slave device. Each received bytes is pushed into the RX DC FIFO,
-and the FIFO asserts VALID to indicated availability of new data. 
+and the FIFO asserts VALID to indicate the availability of new data. 
 
 To store the received data into L2 memory, the uDMA I2C must be programmed with **RX_SADDR**, **RX_SIZE** and **RX_CFG** CSRs.
 
 On detecting the valid signal, the uDMA core arbitrates for access. If the uDMA I2C RX channel wins the arbitration and the core's RX FIFO has space,
-it asserts READY, latching the data from RX DC FIFO. The data is then written into L2 memory at the address specified by RX_SADDR, wih automatic increment for subsequent bytes.
+uDMA core asserts READY, latching the data from RX DC FIFO. The data is then written into L2 memory at the address specified by RX_SADDR, wih automatic increment for subsequent bytes.
 The cycle repeats until the entire transfer (as defined by RX_SIZE) completes.
 
 
