@@ -73,8 +73,8 @@ The uDMA SS, eFPGA, and Core Complex masters connect to the TCDM Demux, which is
 
 Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for address ranges of the each slave.
 
-The TCDM Demux integrates an address decoder that inspects each incoming request address and matches it against the configured address ranges for all slave regions. When the match is found, the module outputs a slave_id, which is used
-as a select line to route the request to the appropriate slave region — AXI, contiguous, or interleaved.
+The TCDM Demux integrates an address decoder that inspects each incoming request address and matches it against the configured address ranges for all slave regions. Upon identifying a match, the address decoder determines the appropriate target region 
+and internally routes the request to the corresponding slave — whether AXI, contiguous, or interleaved.
 
 Interaction with Contiguous Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -94,16 +94,23 @@ The contiguous crossbar consists of two primary components:
 Each address decoder receives the ADDR from TCDM demux and checks it against the address ranges of contiguous slaves address. if a match is found, port_sel is generated and sent to the Xbar module's ADDR input.
 This port sel signal represents the slave index provided to the Xbar to route the request to the appropriate slave arbiter within the Xbar.
 Meanwhile the actual request (ADDR, WEN, WDATA and BE) is aggregated into single bundle and forwarded to Xbar's WDATA input.
+Here, the ADDR bundled with WDATA contains the full original address for read/write operation and is used by the selected slave to determines the exact memory offset for the access.
 
 The Xbar is a multi-master and multi-slave module that includes:
 
 1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel.
 2. A dedicated RR arbiter for each slave to handle requests from multiple masters.
 
-The address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbiter grants access to one master per cycle using a round-robin (RR) policy.
+The address decoder decodes the index received over port_sel port and selects the corresponding slave-specific arbiter. 
+Each arbiter manages contention among multiple masters and grants access to one master per cycle using a round-robin (RR) arbitration policy.
 Once access is granted, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
 
-When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. For read operations, the r_data and valid signals are updated in the next clock cycle.
+When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. 
+
+For read operations, the r_data and valid signals are updated in the next clock cycle.
+The response multiplexer colects the response data from all the slaves and selects the valid response corresponding to the previously decoded target.
+This selection ensures that only the appropriate response is forwarded back to the master.
+
 
 Interaction with Interleaved Crossbar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,18 +124,32 @@ Interaction with Interleaved Crossbar
 
 The interleaved crossbar follows a different mechanism for selecting the target slave. Unlike the contiguous crossbar, it does not use address decoders based on full address ranges.
 Instead, it uses specific address bits (often referred to as bank bits) to determine the destination memory bank. These bits are extracted from the request address and forwarded to the Xbar's ADDR input.
+
+``port_sel = ADDR[$clog2(BE_WIDTH)+PORT_SEL_WIDTH-1:$clog2(BE_WIDTH)]``
+
+NOTE: 
+ - BE_WIDTH = 4
+ - PORT_SEL_WIDTH = $clog2(NR_SLAVE_PORTS) = $clog2(4) = 2
+ - port_sel = ADDR[2+2-1:2] = ADDR[3:2]
+
 These bits represents the slave index provided to the Xbar to route the request to the appropriate slave arbiter within the Xbar.
 Each master aggregates its request (ADDR, WEN, WDATA, and BE) into a bundled format and sends it to the crossbar's DATA input.
+Here, the ADDR bundled with WDATA contains the full original address for read/write operation and is used by the selected slave to determines the exact memory offset for the access.
 
 Internally, the interleaved crossbar also contains a Xbar module that includes:
 
 1. A dedicated local address decoder and response multiplexer for each master to interpret port_sel.
 2. A dedicated RR arbiter for each slave to handle requests from multiple masters.
 
-As in contiguous cross bar, the address decoder and response mux route incoming master request to the appropriate slave-specific arbiter. The arbitration occurs every clock cycle, ensuring fair access.
-Once master is granted access, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
+As in contiguous cross bar, the address decoder decodes the index received over port_sel port and selects the corresponding slave-specific arbiter. 
+The arbitration occurs every clock cycle, ensuring fair access. 
+Once access is granted, the aggregated request is disaggregated into its original signals (ADDR, WEN, WDATA, BE) and forwarded to the slave.
 
-When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. For read operations, the r_data and valid signals are updated in the next clock cycle.
+When a slave detects the REQ signal, it immediately asserts the GNT signal in the same clock cycle to acknowledge the request. 
+
+For read operations, the r_data and valid signals are updated in the next clock cycle.
+The response mux colects the response data from all the slaves and selects the valid response corresponding to the previously decoded target.
+This selection ensures that only the appropriate response is forwarded back to the master.
 
 Interaction with AXI Bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -155,6 +176,16 @@ System Architecture
    :alt: 
 
    TCDM Interconnect connection diagram
+
+Programming Model
+~~~~~~~~~~~~~~~~~
+
+The TCDM Interconnect handles address decoding and transaction routing internally, making its functionality completely transparent to the user.
+
+TCDM interconnect CSRs
+~~~~~~~~~~~~~~~~~~~~~~
+
+There are no CSR available as this IP is transparent to users.
 
 Pin Diagram
 ~~~~~~~~~~~~~~
