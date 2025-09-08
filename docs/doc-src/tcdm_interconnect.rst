@@ -154,18 +154,25 @@ This selection ensures that only the appropriate response is forwarded back to t
 Interaction with AXI Bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The AXI bridge receives incoming requests and internally routes them to the lint_2_axi module. This module translates these requests into standard AXI-compatible transactions.
-The translated AXI transactions are then forwarded to an AXI crossbar (axi_xbar) for further decoding and routing.
+.. figure:: ../images/TCDM_AXI_Bridge.png
+   :name: TCDM_AXI_Bridge
+   :align: center
+   :alt: 
 
-The AXI crossbar is designed to efficiently route transactions from multiple masters to multiple slaves. The crossbar includes the following components:
+   **TCDM AXI Bridge**
+
+The AXI bridge receives incoming requests, which are passed through a TCDM-to-AXI converter. This converter translates 32-bit TCDM protocol transactions into 32-bit AXI transactions. 
+The translated AXI transactions are then forwarded to an AXI crossbar for further decoding and routing.
+
+The AXI crossbar efficiently routes transactions from multiple masters to multiple slaves. The crossbar includes the following components:
 
 - **Write Address Decoder**: Each master has a dedicated write address decoder that compares the write transaction address (AWADDR) against the address ranges of all connected slaves. Upon finding a match, it generates a selection signal for the corresponding slave and forwards the transaction to the AXI Demux; otherwise, the request is redirected to the error slave.
 - **Read Address Decoder**: Similarly, each master has a dedicated read address decoder that compares the ARADDR (read address) against slave address ranges. If a valid slave match is found, the selection signal is generated and the request is passed to the AXI Demux; otherwise, the request is redirected to the error slave.
-- **AXI Demultiplexer (AXI Demux)**: There is one AXI Demux per master. it receives read/write transactions and routes them to one of several slaves based on the selection signals provided by the address decoders. It ensures that transactions are correctly distributed across the slaves.
-- **AXI Error Slave (axi_err_slv)**: A dedicated error slave for each master. It handles unmatched or invalid addresses. If no slave address matches the decoded address, the transaction is routed to the error slave, which generates an appropriate error response.
+- **AXI Demultiplexer**: There is one AXI Demux per master. it receives read/write transactions and routes them to one of several slaves based on the selection signals provided by the address decoders. It ensures that transactions are correctly distributed across the slaves.
+- **AXI Error Slave**: A dedicated error slave for each master. It handles unmatched or invalid addresses. If no slave address matches the decoded address, the transaction is routed to the error slave, which generates an appropriate error response.
 - **AXI Multiplexer**: There is one AXI MUX per slave. It merges response channels( write response and read) coming from multiple masters targeting that slave. The mux includes RR arbitration logic to forward one valid response at a time to the master.
 
-The AXI Demux handles the actual routing of transactions to the correct slave based on the decoder's selection signals received from Write/Read Address decoder. For write transactions, the selection is stored in a FIFO to ensure data consistency throughout burst transfers.
+The AXI Demux handles the actual routing of transactions to the correct slave based on the decoder's selection signals received from Write/Read Address decoder.
 Once the slave complete processing the requests, the read and write responses are sent back to the crossbar. Since multiple masters may target the same slave, their responses are funneled through a shared interface. The axi_mux, instantiated per slave, merges these responses and uses RR arbitration to decide which master's response to forward at any given time.
 
 System Architecture
