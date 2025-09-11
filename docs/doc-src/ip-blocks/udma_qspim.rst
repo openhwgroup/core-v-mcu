@@ -158,7 +158,7 @@ The actions of the QSPI master are controlled using a sequence of commands. The 
 | SPI_CMD_RX_CHECK    | 0xB       | Compares up to 16 bits of received data with an expected reference value.                      |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_FULL_DUPL   | 0xC       | Enables full-duplex mode for simultaneous transmit and receive.                                |
-|                     |           | **Note:** Applicable only in standard SPI mode, not in Quad or QPI modes.                      |
+|                     |           | **Note:** Applicable only in standard SPI mode, not in Quad modes.                             |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_SETUP_UCA   | 0xD       | Sets the base address of the L2-memory buffer used by the QSPI.                                |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
@@ -186,7 +186,8 @@ When the valid signal is enabled, QSPI will read the command from DC CMD FIFO in
 
 The uDMA QSPI decodes the command to configure uDMA QSPI to perform Rx and Tx operation.
 
-Command is encoded in 28th to 31st bit of 32-bit of command data. 32-bit command should be interpreted bassed on the SPI_CMD value present at offset 28-31 bit. Below is the detailed break-up of commands : -
+Command is encoded in 28th to 31st bit of 32-bit of command data. 32-bit command should be interpreted bassed on the SPI_CMD value present at offset 28-31 bit.
+Below is the detailed break-up of commands : -
 
 - SPI_CMD_CFG
 
@@ -213,6 +214,7 @@ Command is encoded in 28th to 31st bit of 32-bit of command data. 32-bit command
 
 Both master and slave must use the same CPOL/CPHA mode, otherwise data gets misaligned or corrupted.
 Below table explains Master and Slave settings for different combination(Mode) of CPOL and CPHA fields.
+
 +------+-------+-------+-------------+--------------------+--------------------+
 | Mode | CPOL  | CPHA  | Clock Idle  | Master Samples On  | Slave Changes On   |
 +======+=======+=======+=============+====================+====================+
@@ -239,10 +241,12 @@ Below table explains Master and Slave settings for different combination(Mode) o
 | CS_WAIT              | 15:8   | Programmable dummy cycles to wait after CS change          |
 +----------------------+--------+------------------------------------------------------------+
 | CS                   | 1:0    | Chip Select line to activate:                              |
-|                      |        | 0x0: Select spi_csn0_o                                     |
-|                      |        | 0x1: Select spi_csn1_o                                     |
-|                      |        | 0x2: Select spi_csn2_o                                     |
-|                      |        | 0x3: Select spi_csn3_o                                     |
+|                      |        |                                                            |
+|                      |        | - 0x0: Select spi_csn0_o                                   |
+|                      |        | - 0x1: Select spi_csn1_o                                   |
+|                      |        | - 0x2: Select spi_csn2_o                                   |
+|                      |        | - 0x3: Select spi_csn3_o                                   |
+|                      |        |                                                            |
 +----------------------+--------+------------------------------------------------------------+
 
 - SPI_CMD_SEND_CMD
@@ -267,12 +271,16 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | as part of the SPI transaction.                              |
 +----------------------+--------+--------------------------------------------------------------+
 | QPI                  | 27:27  | Quad SPI enable:                                             |
-|                      |        | 0x0: Use standard SPI (single bit)                           |
-|                      |        | 0x1: Use Quad SPI mode (4-bit data)                          |
+|                      |        |                                                              |
+|                      |        | - 0x0: Use standard SPI (single bit)                         |
+|                      |        | - 0x1: Use Quad SPI mode (4-bit data)                        |
+|                      |        |                                                              |
 +----------------------+--------+--------------------------------------------------------------+
 | LSB                  | 26:26  | Transfer bit order:                                          |
-|                      |        | 0x0: Transmit MSB first                                      |
-|                      |        | 0x1: Transmit LSB first                                      |
+|                      |        |                                                              |
+|                      |        | - 0x0: Transmit MSB first                                    |
+|                      |        | - 0x1: Transmit LSB first                                    |
+|                      |        |                                                              |
 +----------------------+--------+--------------------------------------------------------------+
 | BITS_WORD            | 19:16  | 2 pow BITS_WORD in a word.                                   |
 +----------------------+--------+--------------------------------------------------------------+
@@ -296,10 +304,12 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                           |        | on an event or a fixed number of cycles.                         |
 +---------------------------+--------+------------------------------------------------------------------+
 | WAIT_TYPE                 | 9:8    | Type of wait condition:                                          |
-|                           |        | 0x0: Wait for SoC event specified by EVENT_ID                    |
-|                           |        | 0x1: Wait for number of cycles specified in CYCLE_COUNT          |
-|                           |        | 0x2: Reserved                                                    |
-|                           |        | 0x3: Reserved                                                    |
+|                           |        |                                                                  |
+|                           |        | - 0x0: Wait for SoC event specified by EVENT_ID                  |
+|                           |        | - 0x1: Wait for number of cycles specified in CYCLE_COUNT        |
+|                           |        | - 0x2: Reserved                                                  |
+|                           |        | - 0x3: Reserved                                                  |
+|                           |        |                                                                  |
 +---------------------------+--------+------------------------------------------------------------------+
 | EVENT_ID_CYCLE_COUNT      | 7:0    |                                                                  |
 |                           |        | - If WAIT_TYPE = 0x0 → Stores Event ID                           |
@@ -342,17 +352,20 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | Total size can go up to 256 Kbits.                               |
 +----------------------+--------+------------------------------------------------------------------+
 | QPI                  | 27:27  | Transfer mode:                                                   |
-|                      |        | 0x0: Standard SPI (1-bit)                                        |
-|                      |        | 0x1: Quad SPI mode (4-bit)                                       |
+|                      |        |                                                                  |
+|                      |        | - 0x0: Standard SPI (1-bit)                                      |
+|                      |        | - 0x1: Quad SPI mode (4-bit)                                     |
 +----------------------+--------+------------------------------------------------------------------+
 | LSB                  | 26:26  | Bit transmission order:                                          |
-|                      |        | 0x0: MSB first                                                   |
-|                      |        | 0x1: LSB first                                                   |
+|                      |        |                                                                  |
+|                      |        | - 0x0: MSB first                                                 |
+|                      |        | - 0x1: LSB first                                                 |
 +----------------------+--------+------------------------------------------------------------------+
 | WORD_PER_TRANSF      | 22:21  | Words transferred per uDMA access:                               |
-|                      |        | 0x0: 1 word per transfer                                         |
-|                      |        | 0x1: 2 words per transfer                                        |
-|                      |        | 0x2: 4 words per transfer                                        |
+|                      |        |                                                                  |
+|                      |        | - 0x0: 1 word per transfer                                       |
+|                      |        | - 0x1: 2 words per transfer                                      |
+|                      |        | - 0x2: 4 words per transfer                                      |
 +----------------------+--------+------------------------------------------------------------------+
 | BITS_WORD            | 20:16  | 2 pow BITS_WORD in a word                                        |
 +----------------------+--------+------------------------------------------------------------------+
@@ -382,17 +395,20 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | Total size can be up to 256 Kbits.                               |
 +----------------------+--------+------------------------------------------------------------------+
 | QPI                  | 27:27  | Receive mode:                                                    |
-|                      |        | 0x0: Standard SPI (1-bit)                                        |
-|                      |        | 0x1: Quad SPI mode (4-bit)                                       |
+|                      |        |                                                                  |
+|                      |        | - 0x0: Standard SPI (1-bit)                                      |
+|                      |        | - 0x1: Quad SPI mode (4-bit)                                     |
 +----------------------+--------+------------------------------------------------------------------+
 | LSB                  | 26:26  | Bit reception order:                                             |
-|                      |        | 0x0: MSB first                                                   |
-|                      |        | 0x1: LSB first                                                   |
+|                      |        |                                                                  |
+|                      |        | - 0x0: MSB first                                                 |
+|                      |        | - 0x1: LSB first                                                 |
 +----------------------+--------+------------------------------------------------------------------+
 | WORD_PER_TRANSF      | 22:21  | Words received per uDMA access:                                  |
-|                      |        | 0x0: 1 word per transfer                                         |
-|                      |        | 0x1: 2 words per transfer                                        |
-|                      |        | 0x2: 4 words per transfer                                        |
+|                      |        |                                                                  |
+|                      |        | - 0x0: 1 word per transfer                                       |
+|                      |        | - 0x1: 2 words per transfer                                      |
+|                      |        | - 0x2: 4 words per transfer                                      |
 +----------------------+--------+------------------------------------------------------------------+
 | BITS_WORD            | 20:16  | 2 pow BITS_WORD in a word                                        |
 +----------------------+--------+------------------------------------------------------------------+
@@ -430,12 +446,14 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | Optionally clears the chip select and generates an EOT event.    |
 +----------------------+--------+------------------------------------------------------------------+
 | KEEP_CHIP_SELECT     | 1:1    | Chip select behavior after EOT:                                  |
-|                      |        | 0x0: Keep chip select asserted                                   |
-|                      |        | 0x1: Deassert (clear) all chip selects                           |
+|                      |        |                                                                  |
+|                      |        | - 0x0: Keep chip select asserted                                 |
+|                      |        | - 0x1: Deassert (clear) all chip selects                         |
 +----------------------+--------+------------------------------------------------------------------+
 | EVENT_GEN            | 0:0    | EOT event generation:                                            |
-|                      |        | 0x0: Disable                                                     |
-|                      |        | 0x1: Generate event on EOT                                       |
+|                      |        |                                                                  |
+|                      |        | - 0x0: Disable                                                   |
+|                      |        | - 0x1: Generate event on EOT                                     |
 +----------------------+--------+------------------------------------------------------------------+
 
 SPI_CMD_RPT_END
@@ -470,18 +488,21 @@ Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 |                      |        | Compares received data against expected value COMP_DATA.              |
 +----------------------+--------+-----------------------------------------------------------------------+
 | QPI                  | 27:27  | Transfer mode:                                                        |
-|                      |        | 0x0: Standard (1-bit) SPI                                             |
-|                      |        | 0x1: Quad SPI mode                                                    |
+|                      |        |                                                                       |
+|                      |        | - 0x0: Standard (1-bit) SPI                                           |
+|                      |        | - 0x1: Quad SPI mode                                                  |
 +----------------------+--------+-----------------------------------------------------------------------+
 | LSB                  | 26:26  | Bit ordering of received data:                                        |
-|                      |        | 0x0: Data is LSB-first                                                |
-|                      |        | 0x1: Data is MSB-first                                                |
+|                      |        |                                                                       |
+|                      |        | - 0x0: Data is LSB-first                                              |
+|                      |        | - 0x1: Data is MSB-first                                              |
 +----------------------+--------+-----------------------------------------------------------------------+
 | CHECK_TYPE           | 25:24  | Comparison mode:                                                      |
-|                      |        | 0x0: Compare bit-by-bit                                               |
-|                      |        | 0x1: Check only 1s                                                    |
-|                      |        | 0x2: Check only 0s                                                    |
-|                      |        | 0x3: Checks if all the bits that are 1 in received data are also 1    |
+|                      |        |                                                                       |
+|                      |        | - 0x0: Compare bit-by-bit                                             |
+|                      |        | - 0x1: Check only 1s                                                  |
+|                      |        | - 0x2: Check only 0s                                                  |
+|                      |        | - 0x3: Checks if all the bits that are 1 in received data are also 1  |
 |                      |        |      in COMP_DATA.                                                    |
 +----------------------+--------+-----------------------------------------------------------------------+
 | BITS_WORD            | 19:16  |  2 pow BITS_WORD in a word                                            |
@@ -499,13 +520,15 @@ Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 |                      |        | Activates full duplex mode for simultaneous Tx and Rx         |
 +----------------------+--------+---------------------------------------------------------------+
 | LSB                  | 26:26  | Bit ordering of data:                                         |
-|                      |        | 0x0: Transmit/receive data LSB first                          |
-|                      |        | 0x1: Transmit/receive data MSB first                          |
+|                      |        |                                                               |
+|                      |        | - 0x0: Transmit/receive data LSB first                        |
+|                      |        | - 0x1: Transmit/receive data MSB first                        |
 +----------------------+--------+---------------------------------------------------------------+
 | WORD_PER_TRANSF      | 22:21  | Words received per uDMA access:                               |
-|                      |        | 0x0: 1 word per transfer/receive                              |
-|                      |        | 0x1: 2 words per transfer/receive                             |
-|                      |        | 0x2: 4 words per transfer/receive                             |
+|                      |        |                                                               |
+|                      |        | - 0x0: 1 word per transfer/receive                            |
+|                      |        | - 0x1: 2 words per transfer/receive                           |
+|                      |        | - 0x2: 4 words per transfer/receive                           |
 +----------------------+--------+---------------------------------------------------------------+
 | BITS_WORD            | 20:16  | 2 pow BITS_WORD in a word                                     |
 +----------------------+--------+---------------------------------------------------------------+
@@ -523,9 +546,11 @@ The Rx and Tx channels of the uDMA core can be configured using either the chann
 | SPI_CMD              | 31:28  | 0xD : SPI_CMD_SETUP_UCA                                                   |
 |                      |        | Sets the base address for the uDMA TX or RX buffer                        |
 +----------------------+--------+---------------------------------------------------------------------------+
-| ADDR                 | 20:0   | L2 memory address (in bytes) to: -                                        |
+| ADDR                 | 20:0   | L2 memory address (in bytes) to:                                          |
+|                      |        |                                                                           |
 |                      |        |- store recived data                                                       |
 |                      |        |- read data that should be transferred                                     |
+|                      |        |                                                                           |
 |                      |        | TX_RXN field of SPI_CMD_SETUP_UCS command decides the transder direction. |
 |                      |        | Depending on the value TX_RXN command field, it can                       |
 |                      |        | update the value of cfg_rx_startaddr_o or cfg_tx_startaddr_o pins.        |
@@ -542,8 +567,9 @@ The Rx and Tx channels of the uDMA core can be configured using either the chann
 |                      |        | Sets size and starts uDMA transfer on Tx or RX channel                |
 +----------------------+--------+-----------------------------------------------------------------------+
 | TX_RXN               | 27:27  | Selects the transfer direction:                                       |
-|                      |        | 0x0: Rx channel                                                       |
-|                      |        | 0x1: Tx channel                                                       |
+|                      |        |                                                                       |
+|                      |        | - 0x0: Rx channel                                                     |
+|                      |        | - 0x1: Tx channel                                                     |
 +----------------------+--------+-----------------------------------------------------------------------+
 | DATASIZE             | 26:25  | Number of words read/write from/to L2 memory per transfer cycle:      |
 |                      |        |                                                                       |
