@@ -86,7 +86,7 @@ The DC FIFO asserts the src_ready_o (ready) signal when there is available space
 The src_ready_o signal is kept asserted as long as the FIFO has space for more data. If the DC FIFO is full, the push operation will be stalled until the FIFO has empty space and the valid line is high.
 A module transmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
 
-During QSPI data transmit operation, the TX DC FIFO is read internally by the QSPI to transmit data to an external device and written by the TX FIFO. Similarly during QSPI command  transmit operation, the Comamnd DC FIFO is read internally by the QSPI to transmit command to an external device and written by the command FIFO.
+During QSPI data transmit operation, the TX DC FIFO is read internally by the QSPI to transmit data to an external device and written by the TX FIFO. Similarly during QSPI command  transmit operation, the Command DC FIFO is read internally by the QSPI to transmit command to an external device and written by the command FIFO.
 During QSPI receive (Rx) operation, the RX DC FIFO is written internally by the QSPI with the data received from the external device and read by the uDMA core.
 
 Dual-clock (DC) FIFOs are transparent to users.
@@ -111,7 +111,7 @@ Tx FIFO operates using a system clock. The clr_i pin is hardcoded with the value
 The read interface of the Tx FIFO is connected to the Tx DC FIFO.
 The Tx DC FIFO raises a ready(ready_i) signal if its FIFO has space. If data is available, Tx FIFO asserts the valid_o signal and updates the data lines with data.
 Tx FIFO will update the valid signal and data lines at each clock cycle. If the ready signal is high, data lines will be updated with new data; otherwise, data lines will show the last transferred byte.
-If the Tx FIFO is empty, the valid_o signal remains deasserted, indicating that no valid data is present on the output lines.
+If the Tx FIFO is empty, the valid_o signal remains de-asserted, indicating that no valid data is present on the output lines.
 
 **Push operation**
 
@@ -145,13 +145,13 @@ The actions of the QSPI master are controlled using a sequence of commands. The 
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_WAIT        | 0x5       | Pauses the sequence until an external event or timeout trigger occurs.                         |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
-| SPI_CMD_Tx_DATA     | 0x6       | Sends data payload (up to 256 Kbits) from memory to the SPI interface.                         |
+| SPI_CMD_Tx_DATA     | 0x6       | Sends data payload from memory to the SPI interface.                                           |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
-| SPI_CMD_RX_DATA     | 0x7       | Receives data payload (up to 256 Kbits) from the SPI interface into memory.                    |
+| SPI_CMD_RX_DATA     | 0x7       | Receives data payload from the SPI interface into memory.                                      |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_RPT         | 0x8       | Starts a loop to repeat the next sequence of commands a specified number of times.             |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
-| SPI_CMD_EOT         | 0x9       | Marks end of transfer. Optionally deasserts CS and/or triggers an event based on configuration.|
+| SPI_CMD_EOT         | 0x9       | Marks end of transfer.Optionally de-asserts CS and/or triggers an event based on configuration.|
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
 | SPI_CMD_RPT_END     | 0xA       | Marks the end of a repeat block started by SPI_CMD_RPT.                                        |
 +---------------------+-----------+------------------------------------------------------------------------------------------------+
@@ -174,19 +174,19 @@ To initiate a read operation from L2 memory, the CMD FIFO asserts both the READY
 
 Upon receiving the REQ signal and if the QSPI TX channel is enabled via CMD CSRs, the uDMA core initiates arbitration. If the QSPI TX channel wins arbitration, the core issues a GNT (grant) signal to the uDMA QSPI. Once command is successfully read from L2 memory, the uDMA core asserts a VALID signal along with the command for transmission to the QSPI.
 
-The uDMA QSPI writes this command into the CMD FIFO and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core deasserts the VALID signal in the following clock cycle and reasserts it only when new command is available for transmission. Since the FIFO is initially empty, both READY and REQ signal are asserted at power up.
+The uDMA QSPI writes this command into the CMD FIFO and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core de-asserts the VALID signal in the following clock cycle and reasserts it only when new command is available for transmission. Since the FIFO is initially empty, both READY and REQ signal are asserted at power up.
 
 **Read command into CMD DC FIFO from CMD FIFO**
 
-To read data from CMD FIFO, CMD DC FIFO will assert the ready signal. CMD FIFO, when it has command, asserts the valid signal and update the command lines of DC FIFO with the valid command. Valid signal will keep asserted until CMD FIFO has command. The command transmission from CMD FIFO to CMD DC FIFO is synchronized using system clock. CMD DC FIFO will deassert the ready signal when it is full. CMD FIFO will only update the command lines with valid command when it has command available is FIFO and the ready signal is high.
+To read data from CMD FIFO, CMD DC FIFO will assert the ready signal. CMD FIFO, when it has command, asserts the valid signal and update the command lines of DC FIFO with the valid command. Valid signal will keep asserted until CMD FIFO has command. The command transmission from CMD FIFO to CMD DC FIFO is synchronized using system clock. CMD DC FIFO will de-assert the ready signal when it is full. CMD FIFO will only update the command lines with valid command when it has command available is FIFO and the ready signal is high.
 
 **Read command from CMD DC FIFO**
 
-When the valid signal is enabled, QSPI will read the command from DC CMD FIFO into its local variable. The uDMA QSPI will raise ready signal to CMD DC FIFO indicating that it can accept more command. In the next clock cycle, the CMD DC FIFO checks whether it has command or not and raises a valid signal and udpate command lines accordingly. The uDMA QSPI deasserts the READY signal and starts processing the command(store in local variable).
+When the valid signal is enabled, QSPI will read the command from DC CMD FIFO into its local variable. The uDMA QSPI will raise ready signal to CMD DC FIFO indicating that it can accept more command. In the next clock cycle, the CMD DC FIFO checks whether it has command or not and raises a valid signal and update command lines accordingly. The uDMA QSPI de-asserts the READY signal and starts processing the command(store in local variable).
 
 The uDMA QSPI decodes the command to configure uDMA QSPI to perform Rx and Tx operation.
 
-Command is encoded in 28th to 31st bit of 32-bit of command data. 32-bit command should be interpreted bassed on the SPI_CMD value present at offset 28-31 bit.
+Command is encoded in 28th to 31st bit of 32-bit of command data. 32-bit command should be interpreted based on the SPI_CMD value present at offset 28-31 bit.
 Below is the detailed break-up of commands : -
 
 - SPI_CMD_CFG
@@ -253,12 +253,12 @@ Below table explains Master and Slave settings for different combination(Mode) o
 
 This command is used to sends COMMAND_DATA received from L2 memory to the external device.
 
-The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx oeration. In SPI mode spi_oe0_o is used and in case of QPI mode all enabled pins are used.
+The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx operation. In SPI mode spi_oe0_o is used and in case of QPI mode all enabled pins are used.
 The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_SEND_CMD command.
 The input pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_SEND_CMD command. 
    
-In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of recived data.
-In SPI mode, spi_sdo0_o reflects the data recived from the external device.
+In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data.
+In SPI mode, spi_sdo0_o reflects the data received from the external device.
 
 uDMA QSPI after transmitting the COMMAND_DATA, asserts ready signal of Tx DC FIFO. Tx DC FIFO when it has data, asserts the valid lines and put the data on the data lines at every clock cycle.
 The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
@@ -334,12 +334,12 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 - SPI_CMD_TX_DATA
 
    This command is used to sends the transmit data received from L2 memory via Tx channel of the uDMA core to the external device.
-   The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx oeration. In SPI mode spi_oe0_o is used and in case of QPI mode all enabled pins are used.
+   The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx operation. In SPI mode spi_oe0_o is used and in case of QPI mode all enabled pins are used.
    The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_SEND_CMD command.
    The input pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_SEND_CMD command. 
    
-   In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of recived data. 
-   In SPI mode, spi_sdo0_o reflects the data recived from the external device.
+   In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data. 
+   In SPI mode, spi_sdo0_o reflects the data received from the external device.
 
    uDMA QSPI after transmitting the data, it asserts ready signal of Tx DC FIFO. Tx DC FIFO when it has data, asserts the valid lines and put the data on the data lines at every clock cycle.
    The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
@@ -349,7 +349,6 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 +======================+========+==================================================================+
 | SPI_CMD              | 31:28  | 0x6 : SPI_CMD_TX_DATA                                            |
 |                      |        | Command to transmit a block of data via SPI.                     |
-|                      |        | Total size can go up to 256 Kbits.                               |
 +----------------------+--------+------------------------------------------------------------------+
 | QPI                  | 27:27  | Transfer mode:                                                   |
 |                      |        |                                                                  |
@@ -375,14 +374,14 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 - SPI_CMD_RX_DATA
 
    This command is used to configure uDMA QSPI for Rx operation. The uDAM QSPI receives SIZE data in multiple of WORD_PER_TRANSF, where each word size is decided by BITS_WORD field of SPI_CMD_RX_DATA. 
-   The uDMA QSPI can be configured to use in QPI or SPI mode depending on the value of QPI field of SPI_CMD_RX_DATA comnmand. User can further decide wether they want to read LSB or MSB first depending on LSB filed of SPI_CMD_RX_DATA command.
+   The uDMA QSPI can be configured to use in QPI or SPI mode depending on the value of QPI field of SPI_CMD_RX_DATA command. User can further decide wether they want to read LSB or MSB first depending on LSB filed of SPI_CMD_RX_DATA command.
 
-   The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 0 during Rx oeration. In SPI mode spi_oe1_o is used and in case of QPI mode all enabled pins are used.
+   The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 0 during Rx operation. In SPI mode spi_oe1_o is used and in case of QPI mode all enabled pins are used.
    The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_RX_DATA command.
    The input pins, spi_sdiX_o{X = 0 to 3}, will be read based on the LSB field value of the SPI_CMD_RX_DATA command. 
    
-   In QPI mode, if LSB is set to 0, then spi_sdi0_o will reflect msb bit else it reflects lsb bit of recived data.
-   In SPI mode, spi_sdi1_o reflects the data recived from the external device.
+   In QPI mode, if LSB is set to 0, then spi_sdi0_o will reflect msb bit else it reflects lsb bit of received data.
+   In SPI mode, spi_sdi1_o reflects the data received from the external device.
 
    uDMA QSPI after reading the WORD_PER_TRANSF words, asserts valid signal of Rx DC FIFO. RC DC FIFO when it has enough space samples the data lines at every clock cycle provided that the valid line is asserted.
    The Rx DC FIFO shows readiness to receive data by asserting the ready signal.
@@ -392,7 +391,6 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 +======================+========+==================================================================+
 | SPI_CMD              | 31:28  | 0x7 : SPI_CMD_RX_DATA                                            |
 |                      |        | Command to receive a block of data via SPI.                      |
-|                      |        | Total size can be up to 256 Kbits.                               |
 +----------------------+--------+------------------------------------------------------------------+
 | QPI                  | 27:27  | Receive mode:                                                    |
 |                      |        |                                                                  |
@@ -429,7 +427,7 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | uDMA QSPI reads command sequence until it receives SPI_CMD_RPT_END.    |
 |                      |        | Execute the whole command sequence for RPT_CNT times.                  |
 +----------------------+--------+------------------------------------------------------------------------+
-| RPT_CNT              | 15:0   | Number of repeat iterations, the command sequnce will be executed for  |
+| RPT_CNT              | 15:0   | Number of repeat iterations, the command sequence will be executed for  |
 |                      |        | RPT_CNT times.                                                         |
 +----------------------+--------+------------------------------------------------------------------------+
 
@@ -448,7 +446,7 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 | KEEP_CHIP_SELECT     | 1:1    | Chip select behavior after EOT:                                  |
 |                      |        |                                                                  |
 |                      |        | - 0x0: Keep chip select asserted                                 |
-|                      |        | - 0x1: Deassert (clear) all chip selects                         |
+|                      |        | - 0x1: De-assert (clear) all chip selects                         |
 +----------------------+--------+------------------------------------------------------------------+
 | EVENT_GEN            | 0:0    | EOT event generation:                                            |
 |                      |        |                                                                  |
@@ -458,7 +456,7 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 
 SPI_CMD_RPT_END
 
-Marks the end of command sequence started by SPI_CMD_RPT for repeat opration. Below is an example of the ussage of 
+Marks the end of command sequence started by SPI_CMD_RPT for repeat operation. Below is an example of the usage of 
 SPI_CMD_RPT and SPI_CMD_RPT_END command.
 
 `
@@ -548,10 +546,10 @@ The Rx and Tx channels of the uDMA core can be configured using either the chann
 +----------------------+--------+---------------------------------------------------------------------------+
 | ADDR                 | 20:0   | L2 memory address (in bytes) to:                                          |
 |                      |        |                                                                           |
-|                      |        |- store recived data                                                       |
+|                      |        |- store received data                                                       |
 |                      |        |- read data that should be transferred                                     |
 |                      |        |                                                                           |
-|                      |        | TX_RXN field of SPI_CMD_SETUP_UCS command decides the transder direction. |
+|                      |        | TX_RXN field of SPI_CMD_SETUP_UCS command decides the transfer direction. |
 |                      |        | Depending on the value TX_RXN command field, it can                       |
 |                      |        | update the value of cfg_rx_startaddr_o or cfg_tx_startaddr_o pins.        |
 +----------------------+--------+---------------------------------------------------------------------------+
@@ -593,22 +591,22 @@ This process continues until all command sequences stored in the L2 memory are e
 Rx operation
 ^^^^^^^^^^^^
 
-User must store the command sequnce to configure QSPI in L2 memory. CMD_SADDR, CMD_SIZE and CMD_CFG CSRs must be configured to read command sequcne from the L2 memory.
+User must store the command sequence to configure QSPI in L2 memory. CMD_SADDR, CMD_SIZE and CMD_CFG CSRs must be configured to read command sequence from the L2 memory.
 When these CSRs are configured then uDMA QSPI starts reading the commands from L2 memory according to the details mentioned in the `QSPI commands` section in the current chapter.
-uDMA QSPI will automatically configure itself as per the commands recieved from the L2 memory.
+uDMA QSPI will automatically configure itself as per the commands received from the L2 memory.
 
-uDMA QSPI configures the clock and chips select lines bassed on the SPI_CMD_CFG and SPI_CMD_SOT command attributes. When it interprets SPI_CMD_SEND_CMD, it sends the command data to the external device via spi_sdoX_o{X = 0 to 3} interface.
+uDMA QSPI configures the clock and chips select lines based on the SPI_CMD_CFG and SPI_CMD_SOT command attributes. When it interprets SPI_CMD_SEND_CMD, it sends the command data to the external device via spi_sdoX_o{X = 0 to 3} interface.
 After sending the command to external QSPI device , the uDMA QSPI serves the next command. User can introduce wait using SPI_CMD_WAIT command.
 
 SPI_CMD_RX_DATA command is used to configure uDMA QSPI for Rx operation. The uDAM QSPI receives SIZE data in multiple of WORD_PER_TRANSF, where each word size is decided by BITS_WORD field of SPI_CMD_RX_DATA. 
-The uDMA QSPI can be configured to use in QPI or SPI mode depending on the value of QPI field of SPI_CMD_RX_DATA comnmand. User can further decide wether they want to read LSB or MSB first depending on LSB filed of SPI_CMD_RX_DATA command.
+The uDMA QSPI can be configured to use in QPI or SPI mode depending on the value of QPI field of SPI_CMD_RX_DATA command. User can further decide wether they want to read LSB or MSB first depending on LSB filed of SPI_CMD_RX_DATA command.
 
-The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 0 during Rx oeration. In SPI mode spi_oe1_o is used and in case of QPI mode all enabled pins are used.
+The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 0 during Rx operation. In SPI mode spi_oe1_o is used and in case of QPI mode all enabled pins are used.
 The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_RX_DATA command.
 The input pins, spi_sdiX_o{X = 0 to 3}, will be read based on the LSB field value of the SPI_CMD_RX_DATA command. 
    
-In QPI mode, if LSB is set to 0, then spi_sdi0_o will reflect msb bit else it reflects lsb bit of recived data.
-In SPI mode, spi_sdi1_o reflects the data recived from the external device.
+In QPI mode, if LSB is set to 0, then spi_sdi0_o will reflect msb bit else it reflects lsb bit of received data.
+In SPI mode, spi_sdi1_o reflects the data received from the external device.
 
 uDMA QSPI after reading the WORD_PER_TRANSF words, asserts valid signal of Rx DC FIFO. RC DC FIFO when it has enough space samples the data lines at every clock cycle provided that the valid line is asserted.
 The Rx DC FIFO shows readiness to receive data by asserting the ready signal.
@@ -633,7 +631,7 @@ Below is the example  command sequence for RX operation: -
 |                   |                        | payload into memory.        |
 +-------------------+------------------------+-----------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally deassert CS.     |
+|                   |                        | optionally de-assert CS.     |
 +-------------------+------------------------+-----------------------------+
 
 The below sequence configures SPI, asserts the chip-select line, sends an instruction (0x0B), then uses a repeat block to receive
@@ -657,26 +655,26 @@ data multiple times without replicating commands.
 | SPI_CMD_RPT_END   | 0xA0000000             | End of repeat block.              |
 +-------------------+------------------------+-----------------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and optionally   |
-|                   |                        | deassert CS.                      |
+|                   |                        | de-assert CS.                      |
 +-------------------+------------------------+-----------------------------------+
 
 Tx operation
 ^^^^^^^^^^^^
 
-User must store the command sequnce to configure QSPI in L2 memory. CMD_SADDR, CMD_SIZE and CMD_CFG CSRs must be configured to read command sequcne from the L2 memory.
+User must store the command sequence to configure QSPI in L2 memory. CMD_SADDR, CMD_SIZE and CMD_CFG CSRs must be configured to read command sequence from the L2 memory.
 When these CSRs are configured then uDMA QSPI starts reading the commands from L2 memory according to the details mentioned in the `QSPI commands` section in the current chapter.
-uDMA QSPI will automatically configure itself as per the commands recieved from the L2 memory.
+uDMA QSPI will automatically configure itself as per the commands received from the L2 memory.
 
-uDMA QSPI configures the clock and chips select lines bassed on the SPI_CMD_CFG and SPI_CMD_SOT command attributes. When it interprets SPI_CMD_SEND_CMD, it sends the command data to the external device via spi_sdoX_o{X = 0 to 3} interface.
+uDMA QSPI configures the clock and chips select lines based on the SPI_CMD_CFG and SPI_CMD_SOT command attributes. When it interprets SPI_CMD_SEND_CMD, it sends the command data to the external device via spi_sdoX_o{X = 0 to 3} interface.
 After sending the command to external QSPI device , the uDMA QSPI serves the next command. User can introduce wait using SPI_CMD_WAIT command.
 
 When the uDMA receives SPI_CMD_TX_DATA command,  uDMA QSPI reads the valid signal from TX DC FIFO. If the valid signal is high then it reads the data lines else it waits for valid signal to go high. After reading the data from data lines and confirming SPI_CMD_TX_DATA command it transmits the data over output, spi_sdoX_o{X = 0 to 3}, lines.
 The uDMA QSPI can be configured to perform either quad SPI transfer(4 bit per cycle) or standard SPI transfer(1 bit per cycle) depending on values of QPI field of SPI_CMD_TX_DATA command.
-The uDMA QSPI drives ouptut enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx oeration. In standard spi mode spi_oe0_o and spi_sdo0_o pins are used, whereas in quad SPI mode all spi_oeX_o{X = 0 to 3} and spi_sdoX_o{X = 0 to 3} pins are used.
+The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx operation. In standard spi mode spi_oe0_o and spi_sdo0_o pins are used, whereas in quad SPI mode all spi_oeX_o{X = 0 to 3} and spi_sdoX_o{X = 0 to 3} pins are used.
 The output pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_TX_DATA command. If LSB is set to 0, then spi_sdo0_o will be updated with msb bit else it is updated with lsb bit of transmit data.
 
-In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of recived data.
-   In SPI mode, spi_sdo0_o reflects the data recived from the external device.
+In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data.
+   In SPI mode, spi_sdo0_o reflects the data received from the external device.
 
 Below is the example command sequence for TX operation
 
@@ -695,7 +693,7 @@ Below is the example command sequence for TX operation
 |                   |                        | from memory.                |
 +-------------------+------------------------+-----------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally deassert CS.     |
+|                   |                        | optionally de-assert CS.     |
 +-------------------+------------------------+-----------------------------+
  
 
@@ -705,12 +703,12 @@ Full duplex operation
 ^^^^^^^^^^^^^^^^^^^^^
 
 Full duplex mode is supported in SPI mode, where spi_sdo0_o is used to transmit the data to  the external device and spi_sdi1_o reflects the data received from the external device.
-Rest operation is similar to Rx and Tx operation. A full duplex mode can be configured using SPI_CMD_FULL_DUPL command or enabling uDMA QSPI to perform TX and RX operation simultanously.
+Rest operation is similar to Rx and Tx operation. A full duplex mode can be configured using SPI_CMD_FULL_DUPL command or enabling uDMA QSPI to perform TX and RX operation simultaneously.
 In case of SPI_CMD_FULL_DUPL command WORD_PER_TRANSF, BITS_WORD and SIZE will be same for Rx and Tx operation.
 
 Command based TX and RX channel configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Upon detecting a valid signal from command FIFO, uDMA QSPI CSR module reads the command from data line. If the command is SPI_CMD_SETUP_UCA or SPI_CMD_SETUP_UCS, uDMA QSPI updates the following pins bassed on the command values:
+Upon detecting a valid signal from command FIFO, uDMA QSPI CSR module reads the command from data line. If the command is SPI_CMD_SETUP_UCA or SPI_CMD_SETUP_UCS, uDMA QSPI updates the following pins based on the command values:
 
 - cfg_rx_size_o or cfg_tx_size_o
 - cfg_rx_datasize_o or cfg_tx_datasize_o
@@ -723,7 +721,7 @@ uDMA QSPI generates the following interrupts during the RX operation:
 
 - Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
 - Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
-- End of transfer interrupt: The uDMA QSPI generate an end of transfer interrupt when it recieves a request to do so via SPI_CMD_EOT command. Interrupt will be cleared automatically in the next cycle.  
+- End of transfer interrupt: The uDMA QSPI generate an end of transfer interrupt when it receives a request to do so via SPI_CMD_EOT command. Interrupt will be cleared automatically in the next cycle.  
 
 The RX and TX channel interrupts are cleared by the uDMA core if any of the following conditions occur:
 
@@ -751,8 +749,8 @@ Programming Model
 As with most peripherals in the uDMA Subsystem, software configuration for the uDMA QSPI interface can be conceptualized into three key steps:
 
 - I/O Configuration: Set up external clock and chip select and output enable lines.
-- uDMA core Setup:  Configure source/destination addresses, transfer size, and direction for Command, TX and RX operastion using channel CSRs. This enables efficient data movement from L2 memory to QSPI  via uDMA core. Update the L2 memory with command sequence to configure QSPI controller.
-- Data Transfer Management: Read command sequence from L2 memory to configure QSPI for RX/TX operation. Drive QSPI bus bassed on the received command sequence.
+- uDMA core Setup:  Configure source/destination addresses, transfer size, and direction for Command, TX and RX operation using channel CSRs. This enables efficient data movement from L2 memory to QSPI  via uDMA core. Update the L2 memory with command sequence to configure QSPI controller.
+- Data Transfer Management: Read command sequence from L2 memory to configure QSPI for RX/TX operation. Drive QSPI bus based on the received command sequence.
 
 Refer to the Firmware Guidelines section in the current chapter for more information.
 
@@ -761,10 +759,10 @@ uDMA QSPI CSRs
 Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the uDMA QSPI0 and uDMA QSPI1.
 
 **NOTE:** Several of the uDMA QSPI CSR are volatile, meaning that their read value may be changed by the hardware.
-For example, writting the *RX_SADDR* CSR will set the address of the receive buffer pointer.
+For example, writing the *RX_SADDR* CSR will set the address of the receive buffer pointer.
 As data is received, the hardware will update the value of the pointer to indicate the current address.
 As the name suggests, the value of non-volatile CSRs is not changed by the hardware.
-These CSRs retain the last value writen by software.
+These CSRs retain the last value written by software.
 
 A CSRs volatility is indicated by its "type".
 
@@ -780,7 +778,7 @@ RX_SADDR
 +--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
 | Field  | Bits | Access | Default    | Description                                                                                              |
 +========+======+========+============+==========================================================================================================+
-| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where QSPI will write the recived data.      |
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where QSPI will write the received data.      |
 |        |      |        |            | Read & write to this CSR access different information.                                                   |
 |        |      |        |            |                                                                                                          |
 |        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction. |
