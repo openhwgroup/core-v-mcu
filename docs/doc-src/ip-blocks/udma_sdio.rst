@@ -44,8 +44,11 @@ Features
    -  48 bits with NO CRC
    -  136 bits
 
--  Error output pin.
--  End of transfer output pin.
+-  Following events are supported:
+
+      - Error event.
+      - End of transfer event.+
+
 -  Four error status for receive operation
 
    -  No error
@@ -73,8 +76,6 @@ In the block diagram above, the DATA lines at the boundary of the uDMA SDIO are 
 - 0x0: 1-byte transfer
 - 0x1: 2-byte transfer
 - 0x2: 4-byte transfer
-
-When transmitting data to the uDMA Core, the uDMA SDIO pads bits [31:8] with 0x0. Conversely, during data reception from the uDMA Core, the uDMA SDIO discards bits [31:8], retaining only the lower 8 bits.
 
 uDMA SDIO uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external SDIO device. uDMA SDIO uses the Rx channel interface to store the data received from the external SDIO device to the interleaved (L2) memory.
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
@@ -153,7 +154,7 @@ Command
 ^^^^^^^
 
 Operation is started by generating a command. A host can send a command to either a single card or to all the connected cards. A command is transferred serially on the CMD line.
-MSB is transmitted first and LSB is transmitted last. Transmission bit is 1, as command is transmitted from host to device.
+MSB is transmitted first and LSB is transmitted last. Direction bit is 1, as command is transmitted from host to device.
 
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 | Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
@@ -162,12 +163,12 @@ MSB is transmitted first and LSB is transmitted last. Transmission bit is 1, as 
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 | Value        | 0         | 1                | x              | x                | x     | 1       |
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
-| Description  | Start bit | Transmission bit | Command opcode | Command argument | CRC   | End bit |
+| Description  | Start bit | Direction bit    | Command opcode | Command argument | CRC   | End bit |
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 
-The CMD_OP and CMD_ARG CSRs of uDMA SDIO cam used to configure command opcode and command arguments respectively.
+The CMD_OP and CMD_ARG CSRs of uDMA SDIO should be used to configure command opcode and command arguments respectively.
 
-When START bit of REG_START CSR is set, the uDMA SDIO will enable the `sdclk_o` clock. After enabling clocks, uDMDA SDIO will drive 0 on `sdcmd_oen_o` and `sdcmd_o` to send a start bit. 
+When START bit of REG_START CSR is set, the uDMA SDIO will enable the `sdclk_o` clock. After enabling clocks, uDMA SDIO will drive 0 on `sdcmd_oen_o` and `sdcmd_o` to send a start bit. 
 
 The command will be send in below sequence : -
 
@@ -176,16 +177,16 @@ The command will be send in below sequence : -
 CRC is calculated based on `x7+x3+1` polynomial function. CRC will calculated on Command opcode and argument field value.
 
 The uDMA SDIO after sending command, enable SDIO to perform data read (Rx) operation from the external device. The data read operation is explained in data section.
-If SDIO is configured to received command response then the comamnd response will be read as per the detail mentioned in the response section.
-If SDIO is not configure to recive command response then it raises EOT interrupt and enables SDIO to perform data write (Tx) operation to external device.
+If SDIO is configured to receive command response then the command response will be read as per the details mentioned in the response section.
+If SDIO is not configure to receive command response then it raises EOT interrupt and enables SDIO to perform data write (Tx) operation to the external device.
 
 Response
 ^^^^^^^^
 
 A response is sent from an addressed card to the host as an answer to a previously received command. A response is transferred serially on the CMD line.
-MSB will be read first and LSB will be read last. Transmission bit is 0, as response is transmitted from device to host.
+MSB will be read first and LSB will be read last. Direction bit is 0, as response is transmitted from device to host.
 
-The RSP_TYPE bified of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
+The RSP_TYPE bifield of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
 
 - RSP_TYPE_48_CRC, response length will be 38 bit long.
 
@@ -196,7 +197,7 @@ The RSP_TYPE bified of CMD_OP CSRs can used to configure expected response from 
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
 | Value        | 0         | 0                | x              | x           | x     | 1       |
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
-| Description  | Start bit | Transmission bit | Command index  | Card status | CRC   | End bit |
+| Description  | Start bit | Direction bit    | Command index  | Card status | CRC   | End bit |
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
 
 - RSP_TYPE_48_BSY, response length will be 38 bit long.
@@ -208,7 +209,7 @@ The RSP_TYPE bified of CMD_OP CSRs can used to configure expected response from 
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
 | Value        | 0         | 0                | x              | x           | x     | 1       |
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
-| Description  | Start bit | Transmission bit | Command index  | Card status | CRC   | End bit |
+| Description  | Start bit | Direction bit    | Command index  | Card status | CRC   | End bit |
 +--------------+-----------+------------------+----------------+-------------+-------+---------+
 
 - RSP_TYPE_48_NOCRC, response length will be 38 bit long.
@@ -220,7 +221,7 @@ The RSP_TYPE bified of CMD_OP CSRs can used to configure expected response from 
 +--------------+-----------+------------------+----------------+-------------+----------+---------+
 | Value        | 0         | 0                | x              | x           | 1111111  | 1       |
 +--------------+-----------+------------------+----------------+-------------+----------+---------+
-| Description  | Start bit | Transmission bit | Command index  | Card status | Reserved | End bit |
+| Description  | Start bit | Direction bit    | Command index  | Card status | Reserved | End bit |
 +--------------+-----------+------------------+----------------+-------------+----------+---------+
 
 - RSP_TYPE_136, response length will be 134 bit long.
@@ -232,14 +233,14 @@ The RSP_TYPE bified of CMD_OP CSRs can used to configure expected response from 
 +---------------+-----------+------------------+-----------+--------------------------------+---------+
 | Value         | 0         | 0                | 111111    | x                              | 1       |
 +---------------+-----------+------------------+-----------+--------------------------------+---------+
-| Description   | Start bit | Transmission bit | Reserved  | Response content including CRC | End bit |
+| Description   | Start bit | Direction bit    | Reserved  | Response content including CRC | End bit |
 +---------------+-----------+------------------+-----------+--------------------------------+---------+
 
 If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending commnand.
-To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cylce, it updates the command STATUS to STATUS_RSP_TIMEOUT.
-After successfully receiving command response, uDMA SDIO validates if the direction bit recived at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero than it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data upto response length.
-If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY respone, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
-The SDIO, irresepective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
+To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cylce, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+If command response is received successfully, uDMA SDIO validates if the direction bit recived at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero than it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data upto response length.
+If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY response, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
+The SDIO, irrespective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
 
 CRC is calculated based on `x7+x3+1` polynomial function.
 
