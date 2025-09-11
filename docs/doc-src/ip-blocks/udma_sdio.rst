@@ -56,6 +56,8 @@ Features
    -  Response wrong direction
    -  Response busy timeout
 
+- SDIO operation is synchronized using a `sdclk_o` clock whose period can be controlled using CLK_DIV CSR.
+
 Block Architecture
 ------------------
 
@@ -153,8 +155,8 @@ TX FIFO is transparent to users.
 Command
 ^^^^^^^
 
-Operation is started by generating a command. A host can send a command to either a single card or to all the connected cards. A command is transferred serially on the CMD line.
-MSB is transmitted first and LSB is transmitted last. Direction bit is 1, as command is transmitted from host to device.
+SDIO operation is started by generating a command. A host can send a command to either a single card or to all the connected cards. A command is transferred serially on the `sdcmd_o` line.
+`sdcmd_oen_o` is pulled low(0) during the transmit operation. MSB is transmitted first and LSB is transmitted last. Direction bit is 1, as command is transmitted from host to device.
 
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 | Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
@@ -176,17 +178,37 @@ The command will be send in below sequence : -
 
 CRC is calculated based on `x7+x3+1` polynomial function. CRC will calculated on Command opcode and argument field value.
 
-The uDMA SDIO after sending command, enable SDIO to perform data read (Rx) operation from the external device. The data read operation is explained in data section.
-If SDIO is configured to receive command response then the command response will be read as per the details mentioned in the response section.
-If SDIO is not configure to receive command response then it raises EOT interrupt and enables SDIO to perform data write (Tx) operation to the external device.
+The uDMA SDIO sends a stop command to communicate end of command transfer to the external device. Below is the format of end of command.
+
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
++==============+===========+==================+================+==================+=======+=========+
+| Width        | 1         | 1                | 6              | 32               | 7     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Value        | 0         | 1                |  6'd12         | 32'h0            | X     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Description  | Start bit | Direction bit    | Command opcode | Command argument | CRC   | End bit |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+
+After transmitting the stop command, the uDMA SDIO expects RSP_TYPE_48_CRC response from the external device.
+
+**Command Response and Data Flow in uDMA SDIO**
+
+After transmitting a command, the uDMA SDIO can perform subsequent operations based on the DATA_SETUP CSR configuration and the command response setting. The behavior is as follows:
+
+- If the DATA_SETUP CSR indicates a read transaction, the uDMA SDIO initiates a data read (Rx) operation from the external device. The details of this operation are described in the Data Section.
+- If SDIO is configured to receive a command response, the response is captured and processed as described in the Response Section.
+- If SDIO is not configured to receive a command response or the command response is received:
+   - An End-of-Transfer (EOT) interrupt is raised.
+   - The uDMA SDIO is then enabled to perform a data write (Tx) operation to the external device, depending on the DATA_SETUP CSR setting.
 
 Response
 ^^^^^^^^
 
-A response is sent from an addressed card to the host as an answer to a previously received command. A response is transferred serially on the CMD line.
-MSB will be read first and LSB will be read last. Direction bit is 0, as response is transmitted from device to host.
+A response is sent from an external card to the host as an answer to a previously received command. A response is received serially on the `sdcmd_i` line.
+`sdcmd_oen_o` is pulled high(1) during the transmit operation. MSB will be read first and LSB will be read last. Direction bit is 0, as response is transmitted from device to host.
 
-The RSP_TYPE bifield of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
+The RSP_TYPE bitfield of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
 
 - RSP_TYPE_48_CRC, response length will be 38 bit long.
 
@@ -236,9 +258,9 @@ The RSP_TYPE bifield of CMD_OP CSRs can used to configure expected response from
 | Description   | Start bit | Direction bit    | Reserved  | Response content including CRC | End bit |
 +---------------+-----------+------------------+-----------+--------------------------------+---------+
 
-If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending commnand.
-To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cylce, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
-If command response is received successfully, uDMA SDIO validates if the direction bit recived at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero than it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data upto response length.
+If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending command.
+To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cycle, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+If command response is received successfully, uDMA SDIO validates if the direction bit received at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero than it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data up to response length.
 If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY response, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
 The SDIO, irrespective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
 
@@ -246,14 +268,12 @@ CRC is calculated based on `x7+x3+1` polynomial function.
 
 The response data can be read from REG_RSPx{x = 0 to 3} CSR of SDIO.
 
-Single bit is transferred at every posedge of the clock. Transmitting a 38 bit command data would take 38 clock cycles and a 7 bit crc
-would take 7 clock cycles. Similarly receiving a response would take response length clock cycle.
-
 Data
 ^^^^
 
-Data can be transferred from the card to the host or vice versa. It is transferred via the data lines.
-Data transfer to/from the SD memory card is done in blocks. Data blocks are succeeded by CRC bits.
+Data can be transferred from the external device to the host uDMA SDIO or vice versa. It is transferred via the data lines.
+
+Data transfer to/from the host is done in blocks. Data blocks are succeeded by CRC bits.
 
 **Tx Operation**
 
@@ -265,27 +285,48 @@ a) When command response is needed
 b) When command response is not needed
    - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command is sent.
 
-To initiate Tx operation, uDMA Core will drive 1 on `sddata_oen_o` line.
-Data will be transmitted over data lines in below sequence: - 
+To initiate Tx operation, uDMA Core will drive 1 on `sddata_oen_o` line. Data will be transmitted over `sddata_o` data lines in below sequence: - 
 
 `Start bit -> Data -> CRC - > End`
 
-To send start bit, the uDMA SDIO will drive the `sddata_o` will value 0.
+To send start bit, the uDMA SDIO will drive the `sddata_o` will value 0. CRC for Tx operation is calculated based on `x16+x12+x5+1` polynomial function. CRC is calculated by the SDIO on the data received from the L2 memory.
+
+To get transmit data from L2 memory TX FIFO requests data from the uDMA core by asserting both the READY (space available) and REQ (request a new transaction) signals. The uDMA core arbitrates among multiple peripherals on receiving the REQ signal. When the SDIO TX channel is enabled and wins arbitration, the uDMA core issues a GNT (grant) signal and places the valid data read from L2 memory on the bus along with asserting VALID signal.
+Tx FIFO stores this received data and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core de-asserts the VALID signal in the following clock cycle and reasserts it only when new data is available for transmission. Initially, after reset or power-up, READY/REQ are asserted since the FIFO is empty.
+
+Whenever TX FIFO has valid data and the TX DC FIFO has shown readiness to accept data by asserting READY signal, it asserts VALID signal and update the data lines of DC FIFO with the valid data. The data transmission from TX FIFO to TX DC FIFO is synchronized using system clock. TX DC FIFO de-asserts READY when it is full, temporarily stalling the upstream TX FIFO.
+Once space is freed, READY is re-asserted. Data moves from TX FIFO to TX DC FIFO when both VALID and READY are high on the same cycle.
+
+The uDMA SDIO must be configured using the TX_SADDR, TX_SIZE and TX_CFG CSRs to read transmit data from L2 memory.
 
 **Rx Operation**
 
 Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is sent. 
+The uDMA SDIO receives data on the `sddata_i` data lines. Data will be received  over `sddata_i` data lines in below sequence: - 
 
+`Start bit -> Data -> CRC - > End`
 
-CRC is calculated based on `x16+x12+x5+1` polynomial function.
+To receive response, uMDA QSPI  expects `sddata_i` pin to have value 0(indicating start bit) within BLOCK_NUM clock cycles. If uDMA SDIO does not receive response from the external device within BLOCK_NUM `sdclk_o` clock cycle, it updates the Rx STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+After successfully receiving the start bit, it reads BLOCK_SIZE data and 16 bit crc values. After successfully reading BLOCK_NUM data and subsequent crc bits, uDMA SDIO sets the EOT bit of STATUS CSR. Reading EOT bit will clear it.
+The uDMA SDIO reads the start bit, BLOCK_SIZE data and 16 bit crc values for BLOCK_NUM to complete Rx operation.
+
+The uDMA SDIO pushes each BLOCK_SIZE data and CRC into the RX DC FIFO. The uDMA SDIO when it has data asserts the valid lines of RX DC FIFO.
+RX DC FIFO reads the data lines and asserts the valid lines for uDMA core to indicate the availability of new data.
+
+To store the received data into L2 memory, the uDMA SDIO must be programmed with RX_SADDR, RX_SIZE and RX_CFG CSRs.
+
+On detecting the valid signal, the uDMA core arbitrates for access. If the uDMA SDIO RX channel wins the arbitration and the core's RX FIFO has space, uDMA core asserts READY, latching the data from RX DC FIFO.
+The data is then written into L2 memory at the address specified by RX_SADDR, with automatic increment for subsequent bytes. The cycle repeats until the entire transfer (as defined by RX_SIZE) completes.
+
+CRC for both Rx and Tx operation is calculated based on `x16+x12+x5+1` polynomial function.
 
 Interrupt
 ^^^^^^^^^
 
 uDMA SDIO generates the following interrupts:
 
-- Error interrupt: 
-- End of transfer interrupt:
+- Error interrupt: Raised by uDMA SDIO when it encounter error while performing command-response reception or Rx/Tx operation.
+- End of transfer interrupt: Raised by uDMA SDIO after successfully completing Rx/Tx operation.
 - Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
 - Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
 
@@ -314,19 +355,13 @@ The figure below shows how the uDMA SDIO interfaces with the rest of the CORE-V-
 
 Programming Model
 ------------------
-As with most peripherals in the uDMA subsystem, software configuration can be conceptualized into three functions:
+As with most peripherals in the uDMA Subsystem, software configuration for the uDMA SDIO  interface can be conceptualized into three key steps:
 
-- Configure the I/O parameters of the peripheral (e.g. baud rate).
-- Configure the uDMA data control parameters.
-- Manage the data transfer/reception operation.
+- I/O Configuration: Set up external clock and chip select and output enable lines.
+- uDMA core Setup:  Configure source/destination addresses, transfer size, and direction for TX and RX operation using channel CSRs. This enables efficient data movement from L2 memory to SDIO  via uDMA core. Update the L2 memory with command sequence to configure SDIO controller.
+- Data Transfer Management: Read command sequence from L2 memory to configure SDIO for RX/TX operation. Drive SDIO bus based on the received command sequence.
 
-uDMA SDIO Data Control
-^^^^^^^^^^^^^^^^^^^^^^
-Refer to the Firmware Guidelines section in the current chapter.
-
-Data Transfer Operation
-^^^^^^^^^^^^^^^^^^^^^^^
-Refer to the Firmware Guidelines section in the current chapter.
+Refer to the Firmware Guidelines section in the current chapter for more information.
 
 uDMA SDIO CSRs
 --------------
@@ -487,10 +522,10 @@ CMD_ARG
 +--------+--------+--------+------------+---------------------------------------------------------------------+
 | Field  | Bits   | Access | Default    | Description                                                         |
 +========+========+========+============+=====================================================================+
-| ARG    | 31:0   | W      | 0x00000000 | Argument value associated with the operation. This 32-bit field     |
-|        |        |        |            | provides optional or required data used by the command specified    |
-|        |        |        |            | in the `OP` field. The meaning of this field depends on the         |
-|        |        |        |            | command type and context.                                           |
+| ARG    | 31:0   | W      | 0x00000000 | Argument value associated with the command operation. This 32-bit   |
+|        |        |        |            | field provides optional or required data used by the command        |
+|        |        |        |            | specified in the `OP` field. The meaning of this field depends on   |
+|        |        |        |            | the command type and context.                                       |
 +--------+--------+--------+------------+---------------------------------------------------------------------+
 
 DATA_SETUP
@@ -514,8 +549,8 @@ DATA_SETUP
 | RWN         | 1:1    | W      | 0x0        | Read/Write control: `0` indicates a write operation, `1` indicates  |
 |             |        |        |            | a read operation.                                                   |
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
-| EN          | 0:0    | W      | 0x0        | Enable bit. When set to `1`, triggers the start of the configured   |
-|             |        |        |            | transfer.                                                           |
+| EN          | 0:0    | W      | 0x0        | Enable bit. When set to `1`, triggers the start of the read-write   |
+|             |        |        |            | operation. Read-write is decided based on the RWN bitfield.         |
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 
 REG_START
@@ -526,7 +561,7 @@ REG_START
 +--------+--------+--------+------------+------------------------------------------------------------------------------+
 | Field  | Bits   | Access | Default    | Description                                                                  |
 +========+========+========+============+==============================================================================+
-| START  | 0:0    | W      | 0x0        | Start bit. Writing `1` to this bit initiates the commdand transmit operation |
+| START  | 0:0    | W      | 0x0        | Start bit. Writing `1` to this bit initiates the command transmit operation  |
 +--------+--------+--------+------------+------------------------------------------------------------------------------+
 
 REG_RSP0
@@ -590,7 +625,6 @@ CLK_DIV
 |           |       |        |            | behavior of a functional block.                                    |
 +-----------+-------+--------+------------+--------------------------------------------------------------------+
 
-
 STATUS
 ^^^^^^
 - Offset: 0x44
@@ -615,10 +649,10 @@ STATUS
 |         |       |        |            |      They hold no functional meaning and may be read as zero or undefined.  |
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
 |  ERR    | 1:1   |  RWC   |   0x0      |  Writing any value clears the bit. Indicates error either                   |
-|         |       |        |            |  during data or commdand-response reception.                                |
+|         |       |        |            |  during data or command-response reception.                                 |
 |         |       |        |            |                                                                             |
-|         |       |        |            |   - 0x0: STATUS bifield is 0x0                                              |
-|         |       |        |            |   - 0x1: STATUS bitfield is non zero                                        |
+|         |       |        |            |   - 0x0: No error                                                           |
+|         |       |        |            |   - 0x1: Error                                                              |
 |         |       |        |            |                                                                             |
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
 |  EOT    | 0:0   |  RWC   |   0x0      |  Writing any value clears the bit.                                          |
@@ -744,7 +778,7 @@ uDMA SDIO interface to generate interrupt
 - eot_o
 - err_o
 
-eot_o interrupt is generated at the end of receive or tranmit operation. `err_o`interrupt is generated when an error is observed during receive operation.
+eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation.
 
 uDMA SDIO interface to read-write CSRs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
