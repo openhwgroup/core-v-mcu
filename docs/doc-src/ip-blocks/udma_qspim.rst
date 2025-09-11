@@ -613,7 +613,7 @@ In SPI mode, spi_sdi1_o reflects the data recived from the external device.
 uDMA QSPI after reading the WORD_PER_TRANSF words, asserts valid signal of Rx DC FIFO. RC DC FIFO when it has enough space samples the data lines at every clock cycle provided that the valid line is asserted.
 The Rx DC FIFO shows readiness to receive data by asserting the ready signal.
 
-Below the typic command sequence for RX operation: -
+Below is the example  command sequence for RX operation: -
 
 +-------------------+------------------------+-----------------------------+
 | Command           | L2 memory Encoded Word | Description                 |
@@ -678,7 +678,7 @@ The output pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field 
 In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of recived data.
    In SPI mode, spi_sdo0_o reflects the data recived from the external device.
 
-Below the typic command sequence for TX operation
+Below is the example command sequence for TX operation
 
 +-------------------+------------------------+-----------------------------+
 | Command           | L2 memory Encoded Word | Description                 |
