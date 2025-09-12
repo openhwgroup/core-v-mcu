@@ -109,7 +109,7 @@ During SDIO transmit (Tx) operation, the TX DC FIFO is read internally by the SD
 During SDIO receive (Rx) operation, the RX DC FIFO is written internally by the SDIO with the data received from the external device and read by the uDMA core.
 
 TX FIFO
-^^^^^^^
+~~~~~~~
 
 uDMA SDIO has a TX FIFO to store the received data from uDMA core. It forwards the data read from L2 memory to the TX DC FIFO. uDMA SDIO on TX path, read the data from TX DC FIFO and transmits it to external device.
 It is a 2-depth FIFO and can store 8-bit wide data. Below diagram shows the interfaces of TX FIFO: 
@@ -145,7 +145,7 @@ TX tries to read data at each clock cycle until TX FIFO has space and a valid pi
 TX FIFO is transparent to users.
 
 Command
-^^^^^^^
+~~~~~~~
 
 SDIO operation is started by generating a command. A host can send a command to either a single card or to all the connected cards. A command is transferred serially on the `sdcmd_o` line.
 `sdcmd_oen_o` is pulled low(0) during the transmit operation. MSB is transmitted first and LSB is transmitted last. Direction bit is 1, as command is transmitted from host to device.
@@ -195,7 +195,7 @@ After transmitting a command, the uDMA SDIO can perform subsequent operations ba
    - The uDMA SDIO is then enabled to perform a data write (Tx) operation to the external device, depending on the DATA_SETUP CSR setting.
 
 Response
-^^^^^^^^
+~~~~~~~~
 
 A response is sent from an external card to the host as an answer to a previously received command. A response is received serially on the `sdcmd_i` line.
 `sdcmd_oen_o` is pulled high(1) during the transmit operation. MSB will be read first and LSB will be read last. Direction bit is 0, as response is transmitted from device to host.
@@ -261,13 +261,14 @@ CRC is calculated based on `x7+x3+1` polynomial function.
 The response data can be read from REG_RSPx{x = 0 to 3} CSR of SDIO.
 
 Data
-^^^^
+~~~~
 
 Data can be transferred from the external device to the host uDMA SDIO or vice versa. It is transferred via the data lines.
 
 Data transfer to/from the host is done in blocks. Data blocks are succeeded by CRC bits.
 
-**Tx Operation**
+Tx operation
+^^^^^^^^^^^^
 
 The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
 
@@ -291,7 +292,8 @@ Once space is freed, READY is re-asserted. Data moves from TX FIFO to TX DC FIFO
 
 The uDMA SDIO must be configured using the TX_SADDR, TX_SIZE and TX_CFG CSRs to read transmit data from L2 memory.
 
-**Rx Operation**
+Rx Operation
+^^^^^^^^^^^^
 
 Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is sent. 
 The uDMA SDIO receives data on the `sddata_i` data lines. Data will be received  over `sddata_i` data lines in below sequence: - 
@@ -313,7 +315,7 @@ The data is then written into L2 memory at the address specified by RX_SADDR, wi
 CRC for both Rx and Tx operation is calculated based on `x16+x12+x5+1` polynomial function.
 
 Interrupt
-^^^^^^^^^
+~~~~~~~~~
 
 uDMA SDIO generates the following interrupts:
 
@@ -347,6 +349,7 @@ The figure below shows how the uDMA SDIO interfaces with the rest of the CORE-V-
 
 Programming Model
 ------------------
+
 As with most peripherals in the uDMA Subsystem, software configuration for the uDMA SDIO  interface can be conceptualized into three key steps:
 
 - I/O Configuration: Set up external clock and chip select and output enable lines.
@@ -357,6 +360,7 @@ Refer to the Firmware Guidelines section in the current chapter for more informa
 
 uDMA SDIO CSRs
 --------------
+
 Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the uDMA SDIO.
 
 **NOTE:** Several of the uDMA SDIO CSRs are volatile, meaning that their read value may be changed by the hardware.
@@ -372,7 +376,8 @@ Details of CSR access type are explained `here <https://docs.openhwgroup.org/pro
 The CSRs RX_SADDR and RX_SIZE specify the configuration for the transaction on the RX channel. The CSRs TX_SADDR and TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and uses it for current ongoing transactions.
 
 RX_SADDR
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x0
 - Type:   volatile
 
@@ -389,7 +394,8 @@ RX_SADDR
 +--------+------+--------+------------+-----------------------------------------------------------------------------------------------------------+
 
 RX_SIZE
-^^^^^^^
+~~~~~~~
+
 - Offset: 0x04
 - Type:   volatile
 
@@ -407,7 +413,8 @@ RX_SIZE
 +-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
 
 RX_CFG
-^^^^^^
+~~~~~~
+
 - Offset: 0x08
 - Type:   volatile
 
@@ -429,7 +436,8 @@ RX_CFG
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 
 TX_SADDR
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x10
 - Type:   volatile
 
@@ -446,7 +454,8 @@ TX_SADDR
 +-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------------+
 
 TX_SIZE
-^^^^^^^
+~~~~~~~
+
 - Offset: 0x14
 - Type:   volatile
 
@@ -463,7 +472,8 @@ TX_SIZE
 +-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------+
 
 TX_CFG
-^^^^^^
+~~~~~~
+
 - Offset: 0x18
 - Type:   volatile
 
@@ -485,7 +495,8 @@ TX_CFG
 
 
 CMD_OP
-^^^^^^
+~~~~~~
+
 - Offset: 0x20
 - Type:   non-volatile
 
@@ -507,7 +518,8 @@ CMD_OP
 +-----------+--------+--------+------------+---------------------------------------------------------------------+
 
 CMD_ARG
-^^^^^^^
+~~~~~~~
+
 - Offset: 0x24
 - Type:   non-volatile
 
@@ -521,7 +533,8 @@ CMD_ARG
 +--------+--------+--------+------------+---------------------------------------------------------------------+
 
 DATA_SETUP
-^^^^^^^^^^
+~~~~~~~~~~
+
 - Offset: 0x28
 - Type:   non-volatile
 
@@ -546,7 +559,8 @@ DATA_SETUP
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 
 REG_START
-^^^^^^^^^
+~~~~~~~~~
+
 - Offset: 0x2C
 - Type:   non-volatile
 
@@ -557,7 +571,8 @@ REG_START
 +--------+--------+--------+------------+------------------------------------------------------------------------------+
 
 REG_RSP0
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x30
 - Type:   volatile
 
@@ -568,7 +583,8 @@ REG_RSP0
 +---------+-------+--------+------------+--------------------------------------------------------------------+
 
 REG_RSP1
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x34
 - Type:   volatile
 
@@ -579,7 +595,8 @@ REG_RSP1
 +---------+-------+--------+------------+--------------------------------------------------------------------+
 
 REG_RSP2
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x38
 - Type:   volatile
 
@@ -590,7 +607,8 @@ REG_RSP2
 +---------+-------+--------+------------+--------------------------------------------------------------------+
 
 REG_RSP3
-^^^^^^^^
+~~~~~~~~
+
 - Offset: 0x3C
 - Type:   volatile
 
@@ -601,7 +619,8 @@ REG_RSP3
 +---------+-------+--------+------------+--------------------------------------------------------------------+
 
 CLK_DIV
-^^^^^^^^
+~~~~~~~
+
 - Offset: 0x40
 - Type:   non-volatile
 
@@ -618,7 +637,8 @@ CLK_DIV
 +-----------+-------+--------+------------+--------------------------------------------------------------------+
 
 STATUS
-^^^^^^
+~~~~~~
+
 - Offset: 0x44
 - Type:   volatile
 
@@ -658,25 +678,29 @@ Firmware Guidelines
 -------------------
 
 Clock Enable, Reset & Configure uDMA SDIO
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA SDIO's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA SDIO.
 - Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA SDIO. It acts as a soft reset for uDMA SDIO.
 - Configure uDMA SDIO's CLK_DIV CSR to update the period of SDIO clock.
 
 Command
-^^^^^^^
+~~~~~~~
+
 - Configure CMD_OP with command opcode and response type expected after transmitting command to the external device.
 - Configure CMD_ARG with the argument associated with the command opcode selected via CMD_OP bitfield.
 - Configure REG_START CSR to initiate command transfer from SDIO to the external device.
 - if RSP_TYPE bitfield is configured with response type then REG_RSPx{x = 0 to 3} shall be read to get the received response from the external device.
 
 Tx Operation
-^^^^^^^^^^^^
+~~~~~~~~~~~~
+
 - Configure the TX channel using the TX_CFG CSR. Refer to the CSR details for detailed information.
 - For each transaction:
    - Update uDMA SDIO's TX_SADDR CSR with an interleaved (L2) memory address. SDIO will read the data from this memory address for transmission.
    - Configure the uDMA SDIO's TX_SIZE CSR with the size of data that the SDIO needs to transmit. uDMA SDIO will copy the transmit TX_SIZE bytes of data from the TX_SADDR location of interleaved memory.
 - Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation is start only successfully command transfer. Refere to the DATA_SETUP CSR for more information.
+
 The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
 
 a) When command response is needed
@@ -686,7 +710,8 @@ b) When command response is not needed
    - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command already transferred.
 
 Rx Operation
-^^^^^^^^^^^^
+~~~~~~~~~~~~
+
 - Configure the RX channel using the RX_CFG CSR. Refer to the CSR details for detailed information.
 - For each transaction:
    - Update uDMA SDIO's RX_SADDR CSR with an interleaved (L2) memory address. SDIO will write the data to this memory address for transmission.
@@ -699,11 +724,13 @@ The uDMA SDIO can be configured to perform Tx operation based on the below condi
 - STATUS bit of the STATUS CSR reflects the status of Rx operation.
 
 End of transfer Interrupt
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - The uDMA SDIO asserts end of transmission event when it completes either Tx or Rx operation. EOT bit of STATUS CSR reflects the error status. The end of transfer interrupt is automatically cleared in the next clock cycle.
 
 Error interrupt
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
+
 - The uDMA SDIO asserts error event when it faces an error during either reception of command-response or data from the external device. ERR bit of STATUS CSR reflects the error status.  The error interrupt is automatically cleared in the next clock cycle.
 
 Pin Diagram
@@ -720,7 +747,8 @@ The Figure below is a high-level block diagram of the uDMA: -
 Below is a categorization of these pins:
 
 Tx channel interface
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
+
 The following pins constitute the Tx channel interface of uDMA SDIO. uDMA SDIO uses these pins to read data from interleaved (L2) memory:
 
 - data_tx_req_o
@@ -733,7 +761,8 @@ The following pins constitute the Tx channel interface of uDMA SDIO. uDMA SDIO u
 Data_tx_datasize_o  pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
 
 Rx channel interface
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
+
 The following pins constitute the Rx channel interface of uDMA SDIO. uDMA SDIO uses these pins to write data to interleaved (L2) memory:
 
 - data_rx_datasize_o
@@ -744,20 +773,22 @@ The following pins constitute the Rx channel interface of uDMA SDIO. uDMA SDIO u
  data_rx_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
 
 Clock interface
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
+
 - sys_clk_i
 - periph_clk_i
 
 uDMA CORE derives these clock pins. periph_clk_i is used to calculate baud rate. sys_clk_i is used to synchronize SDIO with uDAM Core.
 
 Reset interface
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
+
 - rstn_i
 
 uDMA core issues reset signal to SDIO using reset pin. This is active low signal.
 
 uDMA SDIO bus interface
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 **command interface**
 
@@ -783,15 +814,16 @@ reception of response.
 
 
 uDMA SDIO interface to generate interrupt
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - eot_o
 - err_o
 
-eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation.
-These are active high signal.
+eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation. These are active high signal.
 
 uDMA SDIO interface to read-write CSRs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The following interfaces are used to read and write to SDIO CSRs. These interfaces are managed by uDMA Core:
 
 - cfg_data_i
@@ -802,7 +834,8 @@ The following interfaces are used to read and write to SDIO CSRs. These interfac
 - cfg_data_o
 
 uDMA SDIO Rx channel configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - uDMA SDIO uses the following pins to share the value of config CSRs, i.e., RX_SADDR, RX_SIZE, and RX_CFG, with the uDMA core: -
 
    - cfg_rx_startaddr_o
@@ -824,7 +857,8 @@ uDMA SDIO Rx channel configuration interface
    These values are updated by the uDMA core and reflect the configuration values for the current ongoing transactions.
 
 uDMA SDIO Tx channel configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 - uDMA SDIO uses the following pins to share the value of config CSRs, i.e., TX_SADDR, TX_SIZE, and TX_CFG, with the uDMA core: -
 
    - cfg_tx_startaddr_o
