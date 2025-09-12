@@ -640,7 +640,7 @@ Below is the example  command sequence for RX operation: -
 +-------------------+------------------------+-----------------------------+
 
 The below sequence configures SPI, asserts the chip-select line, sends an instruction (0x0B), then uses a repeat block to receive
-data multiple times without replicating commands.
+data multiple times without replicating commands. This way, the Rx block (SPI_CMD_RX_DATA) is executed 3 times automatically, without re-encoding the same command multiple times in memory.
 
 +-------------------+------------------------+-----------------------------------+
 | Command           | L2 memory Encoded Word | Description                       |
@@ -699,9 +699,6 @@ Below is the example command sequence for TX operation
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
 |                   |                        | optionally de-assert CS.    |
 +-------------------+------------------------+-----------------------------+
- 
-
-This way, the Rx block (SPI_CMD_RX_DATA) is executed 3 times automatically, without re-encoding the same command multiple times in memory.
 
 Full duplex operation
 ^^^^^^^^^^^^^^^^^^^^^
