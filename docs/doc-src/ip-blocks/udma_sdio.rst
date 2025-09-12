@@ -1,6 +1,6 @@
 ..
    Copyright (c) 2023 OpenHW Group
-   Copyright (c) 2024 CircuitSutra
+   Copyright (c) 2024 CircuitSutra Technologies Pvt Ltd
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -22,14 +22,6 @@ UDMA SDIO(SD Input/Output) INTERFACE
 
 The SDIO card provides high speed data I/O with low power consumption for mobile electronic devices. Host devices supporting
 SDIO can connect the SD slot with I/O devices like Bluetooth, wireless, LAN, GPS Receiver, Digit Camera etc.
-
-SDIO INTERFACE BUS
-------------------
-
-.. figure:: ./udma_sdio_image8.png
-   :name: uDMA_sdio_interface_Diagram
-   :align: center
-   :alt: 
 
 Features
 --------
@@ -669,6 +661,14 @@ Clock Enable, Reset & Configure uDMA SDIO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA SDIO's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA SDIO.
 - Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA SDIO. It acts as a soft reset for uDMA SDIO.
+- Configure uDMA SDIO's CLK_DIV CSR to update the period of SDIO clock.
+
+Command
+^^^^^^^
+- Configure CMD_OP with command opcode and response type expected after transmitting command to the external device.
+- Configure CMD_ARG with the argument associated with the command opcode selected via CMD_OP bitfield.
+- Configure REG_START CSR to initiate command transfer from SDIO to the external device.
+- if RSP_TYPE bitfield is configured with response type then REG_RSPx{x = 0 to 3} shall be read to get the received response from the external device.
 
 Tx Operation
 ^^^^^^^^^^^^
@@ -676,7 +676,14 @@ Tx Operation
 - For each transaction:
    - Update uDMA SDIO's TX_SADDR CSR with an interleaved (L2) memory address. SDIO will read the data from this memory address for transmission.
    - Configure the uDMA SDIO's TX_SIZE CSR with the size of data that the SDIO needs to transmit. uDMA SDIO will copy the transmit TX_SIZE bytes of data from the TX_SADDR location of interleaved memory.
-- While Tx operation is ongoing, the TX_BUSY bit of the STATUS CSR will be set.
+- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation is start only successfully command transfer. Refere to the DATA_SETUP CSR for more information.
+The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
+
+a) When command response is needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command response is received.
+
+b) When command response is not needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command already transferred.
 
 Rx Operation
 ^^^^^^^^^^^^
@@ -684,18 +691,20 @@ Rx Operation
 - For each transaction:
    - Update uDMA SDIO's RX_SADDR CSR with an interleaved (L2) memory address. SDIO will write the data to this memory address for transmission.
    - Configure uDMA SDIO's RX_SIZE CSR with the size of data that SDIO needs to transmit. uDMA SDIO will copy the transmit RX_SIZE bytes of data to the RX_SADDR location of interleaved memory.
-- While Rx operation is ongoing, the RX_BUSY bit of the STATUS CSR will be set.
-- Upon receiving the data from the external device, uDMA SDIO will set the RX_DATA_VALID bit to high.
-- Received data can also be read using the REG_RSPx{x = 0 to 3} CSR. When there is no valid data, the RX_DATA_VALID bit will be cleared.
+- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation is start only successfully command transfer. Refere to the DATA_SETUP CSR for more information.
+
+The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
+- Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is already transferred.
+
+- STATUS bit of the STATUS CSR reflects the status of Rx operation.
 
 End of transfer Interrupt
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+- The uDMA SDIO asserts end of transmission event when it completes either Tx or Rx operation. EOT bit of STATUS CSR reflects the error status. The end of transfer interrupt is automatically cleared in the next clock cycle.
 
 Error interrupt
 ^^^^^^^^^^^^^^^
-
-Receive interrupt
-^^^^^^^^^^^^^^^^^
+- The uDMA SDIO asserts error event when it faces an error during either reception of command-response or data from the external device. ERR bit of STATUS CSR reflects the error status.  The error interrupt is automatically cleared in the next clock cycle.
 
 Pin Diagram
 -----------
@@ -745,10 +754,10 @@ Reset interface
 ^^^^^^^^^^^^^^^
 - rstn_i
 
-uDMA core issues reset signal to SDIO using reset pin.
+uDMA core issues reset signal to SDIO using reset pin. This is active low signal.
 
-uDMA SDIO interface to get/send data from/to external device
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+uDMA SDIO bus interface
+^^^^^^^^^^^^^^^^^^^^^^^
 
 **command interface**
 
@@ -779,6 +788,7 @@ uDMA SDIO interface to generate interrupt
 - err_o
 
 eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation.
+These are active high signal.
 
 uDMA SDIO interface to read-write CSRs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
