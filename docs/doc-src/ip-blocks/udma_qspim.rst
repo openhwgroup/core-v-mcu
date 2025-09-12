@@ -28,6 +28,8 @@ The CORE-V-MCU QSPI Master supports an implementation of the SPI and the QSPI (Q
 Due to the lack of a formal standard it is impossible to make a claim of compliance to the protocol.
 However, CORE-V-MCU’s QSPI interface is known to work with the Micron N25Q256A Serial NOR Flash Memory and *should* work with a large set of QSPI and SPI devices.
 
+The uDMA QSPI controller is actually a JEDEC SPI NOR Flash controller.
+
 Features
 --------
 - Supports both standard SPI and quad SPI mode. The default mode of operation is standard SPI mode.
@@ -229,7 +231,11 @@ Below table explains Master and Slave settings for different combination(Mode) o
 
 - SPI_CMD_SOT
 
-   uDMA QSPI takes system clock(clk_i) cycle defined in EVENT_ID_CYCLE_COUNT field of SPI_CMD_WAIT command to update chip select lines based on the SPI_CMD_SOT configuration.
+   uDMA QSPI takes system clock(clk_i) cycle defined in WAIT_CYC field of SPI_CMD_WAIT command to update chip select lines based on the SPI_CMD_SOT configuration.
+
+   .. warning::
+      In the current implementation, the `WAIT_CYC` field of the `SPI_CMD_WAIT` command is used in place of the `CS_WAIT` field of the `SPI_CMD_SOT` command. 
+      When applied in the context of `SPI_CMD_SOT`, the `WAIT_CYC` field must, at all times, represent the required wait cycles.
 
 +----------------------+--------+------------------------------------------------------------+
 | Command Field        | Bits   | Description                                                |
@@ -291,8 +297,8 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 - SPI_CMD_WAIT
 
    uDMA QSPI supports the concept of itroducing delay during transaction. There are two way to introduce delay: -
-   `Event based delay` : In this mode uDMA QSPI halt its operation until it receives an event defined by EVENT_ID_CYCLE_COUNT field of SPI_CMD_WAIT, from the uDMA Core.
-   `Clock based delay` : In this mode uDMA QSPI consumes clock defined by EVENT_ID_CYCLE_COUNT field of SPI_CMD_WAIT.
+   `Event based delay` : In this mode uDMA QSPI halt its operation until it receives an event defined by WAIT_CYC field of SPI_CMD_WAIT, from the uDMA Core.
+   `Clock based delay` : In this mode uDMA QSPI consumes clock defined by WAIT_CYC field of SPI_CMD_WAIT.
 
    The WAIT_TYPE field of SPI_CMD_WAIT decides between Event-based-delay and Clock-based-delay.
 
@@ -311,8 +317,8 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                           |        | - 0x3: Reserved                                                  |
 |                           |        |                                                                  |
 +---------------------------+--------+------------------------------------------------------------------+
-| EVENT_ID_CYCLE_COUNT      | 7:0    |                                                                  |
-|                           |        | - If WAIT_TYPE = 0x0 → Stores Event ID                           |
+| WAIT_CYC                  | 7:0    |                                                                  |
+|                           |        | - If WAIT_TYPE = 0x0 → bitfield 0:1 Stores Event ID              |
 |                           |        | - If WAIT_TYPE = 0x1 → Stores number of cycles to wait           |
 +---------------------------+--------+------------------------------------------------------------------+
 
@@ -427,7 +433,7 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 |                      |        | uDMA QSPI reads command sequence until it receives SPI_CMD_RPT_END.    |
 |                      |        | Execute the whole command sequence for RPT_CNT times.                  |
 +----------------------+--------+------------------------------------------------------------------------+
-| RPT_CNT              | 15:0   | Number of repeat iterations, the command sequence will be executed for  |
+| RPT_CNT              | 15:0   | Number of repeat iterations, the command sequence will be executed for |
 |                      |        | RPT_CNT times.                                                         |
 +----------------------+--------+------------------------------------------------------------------------+
 
@@ -446,7 +452,7 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 | KEEP_CHIP_SELECT     | 1:1    | Chip select behavior after EOT:                                  |
 |                      |        |                                                                  |
 |                      |        | - 0x0: Keep chip select asserted                                 |
-|                      |        | - 0x1: De-assert (clear) all chip selects                         |
+|                      |        | - 0x1: De-assert (clear) all chip selects                        |
 +----------------------+--------+------------------------------------------------------------------+
 | EVENT_GEN            | 0:0    | EOT event generation:                                            |
 |                      |        |                                                                  |
@@ -456,14 +462,14 @@ The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
 
 SPI_CMD_RPT_END
 
-Marks the end of command sequence started by SPI_CMD_RPT for repeat operation. Below is an example of the usage of 
-SPI_CMD_RPT and SPI_CMD_RPT_END command.
+Marks the end of command sequence started by SPI_CMD_RPT for repeat operation. Below is an example of the usage of SPI_CMD_RPT and SPI_CMD_RPT_END command.
 
-`
-SPI_CMD_RPT (RPT_CNT = 10)   // Start repeating next command for 10 times
-SPI_CMD_SEND_CMD             // Send a command word
-SPI_CMD_RPT_END              // End repeat block
-`
+
+- SPI_CMD_RPT (RPT_CNT = 10)   // Start repeating next command for 10 times
+- SPI_CMD_SEND_CMD             // Send a command word
+- SPI_CMD_RPT_END              // End repeat block
+
+
 Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 
 +----------------------+--------+--------------------------------------------------------------+
@@ -479,34 +485,33 @@ Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 
    uDMA QSPI also provide the provision to check received data against the expected data. Refer to SPI_CMD_RX_CHECK description for more information.
 
-+----------------------+--------+-----------------------------------------------------------------------+
-| Command Field        | Bits   | Description                                                           |
-+======================+========+=======================================================================+
-| SPI_CMD              | 31:28  | 0xB : SPI_CMD_RX_CHECK                                                |
-|                      |        | Compares received data against expected value COMP_DATA.              |
-+----------------------+--------+-----------------------------------------------------------------------+
-| QPI                  | 27:27  | Transfer mode:                                                        |
-|                      |        |                                                                       |
-|                      |        | - 0x0: Standard (1-bit) SPI                                           |
-|                      |        | - 0x1: Quad SPI mode                                                  |
-+----------------------+--------+-----------------------------------------------------------------------+
-| LSB                  | 26:26  | Bit ordering of received data:                                        |
-|                      |        |                                                                       |
-|                      |        | - 0x0: Data is LSB-first                                              |
-|                      |        | - 0x1: Data is MSB-first                                              |
-+----------------------+--------+-----------------------------------------------------------------------+
-| CHECK_TYPE           | 25:24  | Comparison mode:                                                      |
-|                      |        |                                                                       |
-|                      |        | - 0x0: Compare bit-by-bit                                             |
-|                      |        | - 0x1: Check only 1s                                                  |
-|                      |        | - 0x2: Check only 0s                                                  |
-|                      |        | - 0x3: Checks if all the bits that are 1 in received data are also 1  |
-|                      |        |      in COMP_DATA.                                                    |
-+----------------------+--------+-----------------------------------------------------------------------+
-| BITS_WORD            | 19:16  |  2 pow BITS_WORD in a word                                            |
-+----------------------+--------+-----------------------------------------------------------------------+
-| COMP_DATA            | 15:0   | Expected data to compare against received value                       |
-+----------------------+--------+-----------------------------------------------------------------------+
++----------------------+--------+------------------------------------------------------------------------------------+
+| Command Field        | Bits   | Description                                                                        |
++======================+========+====================================================================================+
+| SPI_CMD              | 31:28  | 0xB : SPI_CMD_RX_CHECK                                                             |
+|                      |        | Compares received data against expected value COMP_DATA.                           |
++----------------------+--------+------------------------------------------------------------------------------------+
+| QPI                  | 27:27  | Transfer mode:                                                                     |
+|                      |        |                                                                                    |
+|                      |        | - 0x0: Standard (1-bit) SPI                                                        |
+|                      |        | - 0x1: Quad SPI mode                                                               |
++----------------------+--------+------------------------------------------------------------------------------------+
+| LSB                  | 26:26  | Bit ordering of received data:                                                     |
+|                      |        |                                                                                    |
+|                      |        | - 0x0: Data is LSB-first                                                           |
+|                      |        | - 0x1: Data is MSB-first                                                           |
++----------------------+--------+------------------------------------------------------------------------------------+
+| CHECK_TYPE           | 25:24  | Comparison mode:                                                                   |
+|                      |        |                                                                                    |
+|                      |        | - 0x0: Compare bit-by-bit                                                          |
+|                      |        | - 0x1: Check only 1s                                                               |
+|                      |        | - 0x2: Check only 0s                                                               |
+|                      |        | - 0x3: Checks if all the bits that are 1 in received data are also 1 in COMP_DATA. |
++----------------------+--------+------------------------------------------------------------------------------------+
+| BITS_WORD            | 19:16  |  2 pow BITS_WORD in a word                                                         |
++----------------------+--------+------------------------------------------------------------------------------------+
+| COMP_DATA            | 15:0   | Expected data to compare against received value                                    |
++----------------------+--------+------------------------------------------------------------------------------------+
 
 - SPI_CMD_FULL_DUPL
 
@@ -631,7 +636,7 @@ Below is the example  command sequence for RX operation: -
 |                   |                        | payload into memory.        |
 +-------------------+------------------------+-----------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally de-assert CS.     |
+|                   |                        | optionally de-assert CS.    |
 +-------------------+------------------------+-----------------------------+
 
 The below sequence configures SPI, asserts the chip-select line, sends an instruction (0x0B), then uses a repeat block to receive
@@ -655,7 +660,7 @@ data multiple times without replicating commands.
 | SPI_CMD_RPT_END   | 0xA0000000             | End of repeat block.              |
 +-------------------+------------------------+-----------------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and optionally   |
-|                   |                        | de-assert CS.                      |
+|                   |                        | de-assert CS.                     |
 +-------------------+------------------------+-----------------------------------+
 
 Tx operation
@@ -673,8 +678,7 @@ The uDMA QSPI can be configured to perform either quad SPI transfer(4 bit per cy
 The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 1 during Tx operation. In standard spi mode spi_oe0_o and spi_sdo0_o pins are used, whereas in quad SPI mode all spi_oeX_o{X = 0 to 3} and spi_sdoX_o{X = 0 to 3} pins are used.
 The output pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_TX_DATA command. If LSB is set to 0, then spi_sdo0_o will be updated with msb bit else it is updated with lsb bit of transmit data.
 
-In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data.
-   In SPI mode, spi_sdo0_o reflects the data received from the external device.
+In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data. In SPI mode, spi_sdo0_o reflects the data received from the external device.
 
 Below is the example command sequence for TX operation
 
@@ -693,7 +697,7 @@ Below is the example command sequence for TX operation
 |                   |                        | from memory.                |
 +-------------------+------------------------+-----------------------------+
 | SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally de-assert CS.     |
+|                   |                        | optionally de-assert CS.    |
 +-------------------+------------------------+-----------------------------+
  
 
@@ -725,9 +729,9 @@ uDMA QSPI generates the following interrupts during the RX operation:
 
 The RX and TX channel interrupts are cleared by the uDMA core if any of the following conditions occur:
 
-- If a clear request for the RX or TX uDMA core channel is triggered via the CLR bitfield in the respective RX or TX CFG CSR of the uDMA UART.
-- If either the RX or TX uDMA channel is disabled via the CFG CSR of the uDMA UART, or if access is not granted by the uDMA core's arbiter.
-- If continuous mode is enabled for the RX or TX uDMA channel through the CFG CSR of the UART uDMA.
+- If a clear request for the RX or TX uDMA core channel is triggered via the CLR bitfield in the respective RX or TX CFG CSR of the uDMA QSPI.
+- If either the RX or TX uDMA channel is disabled via the CFG CSR of the uDMA QSPI, or if access is not granted by the uDMA core's arbiter.
+- If continuous mode is enabled for the RX or TX uDMA channel through the CFG CSR of the uDMA QSPI .
 
 The event bridge forwards interrupts over dedicated lines to the APB event controller for processing. Each interrupt has its own dedicated line.
 Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
