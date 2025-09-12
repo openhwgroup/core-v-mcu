@@ -54,7 +54,7 @@ The Figure below is a high-level block diagram of the uDMA QSPI:-
    uDMA QSPI Block Diagram
 
 In the block diagram above, the DATA lines at the boundary of the uDMA QSPI are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and can be configured using datasize bitfield of the CFG csr.
-When data communication with the uDMA Core, the uDMA QSPI pads the unused bits with 0x0.
+When transmitting data to uDMA Core, the unused bits are filled with 0x0 to form 32-bit
 
 uDMA QSPI uses the Tx channel interface to read the data and command from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external QSPI device. 
 uDMA QSPI uses the Rx channel interface to store the data received from the external QSPI device to the interleaved (L2) memory. Refer to <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_  for more information about the Tx and Rx channel functionality of uDMA Core.
@@ -63,7 +63,7 @@ Dual-clock (DC) Tx (command and data) and Rx FIFO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The uDMA core operates using the system clock, while the uDMA QSPI operates using both the system clock and the SPI clock. To ensure the uDMA QSPI and core are properly synchronized, dual-clock FIFOs are used in the uDMA QSPI.
-These are 4-depth FIFOs and can store 8-bit wide data. It is implemented using circular FIFO.
+These are 8-depth FIFOs and can store 32-bit wide data. It is implemented using circular FIFO.
 
 The diagram below shows the interfaces of DC FIFO: 
 
@@ -97,7 +97,7 @@ Tx and Command FIFO
 ^^^^^^^^^^^^^^^^^^^
 
 uDMA QSPI has a Tx and Command FIFO to store the received Tx and command data from the uDMA core. It forwards the data read from L2 memory to the Tx DC FIFO. uDMA QSPI on the Tx path reads the data from Tx DC FIFO and transmits it to the external device.
-It is a 2-depth FIFO and can store 8-bit wide data. The diagram below shows the interfaces of Tx FIFO: 
+It is a 2-depth FIFO and can store 32-bit wide data. The diagram below shows the interfaces of Tx FIFO: 
 
 .. figure:: uDMA_Uart_TX_FIFO.png
    :name: uDMA_Uart_TX_FIFO
@@ -235,7 +235,7 @@ Below table explains Master and Slave settings for different combination(Mode) o
 
    .. warning::
       In the current implementation, the `WAIT_CYC` field of the `SPI_CMD_WAIT` command is used in place of the `CS_WAIT` field of the `SPI_CMD_SOT` command. 
-      When applied in the context of `SPI_CMD_SOT`, the `WAIT_CYC` field must, at all times, represent the required wait cycles.
+      When applied in the context of `SPI_CMD_SOT`, the `WAIT_CYC` field must, at all times, represent the required wait cycles. This add an extra constraint that `SPI_CMD_WAIT` should appear before `SPI_CMD_SO`.
 
 +----------------------+--------+------------------------------------------------------------+
 | Command Field        | Bits   | Description                                                |
@@ -263,11 +263,7 @@ The uDMA QSPI drives output enable pin, spi_oeX_o{X = 0 to 3},  with value 1 dur
 The uDMA QSPI can be configured to perform either quad SPI reception(4 bit per cycle) or standard SPI reception(1 bit per cycle) depending on values of QPI field of SPI_CMD_SEND_CMD command.
 The input pins, spi_sdoX_o{X = 0 to 3}, will be updated based on the LSB field value of the SPI_CMD_SEND_CMD command. 
    
-In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data.
-In SPI mode, spi_sdo0_o reflects the data received from the external device.
-
-uDMA QSPI after transmitting the COMMAND_DATA, asserts ready signal of Tx DC FIFO. Tx DC FIFO when it has data, asserts the valid lines and put the data on the data lines at every clock cycle.
-The Tx DC FIFO shows readiness to receive data by asserting the ready signal.
+In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it reflects lsb bit of received data. In SPI mode, spi_sdo0_o reflects the data received from the external device.
 
 +----------------------+--------+--------------------------------------------------------------+
 | Command Field        | Bits   | Description                                                  |
@@ -506,7 +502,7 @@ Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 |                      |        | - 0x0: Compare bit-by-bit                                                          |
 |                      |        | - 0x1: Check only 1s                                                               |
 |                      |        | - 0x2: Check only 0s                                                               |
-|                      |        | - 0x3: Checks if all the bits that are 1 in received data are also 1 in COMP_DATA. |
+|                      |        | - 0x3: Checks if the set bit in COMP_DATA and received data are different.         |
 +----------------------+--------+------------------------------------------------------------------------------------+
 | BITS_WORD            | 19:16  |  2 pow BITS_WORD in a word                                                         |
 +----------------------+--------+------------------------------------------------------------------------------------+
@@ -977,6 +973,9 @@ STATUS
 | status        |   1:0 |   RO |            | 0x00: STAT_NONE                                             |
 |               |       |      |            | 0x01: STAT_MATCHED                                          |
 |               |       |      |            | 0x02: STAT_NOT_MATCHED                                      |
+|               |       |      |            |                                                             |
+|               |       |      |            | The uDMA SDIO sets these status after comparing the receive |
+|               |       |      |            | data as per SPI_CMD_RX_CHECK settings                       |
 +---------------+-------+------+--------------------------------------------------------------------------+
 
 Firmware Guidelines
@@ -1018,7 +1017,7 @@ Rx Operation
    - Update uDMA QSPI’s CMD_SADDR CSR with an interleaved (L2) memory address. QSPI will read the data from this memory address for transmission.
    - Configure the uDMA QSPI’s CMD_SIZE CSR with the size of data that the QSPI needs to transmit. uDMA QSPI will copy the transmit CMD_SIZE bytes of data from the CMD_SADDR location of interleaved memory. 
 
-**Read transmit data from L2 memory**
+**Store received data in L2 memory**
 
 - Configure the RX channel using the RX_CFG CSR. Refer to the CSR details for detailed information.
 - For each transaction:
