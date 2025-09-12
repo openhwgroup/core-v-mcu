@@ -235,7 +235,7 @@ Below table explains Master and Slave settings for different combination(Mode) o
 
    .. warning::
       In the current implementation, the `WAIT_CYC` field of the `SPI_CMD_WAIT` command is used in place of the `CS_WAIT` field of the `SPI_CMD_SOT` command. 
-      When applied in the context of `SPI_CMD_SOT`, the `WAIT_CYC` field must, at all times, represent the required wait cycles. This add an extra constraint that `SPI_CMD_WAIT` should appear before `SPI_CMD_SO`.
+      When applied in the context of `SPI_CMD_SOT`, the `WAIT_CYC` field must, at all times, represent the required wait cycles. This add an extra constraint that `SPI_CMD_WAIT` should appear before `SPI_CMD_SOT`.
 
 +----------------------+--------+------------------------------------------------------------+
 | Command Field        | Bits   | Description                                                |
@@ -547,7 +547,7 @@ The Rx and Tx channels of the uDMA core can be configured using either the chann
 +----------------------+--------+---------------------------------------------------------------------------+
 | ADDR                 | 20:0   | L2 memory address (in bytes) to:                                          |
 |                      |        |                                                                           |
-|                      |        |- store received data                                                       |
+|                      |        |- store received data                                                      |
 |                      |        |- read data that should be transferred                                     |
 |                      |        |                                                                           |
 |                      |        | TX_RXN field of SPI_CMD_SETUP_UCS command decides the transfer direction. |
@@ -612,52 +612,54 @@ In SPI mode, spi_sdi1_o reflects the data received from the external device.
 uDMA QSPI after reading the WORD_PER_TRANSF words, asserts valid signal of Rx DC FIFO. RC DC FIFO when it has enough space samples the data lines at every clock cycle provided that the valid line is asserted.
 The Rx DC FIFO shows readiness to receive data by asserting the ready signal.
 
-Below is the example  command sequence for RX operation: -
+The following table illustrates a typical Rx command sequence used for receiving data from an external SPI device. The sequence configures the SPI interface,
+sends the command, inserts dummy cycles (if required), and finally receives data into memory before marking end of transfer.
 
-+-------------------+------------------------+-----------------------------+
-| Command           | L2 memory Encoded Word | Description                 |
-+===================+========================+=============================+
-| SPI_CMD_CFG       | 0x00000010             | Configure clock polarity,   |
-|                   |                        | phase, and divider.         |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_SOT       | 0x10000000             | Assert the chip-select line.|
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_SEND_CMD  | 0x20000005             | Send an instruction or      |
-| (optional)        |                        | address word (0x05).        |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_DUMMY     | 0x40000002             | Insert 2 dummy clock cycles |
-|                   |                        | before data reception.      |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_RX_DATA   | 0x70000008             | Receive an 8-byte data      |
-|                   |                        | payload into memory.        |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally de-assert CS.    |
-+-------------------+------------------------+-----------------------------+
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| Command             | L2 Memory Encoded Word| Description                                                                                    |
++=====================+=======================+================================================================================================+
+| SPI_CMD_CFG         | 0x00000010            | Configure SPI clock polarity (CPOL), clock phase (CPHA), and clock divider (CLKDIV).           |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_WAIT        | 0x50000010            | Pause the sequence for 10(user defined) clock cycle. Useful for synchronization.               |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_SOT         | 0x10000000            | Assert the Chip Select (CS) line to initiate the SPI transaction.                              |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_SEND_CMD    | 0x2000000B            | Send the command word (e.g., READ opcode) on the MOSI line.                                    |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_DUMMY       | 0x40000000            | Insert dummy clock cycles to align device response.                                            |
+|                     |                       | **Note:** Required when external device mandates dummy cycles before valid data is output.     |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_RX_DATA     | 0x70000008            | Receive the data from the external device into memory.                                         |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+| SPI_CMD_EOT         | 0x90000000            | Mark end of transfer. Optionally de-assert CS and/or trigger end-of-transfer event.            |
++---------------------+-----------------------+------------------------------------------------------------------------------------------------+
+
 
 The below sequence configures SPI, asserts the chip-select line, sends an instruction (0x0B), then uses a repeat block to receive
 data multiple times without replicating commands. This way, the Rx block (SPI_CMD_RX_DATA) is executed 3 times automatically, without re-encoding the same command multiple times in memory.
 
-+-------------------+------------------------+-----------------------------------+
-| Command           | L2 memory Encoded Word | Description                       |
-+===================+========================+===================================+
-| SPI_CMD_CFG       | 0x00000010             | Configure clock polarity, phase,  |
-|                   |                        | and divider.                      |
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_SOT       | 0x10000000             | Assert the chip-select line.      |
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_SEND_CMD  | 0x2000000B             | Send an instruction word (0x0B).  |
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_RPT       | 0x80000003             | Repeat the following block 3 times|
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_RX_DATA   | 0x70000004             | Receive a 4-byte data payload     |
-|                   |                        | into memory.                      |
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_RPT_END   | 0xA0000000             | End of repeat block.              |
-+-------------------+------------------------+-----------------------------------+
-| SPI_CMD_EOT       | 0x90000000             | End the transfer and optionally   |
-|                   |                        | de-assert CS.                     |
-+-------------------+------------------------+-----------------------------------+
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| Command           | L2 memory Encoded Word | Description                                                                     |
++===================+========================+=================================================================================+
+| SPI_CMD_CFG       | 0x00000010             | Configure clock polarity, phase,                                                |
+|                   |                        | and divider.                                                                    |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_WAIT      | 0x50000010             | Pause the sequence for 10(user defined) clock cycle. Useful for synchronization.|
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_SOT       | 0x10000000             | Assert the chip-select line.                                                    |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_SEND_CMD  | 0x2000000B             | Send an instruction word (0x0B).                                                |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_RPT       | 0x80000003             | Repeat the following block 3 times                                              |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_RX_DATA   | 0x70000008             | Receive data from external                                                      |
+|                   |                        | device into memory.                                                             |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_RPT_END   | 0xA0000000             | End of repeat block.                                                            |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_EOT       | 0x90000000             | End the transfer and optionally                                                 |
+|                   |                        | de-assert CS.                                                                   |
++-------------------+------------------------+---------------------------------------------------------------------------------+
 
 Tx operation
 ^^^^^^^^^^^^
@@ -678,23 +680,25 @@ In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it re
 
 Below is the example command sequence for TX operation
 
-+-------------------+------------------------+-----------------------------+
-| Command           | L2 memory Encoded Word | Description                 |
-+===================+========================+=============================+
-| SPI_CMD_CFG       | 0x00000010             | Configure clock polarity,   |
-|                   |                        | phase, and divider.         |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_SOT       | 0x10000000             | Assert the chip-select line.|
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_SEND_CMD  | 0x2000009F             | Send an instruction or      |
-| (optional)        |                        | address word if required.   |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_TX_DATA   | 0x60000010             | Transmit the data payload   |
-|                   |                        | from memory.                |
-+-------------------+------------------------+-----------------------------+
-| SPI_CMD_EOT       | 0x90000000             | End the transfer and        |
-|                   |                        | optionally de-assert CS.    |
-+-------------------+------------------------+-----------------------------+
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| Command           | L2 memory Encoded Word | Description                                                                     |
++===================+========================+=================================================================================+
+| SPI_CMD_CFG       | 0x00000010             | Configure clock polarity,                                                       |
+|                   |                        | phase, and divider.                                                             |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_WAIT      | 0x50000010             | Pause the sequence for 10(user defined) clock cycle. Useful for synchronization.|
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_SOT       | 0x10000000             | Assert the chip-select line.                                                    |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_SEND_CMD  | 0x2000009F             | Send an instruction or                                                          |
+| (optional)        |                        | address word if required.                                                       |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_TX_DATA   | 0x60000010             | Transmit the data from L2                                                       |
+|                   |                        |  memory to external device.                                                     |
++-------------------+------------------------+---------------------------------------------------------------------------------+
+| SPI_CMD_EOT       | 0x90000000             | End the transfer and                                                            |
+|                   |                        | optionally de-assert CS.                                                        |
++-------------------+------------------------+---------------------------------------------------------------------------------+
 
 Full duplex operation
 ^^^^^^^^^^^^^^^^^^^^^
@@ -775,7 +779,7 @@ RX_SADDR
 +--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
 | Field  | Bits | Access | Default    | Description                                                                                              |
 +========+======+========+============+==========================================================================================================+
-| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where QSPI will write the received data.      |
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where QSPI will write the received data.     |
 |        |      |        |            | Read & write to this CSR access different information.                                                   |
 |        |      |        |            |                                                                                                          |
 |        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction. |
@@ -936,8 +940,6 @@ CMD_CFG
 - Offset: 0x28
 - Type:   volatile
 
-+---------------+-------+------+------------+-----------------------------------------------------------------------------------+
-| Field         |  Bits | Type | Default    | Description                                                                       |
 +------------+-------+--------+------------+------------------------------------------------------------------------------------+
 | Field      |  Bits | Access | Default    | Description                                                                        |
 +============+=======+========+============+====================================================================================+
