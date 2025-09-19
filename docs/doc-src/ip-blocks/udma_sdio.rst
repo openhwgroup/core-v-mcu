@@ -77,7 +77,7 @@ Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/
 Dual clock FIFO
 ~~~~~~~~~~~~~~~
 The uDMA core operates using the system clock, while the uDMA SDIO operates using both the system clock and the peripheral clock.
-To ensure the uDMA SDIO and core are properly synchronized, dual-clock FIFOs are used in the uDMA SDIO. These are 4-depth FIFOs and can store 8-bit wide data.
+To ensure the uDMA SDIO and core are properly synchronized, dual-clock FIFOs are used in the uDMA SDIO. These are 4-depth FIFOs and can store 32-bit wide data.
 It is implemented using circular FIFO.
 
 Below diagram shows the interfaces of DC FIFO:
@@ -112,7 +112,7 @@ TX FIFO
 ~~~~~~~
 
 uDMA SDIO has a TX FIFO to store the received data from uDMA core. It forwards the data read from L2 memory to the TX DC FIFO. uDMA SDIO on TX path, read the data from TX DC FIFO and transmits it to external device.
-It is a 2-depth FIFO and can store 8-bit wide data. Below diagram shows the interfaces of TX FIFO: 
+It is a 2-depth FIFO and can store 32-bit wide data. Below diagram shows the interfaces of TX FIFO: 
 
 .. figure:: uDMA_UART_TX_FIFO.png
    :name: uDMA_UART_TX_FIFO
@@ -147,8 +147,8 @@ TX FIFO is transparent to users.
 Command
 ~~~~~~~
 
-SDIO operation is started by generating a command. A host can send a command to either a single card or to all the connected cards. A command is transferred serially on the `sdcmd_o` line.
-`sdcmd_oen_o` is pulled low(0) during the transmit operation. MSB is transmitted first and LSB is transmitted last. Direction bit is 1, as command is transmitted from host to device.
+SDIO operation begins with the generating of a command. The host can send a command to either a single card or to all connected cards. During the transmit operation, `sdcmd_oen_o` is pulled low (0) and the command is transferred serially on the `sdcmd_o` line. The MSB is transmitted first, and the LSB is transmitted last.
+The direction bit is set to 1, indicating that the command is transmitted from the host to the card.
 
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 | Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
@@ -188,17 +188,19 @@ After transmitting the stop command, the uDMA SDIO expects RSP_TYPE_48_CRC respo
 
 After transmitting a command, the uDMA SDIO can perform subsequent operations based on the DATA_SETUP CSR configuration and the command response setting. The behavior is as follows:
 
-- If the DATA_SETUP CSR indicates a read transaction, the uDMA SDIO initiates a data read (Rx) operation from the external device. The details of this operation are described in the Data Section.
-- If SDIO is configured to receive a command response, the response is captured and processed as described in the Response Section.
-- If SDIO is not configured to receive a command response or the command response is received:
-   - An End-of-Transfer (EOT) interrupt is raised.
-   - The uDMA SDIO is then enabled to perform a data write (Tx) operation to the external device, depending on the DATA_SETUP CSR setting.
+After sending a command, the uDMA SDIO acts based on the DATA_SETUP CSR and command response settings:
+
+- If set for read, it starts a data read (Rx) from the external device (see Data Section), as per the DATA_SETUP CSR.
+- If configured for a command response, the response is captured and processed (see Response Section).
+- If no response is required, or once the response is received:
+   - An End-of-Transfer (EOT) interrupt is triggered.
+   - The uDMA SDIO may then perform a data write (Tx) to the external device(see Data Section), as per the DATA_SETUP CSR.
 
 Response
 ~~~~~~~~
 
-A response is sent from an external card to the host as an answer to a previously received command. A response is received serially on the `sdcmd_i` line.
-`sdcmd_oen_o` is pulled high(1) during the transmit operation. MSB will be read first and LSB will be read last. Direction bit is 0, as response is transmitted from device to host.
+A response is sent from the external card to the host in reply to a previously received command. During the receive operation, `sdcmd_oen_o` is pulled high (1), and the response is received serially on the `sdcmd_i` line.
+The MSB is read first, and the LSB is read last. The direction bit is set to 0, indicating that the response is transmitted from the card to the host.
 
 The RSP_TYPE bitfield of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
 
@@ -252,7 +254,7 @@ The RSP_TYPE bitfield of CMD_OP CSRs can used to configure expected response fro
 
 If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending command.
 To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cycle, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
-If command response is received successfully, uDMA SDIO validates if the direction bit received at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero than it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data up to response length.
+If command response is received successfully, uDMA SDIO validates if the direction bit received at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero then it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data up to response length.
 If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY response, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
 The SDIO, irrespective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
 
@@ -699,7 +701,7 @@ Tx Operation
 - For each transaction:
    - Update uDMA SDIO's TX_SADDR CSR with an interleaved (L2) memory address. SDIO will read the data from this memory address for transmission.
    - Configure the uDMA SDIO's TX_SIZE CSR with the size of data that the SDIO needs to transmit. uDMA SDIO will copy the transmit TX_SIZE bytes of data from the TX_SADDR location of interleaved memory.
-- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation is start only successfully command transfer. Refere to the DATA_SETUP CSR for more information.
+- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation will start only after successfully command transfer. Refer to the DATA_SETUP CSR for more information.
 
 The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
 
@@ -716,7 +718,7 @@ Rx Operation
 - For each transaction:
    - Update uDMA SDIO's RX_SADDR CSR with an interleaved (L2) memory address. SDIO will write the data to this memory address for transmission.
    - Configure uDMA SDIO's RX_SIZE CSR with the size of data that SDIO needs to transmit. uDMA SDIO will copy the transmit RX_SIZE bytes of data to the RX_SADDR location of interleaved memory.
-- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation is start only successfully command transfer. Refere to the DATA_SETUP CSR for more information.
+- Configure DATA_SETUP setup CSR to enable transmission of data from the external device to L2 memory. The Rx operation will start only after a successful command transfer. Refer to the DATA_SETUP CSR for more information. Refer to the DATA_SETUP CSR for more information.
 
 The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
 - Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is already transferred.
