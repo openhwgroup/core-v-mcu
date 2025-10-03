@@ -1,6 +1,6 @@
 ..
    Copyright (c) 2023 OpenHW Group
-   Copyright (c) 2024 CircuitSutra
+   Copyright (c) 2024 CircuitSutra Technologies Pvt Ltd
 
    SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -17,897 +17,866 @@
    ^^^^^^^
 .. _udma_sd_card_interface:
 
-UDMA SD CARD INTERFACE
-======================
+UDMA SDIO(SD Input/Output) INTERFACE
+====================================
 
-The SDIO (Secure digital I/O) card provides high speed data I/O with low
-power consumption for mobile electronic devices. Host devices supporting
-SDIO can connect the SD slot with I/O devices like Bluetooth, wireless,
-LAN, GPS Receiver, Digit Camera etc.
+The SDIO card provides high speed data I/O with low power consumption for mobile electronic devices. Host devices supporting
+SDIO can connect the SD slot with I/O devices like Bluetooth, wireless, LAN, GPS Receiver, Digit Camera etc.
 
-SDIO INTERFACE BUS:
--------------------
-
-.. udma_sdio_image:: udma_sdio_image8.png
-   :width: 4.17708in
-   :height: 2.51042in
-
-FEATURES:
----------
+Features
+--------
 
 -  It has a clock, command and 4-bit data bus.
-
 -  Supports quad mode.
-
 -  Five types of response supported:
 
    -  No response
-
    -  48 bits with CRC
+   -  48 bits with CRC and BUSY
+   -  48 bits with NO CRC
+   -  136 bits
 
-   -  48 bits with NO CRC.
+-  Following events are supported:
 
-   -  136 bits with BUSY check.
+      - Error event.
+      - End of transfer event.+
 
--  Error output pin.
-
--  End of transfer output pin.
-
--  Four error status for command transfer supported:
+-  Four error status for receive operation
 
    -  No error
-
    -  Response timeout
-
    -  Response wrong direction
-
    -  Response busy timeout
 
-THEORY OF OPERATION:
-^^^^^^^^^^^^^^^^^^^^
-
-Communication over the SD bus is based on command and data bit streams
-that are initiated by a start and terminated by a stop bit.
-
--  Command: Operation is started by generating a command. A host can
-      send a command to either a single card or to all the connected
-      cards. A command is transferred serially on the CMD line. MSB is
-      transmitted first and LSB is transmitted last. Transmission bit is
-      1 as command is transmitted from host to device.
-
-   -  Command token format\ |Command token|
-
-+------------+------+--------------+-----------+---------+----+-------+
-| Bit        | 47   | 46           | [45:40]   | [39:8]  | [  | 0     |
-| position   |      |              |           |         | 7: |       |
-|            |      |              |           |         | 1] |       |
-+============+======+==============+===========+=========+====+=======+
-| Width      | 1    | 1            | 6         | 32      | 7  | 1     |
-+------------+------+--------------+-----------+---------+----+-------+
-| Value      | 0    | 1            | x         | x       | x  | 1     |
-+------------+------+--------------+-----------+---------+----+-------+
-| D          | S    | Transmission | cmd       | Cmd arg | c  | End   |
-| escription | tart | bit          | opcode    |         | rc | bit   |
-|            | bit  |              |           |         |    |       |
-+------------+------+--------------+-----------+---------+----+-------+
-
--  Response: A response is sent from an addressed card to the host as an
-      answer to a previously received command. A response is transferred
-      serially on the CMD line. Transmission bit is 0 as response is
-      transmitted from device to host.
-
-   -  Response token format:
-
-..
-
-   .. udma_sdio_image:: udma_sdio_image2.png
-      :width: 3.95833in
-      :height: 0.96875in
-
-+------------+------+-------------+-----------+---------+----+-------+
-| Bit        | 47   | 46          | [45:40]   | [39:8]  | [  | 0     |
-| position   |      |             |           |         | 7: |       |
-|            |      |             |           |         | 1] |       |
-+============+======+=============+===========+=========+====+=======+
-| Width      | 1    | 1           | 6         | 32      | 7  | 1     |
-+------------+------+-------------+-----------+---------+----+-------+
-| Value      | 0    | 0           | x         | x       | x  | 1     |
-+------------+------+-------------+-----------+---------+----+-------+
-| D          | S    | T           | Command   | Card    | c  | End   |
-| escription | tart | ransmission | index     | status  | rc | bit   |
-|            | bit  | bit         |           |         |    |       |
-+------------+------+-------------+-----------+---------+----+-------+
-
-+------------+------+-------------+-----------+----------------+-----+
-| Bit        | 135  | 134         | [133:128] | [127:1]        | 0   |
-| position   |      |             |           |                |     |
-+============+======+=============+===========+================+=====+
-| Width      | 1    | 1           | 6         | 127            | 1   |
-+------------+------+-------------+-----------+----------------+-----+
-| Value      | 0    | 0           | 111111    | x              | 1   |
-+------------+------+-------------+-----------+----------------+-----+
-| D          | S    | T           | Reserved  | Response       | End |
-| escription | tart | ransmission |           | content        | bit |
-|            | bit  | bit         |           | including CRC  |     |
-+------------+------+-------------+-----------+----------------+-----+
+- SDIO operation is synchronized using a `sdclk_o` clock whose period can be controlled using CLK_DIV CSR.
 
--  Data: Data can be transferred from the card to the host or vice
-      versa. It is transferred via the data lines.
+Block Architecture
+------------------
 
-Data transfer to/from the SD memory card is done in blocks. Data blocks
-are succeeded by CRC bits.
+uDMA SDIO is a peripheral function of the uDMA subsystem. As such, its CSRs are not directly accessible via the APB bus. Rather, the control plane interface to the uDMA SDIO is managed by the uDMA core within the uDMA subsystem.
+This is transparent to the programmer, as all uDMA SDIO CSRs appear within the uDMA subsystem's memory region. As is the case for all uDMA subsystem peripherals, I/O operations are controlled by the uDMA core. This is not transparent to the programmer.
 
-BLOCK DIAGRAM:
-^^^^^^^^^^^^^^
-.. udma_sdio_image:: udma_sdio_image6.png
-   :width: 4.72292in
-   :height: 5.44022in
+The Figure below is a high-level block diagram of the uDMA SDIO:-
 
-.. udma_sdio_image:: udma_sdio_image3.png
-   :width: 6.5in
-   :height: 2.47222in
+.. figure:: uDMA_SDIO_Block_Diagram.png
+   :name: uDMA_SDIO_Block_Diagram
+   :align: center
+   :alt:
 
-It contains a reg interface for writing and reading from the register
-and a SDIO TX/RX module which instantiates command and data modules.
-Command module handles command interface and data module handles data
-transfer.
+   uDMA SDIO Block Diagram
 
-SDIO TX/RX:
-^^^^^^^^^^^
+In the block diagram above, the DATA lines at the boundary of the uDMA SDIO are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x2. The valid values for the DATASIZE pin are: -
 
-This module is responsible for sending and receiving command and data
-between host and device. It instantiates command and data modules.
+- 0x0: 1-byte transfer
+- 0x1: 2-byte transfer
+- 0x2: 4-byte transfer
 
-.. udma_sdio_image:: udma_sdio_image5.png
-   :width: 3.20625in
-   :height: 3.66721in
+uDMA SDIO uses the Tx channel interface to read the data from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external SDIO device. uDMA SDIO uses the Rx channel interface to store the data received from the external SDIO device to the interleaved (L2) memory.
+Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
--  It uses the clock generated by udma_clockgen as input clock.
+Dual clock FIFO
+~~~~~~~~~~~~~~~
+The uDMA core operates using the system clock, while the uDMA SDIO operates using both the system clock and the peripheral clock.
+To ensure the uDMA SDIO and core are properly synchronized, dual-clock FIFOs are used in the uDMA SDIO. These are 4-depth FIFOs and can store 32-bit wide data.
+It is implemented using circular FIFO.
 
--  Synchronous start generated by the edge propagator is used to get the
-      command start bit. This command start bit is sent to the command
-      module which marks the start of the command.
+Below diagram shows the interfaces of DC FIFO:
 
--  This module works in three states:
+.. figure:: uDMA_UART_Dual_clock_fifo.png
+   :name: uDMA_UART_Dual_clock_fifo
+   :align: center
+   :alt:
 
-   -  CMD_ONLY: This is the default state.
+   Dual clock FIFO
 
-      -  State is set to WAIT_EOT if there is no block to be transmitted
-            else state is set to WAIT_LAST.
+For Rx operation, source(src_*) interfaces shown in above diagram operate at peripheral clock and destination(dst_*) interfaces operate using system clock.
 
-   -  WAIT_LAST: Wait for the last piece of data to be transferred.
+For Tx operation, source interfaces shown in above diagram operate at system clock and destination interfaces operate using peripheral clock. 
 
-      -  After transferring the last piece of data we go to state
-            WAIT_EOT.
+**Pop operation**
 
-      -  Data module sends a high signal which indicates transfer of
-            last data.
+The DC FIFO asserts the dst_valid_o (valid) signal to indicate that valid data is available on the data lines. A module waiting for data should read the data lines only when valid pin is high and drive the dst_ready_i (ready)
+signal to high and reset it in next clock cycle. When DC FIFO receives an active ready signal, indicating that the data has been read, it updates the data lines with new data if FIFO is not empty. 
+If the FIFO is empty, the dst_valid_o signal is deasserted.
 
-   -  WAIT_EOT: Wait for the end of transaction.
+**Push operation**
 
-      -  If command eot and data eot sent by command and data module
-            respectively are high then go to state CMD_ONLY and reset
-            command eot and data eot.
+The DC FIFO asserts the src_ready_o (ready) signal when there is available space to accept incoming data. When an active src_valid_i (valid) signal is received, the data is written into the FIFO.
+The src_ready_o signal is kept asserted as long as the FIFO has space for more data. IF the DC FIFO is full, push operation will be stalled until the FIFO has empty space and valid line is high.
+A module transmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
 
--  Status : 16 bit status output is transmitted through this block. This
-      status can be read through SDIO_REG_STATUS. Non-negative status
-      would generate and error.
+During SDIO transmit (Tx) operation, the TX DC FIFO is read internally by the SDIO to transmit data to an external device and written by the TX FIFO.
+During SDIO receive (Rx) operation, the RX DC FIFO is written internally by the SDIO with the data received from the external device and read by the uDMA core.
 
-+-------------+-------------+-------------+-------------+-------------+
-| Bit         | [15:14]     | [13:8]      | [7:6]       | [5:0]       |
-| position    |             |             |             |             |
-+=============+=============+=============+=============+=============+
-| value       | 00          | x           | 00          | x           |
-+-------------+-------------+-------------+-------------+-------------+
-| Description | reserved    | Data status | reserved    | Command     |
-|             |             |             |             | status      |
-+-------------+-------------+-------------+-------------+-------------+
+TX FIFO
+~~~~~~~
 
-It instantiates two sub blocks: command and data.
+uDMA SDIO has a TX FIFO to store the received data from uDMA core. It forwards the data read from L2 memory to the TX DC FIFO. uDMA SDIO on TX path, read the data from TX DC FIFO and transmits it to external device.
+It is a 2-depth FIFO and can store 32-bit wide data. Below diagram shows the interfaces of TX FIFO: 
 
-.. udma_sdio_image:: udma_sdio_image1.png
-   :width: 5.89792in
-   :height: 3.05234in
+.. figure:: uDMA_UART_TX_FIFO.png
+   :name: uDMA_UART_TX_FIFO
+   :align: center
+   :alt:
 
--  Command block: This module handles the command interface.
+   TX FIFO
 
-   -  It supports three types of response status:
+TX FIFO operates using system clock. clr_i pin is hardcoded with value 0x0.
 
-      -  Response timeout
+**Pop operation**
 
-      -  Response wrong direction
+The read interface of the TX FIFO is connected to the TX DC FIFO.
+The TX DC FIFO raises ready(ready_i) signal if its FIFO has space. If data is available, TX FIFO asserts the valid_o signal and update the data lines with data.
+TX FIFO will update the valid signal and data lines at each clock cycle. If the ready signal is high, data lines will be update with new data, otherwise, data lines will show the last transferred byte.
+If the TX FIFO is empty, the valid_o signal remains deasserted, indicating that no valid data is present on the output lines.
 
-      -  Response busy timeout
+**Push operation**
 
-   -  It supports five types of responses: Response type is written to
-         register
+The write interface of the TX FIFO is extended to the uDMA Core. The TX FIFO write operation is performed with the help of the req(req_o) and ready(ready_o) signals.
+The TX FIFO keeps the ready_o (ready) signal high until the TX FIFO is full. TX FIFO raises a req_o signal when it has enough space in FIFO, i.e., ready_o is high, and the pending requests at the uDMA core do not exceed the depth of TX FIFO.
+TX FIFO receives a GNT (gnt_i) signal from the uDMA core confirming that the request is accepted. TX FIFO maintains a counter to track unserved requests; it applies the following logic to update the counter: -
 
-..
+- When a request (req_o) is issued and granted (gnt_i), the TX FIFO increments the counter if either the valid_i or ready_o signal is low.
+- Regardless of the state of the req_o and gnt_i signals, the frame counter is decremented whenever both valid_i and ready_o are high.
 
-   SDIO_REG_CMD_OP.
+When it receives the valid signal from the uDMA core and the FIFO is not full, the TX FIFO pushes the data coming from the uDMA core. 
+TX tries to read data at each clock cycle until TX FIFO has space and a valid pin is high.
 
--  Null response: No response.
+TX FIFO is transparent to users.
 
--  48 bits with CRC.
+Command
+~~~~~~~
 
-   -  Supports CRC.
+SDIO operation begins with the generating of a command. The host can send a command to either a single card or to all connected cards. During the transmit operation, `sdcmd_oen_o` is pulled low (0) and the command is transferred serially on the `sdcmd_o` line. The MSB is transmitted first, and the LSB is transmitted last.
+The direction bit is set to 1, indicating that the command is transmitted from the host to the card.
+
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
++==============+===========+==================+================+==================+=======+=========+
+| Width        | 1         | 1                | 6              | 32               | 7     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Value        | 0         | 1                | x              | x                | x     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Description  | Start bit | Direction bit    | Command opcode | Command argument | CRC   | End bit |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+
+The CMD_OP and CMD_ARG CSRs of uDMA SDIO should be used to configure command opcode and command arguments respectively.
+
+When START bit of REG_START CSR is set, the uDMA SDIO will enable the `sdclk_o` clock. After enabling clocks, uDMA SDIO will drive 0 on `sdcmd_oen_o` and `sdcmd_o` to send a start bit. 
+
+The command will be send in below sequence : -
+
+`Start bit -> Direction bit -> Command opcode -> command arguments -> CRC -> End of transmission`
 
-   -  Response length is 38 bits.
+CRC is calculated based on `x7+x3+1` polynomial function. CRC will calculated on Command opcode and argument field value.
 
--  48 bits with NO CRC
+The uDMA SDIO sends a stop command to communicate end of command transfer to the external device. Below is the format of end of command.
 
-   -  Supports CRC.
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
++==============+===========+==================+================+==================+=======+=========+
+| Width        | 1         | 1                | 6              | 32               | 7     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Value        | 0         | 1                |  6'd12         | 32'h0            | X     | 1       |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
+| Description  | Start bit | Direction bit    | Command opcode | Command argument | CRC   | End bit |
++--------------+-----------+------------------+----------------+------------------+-------+---------+
 
-   -  Response length is 38 bits.
+After transmitting the stop command, the uDMA SDIO expects RSP_TYPE_48_CRC response from the external device.
 
--  136 bits
+**Command Response and Data Flow in uDMA SDIO**
 
-   -  Supports CRC.
+After transmitting a command, the uDMA SDIO can perform subsequent operations based on the DATA_SETUP CSR configuration and the command response setting. The behavior is as follows:
 
-   -  Response length is 133 bits.
+After sending a command, the uDMA SDIO acts based on the DATA_SETUP CSR and command response settings:
 
--  48 bits with a busy check.
+- If set for read, it starts a data read (Rx) from the external device (see Data Section), as per the DATA_SETUP CSR.
+- If configured for a command response, the response is captured and processed (see Response Section).
+- If no response is required, or once the response is received:
+   - An End-of-Transfer (EOT) interrupt is triggered.
+   - The uDMA SDIO may then perform a data write (Tx) to the external device(see Data Section), as per the DATA_SETUP CSR.
 
-   -  Supports CRC.
+Response
+~~~~~~~~
 
-   -  Response length is 38 bits.
+A response is sent from the external card to the host in reply to a previously received command. During the receive operation, `sdcmd_oen_o` is pulled high (1), and the response is received serially on the `sdcmd_i` line.
+The MSB is read first, and the LSB is read last. The direction bit is set to 0, indicating that the response is transmitted from the card to the host.
 
-   -  Supports busy signal.
+The RSP_TYPE bitfield of CMD_OP CSRs can used to configure expected response from the external SDIO device. Following response can be expected from the external device: -
 
--  Command output enable signal: sdcmd_oen_o is an active low signal. It
-      is enabled during transfer of command and is disabled during
-      reception of response.
+- RSP_TYPE_48_CRC, response length will be 38 bit long.
 
--  It goes through twelve states:
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]      | [7:1] | 0       |
++==============+===========+==================+================+=============+=======+=========+
+| Width        | 1         | 1                | 6              | 32          | 7     | 1       |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Value        | 0         | 0                | x              | x           | x     | 1       |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Description  | Start bit | Direction bit    | Command index  | Card status | CRC   | End bit |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
 
-   -  ST_IDLE: Default state when the system is IDLE.
+- RSP_TYPE_48_BSY, response length will be 38 bit long.
 
-      -  Clock is disabled initially.
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]      | [7:1] | 0       |
++==============+===========+==================+================+=============+=======+=========+
+| Width        | 1         | 1                | 6              | 32          | 7     | 1       |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Value        | 0         | 0                | x              | x           | x     | 1       |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
+| Description  | Start bit | Direction bit    | Command index  | Card status | CRC   | End bit |
++--------------+-----------+------------------+----------------+-------------+-------+---------+
 
-      -  If the command start bit is high then state is set to
-            ST_TX_START and clock is enabled.
+- RSP_TYPE_48_NOCRC, response length will be 38 bit long.
 
-   -  ST_TX_START: Send the start bit to start the transaction.
++--------------+-----------+------------------+----------------+-------------+----------+---------+
+| Bit position | 47        | 46               | [45:40]        | [39:8]      | [7:1]    | 0       |
++==============+===========+==================+================+=============+==========+=========+
+| Width        | 1         | 1                | 6              | 32          | 7        | 1       |
++--------------+-----------+------------------+----------------+-------------+----------+---------+
+| Value        | 0         | 0                | x              | x           | 1111111  | 1       |
++--------------+-----------+------------------+----------------+-------------+----------+---------+
+| Description  | Start bit | Direction bit    | Command index  | Card status | Reserved | End bit |
++--------------+-----------+------------------+----------------+-------------+----------+---------+
 
-      -  Start bit is sent through sdcmd_o.
+- RSP_TYPE_136, response length will be 134 bit long.
 
-      -  State is set to ST_TX_DIR.
++---------------+-----------+------------------+-----------+--------------------------------+---------+
+| Bit position  | 135       | 134              | [133:128] | [127:1]                        | 0       |
++===============+===========+==================+===========+================================+=========+
+| Width         | 1         | 1                | 6         | 127                            | 1       |
++---------------+-----------+------------------+-----------+--------------------------------+---------+
+| Value         | 0         | 0                | 111111    | x                              | 1       |
++---------------+-----------+------------------+-----------+--------------------------------+---------+
+| Description   | Start bit | Direction bit    | Reserved  | Response content including CRC | End bit |
++---------------+-----------+------------------+-----------+--------------------------------+---------+
 
-   -  ST_TX_DIR: Set the transmission bit of the command.
+If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending command.
+To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cycle, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+If command response is received successfully, uDMA SDIO validates if the direction bit received at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero then it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data up to response length.
+If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY response, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
+The SDIO, irrespective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
 
-      -  Transmission bit is sent through sdcmd_o.
+CRC is calculated based on `x7+x3+1` polynomial function.
 
-      -  CRC is enabled.
+The response data can be read from REG_RSPx{x = 0 to 3} CSR of SDIO.
 
-      -  State is set to ST_TX_SHIFT and 38 bit command data is
-            transmitted.
+Data
+~~~~
 
-   -  ST_TX_SHIFT:
+Data can be transferred from the external device to the host uDMA SDIO or vice versa. It is transferred via the data lines.
 
-      -  MSB of the command is sent as output through sdcmd_o.
+Data transfer to/from the host is done in blocks. Data blocks are succeeded by CRC bits.
 
-      -  CRC is enabled.
+Tx operation
+^^^^^^^^^^^^
 
-      -  Command data is shifted to the left by 1 bit.
+The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
 
-      -  If the 38 bit command data is transmitted go to state ST_TX_CRC
-            and start counting the CRC bits. There are 7 CRC bits.
+a) When command response is needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command response is received.
 
-   -  ST_TX_CRC: Send CRC output and shifts CRC.
+b) When command response is not needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command is sent.
 
-      -  CRC output is sent as output through sdcmd_o.
+To initiate Tx operation, uDMA Core will drive 1 on `sddata_oen_o` line. Data will be transmitted over `sddata_o` data lines in below sequence: - 
 
-      -  CRC is enabled.
+`Start bit -> Data -> CRC - > End`
 
-      -  State is set to ST_TX_STOP after successfully transmitting the
-            CRC bits.
+To send start bit, the uDMA SDIO will drive the `sddata_o` will value 0. CRC for Tx operation is calculated based on `x16+x12+x5+1` polynomial function. CRC is calculated by the SDIO on the data received from the L2 memory.
 
-   -  ST_TX_STOP: Transmit the stop bit of the command.
+To get transmit data from L2 memory TX FIFO requests data from the uDMA core by asserting both the READY (space available) and REQ (request a new transaction) signals. The uDMA core arbitrates among multiple peripherals on receiving the REQ signal. When the SDIO TX channel is enabled and wins arbitration, the uDMA core issues a GNT (grant) signal and places the valid data read from L2 memory on the bus along with asserting VALID signal.
+Tx FIFO stores this received data and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core de-asserts the VALID signal in the following clock cycle and reasserts it only when new data is available for transmission. Initially, after reset or power-up, READY/REQ are asserted since the FIFO is empty.
 
-      -  Stop bit is sent through sdcmd_o.
+Whenever TX FIFO has valid data and the TX DC FIFO has shown readiness to accept data by asserting READY signal, it asserts VALID signal and update the data lines of DC FIFO with the valid data. The data transmission from TX FIFO to TX DC FIFO is synchronized using system clock. TX DC FIFO de-asserts READY when it is full, temporarily stalling the upstream TX FIFO.
+Once space is freed, READY is re-asserted. Data moves from TX FIFO to TX DC FIFO when both VALID and READY are high on the same cycle.
 
-      -  Start read is enabled which indicate we can read from data
-            block.
+The uDMA SDIO must be configured using the TX_SADDR, TX_SIZE and TX_CFG CSRs to read transmit data from L2 memory.
 
-      -  If the response is enabled, set the state to ST_RX_START.
+Rx Operation
+^^^^^^^^^^^^
 
-      -  If the response is disabled, go to state ST_WAIT.
+Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is sent. 
+The uDMA SDIO receives data on the `sddata_i` data lines. Data will be received  over `sddata_i` data lines in below sequence: - 
 
-   -  ST_RX_START: Initiates the reception of response.
+`Start bit -> Data -> CRC - > End`
 
-      -  Response is received via sdcmd_i
+To receive response, uMDA QSPI  expects `sddata_i` pin to have value 0(indicating start bit) within BLOCK_NUM clock cycles. If uDMA SDIO does not receive response from the external device within BLOCK_NUM `sdclk_o` clock cycle, it updates the Rx STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+After successfully receiving the start bit, it reads BLOCK_SIZE data and 16 bit crc values. After successfully reading BLOCK_NUM data and subsequent crc bits, uDMA SDIO sets the EOT bit of STATUS CSR. Reading EOT bit will clear it.
+The uDMA SDIO reads the start bit, BLOCK_SIZE data and 16 bit crc values for BLOCK_NUM to complete Rx operation.
 
-      -  State is set to ST_RX_DIR if the start bit is received.
+The uDMA SDIO pushes each BLOCK_SIZE data and CRC into the RX DC FIFO. The uDMA SDIO when it has data asserts the valid lines of RX DC FIFO.
+RX DC FIFO reads the data lines and asserts the valid lines for uDMA core to indicate the availability of new data.
 
-      -  If the start bit is not received till 38 clock cycle then
-            response status is set to response timeout.
+To store the received data into L2 memory, the uDMA SDIO must be programmed with RX_SADDR, RX_SIZE and RX_CFG CSRs.
 
-   -  ST_RX_DIR: Check if the received command indicates the correct
-         direction.
+On detecting the valid signal, the uDMA core arbitrates for access. If the uDMA SDIO RX channel wins the arbitration and the core's RX FIFO has space, uDMA core asserts READY, latching the data from RX DC FIFO.
+The data is then written into L2 memory at the address specified by RX_SADDR, with automatic increment for subsequent bytes. The cycle repeats until the entire transfer (as defined by RX_SIZE) completes.
 
-      -  Direction bit is received and state is set ST_RX_SHIFT.
+CRC for both Rx and Tx operation is calculated based on `x16+x12+x5+1` polynomial function.
 
-      -  Response data is received.
+Interrupt
+~~~~~~~~~
 
-      -  Receiving an incorrect bit would set the response status to
-            response wrong direction and the state is set to ST_IDLE.
+uDMA SDIO generates the following interrupts:
 
-   -  ST_RX_SHIFT: Shift in response data.
+- Error interrupt: Raised by uDMA SDIO when it encounter error while performing command-response reception or Rx/Tx operation.
+- End of transfer interrupt: Raised by uDMA SDIO after successfully completing Rx/Tx operation.
+- Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
+- Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
 
-      -  CRC is calculated.
+The RX and TX channel interrupts are cleared by the uDMA core if any of the following conditions occur:
 
-      -  If the response data is received and response crc is enabled
-            then state is set to ST_TX_CRC.
+- If a clear request for the RX or TX uDMA core channel is triggered via the CLR bitfield in the respective RX or TX CFG CSR of the uDMA SDIO.
+- If either the RX or TX uDMA channel is disabled via the CFG CSR of the uDMA SDIO, or if access is not granted by the uDMA core's arbiter.
+- If continuous mode is enabled for the RX or TX uDMA channel through the CFG CSR of the SDIO uDMA.
 
-      -  If response data is received and response crc is disabled and
-            response busy is enabled then go to state ST_WAIT_BUSY.
+RX and TX channel interrupts are transparent to users.
 
-      -  If response count is completed but response crc and response
-            busy are not enabled then go to ST_WAIT.
+The event bridge forwards interrupts over dedicated lines to the APB event controller for processing. Each interrupt has its own dedicated line.
+Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
 
-   -  ST_RX_CRC:
+System Architecture
+-------------------
 
-      -  If CRC is received then go to ST_WAIT..
+The figure below shows how the uDMA SDIO interfaces with the rest of the CORE-V-MCU components and the external SDIO device:-
 
-   -  ST_WAIT_BUSY:
+.. figure:: uDMA-SDIO-CORE-V-MCU-Connection-Diagram.png
+   :name: uDMA-SDIO-CORE-V-MCU-Connection-Diagram
+   :align: center
+   :alt:
 
-      -  If a low busy signal is received from the data block then we go
-            to ST_WAIT.
+   uDMA SDIO CORE-V-MCU connection diagram
 
-      -  If the busy signal is high till 256 clock cycle status is set
-            to response busy timeout.
+Programming Model
+------------------
 
-   -  ST_WAIT:
+As with most peripherals in the uDMA Subsystem, software configuration for the uDMA SDIO  interface can be conceptualized into three key steps:
 
-      -  After waiting for 8 clock cycles, high output is asserted
-            through command eot output and high start write output is
-            sent which indicates successful write command.
+- I/O Configuration: Set up external clock and chip select and output enable lines.
+- uDMA core Setup:  Configure source/destination addresses, transfer size, and direction for TX and RX operation using channel CSRs. This enables efficient data movement from L2 memory to SDIO  via uDMA core. Update the L2 memory with command sequence to configure SDIO controller.
+- Data Transfer Management: Read command sequence from L2 memory to configure SDIO for RX/TX operation. Drive SDIO bus based on the received command sequence.
 
-      -  Set the state to ST_IDLE.
+Refer to the Firmware Guidelines section in the current chapter for more information.
 
--  Single bit is transferred at every posedge of the clock. Transmitting
-      a 38 bit command data would take 38 clock cycles and a 7 bit crc
-      would take 7 clock cycles. Similarly receiving a response would
-      take response length clock cycle.
+uDMA SDIO CSRs
+--------------
 
--  Response content is received through sdcmd_i and is sent as output
-      through rsp_data_o.
+Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the uDMA SDIO.
 
--  Data block: This module is responsible for handling data transfer.
+**NOTE:** Several of the uDMA SDIO CSRs are volatile, meaning that their read value may be changed by the hardware.
+For example, writing the *RX_SADDR* CSR will set the address of the receive buffer pointer.
+As data is received, the hardware will update the value of the pointer to indicate the current address.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware.
+These CSRs retain the last value written by software.
 
-   -  Support response status timeout.
+A CSR's volatility is indicated by its "type".
 
-   -  Supports five types of responses:
+Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
-      -  Null response: No response.
+The CSRs RX_SADDR and RX_SIZE specify the configuration for the transaction on the RX channel. The CSRs TX_SADDR and TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and uses it for current ongoing transactions.
 
-      -  48 bits with CRC.
+RX_SADDR
+~~~~~~~~
 
-         -  Supports CRC.
+- Offset: 0x0
+- Type:   volatile
 
-         -  Response length is 38 bits.
++--------+------+--------+------------+-----------------------------------------------------------------------------------------------------------+
+| Field  | Bits | Access | Default    | Description                                                                                               |
++========+======+========+============+===========================================================================================================+
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where SDIO will write the received data.      |
+|        |      |        |            | Read & write to this CSR access different information.                                                    |
+|        |      |        |            |                                                                                                           |
+|        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transactions. |
+|        |      |        |            |                                                                                                           |
+|        |      |        |            | **On Read**: Address of read buffer for the current ongoing transaction. This is the local copy of        |
+|        |      |        |            | information maintained inside the uDMA core.                                                              |
++--------+------+--------+------------+-----------------------------------------------------------------------------------------------------------+
 
-      -  48 bits with NO CRC
+RX_SIZE
+~~~~~~~
 
-         -  Supports CRC.
+- Offset: 0x04
+- Type:   volatile
 
-         -  Response length is 38 bits.
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
+| Field |  Bits | Access | Default    | Description                                                                                |
++=======+=======+========+============+============================================================================================+
+| SIZE  |  19:0 |   RW   |    0x0     | Size of Rx buffer (amount of data to be transferred by SDIO to L2 memory). Read & write    |
+|       |       |        |            | to this CSR access different information.                                                  |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Write**: Size of Rx buffer for next transaction. It does not impact current ongoing   |
+|       |       |        |            | transaction.                                                                               |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Read**: Bytes left for current ongoing transaction. This is the local copy of         |
+|       |       |        |            | information maintained inside the uDMA core.                                               |
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
+
+RX_CFG
+~~~~~~
+
+- Offset: 0x08
+- Type:   volatile
+
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core             |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,           |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO  |
+|            |       |        |            |   of uDMA Core                                                                     |
+|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory.   |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                     |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                        |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size                         |
+|            |       |        |            |   and start address and restart channel                                            |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+
+TX_SADDR
+~~~~~~~~
+
+- Offset: 0x10
+- Type:   volatile
+
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------------+
+| Field |  Bits | Access | Default    | Description                                                                                                  |
++=======+=======+========+============+==============================================================================================================+
+| SADDR |  18:0 |   RW   |    0x0     | Address of the Tx buffer. This is location in the L2 memory from where SDIO will read the data to transmit.  |
+|       |       |        |            | Read & write to this CSR access different information.                                                       |
+|       |       |        |            |                                                                                                              |
+|       |       |        |            | **On Write**: Address of Tx buffer for next transaction. It does not impact current ongoing transactions.    |
+|       |       |        |            |                                                                                                              |
+|       |       |        |            | **On Read**: Address of Tx buffer for the current ongoing transaction. This is the local copy of information.|
+|       |       |        |            | maintained inside the uDMA core.                                                                             |
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------------+
+
+TX_SIZE
+~~~~~~~
+
+- Offset: 0x14
+- Type:   volatile
+
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------+
+| Field |  Bits | Access | Default    | Description                                                                                            |
++=======+=======+========+============+========================================================================================================+
+| SIZE  |  19:0 |   RW   |    0x0     | Size of Tx buffer (amount of data to be read by SDIO from L2 memory for Tx operation). Read & write    |
+|       |       |        |            | to this CSR access different information.                                                              |
+|       |       |        |            |                                                                                                        |
+|       |       |        |            | **On Write**: Size of Tx buffer for next transaction. It does not impact current ongoing transactions. |
+|       |       |        |            |                                                                                                        |
+|       |       |        |            | **On Read**: Bytes left for current ongoing transaction, i.e., bytes left to read from L2 memory. This |
+|       |       |        |            | is the local copy of information maintained inside the uDMA core.                                      |
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------------------+
+
+TX_CFG
+~~~~~~
+
+- Offset: 0x18
+- Type:   volatile
+
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                        |
++============+=======+========+============+====================================================================================+
+| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Tx channel configuration CSRs inside uDMA core             |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Tx channel is enabled and is either receiving data,           |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Tx FIFO  |
+|            |       |        |            | - 0x0 : Tx channel of the uDMA core does not have data to read from L2 memory      |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| EN         |   4:4 |   RW   |    0x0     | Enable the transmit channel of uDMA core to perform Tx operation                   |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW   |            | - 0x0: stop after last transfer for channel                                        |
+|            |       |        |    0x0     | - 0x1: after last transfer for channel, reload buffer size                         |
+|            |       |        |            |   and start address and restart channel                                            |
++------------+-------+--------+------------+------------------------------------------------------------------------------------+
+
+
+CMD_OP
+~~~~~~
+
+- Offset: 0x20
+- Type:   non-volatile
+
++-----------+--------+--------+------------+---------------------------------------------------------------------+
+| Field     | Bits   | Access | Default    | Description                                                         |
++===========+========+========+============+=====================================================================+
+| OP        | 13:8   | W      | 0x00       | Operation code specifying the command or function to be performed.  |
+|           |        |        |            | This 6-bit field selects the type of operation initiated by the     |
+|           |        |        |            | controller or processor.                                            |
++-----------+--------+--------+------------+---------------------------------------------------------------------+
+| RSP_TYPE  | 2:0    | W      | 0x0        | Response type expected for the issued operation. This 3-bit field   |
+|           |        |        |            | defines the format or presence of the response data.                |
+|           |        |        |            |                                                                     |
+|           |        |        |            |  - 3'b001: RSP_TYPE_48_CRC , response length will be 48 bit long.   |
+|           |        |        |            |  - 3'b010: RSP_TYPE_48_NOCRC , response length will be 48 bit long. |
+|           |        |        |            |  - 3'b011: RSP_TYPE_136 , response length will be 136 bit long.     |
+|           |        |        |            |  - 3'b100: RSP_TYPE_48_BSY , response length will be 48 bit long.   |
+|           |        |        |            |                                                                     |
++-----------+--------+--------+------------+---------------------------------------------------------------------+
+
+CMD_ARG
+~~~~~~~
+
+- Offset: 0x24
+- Type:   non-volatile
+
++--------+--------+--------+------------+---------------------------------------------------------------------+
+| Field  | Bits   | Access | Default    | Description                                                         |
++========+========+========+============+=====================================================================+
+| ARG    | 31:0   | W      | 0x00000000 | Argument value associated with the command operation. This 32-bit   |
+|        |        |        |            | field provides optional or required data used by the command        |
+|        |        |        |            | specified in the `OP` field. The meaning of this field depends on   |
+|        |        |        |            | the command type and context.                                       |
++--------+--------+--------+------------+---------------------------------------------------------------------+
+
+DATA_SETUP
+~~~~~~~~~~
+
+- Offset: 0x28
+- Type:   non-volatile
+
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+| Field       | Bits   | Access | Default    | Description                                                         |
++=============+========+========+============+=====================================================================+
+| BLOCK_SIZE  | 25:16  | W      | 0x000      | Specifies the size of each data block to be transferred, in bytes.  |
+|             |        |        |            | Typically used to define the transfer chunk size for multi-block    |
+|             |        |        |            | operations.                                                         |
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+| BLOCK_NUM   | 15:8   | W      | 0x00       | Number of blocks to be transferred. This value works together       |
+|             |        |        |            | with `BLOCK_SIZE` to determine total transfer size.                 |
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+| QUAD        | 2:2    | W      | 0x0        | Enables Quad SPI mode when set to `1`. In this mode, 4 data lines   |
+|             |        |        |            | are used for faster data transfer. Set to `0` for standard mode.    |
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+| RWN         | 1:1    | W      | 0x0        | Read/Write control: `0` indicates a write operation, `1` indicates  |
+|             |        |        |            | a read operation.                                                   |
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+| EN          | 0:0    | W      | 0x0        | Enable bit. When set to `1`, triggers the start of the read-write   |
+|             |        |        |            | operation. Read-write is decided based on the RWN bitfield.         |
++-------------+--------+--------+------------+---------------------------------------------------------------------+
+
+REG_START
+~~~~~~~~~
+
+- Offset: 0x2C
+- Type:   non-volatile
+
++--------+--------+--------+------------+------------------------------------------------------------------------------+
+| Field  | Bits   | Access | Default    | Description                                                                  |
++========+========+========+============+==============================================================================+
+| START  | 0:0    | W      | 0x0        | Start bit. Writing `1` to this bit initiates the command transmit operation  |
++--------+--------+--------+------------+------------------------------------------------------------------------------+
+
+REG_RSP0
+~~~~~~~~
+
+- Offset: 0x30
+- Type:   volatile
+
++---------+-------+--------+------------+--------------------------------------------------------------------+
+| Field   |  Bits | Access | Default    | Description                                                        |  
++=========+=======+========+============+====================================================================+
+|   DATA  |  31:0 |   R    |     0x0    |  Represents the 31:0 bits of RSP data                              |
++---------+-------+--------+------------+--------------------------------------------------------------------+
+
+REG_RSP1
+~~~~~~~~
+
+- Offset: 0x34
+- Type:   volatile
+
++---------+-------+--------+------------+--------------------------------------------------------------------+
+| Field   |  Bits | Access | Default    | Description                                                        |  
++=========+=======+========+============+====================================================================+
+|   DATA  |  31:0 |   R    |     0x0    |  Represents the 63:32 bits of RSP data                             |
++---------+-------+--------+------------+--------------------------------------------------------------------+
+
+REG_RSP2
+~~~~~~~~
+
+- Offset: 0x38
+- Type:   volatile
+
++---------+-------+--------+------------+--------------------------------------------------------------------+
+| Field   |  Bits | Access | Default    | Description                                                        |  
++=========+=======+========+============+====================================================================+
+|   DATA  |  31:0 |   R    |     0x0    |  Represents the 95:64 bits of RSP data                             |
++---------+-------+--------+------------+--------------------------------------------------------------------+
+
+REG_RSP3
+~~~~~~~~
+
+- Offset: 0x3C
+- Type:   volatile
+
++---------+-------+--------+------------+--------------------------------------------------------------------+
+| Field   |  Bits | Access | Default    | Description                                                        |  
++=========+=======+========+============+====================================================================+
+|   DATA  |  31:0 |   R    |     0x0    |  Represents the 127:96 bits of RSP data                            |
++---------+-------+--------+------------+--------------------------------------------------------------------+
+
+CLK_DIV
+~~~~~~~
+
+- Offset: 0x40
+- Type:   non-volatile
+
++-----------+-------+--------+------------+--------------------------------------------------------------------+
+| Field     | Bits  | Access | Default    | Description                                                        |
++===========+=======+========+============+====================================================================+
+| DIV_VALID | 8:8   | RW     | 0x0        | Indicates whether the value in `DIV_DATA` is valid. When set to    |
+|           |       |        |            | `1`, the divider logic uses the value in `DIV_DATA`. When `0`,     |
+|           |       |        |            | the divider is considered inactive or disabled.                    |
++-----------+-------+--------+------------+--------------------------------------------------------------------+
+| DIV_DATA  | 7:0   | RW     | 0x0        | 8-bit divider value to be used when `DIV_VALID` is set. This       |
+|           |       |        |            | value typically controls the clock division ratio or timing        |
+|           |       |        |            | behavior of a functional block.                                    |
++-----------+-------+--------+------------+--------------------------------------------------------------------+
+
+STATUS
+~~~~~~
+
+- Offset: 0x44
+- Type:   volatile
+
++---------+-------+--------+------------+-----------------------------------------------------------------------------+
+| Field   |  Bits | Access | Default    | Description                                                                 |  
++=========+=======+========+============+=============================================================================+
+|  STATUS | 31:16 |  RW    |   0x0      | - Bits [21:16] represent the Command Status, a 6-bit field indicating       |
+|         |       |        |            |      the state or result of the most recent command execution.              |
+|         |       |        |            |                                                                             |
+|         |       |        |            |         - 6'b000001: STATUS_RSP_TIMEOUT                                     |
+|         |       |        |            |         - 6'b000010: STATUS_RSP_WRONG_DIR                                   |
+|         |       |        |            |         - 6'b000100: STATUS_RSP_BUSY_TIMEOUT                                |
+|         |       |        |            |                                                                             |
+|         |       |        |            | - Bits [29:24] represent the TXRX Status, a 6-bit field indicating          |
+|         |       |        |            |      the transmit/receive state of the interface.                           |
+|         |       |        |            |                                                                             |
+|         |       |        |            |         - 6'b000001: STATUS_RSP_TIMEOUT                                     |
+|         |       |        |            |                                                                             |
+|         |       |        |            | - Bits [23:22] and [31:30] are reserved and should be ignored by software.  |
+|         |       |        |            |      They hold no functional meaning and may be read as zero or undefined.  |
++---------+-------+--------+------------+-----------------------------------------------------------------------------+
+|  ERR    | 1:1   |  RWC   |   0x0      |  Writing any value clears the bit. Indicates error either                   |
+|         |       |        |            |  during data or command-response reception.                                 |
+|         |       |        |            |                                                                             |
+|         |       |        |            |   - 0x0: No error                                                           |
+|         |       |        |            |   - 0x1: Error                                                              |
+|         |       |        |            |                                                                             |
++---------+-------+--------+------------+-----------------------------------------------------------------------------+
+|  EOT    | 0:0   |  RWC   |   0x0      |  Writing any value clears the bit.                                          |
+|         |       |        |            |                                                                             |
+|         |       |        |            |  - 0x1: End of transmission (data or command) or reception                  |
+|         |       |        |            |                                                                             |
++---------+-------+--------+------------+-----------------------------------------------------------------------------+
+
+
+Firmware Guidelines
+-------------------
+
+Clock Enable, Reset & Configure uDMA SDIO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA SDIO's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA SDIO.
+- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA SDIO. It acts as a soft reset for uDMA SDIO.
+- Configure uDMA SDIO's CLK_DIV CSR to update the period of SDIO clock.
+
+Command
+~~~~~~~
+
+- Configure CMD_OP with command opcode and response type expected after transmitting command to the external device.
+- Configure CMD_ARG with the argument associated with the command opcode selected via CMD_OP bitfield.
+- Configure REG_START CSR to initiate command transfer from SDIO to the external device.
+- if RSP_TYPE bitfield is configured with response type then REG_RSPx{x = 0 to 3} shall be read to get the received response from the external device.
+
+Tx Operation
+~~~~~~~~~~~~
+
+- Configure the TX channel using the TX_CFG CSR. Refer to the CSR details for detailed information.
+- For each transaction:
+   - Update uDMA SDIO's TX_SADDR CSR with an interleaved (L2) memory address. SDIO will read the data from this memory address for transmission.
+   - Configure the uDMA SDIO's TX_SIZE CSR with the size of data that the SDIO needs to transmit. uDMA SDIO will copy the transmit TX_SIZE bytes of data from the TX_SADDR location of interleaved memory.
+- Configure DATA_SETUP setup CSR to enable transmit of data from the L2 memory to the external. The Tx operation will start only after successfully command transfer. Refer to the DATA_SETUP CSR for more information.
+
+The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
+
+a) When command response is needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command response is received.
+
+b) When command response is not needed
+   - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command already transferred.
+
+Rx Operation
+~~~~~~~~~~~~
+
+- Configure the RX channel using the RX_CFG CSR. Refer to the CSR details for detailed information.
+- For each transaction:
+   - Update uDMA SDIO's RX_SADDR CSR with an interleaved (L2) memory address. SDIO will write the data to this memory address for transmission.
+   - Configure uDMA SDIO's RX_SIZE CSR with the size of data that SDIO needs to transmit. uDMA SDIO will copy the transmit RX_SIZE bytes of data to the RX_SADDR location of interleaved memory.
+- Configure DATA_SETUP setup CSR to enable transmission of data from the external device to L2 memory. The Rx operation will start only after a successful command transfer. Refer to the DATA_SETUP CSR for more information. Refer to the DATA_SETUP CSR for more information.
+
+The uDMA SDIO can be configured to perform Tx operation based on the below conditions: 
+- Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is already transferred.
+
+- STATUS bit of the STATUS CSR reflects the status of Rx operation.
 
-      -  136 bits
+End of transfer Interrupt
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         -  Supports CRC.
+- The uDMA SDIO asserts end of transmission event when it completes either Tx or Rx operation. EOT bit of STATUS CSR reflects the error status. The end of transfer interrupt is automatically cleared in the next clock cycle.
 
-         -  Response length is 133 bits.
+Error interrupt
+~~~~~~~~~~~~~~~
 
-      -  48 bits with a busy check.
+- The uDMA SDIO asserts error event when it faces an error during either reception of command-response or data from the external device. ERR bit of STATUS CSR reflects the error status.  The error interrupt is automatically cleared in the next clock cycle.
+
+Pin Diagram
+-----------
+The Figure below is a high-level block diagram of the uDMA: -
 
-         -  Supports CRC.
+.. figure:: uDMA_SDIO_Pin_Diagram.png
+   :name: uDMA_SDIO_Pin_Diagram
+   :align: center
+   :alt:
 
-         -  Response length is 38 bits.
+   uDMA SDIO Pin Diagram
+
+Below is a categorization of these pins:
 
-         -  Supports busy signal.
+Tx channel interface
+~~~~~~~~~~~~~~~~~~~~
 
-   -  Supports 16 bit CRC.
+The following pins constitute the Tx channel interface of uDMA SDIO. uDMA SDIO uses these pins to read data from interleaved (L2) memory:
 
-   -  Data output enable signal: sddata_oen_o is an active low signal.
-         It is enabled during transfer of data and is disabled during
-         reception of data.
+- data_tx_req_o
+- data_tx_gnt_i
+- data_tx_datasize_o
+- data_tx_i
+- data_tx_valid_i
+- data_tx_ready_o
 
-   -  Data can be transmitted in 2 modes:
+Data_tx_datasize_o  pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
 
-      -  Single count mode: Data is transferred only on DATA[0] pin. LSB
-            is transmitted first and MSB is transmitted last.
+Rx channel interface
+~~~~~~~~~~~~~~~~~~~~
 
-..
+The following pins constitute the Rx channel interface of uDMA SDIO. uDMA SDIO uses these pins to write data to interleaved (L2) memory:
 
-   .. udma_sdio_image:: udma_sdio_image9.png
-      :width: 5.63542in
-      :height: 1.07292in
+- data_rx_datasize_o
+- data_rx_o
+- data_rx_valid_o
+- data_rx_ready_i
 
--  Quad mode: Data is transferred on all the four data pins.
+ data_rx_datasize_o pin is hardcoded to value 0x0. These pins reflect the configuration values for the next transaction.
 
-..
+Clock interface
+~~~~~~~~~~~~~~~
 
-   .. udma_sdio_image:: udma_sdio_image10.jpg
-      :width: 5.28762in
-      :height: 2.70313in
+- sys_clk_i
+- periph_clk_i
 
--  States:
+uDMA CORE derives these clock pins. periph_clk_i is used to calculate baud rate. sys_clk_i is used to synchronize SDIO with uDAM Core.
 
-   -  ST_IDLE:
+Reset interface
+~~~~~~~~~~~~~~~
 
-      -  For read operation go to state ST_RX_START.
+- rstn_i
 
-      -  For write operation go to ST_TX_START.
+uDMA core issues reset signal to SDIO using reset pin. This is active low signal.
 
-      -  Read and write operation is decided by data_rwn_i.
+uDMA SDIO bus interface
+~~~~~~~~~~~~~~~~~~~~~~~
 
-   -  ST_TX_START:
+**command interface**
 
-      -  Send the start bit through sddata_o to start the transaction.
+- sdcmd_o
+- sdcmd_i
+- sdcmd_oen_o
 
-      -  Go to state ST_TX_SHIFT.
+sdcmd_oen_o is an active low signal. It is enabled during transfer of command and is disabled during
+reception of response.
 
-      -  one block is transmitted.
+**data interface**
 
-   -  ST_TX_SHIFT:
+- sddata_o
+- sddata_i
+- sddata_oen_o
 
-      -  Data output is enabled.
+sddata_oen_o is an active low signal. It is enabled during transfer of command and is disabled during
+reception of response.
 
-      -  CRC is calculated.
+**sdio clock**
 
-      -  Direction bit is sent.
+- sdclk_o
 
-      -  If the whole block is transmitted go to state ST_TX_CRC.
 
-   -  ST_TX_CRC:
+uDMA SDIO interface to generate interrupt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      -  Output crc through sddata_o.
+- eot_o
+- err_o
 
-      -  state is set to ST_TX_END.
+eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation. These are active high signal.
 
-   -  ST_TX_END
+uDMA SDIO interface to read-write CSRs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      -  Send ‘F’ through sddata_o.
+The following interfaces are used to read and write to SDIO CSRs. These interfaces are managed by uDMA Core:
 
-      -  Go to state ST_TX_CRCSTAT.
+- cfg_data_i
+- cfg_addr_i
+- cfg_valid_i
+- cfg_rwn_i
+- cfg_ready_o
+- cfg_data_o
 
-   -  ST_TX_CRCSTAT
+uDMA SDIO Rx channel configuration interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      -  Wait for 8 clock cycles and go to state ST_TX_BUSY
+- uDMA SDIO uses the following pins to share the value of config CSRs, i.e., RX_SADDR, RX_SIZE, and RX_CFG, with the uDMA core: -
 
-   -  ST_TX_BUSY
+   - cfg_rx_startaddr_o
+   - cfg_rx_size_o
+   - cfg_rx_datasize_o
+   - cfg_rx_continuous_o
+   - cfg_rx_en_o
+   - cfg_rx_clr_o
 
-      -  After waiting for 512 cycles go to timeout phase:
+   The cfg_rx_datasize_o pin is stubbed.
 
-         -  Sdio timeout counter is increased till it reaches 1023.
+- SDIO shares the values present over the below pins as read values of the config CSRs, i.e. RX_SADDR, RX_SIZE, and RX_CFG:
 
-         -  State is set to ST_IDLE and high output is driven through
-               eot output.
+   - cfg_rx_en_i
+   - cfg_rx_pending_i
+   - cfg_rx_curr_addr_i
+   - cfg_rx_bytes_left_i
 
-      -  If 512 cycles is not reached and high bit is received in LSB of
-            incoming data:
+   These values are updated by the uDMA core and reflect the configuration values for the current ongoing transactions.
 
-         -  If all the blocks are transmitted then the state is set to
-               ST_IDLE and eot is asserted.
+uDMA SDIO Tx channel configuration interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         -  If the whole block is not transmitted then go to ST_TX_START
-               and transmit the next block.
+- uDMA SDIO uses the following pins to share the value of config CSRs, i.e., TX_SADDR, TX_SIZE, and TX_CFG, with the uDMA core: -
 
-   -  ST_RX_START:
+   - cfg_tx_startaddr_o
+   - cfg_tx_size_o
+   - cfg_tx_datasize_o
+   - cfg_tx_continuous_o
+   - cfg_tx_en_o
+   - cfg_tx_clr_o
 
-      -  Data is received through sddata_i.
+  The cfg_tx_datasize_o pin is stubbed.
 
-      -  Go to state ST_RX_SHIFT if the start bit is received.
+- SDIO shares the values present over the below pins as read values of the config CSRs, i.e., TX_SADDR, TX_SIZE, and TX_CFG:
 
-      -  If the start bit is not received, set the status to response
-            timeout and go to ST_IDLE.
+   - cfg_tx_en_i
+   - cfg_tx_pending_i
+   - cfg_tx_curr_addr_i
+   - cfg_tx_bytes_left_i
 
-   -  ST_RX_SHIFT:
-
-      -  CRC is calculated.
-
-      -  After receiving the block state is set to ST_RX_CRC.
-
-   -  ST_RX_CRC:
-
-      -  CRC is calculated.
-
-      -  After receiving the 16 bit CRC, if the all the blocks are
-            received assert eot else go to ST_RX_START and receive
-            another block.
-
-   -  ST_WAIT
-
-      -  After waiting for 8 clock cycle assert eot and go to state
-            ST_IDLE.
-
--  This block contains a data input, data output, ready output and valid
-      output.
-
-   -  Data input: Receive the data from tx fifo and transfer it to
-         device.
-
-   -  Data output: Transmits the data received from device to rx fifo.
-
-   -  Ready output: Indicate if block is ready to write data to tx fifo.
-
-   -  Valid output: Indicate if there is valid data to be written to rx
-         fifo.
-
-.. udma_sdio_image:: udma_sdio_image4.png
-   :width: 6.5in
-   :height: 3.41667in
-
-**(u_clockgen) udma_clkgen:-**
-
-**Ports:-**
-
-input logic clk_i,
-
-input logic rstn_i,
-
-input logic dft_test_mode_i,
-
-input logic dft_cg_enable_i,
-
-input logic clock_enable_i,
-
-input logic [7:0] clk_div_data_i,
-
-input logic clk_div_valid_i,
-
-output logic clk_div_ack_o,
-
-output logic clk_o
-
-**Theory of operation :-**
-
--  This is a Integer clock divider with async configuration interface.
-
--  The module will be in four modes namely IDLE, STOP, WAIT, RELEASE.
-
--  The clock_enable_i should be high and the **module should enable the clock** for the output to be visible.
-
--  When the module is in reset mode by making rstn_i low,then the mode
-      is set to IDLE.The multiplexer will select the input clock to be
-      the output clock of the module.The clock divider is
-      enabled.\ **The clock is enabled by the module**.
-
--  The signal clk_div_valid_i is sent to a pulp_sync_wedge module as
-      serial_i and output of the module is clk_div_valid_sync which
-      represents the r_edge_o of the pulp_sync_edge.
-
--  Now at every positive edge of the clk_i,If clk_div_valid_sync is
-      high,then the clk_div_data_i is read and the clock divider value
-      is updated.Also ,the next state of the module is change to STOP
-      state, so that in next clock cycle as state is in STOP mode, the
-      multiplexer sets the output to the clock divider output and
-      schedules the update of **clock divider config** to next clock
-      cycle by changing the next state to WAIT.The clock is disabled in
-      this state to make the config changes.
-
--  At the next clock edge as it is in WAIT state,here the **clock divider config** is updated ,which means the counter value is set
-      to default 0 and output clock is made low.The next state is
-      RELEASE state.
-
--  In the next clock edge where the state is RELEASE,from this moment
-      the clock divider starts working with a new clock divider value
-      from the start(as counter i made 0).The next state is again back
-      to IDLE state.
-
--  In the next clock edge(IDLE state),\ **The clock is enabled** so that
-      we can see the output in the output pin.The module will remain in
-      this state and clock divider will be toggle the output clock
-      signal after the counter reaches a value equal to **(clock divisor
-      value -1)** and at this moment the counter also becomes 0 so that
-      it can be incremented by one unit again at every clock edge.This
-      will continue until again clk_div_valid_sync become high again
-      then The clock divider value is updated and the state goes to STOP
-      mode for next clock cycle to reset the clock divisor and counter
-      to 0.
-
--  The clk_o is nothing but the output signal of the clock divider.
-
-**Pulp_sync_wedge:-**
-
-**Ports:-**
-
-input logic clk_i,
-
-input logic rstn_i,
-
-input logic en_i,
-
-input logic serial_i,
-
-output logic r_edge_o,
-
-output logic f_edge_o,
-
-output logic serial_o
-
-The module takes an input(serial_i) and a clock signal.There is a
-submodule which contains a 2 bit shift register which will be storing
-the signal value at every clock edge by shifting to right and storing
-new signal value in MSB.The output of the shift register is the LSB
-which is connected in cascaded fashion to a module which writes the
-output serial_o .At every clock positive edge , the serial_o is updated
-with the current LSB of the shift register and LSB is updated by shift
-register with new value ,both happening in a parallel non blocking
-fashion.Whenever the LSB of the shift register changes to high and
-serial_o was low,then r_edge_o is made high ,but at next clock cycle as
-serial_o is updated to LSB of shift register ,r_edge_o goes low (So
-r_edge_o stays high for only one clock cycle).
-
-**Edge Propagator:-**
-
-**Ports:-**
-
-input logic clk_tx_i,
-
-input logic rstn_tx_i,
-
-input logic edge_i,
-
-input logic clk_rx_i,
-
-input logic rstn_rx_i,
-
-output logic edge_o
-
-**Theory of operation:-**
-
--  The main purpose of the module is to propagate the input value in
-      edge_i for a period of time.
-
--  So,when rstn_tx_i is low, then the output is low.
-
--  In active mode ,Whenever the edge_i is high it is stored in a
-      register and reflected in a signal in the next positive edge of
-      clk_tx_i.The signal which is sensitive to edge_i at every positive
-      edge of clk_tx_i is sent to pulp_sync_wedge.This signal will
-      remain high until we get an output from pulp_sync_wedge(serial_o)(
-      clock clk_rx_i ) for the signal sensitive to edge_i.Then after
-      three clock cycles after we get a output from pulp_sync_wedge we
-      will make the signal low .After this the signal is again set
-      sensitive to edge_i .So everything repeats after the edge_i is
-      triggered again.Now the output of the edge propagator (edge_o) is
-      nothing but the rising edge pulp_sync_wedge based
-      signal,i.e.,r_edge_o, which asserts one clock cycle after the
-      signal sensitive to edge_i is made high.
-
-**udma_dc_fifo:**
-
-**Ports:-**
-
-input logic src_clk_i,
-
-input logic src_rstn_i,
-
-input logic [DATA_WIDTH-1:0] src_data_i,
-
-input logic src_valid_i,
-
-output logic src_ready_o,
-
-input logic dst_clk_i,
-
-input logic dst_rstn_i,
-
-output logic [DATA_WIDTH-1:0] dst_data_o,
-
-output logic dst_valid_o,
-
-input logic dst_ready_i
-
-**Theory of operation:-**
-
--  The module contains two sub modules ,one connected to the source to
-      receive the data and enter the data into FIFO and another module
-      connected to the destination and works on sending the FIFO data to
-      destination.
-
--  din:
-
-   -  This is connected to the source.
-
-      -  input clk;
-
-      -  input rstn;
-
-      -  input [DATA_WIDTH - 1 : 0] data;
-
-      -  input valid;
-
-      -  output ready;
-
-      -  output [BUFFER_DEPTH - 1 : 0] write_token;
-
-      -  input [BUFFER_DEPTH - 1 : 0] read_pointer;
-
-      -  output [DATA_WIDTH - 1 : 0] data_async;
-
-   -  The din contains the dc_buffer module which contains the actual
-         FIFO , dc_token_ring module which contains the logic to compute
-         the write pointers and finally the dc_full_detector module
-         which contains the logic to deduce whether FIFO is full or not.
-
--  dout:
-
-   -  input [DATA_WIDTH - 1 : 0] data_async;
-
-   -  input clk;
-
-   -  input rstn;
-
-   -  output [DATA_WIDTH - 1 : 0] data;
-
-   -  output valid;
-
-   -  input ready;
-
-   -  input [BUFFER_DEPTH - 1 : 0] write_token;
-
-   -  output [BUFFER_DEPTH - 1 : 0] read_pointer;
-
-   -  dout contains the dc_token_ring module which contains the logic to
-         compute the read_pointer to read data from when FIFO is not
-         empty .
-
-   -  It will also be taking write_token from the din module and perform
-         the logic of dc_synchronizer on it to get the synchronized
-         version of write_token.This synchronized write_token along with
-         read_pointer is used to deduce whether the FIFO is empty or not
-         ,using bit manipulation.
-
-   -  The dc_synchronizer synchronizes the write_token with respect to
-         clk ,which means at every clock edge the value of the
-         write_token is stored but it is reflected in the output in the
-         next clock edge.
-
-   -  If the FIFO is empty then we cannot read from the FIFO.
-
-**io_tx_fifo:-**
-
--  This is a TX FIFO with outstanding request support.
-
--  Ports:-
-
-   -  input logic clk_i,
-
-   -  input logic rstn_i,
-
-   -  
-
-   -  input logic clr_i,
-
-   -  
-
-   -  output logic req_o,
-
-   -  input logic gnt_i,
-
-   -  
-
-   -  output logic [DATA_WIDTH-1 : 0] data_o,
-
-   -  output logic valid_o,
-
-   -  input logic ready_i,
-
-   -  
-
-   -  input logic valid_i,
-
-   -  input logic [DATA_WIDTH-1 : 0] data_i,
-
-   -  output logic ready_o
-
--  Theory of operation:-
-
-   -  The module contains a FIFO module which is a synchronous FIFO with
-         configurable width and depth and logic to keep record of any
-         outstanding requests and if requests are solved and accordingly
-         update the record.
-
-   -  The FIFO module does three things which are updating the buffer ,
-         keeping record of the number of elements in the buffer and
-         updating the write and read pointers in the buffer.
-
-   -  If the signal valid_i is high and the buffer is not full then at
-         the current position at the write pointer of the buffer array
-         the data from data_i is stored and the write pointer is
-         incremented.
-
-   -  If the signal ready_i is high and the buffer is not empty then the
-         read pointer is incremented.
-
-   -  The current read pointer position in the buffer array is read into
-         data_o always.The read pointer is updated at every clock
-         positive edge as mentioned in above bullet point.
-
-   -  While above functions are happening at every clock positive edge
-         the number of elements in the buffer is also updated and
-         recorded after the operation.
-
-   -  Coming to the logic for the outstanding requests,We calculate the
-         number of free spaces left in the buffer and if it is equal to
-         the number of the outstanding requests then we signal to stop
-         further requests.If there is no signal to stop the requests and
-         the buffer is ready to accept requests (which means it is not
-         full) then we can accept the requests.
-
-   -  So at every clock positive edge if the module and accept requests
-         based on above conditions and the request is granted by making
-         gnt_i signal high then if valid_i is low(meaning the request is
-         not valid) or The buffer is not ready (meaning the buffer is
-         full) then the number of outstanding requests will be
-         incremented.If valid_i is high and the buffer is ready then the
-         number of outstanding requests will be decremented.
-
-**Whole operation:-**
-
-.. udma_sdio_image:: udma_sdio_image4.png
-   :width: 7.14063in
-   :height: 3.75in
-
--  As we can see in the above block diagram,some of the input signals go
-      into the register interface and few signals are generated by the
-      register interface which are used for various operations in SDIO.
-
--  We have a module called u_clockgen which takes in a few parameters
-      from the register and generates a sdio clock from the peripheral
-      clock (u_clockgen is a Integer clock divider with async
-      configuration interface).
-
--  The SDIO clock generated will be used in the SDIO module.There is a
-      edge propagator module which takes in s_start from register which
-      is in sync with system clock sys_clk_i and sdio clock as input
-      ,finally generates the resign edge of the s_start in sync with the
-      sdio clock ,So this module generates resign edge of s_start in
-      sync with the sdio clock instead of sys_clk_i.
-
--  The s_start_sync ,sdio clock and signals from registers go to
-      sdio_tx_rx where actual logic for transmission and receiving is
-      executed.sdio_tx_rx runs in sync with sdio clock.
-
--  The signal s_err from the module sdio_tx_rx is synchronized to
-      sys_clk_i using the module pulp_sync_wedge and set to register to
-      be stored.
-
--  The s_eot signal from sdio_tx__rx is in sync with sdio clock ,there
-      is edge propagator with name i_eot_sync which generates the rising
-      edge of the signal s_eot in sync with sys_clk_i and the
-      synchronized signal is sent to register to be stored.
-
--  For communication between( SDIO and uDMA )and (SDIO and I/O) we use
-      FIFOs.
-
--  FIFOs for SDIO and uDMA:-
-
-   -  There are three FIFOs in total , i_dc_fifo_tx , u_dc_fifo_rx and
-         io_tx_fifo.
-
-   -  **u_dc_fifo_rx** is a **udma_dc_fifo** which is used to transfer
-         the data from the clock domain of sdio clock domain(source) and
-         sys_clk_i (system clock)(destination).So the data from
-         peripheral I/O gets into sdio_tx_rx module, to communicate this
-         received data from the sdio_tx_rx to uDMA we use this FIFO
-         **u_dc_fifo_rx.**
-
-   -  **i_dc_fifo_tx** is different clock FIFO between sys_ck_i(source)
-         and sdio clock(destination) .So basically The data which comes
-         as input to the top module from uDMA is sent first to
-         **io_tx_fifo** which is a TX FIFO with outstanding request
-         support.The data in this FIFO goes to **i_dc_fifo_tx** which is
-         FIFO between sys_clk_i as source and sdio clock as destination
-         ,So through this FIFO named **i_dc_fifo_tx** ,the data can be
-         sent to the **sdio_tx_rx** module in SDIO.So the data from the
-         uDMA first gets into the FIFO named **io_tx_fifo** and then
-         from there into a FIFO named **i_dc_fifo_tx** and finally to
-         **sdio_tx_rx**.
-
-.. |Command token| udma_sdio_image:: udma_sdio_image7.png
-   :width: 3.95833in
-   :height: 0.96875in
+   These values are updated by the uDMA core and reflect the configuration values for the current ongoing transactions.
