@@ -53,8 +53,9 @@ The Figure below is a high-level block diagram of the uDMA QSPI:-
 
    uDMA QSPI Block Diagram
 
-In the block diagram above, the DATA lines at the boundary of the uDMA QSPI are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and can be configured using datasize bitfield of the CFG csr.
-When transmitting data to uDMA Core, the unused bits are filled with 0x0 to form 32-bit
+In the block diagram above, the DATA lines are 32 bits wide. The DATASIZE pin is 2 bits wide and can be configured using datasize bitfield of the CFG csr.
+When transmitting data to uDMA Core, the unused bits are filled with 0x0 to form 32-bit i.e. if the data received from the external device is less that 32 bit the unused bits will be filled with zero.
+The uDMA core interprets data in multiples defined by the datasize bitfield of the CFG CSR.
 
 uDMA QSPI uses the Tx channel interface to read the data and command from the interleaved (L2) memory via the uDMA Core. It transmits the read data to the external QSPI device. 
 uDMA QSPI uses the Rx channel interface to store the data received from the external QSPI device to the interleaved (L2) memory. Refer to <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_  for more information about the Tx and Rx channel functionality of uDMA Core.
@@ -62,13 +63,13 @@ uDMA QSPI uses the Rx channel interface to store the data received from the exte
 Dual-clock (DC) Tx (command and data) and Rx FIFO
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The uDMA core operates using the system clock, while the uDMA QSPI operates using both the system clock and the SPI clock. To ensure the uDMA QSPI and core are properly synchronized, dual-clock FIFOs are used in the uDMA QSPI.
+The uDMA core operates using the system clock, while the uDMA QSPI operates using both the system clock and the SPI clock. To ensure the uDMA QSPI and the uDMA core are properly synchronized, dual-clock FIFOs are used in the uDMA QSPI.
 These are 8-depth FIFOs and can store 32-bit wide data. It is implemented using circular FIFO.
 
 The diagram below shows the interfaces of DC FIFO: 
 
-.. figure:: uDMA_UART_Dual_clock_fifo.png
-   :name: uDMA_UART_Dual_clock_fifo
+.. figure:: uDMA_QSPI_Dual_clock_fifo.png
+   :name: uDMA_QSPI_Dual_clock_fifo
    :align: center
    :alt:
 
@@ -99,8 +100,8 @@ Tx and Command FIFO
 uDMA QSPI has a Tx and Command FIFO to store the received Tx and command data from the uDMA core. It forwards the data read from L2 memory to the Tx DC FIFO. uDMA QSPI on the Tx path reads the data from Tx DC FIFO and transmits it to the external device.
 It is a 2-depth FIFO and can store 32-bit wide data. The diagram below shows the interfaces of Tx FIFO: 
 
-.. figure:: uDMA_Uart_TX_FIFO.png
-   :name: uDMA_Uart_TX_FIFO
+.. figure:: uDMA_QSPI_TX_FIFO.png
+   :name: uDMA_QSPI_TX_FIFO
    :align: center
    :alt:
 
@@ -172,9 +173,9 @@ Following steps are performed to read the command from L2 memory: -
 
 **Read command into CMD FIFO from L2 memory**
 
-To initiate a read operation from L2 memory, the CMD FIFO asserts both the READY and REQ signals to the uDMA core, indicating its readiness to receive command. A high READY signal signifies that the CMD FIFO has available space, while a high REQ signal confirms that the FIFO can accept command from the uDMA core and that the number of pending transactions does not exceed its capacity. The CMD FIFO internally maintains a counter to track unserved transactions from the core.
+To initiate a read operation from L2 memory, the CMD FIFO asserts both the READY and REQ signals to the uDMA core, indicating its readiness to receive command. A high READY signal signifies that the CMD FIFO has available space, while a high REQ signal confirms that the FIFO can accept command from the uDMA core and that the number of pending transactions does not exceed its capacity. The CMD FIFO internally maintains a counter to track unserved transactions from the uDMA core.
 
-Upon receiving the REQ signal and if the QSPI TX channel is enabled via CMD CSRs, the uDMA core initiates arbitration. If the QSPI TX channel wins arbitration, the core issues a GNT (grant) signal to the uDMA QSPI. Once command is successfully read from L2 memory, the uDMA core asserts a VALID signal along with the command for transmission to the QSPI.
+Upon receiving the REQ signal and if the QSPI TX channel is enabled via CMD CSRs, the uDMA core initiates arbitration. If the QSPI TX channel wins arbitration, the uDMA core issues a GNT (grant) signal to the uDMA QSPI. Once command is successfully read from L2 memory, the uDMA core asserts a VALID signal along with the command for transmission to the QSPI.
 
 The uDMA QSPI writes this command into the CMD FIFO and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core de-asserts the VALID signal in the following clock cycle and reasserts it only when new command is available for transmission. Since the FIFO is initially empty, both READY and REQ signal are asserted at power up.
 
@@ -231,7 +232,7 @@ Below table explains Master and Slave settings for different combination(Mode) o
 
 - SPI_CMD_SOT
 
-   uDMA QSPI takes system clock(clk_i) cycle defined in WAIT_CYC field of SPI_CMD_WAIT command to update chip select lines based on the SPI_CMD_SOT configuration.
+   uDMA QSPI takes system clock(clk_i) cycle defined programmable WAIT_CYC field of SPI_CMD_WAIT command to wait after chip select lines are updated based on the SPI_CMD_SOT configuration.
 
    .. warning::
       In the current implementation, the `WAIT_CYC` field of the `SPI_CMD_WAIT` command is used in place of the `CS_WAIT` field of the `SPI_CMD_SOT` command. 
@@ -292,7 +293,7 @@ In QPI mode, if LSB is set to 0, then spi_sdo0_o will reflect msb bit else it re
 
 - SPI_CMD_WAIT
 
-   uDMA QSPI supports the concept of itroducing delay during transaction. There are two way to introduce delay: -
+   uDMA QSPI supports the concept of introducing delay during transaction. There are two way to introduce delay: -
    `Event based delay` : In this mode uDMA QSPI halt its operation until it receives an event defined by WAIT_CYC field of SPI_CMD_WAIT, from the uDMA Core.
    `Clock based delay` : In this mode uDMA QSPI consumes clock defined by WAIT_CYC field of SPI_CMD_WAIT.
 
@@ -634,7 +635,6 @@ sends the command, inserts dummy cycles (if required), and finally receives data
 | SPI_CMD_EOT         | 0x90000000            | Mark end of transfer. Optionally de-assert CS and/or trigger end-of-transfer event.            |
 +---------------------+-----------------------+------------------------------------------------------------------------------------------------+
 
-
 The below sequence configures SPI, asserts the chip-select line, sends an instruction (0x0B), then uses a repeat block to receive
 data multiple times without replicating commands. This way, the Rx block (SPI_CMD_RX_DATA) is executed 3 times automatically, without re-encoding the same command multiple times in memory.
 
@@ -720,8 +720,8 @@ Interrupt
 
 uDMA QSPI generates the following interrupts during the RX operation:
 
-- Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
-- Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
+- Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into uDMA core RX FIFO.
+- Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into uDMA core TX FIFO.
 - End of transfer interrupt: The uDMA QSPI generate an end of transfer interrupt when it receives a request to do so via SPI_CMD_EOT command. Interrupt will be cleared automatically in the next cycle.  
 
 The RX and TX channel interrupts are cleared by the uDMA core if any of the following conditions occur:
@@ -732,6 +732,34 @@ The RX and TX channel interrupts are cleared by the uDMA core if any of the foll
 
 The event bridge forwards interrupts over dedicated lines to the APB event controller for processing. Each interrupt has its own dedicated line.
 Users can mask these interrupts through the APB event controller's control and status registers (CSRs).
+
+Example Transactions
+^^^^^^^^^^^^^^^^^^^^
+
+Below are examples of typical writes and reads to external memories using the standard 4-wire SPI protocol.
+
+.. figure:: ../../images/simple_spi_write_transfer.png
+   :name: Simple_SPI_Write_Transfer
+   :align: center
+   :alt:
+
+   Simple SPI Write Transfer
+
+.. figure:: ../../images/simple_spi_read_transfer.png
+   :name: Simple_SPI_Read_Transfer
+   :align: center
+   :alt:
+
+   Simple SPI Read Transfer
+
+Next we see an example transfer in QSPI mode. All 4 datalines are bidirectional and the communication is always half duplex.
+
+.. figure:: ../../images/quad_spi_transfer.png
+   :name: Quad_SPI_Transfer
+   :align: center
+   :alt: 
+   
+   Quad SPI Transfer
 
 System Architecture
 -------------------
@@ -986,7 +1014,9 @@ Firmware Guidelines
 Clock Enable, Reset & Configure uDMA QSPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA QSPI's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA QSPI.
-- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA QSPI. It acts as a soft reset for uDMA QSPI.
+- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA QSPI. The uDMA QSPI can be reset via:
+   - System system
+   - Setting corresponding bit in the uDMA Core's PERIPH_RESET CSR
 - Configure QSPI Operation using  SETUP CSR. Refer to the CSR details for detailed information.
 
 Tx Operation
