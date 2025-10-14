@@ -65,7 +65,7 @@ The Figure below is a high-level block diagram of the uDMA SDIO:-
 
    uDMA SDIO Block Diagram
 
-In the block diagram above, the DATA lines at the boundary of the uDMA SDIO are 32 bits wide, whereas other DATA lines are only 8 bits wide. The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x2. The valid values for the DATASIZE pin are: -
+In the block diagram above, the DATA lines are 32 bits wide The DATASIZE pin is 2 bits wide and is currently hardcoded to 0x2. The valid values for the DATASIZE pin are: -
 
 - 0x0: 1-byte transfer
 - 0x1: 2-byte transfer
@@ -82,8 +82,8 @@ It is implemented using circular FIFO.
 
 Below diagram shows the interfaces of DC FIFO:
 
-.. figure:: uDMA_UART_Dual_clock_fifo.png
-   :name: uDMA_UART_Dual_clock_fifo
+.. figure:: uDMA_SDIO_Dual_clock_fifo.png
+   :name: uDMA_SDIO_Dual_clock_fifo
    :align: center
    :alt:
 
@@ -114,8 +114,8 @@ TX FIFO
 uDMA SDIO has a TX FIFO to store the received data from uDMA core. It forwards the data read from L2 memory to the TX DC FIFO. uDMA SDIO on TX path, read the data from TX DC FIFO and transmits it to external device.
 It is a 2-depth FIFO and can store 32-bit wide data. Below diagram shows the interfaces of TX FIFO: 
 
-.. figure:: uDMA_UART_TX_FIFO.png
-   :name: uDMA_UART_TX_FIFO
+.. figure:: uDMA_SDIO_TX_FIFO.png
+   :name: uDMA_SDIO_TX_FIFO
    :align: center
    :alt:
 
@@ -186,8 +186,6 @@ After transmitting the stop command, the uDMA SDIO expects RSP_TYPE_48_CRC respo
 
 **Command Response and Data Flow in uDMA SDIO**
 
-After transmitting a command, the uDMA SDIO can perform subsequent operations based on the DATA_SETUP CSR configuration and the command response setting. The behavior is as follows:
-
 After sending a command, the uDMA SDIO acts based on the DATA_SETUP CSR and command response settings:
 
 - If set for read, it starts a data read (Rx) from the external device (see Data Section), as per the DATA_SETUP CSR.
@@ -253,7 +251,7 @@ The RSP_TYPE bitfield of CMD_OP CSRs can used to configure expected response fro
 +---------------+-----------+------------------+-----------+--------------------------------+---------+
 
 If any of the above response is selected via RSP_TYPE bitfield of CMD_OP CSRs then the uDMA SDIO will wait for a response after sending command.
-To receive response, uMDA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cycle, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+To receive response, uDMA QSPI drives `sdcmd_oen_o` with value 1 and expects `sdcmd_i` pin to have value 0(indicating start bit) within 38 clock cycles. If uDMA SDIO does not receive response from the external device within 38 `sdclk_o` clock cycle, it updates the command STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
 If command response is received successfully, uDMA SDIO validates if the direction bit received at `sdcmd_i` pin. If the value at the `sdcmd_i` pin is non-zero then it updates the command STATUS to STATUS_RSP_WRONG_DIR. After validating direction, uDMA SDIO will read data up to response length.
 If Response expects the CRC value then uDMA SDIO reads the command CRC and perform CRC validation. In case of RSP_TYPE_48_BSY response, the uDMA SDIO expects that data lines to be inactive, if not, uDMA SDIO retry after 8 clock cycles to confirm whether data lines are free or not. If the data lines are busy even after 8 clock cycles then SDIO updates the command STATUS to STATUS_RSP_BUSY_TIMEOUT.
 The SDIO, irrespective of whether data lines are busy or not spends 8 clock cycle before raising eot interrupt. Apart from asserting EOT interrupt , the uDMA SDIO enable SDIO to perform data write (Tx) operation to the external device.
@@ -302,7 +300,7 @@ The uDMA SDIO receives data on the `sddata_i` data lines. Data will be received 
 
 `Start bit -> Data -> CRC - > End`
 
-To receive response, uMDA QSPI  expects `sddata_i` pin to have value 0(indicating start bit) within BLOCK_NUM clock cycles. If uDMA SDIO does not receive response from the external device within BLOCK_NUM `sdclk_o` clock cycle, it updates the Rx STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
+To receive response, uDMA QSPI  expects `sddata_i` pin to have value 0(indicating start bit) within BLOCK_NUM clock cycles. If uDMA SDIO does not receive response from the external device within BLOCK_NUM `sdclk_o` clock cycle, it updates the Rx STATUS to STATUS_RSP_TIMEOUT and does not wait for the response.
 After successfully receiving the start bit, it reads BLOCK_SIZE data and 16 bit crc values. After successfully reading BLOCK_NUM data and subsequent crc bits, uDMA SDIO sets the EOT bit of STATUS CSR. Reading EOT bit will clear it.
 The uDMA SDIO reads the start bit, BLOCK_SIZE data and 16 bit crc values for BLOCK_NUM to complete Rx operation.
 
@@ -682,9 +680,11 @@ Firmware Guidelines
 Clock Enable, Reset & Configure uDMA SDIO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA SDIO's peripheral clock. A peripheral clock is used to calculate the baud rate in uDMA SDIO.
-- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA SDIO. It acts as a soft reset for uDMA SDIO.
-- Configure uDMA SDIO's CLK_DIV CSR to update the period of SDIO clock.
+- Configure uDMA Core's PERIPH_CLK_ENABLE to enable uDMA SDIO's peripheral clock. A peripheral clock is used by uDMA SDIO to synchronize data with external device.
+   - Configure uDMA SDIO's CLK_DIV CSR to update the period of SDIO's peripheral clock. Refer to the register description for more information.
+- Configure uDMA Core's PERIPH_RESET CSR to issue a reset signal to uDMA QSPI. The uDMA QSPI can be reset via:
+   - System system
+   - Setting corresponding bit in the uDMA Core's PERIPH_RESET CSR
 
 Command
 ~~~~~~~
