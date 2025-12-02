@@ -614,4 +614,4 @@ uDMA I2C interface to generate error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - err_o
 
-``**Note**:: Currently, no details are provided for this pin.``
+``**Note**:: As of commit #30e3c8b, the err_o signal is left unconnected.``

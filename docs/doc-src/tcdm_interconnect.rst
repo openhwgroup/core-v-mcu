@@ -23,6 +23,8 @@ Features
    - Full Crossbar
    - Clos network
    - Butterfly
+   
+   **NOTE**: The network topology is fixed and not configurable.
 
 
 For more details about TCDM interconnect refer `here <https://github.com/openhwgroup/core-v-mcu/blob/master/rtl/tcdm_interconnect/README.md>`_.
