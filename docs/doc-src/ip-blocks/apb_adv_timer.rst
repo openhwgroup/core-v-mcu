@@ -25,15 +25,17 @@ These four timers can be configured independently to support four unique PWM gen
 Features
 --------
 
-- Multiple trigger input sources:
 
-  - PWM output signals of all 4 timers
-  - 32 GPIOs
 
 - Multiple clock sources:
 
-  - Reference clock at 32kHz
+  - low_speed_clk_i clock
   - HCLK clock
+
+- Multiple input sources:
+
+  - PWM output signals of all 4 timers as input to the APB Advanced Timer.
+  - GPIOs are inputs to the APB Advanced Timer
 
 - Configurable input trigger modes for each timer
 - Configurable prescaler for each timer
@@ -1789,9 +1791,9 @@ Firmware Guidelines
 
 Initialization:
 ~~~~~~~~~~~~~~~
-- When the HRESETn signal is low, CSRs default to 0, and outputs are low.
-- Four timer modules have four clock gates, which will be enabled(meaning they pass the ref clock to the respective timer module). only when either dft_cg_enable_i is high or the bit in respective position of REG_CH_EN CSR is high(0th bit for timer_0,1st bit for timer_1,etc).
-- At every positive edge of the clock, the CSR CSRs are updated based on APB signals.
+- When the HRESETn signal is low, all CSRs are set to their default value.
+- Four timer modules have four clock gates, which will be enabled(meaning they pass the ref clock to the respective timer module), only when either dft_cg_enable_i is high or the bit in respective position of REG_CH_EN CSR is high(0th bit for timer_0,1st bit for timer_1,etc).
+- At every positive edge of the clock, the CSRs are updated based on APB signals.
 - FW can update the below bitfields to any custom value before the START bitfield in the REG_TIMx_CMD CSR (where x = 0 to 3 for Timer0 to Timer3) CSR is set to '1' and the timer is not active yet (which means the timer is started for the first time). Otherwise, all the config values of all sub-modules are commanded to be updated to the default.
 
   - The CLK_ENABLE bitfields of REG_CH_EN.
@@ -1806,14 +1808,11 @@ Initialization:
 
   - The OUT_SEL_EVT_ENABLE, OUT_SEL_EVT3, OUT_SEL_EVT2, OUT_SEL_EVT1 and OUT_SEL_EVT0 bitfields of REG_EVENT_CFG 
 
-  - Here, the general update of all the config happens in sync with the positive edge of the clock, but the configuration of certain bitfields like COUNT_START, COUNT_END, direction, and SAWTOOTH are updated immediately. 
-
 PWM generation or Start the Timer:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 FW can start the timer or PWM generation via the steps below.
 
-- When the External input/stimulus ext_sig_i is provided by the APB_GPIO.
 - START bitfield in the REG_TIMx_CMD CSR (where x = 0 to 3 for Timer0 to Timer3) is set to '1'and STOP bitfield in the REG_TIMx_CMD CSR (where x = 0 to 3 for Timer0 to Timer3) is set to '0', then all the timer and its sub modules are made active.
 
 This input signal is processed by the APB ADVANCED TIMER according to the CSR configurations.
