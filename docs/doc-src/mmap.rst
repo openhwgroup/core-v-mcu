@@ -113,6 +113,10 @@ CSR Access Types:
 +-------------+---------------------------------------------------------------------+
 | RW0C        | Read & on Write bits with 0 get cleared, bits with 1 left unchanged |
 +-------------+---------------------------------------------------------------------+
+| RWC         | Read normal; Write Clears (value ignored; always writes a 0)        |
++-------------+---------------------------------------------------------------------+
+| RCW         | Read normal & clear after read; Write normal                        |
++-------------+---------------------------------------------------------------------+
 
 Implementation Details
 ----------------------

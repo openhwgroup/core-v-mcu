@@ -19,496 +19,557 @@
 
 uDMA CAMERA
 ===========
-A camera interface is a hardware block that interfaces with different
-image sensor interfaces and generates output that can be used for
-image processing.
+A camera interface is a hardware block that interfaces with different image sensor interfaces and generates output that can be used for image processing.
 
-FEATURES:
----------
-   - Supports RGB565, RGB555 ,RGB444, BYPASS_LITEND and BYPASS_BIGEND
-     image formats.
+Features
+--------
+- Supports RGB565, RGB555 ,RGB444, BYPASS_LITEND and BYPASS_BIGEND image formats.
+- Supports Frame slicing. It allows users to select a range of interest in the picture.
+- Supports Frame dropping. It allows users to select a number of frames that can dropped before storing it in L2 memory.
+- Supports Grayscaling. It allows users to update RGB coefficient in the pixel before storing it in L2 memory.
+- Supports variable row len. Number od pixels in a row can be defined by ``REG_CAM_CFG_SIZE`` CSR.
+- Parallel data input line for carrying frame data.
+- There is a horizontal sync(HSYNC) input which indicates one line of the frame is transmitted.
+- There is a vertical sync(VSYNC) input which indicates that one entire frame is transmitted. Polarity of ``cam_vsync_i`` signal can defined using ``REG_CAM_VSYNC_POLARITY`` CSR.
+- Supports active low reset.
 
-   - Allows windowing. It allows users to select a range of interest in
-     the picture. It can be disabled by the user.
+Block Architecture
+------------------
 
-   - Parallel data input line for carrying pixel data.
+uDMA camera is a peripheral function of the uDMA subsystem. As such, its CSRs are not directly accessible via the APB bus. Rather, the control plane interface to the uDMA camera is managed by the uDMA core within the uDMA subsystem.
+This is transparent to the programmer as all uDMA camera CSRs appear within the uDMA Subsystem's memory region. As is the case for all uDMA subsystem peripherals, I/O operations are controlled by the uDMA core. This is not transparent to the programmer.
 
-   - There is a horizontal sync(HSYNC) input which indicates one line of
-     the frame is transmitted.
+The Figure below is a high-level block diagram of the uDMA camera:-
 
-   - There is a vertical sync(VSYNC) input which indicates that one
-     entire frame is transmitted. It can be configured for polarity.
+.. figure:: uDMA_Camera_Block_Diagram.png
+   :name: uDMA_camera_Block_Diagram
+   :align: center
+   :alt:
 
-THEORY OF OPERATION:
-^^^^^^^^^^^^^^^^^^^^
-     cam_clk_i is a pixel clock which changes on every pixel. Pixel data
-     is taken as input through cam_data_i, and cam_hsync_i and
-     cam_vsync_i indicate the horizontal and vertical sync value. It
-     supports active low reset. It contains a udma dc fifo to store the
-     pixel value before sending it to output.
+   uDMA camera Block Diagram
 
-BLOCK DIAGRAM:
-^^^^^^^^^^^^^^^^^^^
+In the block diagram above, the DATA lines at the boundary of the uDMA camera are 32 bits wide, whereas other DATA lines are only 16 bits wide. The DATASIZE pin is 2 bits wide and ``DATASIZE`` bit of ``REG_RX_CFG`` define the value of this pin. The valid values for the DATASIZE pin are:
 
-   |image1|
-   
-   - Read write input pin, cfg_rwn_i indicates if we want to write to
-     the register or read from the register. If the input is high then the
-     register is selected for reading and else for writing. Address of the
-     register is provided through cfg_addr_i.
+- 0x0: 1-byte transfer
+- 0x1: 2-byte transfer
+- 0x2: 4-byte transfer
 
-   - Value read through the register is provided as output through
-     cfg_data_o. 
-   
-   - cfg_data_i writes values to register.
+When transmitting data to the uDMA Core, the unintended bytes are padded with 0x0.
 
-   - Data in register REG_RX_SADDR is passed through cfg_rx_startaddr_o.
-   
-   - Data in register REG_RX_SIZE is passed through cfg_rx_size_o.
+uDMA camera uses the Rx channel interface to store the data received from the external camera device to the interleaved (L2) memory.
+Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Rx channel functionality of uDMA Core.
 
-   - Data in the REG_RX_CFG is passed through cfg_rx_continuous_o,
-     cfg_rx_en_o, cfg_rx_clr_o and data_rx_datasize_o.
+Pixel data is taken as input from external device through ``cam_data_i``. ``cam_hsync_i`` and ``cam_vsync_i`` indicates the horizontal and vertical sync value.
 
-   - Frame counter:
-      ○ Frame counter is incremented at start of frame if frame drop is
-      enabled.
+Each component of the uDMA camera is discussed in greater detail in the following sections.
 
-      ○ Counter is reset if the counter value reaches frame drop value.or
-      frame drop is disabled.
+Clock MUX
+^^^^^^^^^
+The uDMA core includes a clock multiplexer used to select the input clock source. If dft_test_mode_i is low, the clock multiplexer outputs the peripheral(cam_clk_i) clock; otherwise, it outputs the system(clk_i) clock.
 
-      ○ Frame drop enable status and frame drop value can be read from
-      REG_CAM_CFG_GLOB.
 
-      ○ Non zero frame counter value indicates a valid frame.
+Dual-clock(DC) RX FIFO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   - WINDOWING:
-      ○ Window of interest can be selected by using the windowing
-      feature.
+The uDMA core operates using the system clock, while the uDMA Camera operates using both the system clock and the peripheral clock. To ensure the uDMA camera and core are properly synchronized, dual-clock FIFOs are used in the uDMA Camera.
+These are 8-depth FIFOs and can store 16-bit wide data. It is implemented using circular FIFO.
 
-      ○ Its enable or disable status can be read from REG_CAM_CFG_GLOB.
+Below diagram shows the interfaces of DC FIFO: 
 
-      ○ Coordinates of the window can be written to and read from
-      REG_CAM_CFG_LL and REG_CAM_CFG_UR.
+.. figure:: uDMA_camera_Dual_clock_fifo.png
+   :name: uDMA_camera_Dual_clock_fifo
+   :align: center
+   :alt:
 
-      ○ A pixel is valid only if it is inside the window of interest if
-      windowing is enabled.
+   Dual clock FIFO
 
-      ○ If windowing is disabled, pixels will be valid for every valid
-      frame.
+For Rx operation, source(src_*) interfaces shown in above diagram operate at peripheral clock and destination(dst_*) interfaces operate using system clock.
 
-   - Row counter and column counter:
-      ○ Counts the row and column at every camera clock.
+**Pop operation**
 
-      ○ Counter is reset at the start of the frame.
+The DC FIFO asserts the dst_valid_o (valid) signal to indicate that valid data is available on the data lines. A module waiting for data should read the data lines only when valid pin is high and drive the dst_ready_i (ready)
+signal to high and reset it in next clock cycle. When DC FIFO receives an active ready signal, indicating that the data has been read, it updates the data lines with new data if FIFO is not empty. 
+If the FIFO is empty, the dst_valid_o signal is deasserted.
 
-      ○ These counter values are used when windowing is enabled to check
-      the validity of pixels.
+**Push operation**
 
-      ○ Column counter is incremented at posedge of cam_clk_i. Column ends
-      when the column counter reaches ROWLEN, which resets the counter
-      value. ROWLEN value can be read from REG_CAM_CFG_SIZE.
+The DC FIFO asserts the src_ready_o (ready) signal when there is available space to accept incoming data. When an active src_valid_i (valid) signal is received, the data is written into the FIFO.
+The src_ready_o signal is kept asserted as long as the FIFO has space for more data. IF the DC FIFO is full, push operation will be stalled until the FIFO has empty space and valid line is high.
+A module tranmitting the data to DC FIFO should drive the valid signal low to indicate data lines should not be read.
 
-      ○ Row counter is incremented at the end of each column.
+During Camera receive (Rx) operation, the RX DC FIFO is written internally by the uDMA Camera with the data received from the external device and read by the uDMA core.
 
-  - IMAGE FORMAT: RGB565, RGB555, RGB444
-      ○ RGB565: Five bits of data is allocated for the red and blue color
-      component and 6 bits data for the green color component.
+RX operation
+^^^^^^^^^^^^
 
-      ○ RGB555: Five bits of data is allocated for all the color
-      components.
+The RX operation of uDMA camera includes reading the data from external device and store it into L2 memory. The ``EN`` bit of ``REG_CAM_CFG_GLOB`` CSR is used to enable uDMA camera to recieve data from external device.
 
-      ○ RGB444: Four bits of data is allocated for all the color
-      components.
+When an external device want to transmit a frame to uDMA camera, it asserts ``cam_vsync_i`` signal. A frame consists of multiple pixels. The polarity of ``cam_vsync_i`` is decoded as per ``VSYNC_POLARITY`` bitfield value of ``REG_CAM_VSYNC_POLARITY`` CSR.
+After transmitting a horizontal-row(pixel) of a frame, external device sends a ``cam_hsync_i`` signal.
 
-      ○ R, G, B pixel values can be read from cam_data_i.
+Frame data from the external device arives arrives serially over the ``cam_data_i`` pin using two clock cycles per pixel (16-bit format over an 8-bit interface).
+A ``cam_hsync_i`` signal indicates valid data on ``cam_data_i`` lines.
 
-      ○ Filter values for R, G, B can be obtained by multiplying their
-      respective pixel values by their coefficients. Coefficient can be
-      read from
-      REG_CAM_CFG_FILTER.
+The following image format is supported by uDMA Core: -
 
-      ○ Filter values for all the pixels are added and then shifted right
-      to get the final pixel value which is then passed to fifo. Number of
-      bits needed to be shifted can be read from REG_CAM_CFG_GLOB.
+- RGB565: Five bits of data is allocated for the red and blue color component and 6 bits data for the green color component.
+- RGB555: Five bits of data is allocated for each(R,G and B) the color components.
+- RGB444: Four bits of data is allocated for each(R,G and B) the color components.
+- BYPASS_LITEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
+- BYPASS_BIGEND: Used for YUV images. In the YUV image a color is described as a Y component(luma, for brightness) and two chroma(for colors) components U and V.
 
-  - IMAGE FORMAT: BYPASS_LITEND, BYPASS_BIGEND
-      ○ These image formats are used for YUV images. In the YUV image a
-      color is described as a Y component(luma) and two chroma components
-      U and V. Luma represents the brightness of the image and chroma
-      conveys the color information of the picture.
+A full pixel is received over two consecutive clock cycles:
 
-      ○ YUV pixel value can be read from cam_data_i.
+**First cycle (odd clocks: 1, 3, 5, ...):**
 
-      ○ Filter is not valid.
+- The value from ``cam_data_i`` is captured and stored in a temporary CSR, let's say ``MSB``
+- This value will be used in the next clock cycle.
 
-  - Vertical sync:
-      ○ Polarity can be read from REG_CAM_VSYNC_POLARITY..
+**Second cycle (even clocks: 2, 4, 6, ...):**
 
-      ○ A start of frame is marked by high current vsync value and low
-      previous vsync.
+- A new value is received from ``cam_data_i`` (this is the LSB of the pixel).
 
-  - udma_dc_fifo:
-      ○ RGB or YUV pixel values are sent as input udma_dc_fifo.
+The full 16-bit pixel is reconstructed using:
+  
+  - ``MSB`` (from previous cycle)
+  - ``cam_data_i`` (current cycle)
 
-      ○ Valid output is passed through data_rx_valid_o if there is data in
-      fifo to be read.
+Before pushing the data onto uDMA camera internal FIFO, uDMA camera does following operation on received frame: -
 
-      ○ Data can be read from the fifo through data_rx_data_o.
+- Frame Dropping
+- Frame Slicing
+- uDMA camera Pixel Arrangement
+- Greyscalling and coefficent update
+
+Each of these operation are discussed in the following sections: -
+
+**Frame Dropping**
+
+The uDMA Camera supports frame dropping, which allows selective skipping of incoming frames. Frame dropping can be configured via the ``FRAMEDROP_EN`` and ``FRAMEDROP_VALUE`` fields in the ``REG_CAM_CFG_GLOB`` control and status CSR.
+When frame dropping is enabled and the uDMA Camera is configured to receive data from an external source, it uses an internal frame counter to track received frames. The frame counter increments on each new frame. Once it reaches the value specified in ``FRAMEDROP_VALUE``, it is reset to zero, allowing the next frame to be stored.
+Frames are considered valid and written to L2 memory only when the frame counter value is zero. If the frame counter is non-zero, the corresponding frames are treated as dropped and are not stored in L2 memory. The counter is also reset under the following conditions:
+
+- A reset signal is received by the uDMA Camera
+- Frame dropping is disabled
+
+**Frame Slicing**
+
+The uDMA Camera supports frame slicing(windowing), which allows selective slicing of incoming frames. Frame slicing can be enabled via the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` control and status CS. The size of the sliced frame can be configured using ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR.
+``REG_CAM_CFG_LL`` CSR is used to select lower left cordinates of frame and ``REG_CAM_CFG_UR`` is used to select upper right cordinates.
+
+If frame slicing is enabled, the current pixel is processed only if it lies within the configured frame slice region, based on the following conditions:
+- The current row is greater than or equal to the frame slice's lower-left Y-coordinate(``FRAMESLICE_LLY``).
+- The current row is less than or equal to the frame slice's upper-right Y-coordinate(``FRAMESLICE_URY``).
+- The current column is greater than or equal to the frame slice's lower-left X-coordinate(``FRAMESLICE_LLX``).
+- The current column is less than or equal to the frame slice's upper-right X-coordinate(``FRAMESLICE_URY``).
+
+If Frame slicing is enabled, pixels outside this region are excluded from processing.
+
+**uDMA camera Pixel Arrangement**
+The uDMA camera organizes the incoming pixel stream into image data based on its supported formats. Arrangement logic is discussed below: -
+
+- RGB565
+   - Red_component = {MSB[7:3],3'b000}
+   - Green_component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   - Blue_component = {cam_data_i[4:0], 3'b000}
+
+- RGB555
+   - Red_component = {MSB[6:2],3'b000}
+   - Green_component = {MSB[2:0],cam_data_i[7:5], 2'b00}
+   - Blue_component = {cam_data_i[4:0], 3'b000}
+
+- RGB444
+   - Red_component = {MSB[3:0],4'b0000}
+   - Green_component = {cam_data_i[7:4],4'b0000}
+   - Blue_component = {cam_data_i[3:0],4'b0000}
+
+- BYPASS_LITEND
+   - YUV_Pixel = {MSB[7:0],cam_data_i[7:0]}
+
+- BYPASS_BIGEND
+   - YUV_Pixel = {cam_data_i[7:0],MSB[7:0]}
+
+
+**Greyscalling and coefficent update**
+Now that we have 16-bit pixel data in form of RGB and YUV format, grey scalling is perfomed on RGB pixels.
+
+The ``R_COEFF``, ``G_COEFF`` and ``B_COEFF`` bits ``REG_CAM_CFG_FILTER`` CSR is used to update the RGB Coefficent in RGB pixel. 
+
+- Red_component = Red_component * 'R_COEFF'
+- Green_component = Green_component * 'G_COEFF'
+- Blue_component = Blue_component * 'B_COEFF'
+
+After updating the coefficent of R, G and B component of the pixel, each component is added to generate pixel information.
+``RGB_Pixel = Red component + Green component + Blue component``
+
+Please note greyscalling is not applicable for YUV pixels.
+
+After Greyscalling, RGB pixel undergoes pixel shifting. The ``SHIFT`` bit of ``REG_CAM_CFG_GLOB`` CSR is used to configure shift value. 
+Shifting is done as per the below rule: -
+``RGB_Pixel >= ((0 <= SHIFT_bit_val <= 9) ? SHIFT_bit_val : 0)``
+
+The uppper bits of 16 bit pixel will be padded with zero.
+
+uDMA camera pushes the refined pixel data onto DC FIFO. Pixel data is transmitted to uDMA core. uDMA FIFO, when it has data, raises valid signal and updates the data lines with pixel data. The data line is 16 bit wide.
+Upon detecting the valid signal, the uDMA core initiates arbitration. If the uDMA core channel wins the arbitration and the core’s RX FIFO has sufficient space to accommodate the incoming data, it read the data lines and asserts a ready signal back to the camera indicating data is read.
+After receiving ready signal RX DC FIFO will update the valid and data pin will new value. In the next clock cycle uDMA Core will deassert the ready pin.
+
+.. note:: The uDMA CORE RX channel will only respond to uDMA camera requests when it is enabled via the EN bit in the RX_CFG channel configuration CSR.
+
+Interrupt
+^^^^^^^^^
+
+uDMA camera generates below interrupts during the RX operation:
+- Rx channel interrupt: Raised by uDMA core's Rx channel after pushing last byte of RX_SIZE bytes into core RX FIFO.
+
+Rx interrupt is automatically cleared by uDMA Core in the next clock cycle.
+
+The event bridge forwards interrupt over dedicated line to the APB event controller for processing. Each interrupt has its own dedicated line.
+Users can mask these interrupts through the APB event controller's control and status CSRs.
+
+System Architecture
+-------------------
+The figure below shows how the uDMA camera interfaces with the rest of the CORE-V-MCU components and the external camera device:-
+
+.. figure:: uDMA-Camera-system-Connection-Diagram.png
+   :name: uDMA-Camera-CORE-V-MCU-Connection-Diagram
+   :align: center
+   :alt:
+
+   uDMA Camera CORE-V-MCU connection diagram
+
+Programming Model
+------------------
+As with the most peripherals in the uDMA Subsystem, software configuration can be conceptualized into three functions:
+
+- Configure the I/O parameters of the peripheral (e.g. frame size).
+- Configure the uDMA camera data control parameters.
+- Manage the data reception operation.
+
+uDMA Camera Data Control
+^^^^^^^^^^^^^^^^^^^^^^
+Refer to the Firmware Guidelines section in the current chapter.
+
+Data Transfer Operation
+^^^^^^^^^^^^^^^^^^^^^^^
+Refer to the Firmware Guidelines section in the current chapter.
 
 uDMA CAMERA CSRs
-^^^^^^^^^^^^^^^^^
+----------------
 
-REG_RX_SADDR (Offset = 0x00)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+Refer to `Memory Map <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/mmap.rst>`_ for peripheral domain address of the uDMA CAMERA.
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SADDR
-     - 31:0
-     - RW
-     - 
-     - Address of receive memory buffer:
-   * -
-     - 
-     - 
-     - 
-     - Read: value of pointer until transfer is over, then 0
-   * - 
-     - 
-     - 
-     - 
-     - Write: set memory buffer start address  
-..
+**NOTE:** Several of the uDMA CAMERA CSR are volatile, meaning that their read value may be changed by the hardware.
+For example, writting the *REG_RX_SADDR* CSR will set the address of the receive buffer pointer.
+As data is received, the hardware will update the value of the pointer to indicate the current address.
+As the name suggests, the value of non-volatile CSRs is not changed by the hardware.
+These CSRs retain the last value writen by software.
 
-REG_RX_SIZE (Offset = 0x04)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+A CSRs volatility is indicated by its "type".
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 15:0
-     - RW
-     - 0x00
-     - Buffer size in bytes (1MB max)
-   * -
-     - 
-     - 
-     - 
-     - Read: bytes remaining until transfer complete
-   * - 
-     - 
-     - 
-     - 
-     - Write: set number of bytes to transfer
-..
+Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
-REG_RX_CFG (Offset = 0x08)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-    :widths: 10 20 10 10 20
-    :header-rows: 1
+The CSRs REG_RX_SADDR, REG_RX_SIZE specifies the configuration for the transaction on the RX channel. The uDMA Core creates a local copy of this information at its end and use it for current ongoing transaction.
 
-    * - Field
-      - Bits
-      - Type
-      - Default
-      - Description
-    * - CLR
-      - 6:6
-      - WO
-      - 0x00
-      - Clear the receive channel
-    * - PENDING
-      - 5:5
-      - RO
-      - 0x00
-      - Receive transaction is pending
-    * - EN
-      - 4:4
-      - RW
-      - 0x00
-      - Enable the receive channel
-    * - DATASIZE
-      - 2:1
-      - RW
-      - 0X02
-      - Controls uDMA address increment
-    * - 
-      - 
-      - 
-      -
-      - 0x00: increment address by 1 (data is 8 bits)
-        
-        0x01: increment address by 2 (data is 16 bits)
-    * - 
-      - 
-      - 
-      -
-      - 0x02: increment address by 4 (data is 32 bits)
-    * - 
-      - 
-      - 
-      -
-      - 0x03: increment address by 0.
-    * - CONTINUOUS
-      - 0:0
-      - RW
-      - 0x00
-      - 0x0: stop after last transfer for channel
-    * - 
-      - 
-      - 
-      -      
-      - 0x1: after last transfer for channel 
-        
-        reload buffer size and start address and restart channel
-..
+REG_RX_SADDR
+^^^^^^^^^^^^
 
-REG_CAM_CFG_GLOB (Offset = 0x20)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-  :widths: 10 20 10 10 20
-  :header-rows: 1
+- Offset: 0x0
+- Type:   volatile
 
-  * - Field
-    - Bits
-    - Type
-    - Default
-    - Description
-  * - EN
-    - 31:31
-    - RW
-    - 0x00
-    - Enable data RX from camera interface
-  * - 
-    - 
-    - 
-    - 
-    - Enable/disable only happens at start of frame
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: disable
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: enable
-  * - SHIFT
-    - 14:11
-    - RW
-    - 0x00
-    - Number of bits to right shift final pixel value
-  * - 
-    - 
-    - 
-    - 
-    - Note: not used if FORMAT == BYPASS
-  * - FORMAT
-    - 10:8
-    - RW
-    - 0x00
-    - Input frame format:
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: RGB565
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: RGB555
-  * - 
-    - 
-    - 
-    - 
-    - 0x2: RGB444
-  * - 
-    - 
-    - 
-    - 
-    - 0x4: BYPASS_LITTLEEND
-  * - 
-    - 
-    - 
-    - 
-    - 0x5: BYPASS_BIGEND
-  * - FRAMEWINDOW_EN
-    - 7:7
-    - RW
-    - 0x00
-    - Windowing enable:
-  * - 
-    - 
-    - 
-    - 
-    - 0x0: disable
-  * - 
-    - 
-    - 
-    - 
-    - 0x1: enable
-..
-  
-REG_CAM_CFG_LL (Offset = 0x24)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
++--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
+| Field  | Bits | Access | Default    | Description                                                                                              |
++========+======+========+============+==========================================================================================================+
+| SADDR  | 18:0 | RW     |    0x0     | Address of the Rx buffer. This is location in the L2 memory where camera will write the recived data.    |
+|        |      |        |            | Read & write to this CSR access different information.                                                   |
+|        |      |        |            |                                                                                                          |
+|        |      |        |            | **On Write**: Address of Rx buffer for next transaction. It does not impact current ongoing transaction. |
+|        |      |        |            |                                                                                                          |
+|        |      |        |            | **On Read**:  Address of read buffer for the current ongoing transaction. This is the local copy of      |
+|        |      |        |            | information maintained inside the uDMA core.                                                             |
++--------+------+--------+------------+----------------------------------------------------------------------------------------------------------+
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 15:0
-     - RW
-     - 0x00
-     - Buffer size in bytes (1MB max)
-   * -
-     - 
-     - 
-     - 
-     - Read: bytes remaining until transfer complete
-   * - 
-     - 
-     - 
-     - 
-     - Write: set number of bytes to transfer
-..
+REG_RX_SIZE
+^^^^^^^^^^^
 
-REG_CAM_CFG_UR (Offset = 0x28)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+- Offset: 0x04
+- Type:   volatile
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - SIZE
-     - 31:16
-     - RW
-     - 0x00
-     - Y coordinate of upper right corner of window.
-   * - FRAMEWINDOW_URX
-     - 15:0
-     - RW
-     - 0X00
-     - X coordinate of upper right corner of window.
-..
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
+| Field |  Bits | Access | Default    | Description                                                                                |
++=======+=======+========+============+============================================================================================+
+| SIZE  |  19:0 |   RW   |    0x0     | Size of Rx buffer(amount of data to be transferred by camera to L2 memory). Read & write   |
+|       |       |        |            | to this CSR access different information.                                                  |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Write**: Size of Rx buffer for next transaction.  It does not impact current ongoing  |
+|       |       |        |            | transaction.                                                                               |
+|       |       |        |            |                                                                                            |
+|       |       |        |            | **On Read**:  Bytes left for current ongoing transaction.  This is the local copy of       |
+|       |       |        |            | information maintained inside the uDMA core.                                               |
++-------+-------+--------+------------+--------------------------------------------------------------------------------------------+
 
-REG_CAM_CFG_SIZE (Offset = 0x2C)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+REG_RX_CFG
+^^^^^^^^^^
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - ROWLEN
-     - 31:16
-     - RW
-     - 0x00
-     - N-1 where N is the number of horizontal pixels
-   * -
-     - 
-     - 
-     - 
-     - (used in window mode)
-..
+- Offset: 0x08
+- Type:   volatile
 
-REG_CAM_CFG_FILTER (Offset = 0x30)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                                                     |
++============+=======+========+============+=================================================================================================+
+| CLR        |   6:6 |   WO   |    0x0     | Clear the local copy of Rx channel configuration CSRs inside uDMA core                          |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| PENDING    |   5:5 |   RO   |    0x0     | - 0x1: The uDMA core Rx channel is enabled and either transmitting data,                        |
+|            |       |        |            |   waiting for access from the uDMA core arbiter, or stalled due to a full Rx FIFO               |
+|            |       |        |            |   of uDMA Core                                                                                  |
+|            |       |        |            | - 0x0 : Rx channel of the uDMA core does not have data to transmit to L2 memory                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| EN         |   4:4 |   RW   |    0x0     | Enable the Rx channel of the uDMA core to perform Rx operation                                  |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| DATASIZE   |   2:1 |   RW   |    0x2     | Controls uDMA address increment for each transfer from L2 memory                                |
+|            |       |        |            |                                                                                                 |
+|            |       |        |            | - 0x0: increment address by 1 (data is 8 bits)                                                  |
+|            |       |        |            | - 0x1: increment address by 2 (data is 16 bits)                                                 |
+|            |       |        |            | - 0x02: increment address by 4 (data is 32 bits)                                                |
+|            |       |        |            | - 0x03: increment address by 0                                                                  |
+|            |       |        |            |                                                                                                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
+| CONTINUOUS |   0:0 |   RW   |    0x0     | - 0x0: stop after last transfer for channel                                                     |
+|            |       |        |            | - 0x1: after last transfer for channel, reload buffer size, start address  and restart channel  |
+|            |       |        |            |                                                                                                 |
++------------+-------+--------+------------+-------------------------------------------------------------------------------------------------+
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - R_COEFF
-     - 23:16
-     - RW
-     - 0x00
-     - Coefficent that multiplies R component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-   * - G_COEFF
-     - 15:8
-     - RW
-     - 0x00
-     - Coefficent that multiplies G component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-   * - B_COEFF
-     - 7:0
-     - RW
-     - 0x00
-     - Coefficent that multiplies B component
-   * -
-     - 
-     - 
-     - 
-     - Note: not used if FORMAT == BYPASS
-..
+REG_CAM_CFG_GLOB
+^^^^^^^^^^^^^^^^
 
-REG_CAM_VSYNC_POLARITY (Offset = 0x34)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. list-table::
-   :widths: 10 20 10 10 20
-   :header-rows: 1
+- Offset: 0x20
+- Type:  non-volatile
 
-   * - Field
-     - Bits
-     - Type
-     - Default
-     - Description
-   * - VSYNC_POLARITY
-     - 0:0
-     - RW
-     - 0x00
-     - Set vsync polarity:
-   * -
-     - 
-     - 
-     - 
-     - 0x0: Active low
-   * -
-     - 
-     - 
-     - 
-     - 0x1: Active high
-..
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| Field            |  Bits | Access | Default    | Description                                                                |
++==================+=======+========+============+============================================================================+
+| EN               | 31:31 |   RW   |    0x0     | Enable camera RX operation, When this bit is enabled, camera starts        |
+|                  |       |        |            | accepting new frames from external device.                                 |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| SHIFT            | 14:11 |   RW   |    0x0     | Number of bits to right shift final pixel value.                           |
+|                  |       |        |            | Note: not used if FORMAT == BYPASS                                         |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FORMAT           |  10:8 |   RW   |    0x0     |Input frame format:                                                         |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: RGB565                                                              |
+|                  |       |        |            | - 0x1: RGB555                                                              |
+|                  |       |        |            | - 0x2: RGB444                                                              |
+|                  |       |        |            | - 0x4: BYPASS_LITTLEEND                                                    |
+|                  |       |        |            | - 0x5: BYPASS_BIGEND                                                       |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMESLICE_EN    |  7:7  |   RW   |    0x0     | Enable/Disable Frame Slicing (Windowing)                                   |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMEDROP_VALUE  |  6:1  |   RW   |    0x0     | Frame Drop value. Number of frames to be dropped before pushing data onto  |
+|                  |       |        |            | RX DC FIFO                                                                 |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
+| FRAMEDROP_EN     |  0:0  |   RW   |    0x0     | Enable/Disable Frame Drop                                                  |
+|                  |       |        |            |                                                                            |
+|                  |       |        |            | - 0x0: disable                                                             |
+|                  |       |        |            | - 0x1: enable                                                              |
+|                  |       |        |            |                                                                            |
++------------------+-------+--------+------------+----------------------------------------------------------------------------+
 
-.. |image1| image:: udma_cam_image.png
-   :width: 6.5in
-   :height: 2.83333in
+REG_CAM_CFG_LL
+^^^^^^^^^^^^^^
+
+- Offset: 0x24
+- Type:   volatile
+
++-----------------+-------+--------+------------+----------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                        |
++=================+=======+========+============+====================================================+
+| FRAMESLICE_LLY  | 31:16 |   RW   |    0x0     | Y coordinate of Lower left corner of Frame.        |
++-----------------+-------+--------+------------+----------------------------------------------------+
+| FRAMESLICE_LLX  | 15:0  |   RW   |    0x0     | X coordinate of Lower left corner of Frame.        |
++-----------------+-------+--------+------------+----------------------------------------------------+
+
+REG_CAM_CFG_UR
+^^^^^^^^^^^^^^
+
+- Offset: 0x28
+- Type:   non-volatile
+
++-----------------+-------+--------+------------+-------------------------------------------------------+
+| Field           |  Bits | Access | Default    | Description                                           |
++=================+=======+========+============+=======================================================+
+| FRAMESLICE_URY  | 31:16 |   RW   |    0x0     | Y coordinate of upper right corner of Frame.          |
++-----------------+-------+--------+------------+-------------------------------------------------------+
+| FRAMEWINDOW_URX | 15:0  |   RW   |    0x0     | X coordinate of upper right corner of Frame.          |
++-----------------+-------+--------+------------+-------------------------------------------------------+
+
+REG_CAM_CFG_SIZE
+^^^^^^^^^^^^^^^^
+
+- Offset: 0x2C
+- Type:   non-volatile
+
++------------+-------+--------+------------+-------------------------------------------------------------------------+
+| Field      |  Bits | Access | Default    | Description                                                             |
++============+=======+========+============+=========================================================================+
+| ROWLEN     | 31:16 |   RW   |    0x0     | Defines the number of pixels that constitute a single row in the frame. |
++------------+-------+--------+------------+-------------------------------------------------------------------------+
+
+REG_CAM_CFG_FILTER
+^^^^^^^^^^^^^^^^^^
+
+- Offset: 0x30
+- Type:   volatile
+
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| Field      |  Bits   | Access | Default    | Description                                                                        |
++============+=========+========+============+====================================================================================+
+| R_COEFF    |   23:16 |   RW   |    0x0     | Coefficent that multiplies R component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| G_COEFF    |   15:8  |   RW   |    0x0     | Coefficent that multiplies G component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+| B_COEFF    |   7:0   |   RW   |    0x0     | Coefficent that multiplies B component, Note: not used if FORMAT == BYPASS         |
++------------+---------+--------+------------+------------------------------------------------------------------------------------+
+
+
+REG_CAM_VSYNC_POLARITY
+^^^^^^^^^^^^^^^^^^^^^^
+
+- Offset: 0x34
+- Type:   volatile
+
++----------------+-------+--------+------------+---------------------------------+
+| Field          |  Bits | Access | Default    | Description                     |
++================+=======+========+============+=================================+
+| VSYNC_POLARITY |   0:0 |   RW   |    0x0     | Set vsync polarit               |
+|                |       |        |            |                                 |
+|                |       |        |            |- 0x0: Active low                |
+|                |       |        |            |- 0x0: Active high               |
+|                |       |        |            |                                 |
++----------------+-------+--------+------------+---------------------------------+
+
+Firmware Guidelines
+-------------------
+
+Rx Operation
+^^^^^^^^^^^^
+
+- Configure uDMA Core's ``PERIPH_RESET CSR`` to issue a reset signal to uDMA camera. It acts as a soft reset for uDMA camera.
+- Configure uDMA camera's ``REG_CAM_CFG_FILTER`` CSR to define the values of R, G and B coefficient in the RGB pixel.
+- Configure uDMA camera's ``REG_CAM_VSYNC_POLARITY`` CSR to define the number of pixels that constitute a single row in the frame.
+- Configure uDMA camera's ``REG_CAM_CFG_SIZE`` CSR to define the active level of ``cam_vsync_i`` input signal.
+- Configure camera Operation using  REG_CAM_CFG_GLOB CSR. Refer to the CSR details for detailed information.
+- If frame slicing is enabled by setting the ``FRAMESLICE_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``REG_CAM_CFG_LL`` and ``REG_CAM_CFG_UR`` CSR to define the lower-left and upper-right corners of the sliced frame.
+- If frame dropping is enabled by setting the ``FRAMEDROP_EN`` bit in the ``REG_CAM_CFG_GLOB`` CSR, configure the ``FRAMEDROP_VALUE`` bit of the same CSR with the value indicating the number of frames to drop.
+- Configure RX channel using ``RX_CFG CSR``. Refer to the CSR details for detailed information.
+- For each transaction:
+   - Update uDMA camera's ``RX_SADDR CSR`` with an interleaved(L2) memory address. camera will write the data to the this memory address for transmission.
+   - Configure uDMA camera's ``RX_SIZE`` CSR with the size of data that camera needs to transmit. uDMA camera will copy the transmit RX_SIZE bytes of data to RX_SADDR location of interleaved memory.
+
+Pin Diagram
+-----------
+The Figure below is a high-level block diagram of the uDMA Camera:-
+
+.. figure:: uDMA_Camera_Pin_Diagram.png
+   :name: uDMA_Camera_Pin_Diagram
+   :align: center
+   :alt:
+
+   uDMA Camera Pin Diagram
+
+Below is categorization of these pins:
+
+Rx channel interface
+^^^^^^^^^^^^^^^^^^^^
+The following pins constitute the Rx channel interface of uDMA camera. uDMA camera uses these pins to write data to interleaved (L2) memory:
+
+- data_rx_datasize_o
+- data_rx_o
+- data_rx_valid_o
+- data_rx_ready_i
+
+These pins reflect the configuration values for the next transaction.
+
+Clock interface
+^^^^^^^^^^^^^^^
+- clk_i
+
+uDMA CORE derives these clock pins. clk_i is used to synchronize Camera with uDAM Core.
+
+Reset interface
+^^^^^^^^^^^^^^^
+- rstn_i
+
+uDMA core issues reset signal to Camera using reset pin.
+
+uDMA camera inerface to read-write CSRs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The following interfaces are used to read and write to Camera CSRs. These interfaces are managed by uDMA Core:
+
+- cfg_data_i
+- cfg_addr_i
+- cfg_valid_i
+- cfg_rwn_i
+- cfg_ready_o
+- cfg_data_o
+
+Rx channel interface
+^^^^^^^^^^^^^^^^^^^^
+The following pins constitute the Rx channel interface of uDMA camera. uDMA camera uses these pins to write data to interleaved (L2) memory:
+
+- data_rx_datasize_o
+- data_rx_o
+- data_rx_valid_o
+- data_rx_ready_i
+
+These pins reflect the configuration values for the next transaction.
+
+uDMA camera Rx channel configuration interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- uDMA camera uses the following pins to share the value of config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG with the uDMA core:-
+
+   - cfg_rx_startaddr_o
+   - cfg_rx_size_o
+   - cfg_rx_continuous_o
+   - cfg_rx_en_o
+   - cfg_rx_clr_o
+
+- camera shares the values present over the below pins as read values of the config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG:
+
+   - cfg_rx_en_i
+   - cfg_rx_pending_i
+   - cfg_rx_curr_addr_i
+   - cfg_rx_bytes_left_i
+
+   These values are updated by the uDMA core and reflects the configuration values for the current ongoing transactions.
+
+Test Interface
+^^^^^^^^^^^^^^
+
+- dft_test_mode_i: Design-for-test mode signal
+- dft_cg_enable_i: Clock gating enable during test
+
+*dft_test_mode_i* is used to put uDMA Camera into test mode. *dft_cg_enable_i* is used to control clock gating such that clock behavior can be tested.
+*dft_cg_enable_i* pin is not used in the uDMA camera block.
+
+Camera clock interface
+^^^^^^^^^^^^^^^^^^^^^^
+
+- cam_clk_i
+
+External device derives the clock pins. cam_clk_i is used to synchronize Camera with the exteral device.
+
+Camera frame interface
+^^^^^^^^^^^^^^^^^^^^^^
+- cam_data_i : Camera pixel data input. Carries pixel data from the camera sensor. Data is valid during active cam_hsync_i.
+- cam_hsync_i : Horizontal sync input. Indicates the horizontal line of pixel data.
+- cam_vsync_i : Vertical sync input. Signals the start of a new frame. Helps align frame boundaries for image processing.
