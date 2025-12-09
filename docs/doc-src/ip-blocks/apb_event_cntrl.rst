@@ -41,7 +41,7 @@ Features
 Block Architecture
 ------------------
 
-APB event controller is designed to route interrupts comming from multiple event sources to the core-complex, uDMA Subsystem and eFGA subsystem.
+APB event controller is designed to route interrupts comming from multiple event sources to the core-complex, uDMA Subsystem and eFPGA subsystem.
 Based on TIMER1_SEL_HI and TIMER1_SEL_HI CSR configuration, events coming from multiple event sources can be routed to APB Timer unit as well.
 Below is the block diagram of APB event controller:
 
