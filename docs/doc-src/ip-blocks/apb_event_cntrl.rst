@@ -325,13 +325,21 @@ PR channel is responsible for routing events to uDMA subsystem. Whenever a valid
 the APB event controller checks whether the PR channel is ready to accept (pr_event_ready_i pin is asserted) event or not.
 If pr_event_ready_i pin is asserted by the uDMA subsystem, the APB event controller writes event ID on pr_event_data_o pin and asserts pr_event_valid_o to signal that a valid event ID is available for processing.
 
+Output Channel Readiness
+~~~~~~~~~~~~~~~~~~~~~~~~
 Output channel readiness can be summarised as below:
   - pr_event_ready_i is asserted for PR channel
   - cl_event_ready_i is asserted for CL channel
   - FC Channel is considered ready if FIFO is not full
 
-An ack is issued to arbiter after event is accecpted by any of the output channel. After receiving the ack, arbiter tries to find next most eligible event from the list of available events.
-The event will only be popped from the queue if there is a valid channel that has accepted the event, otherwise event will be not be popped from the queue.
+An ack is issued to arbiter after event is accecpted by all of the output channel that the event is valid for.
+An output channel indicates acceptance by asserting its readiness signal.
+After receiving the ack, arbiter tries to find next most eligible event from the list of available events.
+An event is removed from the queue only when all valid output channels have accepted it.
+If any required output channel is not ready, the event remains in the queue.
+In this situation, the event controller temporarily halts it's operation unless a new higher priority event arrives.
+During this time the event controller continues receiving new events, which are stored in the input event queue until it reaches capacity; any events arriving after the queue is full will be dropped.
+The software must ensure proper servicing of all events so that queued events are correctly processed once the output channel becomes ready.
 If the event is masked for all output channels, it is popped and discarded from the queue. The controller proceeds to the next event.
 
 Event Masking
