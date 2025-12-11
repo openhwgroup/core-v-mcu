@@ -339,7 +339,7 @@ An event is removed from the queue only when all valid output channels have acce
 If any required output channel is not ready, the event remains in the queue.
 In this situation, the event controller temporarily halts it's operation unless a new higher priority event arrives.
 During this time the event controller continues receiving new events, which are stored in the input event queue until it reaches capacity; any events arriving after the queue is full will be dropped.
-The software must ensure proper servicing of all events so that queued events are correctly processed once the output channel becomes ready.
+**The software must ensure proper servicing of all events so that queued events are correctly processed once the output channel becomes ready.**
 If the event is masked for all output channels, it is popped and discarded from the queue. The controller proceeds to the next event.
 
 Event Masking
@@ -372,11 +372,12 @@ FC FIFO
 The FC FIFO is a 4-entry queue, housed within the APB event controller, that holds events until they are read by the Fabric Controller.
 The FIFO is used to store 8-bits wide event ID of the event that is being routed to the Fabric Controller.
 
+
 Push Operation
 ^^^^^^^^^^^^^^
   - When an event is granted for the FC channel and the FIFO has available space, the event ID is pushed into the FC FIFO.
   - The FIFO indicates that it has available space by asserting the grant_o signal. The grant_o is an internal signal and is not visible outside the APB event controller.
-  - When the FIFO is full, the grant_o signal is deasserted, indicating that no more events can be pushed into the FIFO until space becomes available.
+  - When the FIFO is full, the grant_o signal is deasserted, indicating that no more events can be pushed into the FIFO until space becomes available, halting further event processing.
 
 Pop Operation
 ^^^^^^^^^^^^^
@@ -387,8 +388,10 @@ Pop Operation
   - If the FIFO was previously full, deassertion of ``grant_o`` prevents new events from being written. After the event is acknowledged and popped, space becomes available, and ``grant_o`` is asserted again.
   - The ``event_fifo_valid_o`` signal is deasserted when the FIFO becomes empty, indicating there are no more events to read.
 
+**Note:** The FIFO state is not visible to the software; whenever any event is present in the FIFO, the ``event_fifo_valid_o`` signal is asserted, and the software must ensure timely acknowledgment of events to prevent FIFO overflow and avoid halting further event processing.
+
 Event Routing Process
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 The output routing for incoming events can be summarised as:
 
