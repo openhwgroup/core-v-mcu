@@ -39,7 +39,7 @@ Features
 -  Following events are supported:
 
       - Error event.
-      - End of transfer event.+
+      - End of transfer event.
 
 -  Four error status for receive operation
 
@@ -170,7 +170,9 @@ The command will be send in below sequence : -
 
 CRC is calculated based on `x7+x3+1` polynomial function. CRC will calculated on Command opcode and argument field value.
 
-The uDMA SDIO sends a stop command to communicate end of command transfer to the external device. Below is the format of end of command.
+The uDMA SDIO sends the stop command after sending all the data blocks for multi block transfer. The stop command has fixed command opcode value of 6 and command argument value of 0.
+Stop command packet is automatically created by SDIO and is transparent to users. The uDMA SDIO reads BLOCK_NUM bit DATA_SETUP CSR to determine the number of blocks to be transferred.
+In case of multi block transfer,  BLOCK_NUM bit DATA_SETUP CSR must be non zero. The stop command will be sent in below sequence: -
 
 +--------------+-----------+------------------+----------------+------------------+-------+---------+
 | Bit position | 47        | 46               | [45:40]        | [39:8]           | [7:1] | 0       |
@@ -278,11 +280,11 @@ a) When command response is needed
 b) When command response is not needed
    - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command is sent.
 
-To initiate Tx operation, uDMA Core will drive 1 on `sddata_oen_o` line. Data will be transmitted over `sddata_o` data lines in below sequence: - 
+To initiate Tx operation, uDMA sdio will drive 1 on `sddata_oen_o` line. Data will be transmitted over `sddata_o` data lines in below sequence: - 
 
 `Start bit -> Data -> CRC - > End`
 
-To send start bit, the uDMA SDIO will drive the `sddata_o` will value 0. CRC for Tx operation is calculated based on `x16+x12+x5+1` polynomial function. CRC is calculated by the SDIO on the data received from the L2 memory.
+To send start bit, the uDMA SDIO will drive the `sddata_o` with value 0. CRC for Tx operation is calculated based on `x16+x12+x5+1` polynomial function. CRC is calculated by the SDIO on the data received from the L2 memory.
 
 To get transmit data from L2 memory TX FIFO requests data from the uDMA core by asserting both the READY (space available) and REQ (request a new transaction) signals. The uDMA core arbitrates among multiple peripherals on receiving the REQ signal. When the SDIO TX channel is enabled and wins arbitration, the uDMA core issues a GNT (grant) signal and places the valid data read from L2 memory on the bus along with asserting VALID signal.
 Tx FIFO stores this received data and keeps the READY and REQ signals asserted as long as the aforementioned conditions remain valid. The uDMA core de-asserts the VALID signal in the following clock cycle and reasserts it only when new data is available for transmission. Initially, after reset or power-up, READY/REQ are asserted since the FIFO is empty.
@@ -314,12 +316,15 @@ The data is then written into L2 memory at the address specified by RX_SADDR, wi
 
 CRC for both Rx and Tx operation is calculated based on `x16+x12+x5+1` polynomial function.
 
+.. note:: The uDMA SDIO module does not support CRC error detection for externally received command responses or data.
+
+
 Interrupt
 ~~~~~~~~~
 
 uDMA SDIO generates the following interrupts:
 
-- Error interrupt: Raised by uDMA SDIO when it encounter error while performing command-response reception or Rx/Tx operation.
+- Error interrupt: Raised by uDMA SDIO when it encounter timeout error while performing command-response reception or Rx operation.
 - End of transfer interrupt: Raised by uDMA SDIO after successfully completing Rx/Tx operation.
 - Rx channel interrupt: Raised by uDMA core's Rx channel after pushing the last byte of RX_SIZE bytes into core RX FIFO.
 - Tx channel interrupt: Raised by uDMA core's Tx channel after pushing the last byte of TX_SIZE bytes into core TX FIFO.
@@ -373,7 +378,8 @@ A CSR's volatility is indicated by its "type".
 
 Details of CSR access type are explained `here <https://docs.openhwgroup.org/projects/core-v-mcu/doc-src/mmap.html#csr-access-types>`_.
 
-The CSRs RX_SADDR and RX_SIZE specify the configuration for the transaction on the RX channel. The CSRs TX_SADDR and TX_SIZE specify the configuration for the transaction on the TX channel. The uDMA Core creates a local copy of this information at its end and uses it for current ongoing transactions.
+The CSRs RX_SADDR and RX_SIZE specify the configuration for the transaction on the RX channel. The CSRs TX_SADDR and TX_SIZE specify the configuration for the transaction on the TX channel. 
+The uDMA Core creates a local copy of this information at its end and uses it for current ongoing transactions.
 
 RX_SADDR
 ~~~~~~~~
@@ -547,6 +553,9 @@ DATA_SETUP
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 | BLOCK_NUM   | 15:8   | W      | 0x00       | Number of blocks to be transferred. This value works together       |
 |             |        |        |            | with `BLOCK_SIZE` to determine total transfer size.                 |
+|             |        |        |            |                                                                     |
+|             |        |        |            | - 0 : Single block transfer                                         |
+|             |        |        |            | - non zero : Multi block transfer                                   |
 +-------------+--------+--------+------------+---------------------------------------------------------------------+
 | QUAD        | 2:2    | W      | 0x0        | Enables Quad SPI mode when set to `1`. In this mode, 4 data lines   |
 |             |        |        |            | are used for faster data transfer. Set to `0` for standard mode.    |
@@ -645,7 +654,7 @@ STATUS
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
 | Field   |  Bits | Access | Default    | Description                                                                 |  
 +=========+=======+========+============+=============================================================================+
-|  STATUS | 31:16 |  RW    |   0x0      | - Bits [21:16] represent the Command Status, a 6-bit field indicating       |
+|  STATUS | 31:16 |  R     |   0x0      | - Bits [21:16] represent the Command Status, a 6-bit field indicating       |
 |         |       |        |            |      the state or result of the most recent command execution.              |
 |         |       |        |            |                                                                             |
 |         |       |        |            |         - 6'b000001: STATUS_RSP_TIMEOUT                                     |
@@ -661,7 +670,8 @@ STATUS
 |         |       |        |            |      They hold no functional meaning and may be read as zero or undefined.  |
 +---------+-------+--------+------------+-----------------------------------------------------------------------------+
 |  ERR    | 1:1   |  RWC   |   0x0      |  Writing any value clears the bit. Indicates error either                   |
-|         |       |        |            |  during data or command-response reception.                                 |
+|         |       |        |            |  during data or command-response reception. Error type can be read from the |
+|         |       |        |            |  status bit(31:16)                                                          |
 |         |       |        |            |                                                                             |
 |         |       |        |            |   - 0x0: No error                                                           |
 |         |       |        |            |   - 0x1: Error                                                              |
@@ -711,6 +721,8 @@ a) When command response is needed
 b) When command response is not needed
    - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command already transferred.
 
+Ofcourse, the command should be transferred successfully for Tx operation to start.
+
 Rx Operation
 ~~~~~~~~~~~~
 
@@ -724,6 +736,8 @@ The uDMA SDIO can be configured to perform Tx operation based on the below condi
 - Rx operation is initiated when RWN and EN bit of DATA_SETUP CSR is 1 and command is already transferred.
 
 - STATUS bit of the STATUS CSR reflects the status of Rx operation.
+
+Ofcourse, the command should be transferred successfully for Rx operation to start.
 
 End of transfer Interrupt
 ~~~~~~~~~~~~~~~~~~~~~~~~~
