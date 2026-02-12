@@ -721,7 +721,7 @@ a) When command response is needed
 b) When command response is not needed
    - RWN bit of DATA_SETUP CSR is 0 and EN bit of DATA_SETUP CSR is 1 and command already transferred.
 
-Ofcourse, the command should be transferred successfully for Tx operation to start.
+Of course, the command should be transferred successfully for Tx operation to start.
 
 Rx Operation
 ~~~~~~~~~~~~
@@ -737,7 +737,7 @@ The uDMA SDIO can be configured to perform Tx operation based on the below condi
 
 - STATUS bit of the STATUS CSR reflects the status of Rx operation.
 
-Ofcourse, the command should be transferred successfully for Rx operation to start.
+Of course, the command should be transferred successfully for Rx operation to start.
 
 End of transfer Interrupt
 ~~~~~~~~~~~~~~~~~~~~~~~~~
