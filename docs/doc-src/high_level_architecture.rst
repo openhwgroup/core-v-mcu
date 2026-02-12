@@ -89,7 +89,6 @@ Micro-DMA Subsystem
 ~~~~~~~~~~~~~~~~~~~
 The micro-DMA (uDMA) manages data transfer to/from memory for a set of peripherals.
 Its connections to the TCDM Interconnect providing high-bandwidth, low-latency access to the interleaved data memories.
-Note that the uDMA cannot access the non-interleaved memories or the boot ROM.
 Peripherals supported by the uDMA are:
 
 * UART
