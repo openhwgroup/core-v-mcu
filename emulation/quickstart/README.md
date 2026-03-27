@@ -118,8 +118,7 @@ Emulating the CORE-V-MCU on the Nexys A7-100T is a two step process:
 2. Download the cli_test program into memory.
 
 The bitmap file has a _.bit_ file extension and the cli_test is an "S record" file with an _.srec_ extension.
-Currently an example bitmap and srec file can be found in this directory.
-In the near future these will be made available on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
+An example bitmap and srec file can be found in this directory, or on the [OpenHW Group Downloads Page](http://downloads.openhwgroup.org/).
 
 ### Nexys A7-100T Hardware Steup
 You will need to refer to the [Nexys A7 Reference Manual](https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual)
