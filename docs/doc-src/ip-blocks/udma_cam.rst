@@ -247,7 +247,7 @@ As with the most peripherals in the uDMA Subsystem, software configuration can b
 - Manage the data reception operation.
 
 uDMA Camera Data Control
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 Refer to the Firmware Guidelines section in the current chapter.
 
 Data Transfer Operation
@@ -512,7 +512,7 @@ Reset interface
 uDMA core issues reset signal to Camera using reset pin.
 
 uDMA camera inerface to read-write CSRs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following interfaces are used to read and write to Camera CSRs. These interfaces are managed by uDMA Core:
 
 - cfg_data_i
@@ -534,7 +534,7 @@ The following pins constitute the Rx channel interface of uDMA camera. uDMA came
 These pins reflect the configuration values for the next transaction.
 
 uDMA camera Rx channel configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - uDMA camera uses the following pins to share the value of config CSRs i.e. RX_SADDR, RX_SIZE, and RX_CFG with the uDMA core:-
 
    - cfg_rx_startaddr_o
