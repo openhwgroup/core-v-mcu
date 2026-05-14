@@ -25,15 +25,18 @@ Two bugs prevented compilation with Verilator 5.048 (the project was originally 
 
 ## Build steps
 
+**Note:** If you are running tools such as `fusesoc` from a python virtual environment,
+you will need to activate it first. How this works is dependent on your local installation.
+<br>
 From the repo root:
 
 ```bash
 # Lint check (verify RTL parses cleanly)
-~/venv/core-v-mcu/bin/fusesoc --cores-root . run --target=lint --setup --build \
+fusesoc --cores-root . run --target=lint --setup --build \
     openhwgroup.org:systems:core-v-mcu
 
 # Build Verilator C++ model library
-~/venv/core-v-mcu/bin/fusesoc --cores-root . run --target=model-lib --setup --build \
+fusesoc --cores-root . run --target=model-lib --setup --build \
     openhwgroup.org:systems:core-v-mcu
 ```
 
