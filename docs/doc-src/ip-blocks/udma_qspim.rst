@@ -513,6 +513,7 @@ Here, the SPI_CMD_SEND_CMD command executes 10 times automatically.
 - SPI_CMD_FULL_DUPL
 
  uDMA QSPI supports full duplex in SPI mode.
+
 +----------------------+--------+---------------------------------------------------------------+
 | Command Field        | Bits   | Description                                                   |
 +======================+========+===============================================================+
@@ -1074,7 +1075,7 @@ The Figure below is a high-level pin diagram of the uDMA:-
 Below is categorization of these pins:
 
 CMD Tx channel interface
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 The following pins constitute the CMD Tx channel interface of uDMA QSPI. uDMA QSPI uses these pins to read commands from interleaved (L2) memory:
 
 - cmd_req_o
@@ -1166,7 +1167,7 @@ uDMA QSPI Rx channel configuration interface
    These values are updated by the uDMA core and reflects the configuration values for the current ongoing transactions.
 
 uDMA QSPI Tx channel cmd-configuration interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - uDMA QSPI uses the following pins to share the value of config CSRs i.e. CMD_SADDR, CMD_SIZE, and CMD_CFG with the uDMA core:-
 
    - cfg_cmd_startaddr_o

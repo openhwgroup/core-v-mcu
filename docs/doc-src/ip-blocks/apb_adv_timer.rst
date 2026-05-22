@@ -124,6 +124,7 @@ Input stage operation is synchronized using HCLK or reference clock, based on th
 - If CLKSEL = 1, it process the input signal as per MODE at every posistive edge of the reference clock.
 
 - If REF_CLK_EN_BIT = 0, it process the input signal as per MODE at every posistive edge of the system clock (HCLK). 
+
 When the timer controller asserts the active signal, then at every positive edge of the selected clock and selected input signal, 
 the Input stage uses the bitfield MODE in REG_TIMx_CFG CSR (where x = 0 to 3 for Timer0 to Timer3) to generate an output event signal according to the information below:
 
@@ -640,8 +641,8 @@ REG_TIM0_CH1_TH
 | COMP_OP        | 18:16 | 0               | RW     | It decides the comparator operation to be performed to drive the output PWM      |
 |                |       |                 |        | ch_0_o[1]. Detailed description is provided in comparator section.               |
 +----------------+-------+-----------------+--------+----------------------------------------------------------------------------------+
-| COMP_THRESHOLD | 15:0  | 0               | RW     | Timer0 Channel 1 comparator threshold value (Timer0 updown counter value is      | 
-|                |       |                 |        |compared with the COMP_THRESHOLD value to generate the ch_0_o[1])                 |
+| COMP_THRESHOLD | 15:0  | 0               | RW     | Timer0 Channel 1 comparator threshold value (Timer0 updown counter value is      |
+|                |       |                 |        | compared with the COMP_THRESHOLD value to generate the ch_0_o[1])                |
 +----------------+-------+-----------------+--------+----------------------------------------------------------------------------------+
 
 
@@ -1746,6 +1747,7 @@ REG_CH_EN
 ~~~~~~~~~~~~~
 - Address Offset=0x104
 - Type: non-volatile
+
 +------------+-------+-----------------+--------+---------------------------------------------------------------------------------------------------+
 | Field      | Bits  | Default Value   | Access | Description                                                                                       |
 +============+=======+=================+========+===================================================================================================+

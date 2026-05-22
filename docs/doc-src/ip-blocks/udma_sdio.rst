@@ -835,7 +835,7 @@ uDMA SDIO interface to generate interrupt
 - eot_o
 - err_o
 
-eot_o interrupt is generated at the end of receive or transmit operation. `err_o`interrupt is generated when an error is observed during receive operation. These are active high signal.
+eot_o interrupt is generated at the end of receive or transmit operation. `err_o` interrupt is generated when an error is observed during receive operation. These are active high signal.
 
 uDMA SDIO interface to read-write CSRs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -901,6 +901,7 @@ The output interface is used to return the current values(via output interface) 
 **Rx event**
 
 - ``rx_lin_events_o``: Event signal from RX.
+
 The uDMA core uses this interface to raise an event after reading data of size provided by rx_lin_cfg_size_i pin from L2 memory.
 
 **Stream inerface**
@@ -944,6 +945,7 @@ The output interface is used to return the current values of local copy when the
 **Rx event**
 
 - ``tx_lin_events_o``: Event signal output for TX.
+
 The uDMA core uses this interface to raise an event after reading data of size provided by tx_lin_cfg_size_i pin from L2 memory.
 
 
