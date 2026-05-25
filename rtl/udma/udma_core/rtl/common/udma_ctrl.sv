@@ -110,6 +110,7 @@ module udma_ctrl
                     r_cmp_evt[2] <= cfg_data_i[23:16];
                     r_cmp_evt[3] <= cfg_data_i[31:24];
                 end
+                default: ;
                 endcase
             end
         end

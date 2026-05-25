@@ -34,7 +34,7 @@ module timer_cntrl (
 
 	assign ctrl_arm_o = cfg_arm_i;
 
-	assign status_o = {6'h0,r_pending};
+	assign status_o = {7'h0,r_pending};
 
 	assign ctrl_active_o = r_active;
 

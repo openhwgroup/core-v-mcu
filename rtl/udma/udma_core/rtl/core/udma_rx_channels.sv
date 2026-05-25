@@ -383,7 +383,7 @@ module udma_rx_channels
       s_grant_log = 0;
       for(int i=0;i<N_CHANNELS_RX;i++)
         if(r_grant[i])
-          s_grant_log = i;
+          s_grant_log = LOG_N_CHANNELS'(i);
     end
 
     always_comb
@@ -480,6 +480,7 @@ module udma_rx_channels
             begin
                if     (s_l2_addr[0] || s_l2_addr[1]) s_detect_na = 1'b1;
             end
+      default: ;
       endcase
     end
 

@@ -338,6 +338,7 @@ module cv32e40p_load_store_unit #(
         begin
           if (data_addr_int[1:0] == 2'b11) data_misaligned_o = 1'b1;
         end
+        default: ;
       endcase  // case (data_type_ex_i)
     end
   end

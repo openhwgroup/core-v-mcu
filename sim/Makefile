@@ -1,6 +1,17 @@
-.PHONY: build lib clean sim simc mem_init verilator
+.PHONY: build lib clean sim simc mem_init verilator verilator-sv
 
 mkfile_path := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
+
+#--- Number of threads launched at compile time (careful!)
+NJOBS ?= 4
+
+#--- Waive the following Verilator warnings (for now).
+WAIVED_VERILATOR_WARNINGS = -Wno-UNOPTFLAT \
+                            -Wno-CASEX \
+                            -Wno-ASCRANGE \
+                            -Wno-PINMISSING \
+                            -Wno-CMPCONST \
+                            -Wno-TIMESCALEMOD
 
 VSIM        ?= vsim
 VSIM_FLAGS  = -gUSE_SDVT_SPI=0 -gUSE_SDVT_CPI=0 -gBAUDRATE=115200 \
@@ -49,6 +60,8 @@ clean: clean-deps
 	@make --no-print-directory -f $(mkfile_path)/vcompile/rtl.mk clean
 	rm -rf $(MEM_INIT_DIR)
 	rm -f  sim_core_v_mcu
+	rm -f  $(TB_VC)
+	rm -rf $(VC_DIR)/obj_dir_sv
 
 # Copy memory initialisation files from tb/mem_init_files/ to the paths that
 # the RTL $readmem calls expect (relative to the simulation working directory).
@@ -57,6 +70,16 @@ clean: clean-deps
 MEM_INIT_DIR := mem_init
 TB_MEM       := ../tb/mem_init_files
 
+# The mem_init files are loaded by Verilator $readmem calls inside the RTL at
+# simulation start.  The file names must match the full hierarchical scope of
+# each memory instance as Verilator sees it.
+#
+# Source files (tb/mem_init_files/) use the FuseSoC stand-alone naming scheme
+# "TOP.core_v_mcu.*".  When the design is compiled under the tb_core_v_mcu
+# testbench the hierarchy root becomes "tb_core_v_mcu.dut.*" instead.  Rather
+# than keeping two copies, the files are copied once under the TOP.* names and
+# then a symlink with the tb_core_v_mcu.dut.* name is created beside each one.
+# Both names resolve to the same data so either build style finds its files.
 mem_init:
 	mkdir -p $(MEM_INIT_DIR)
 	cp $(TB_MEM)/verilatorBoot.mem  $(MEM_INIT_DIR)/boot.mem
@@ -67,8 +90,12 @@ mem_init:
 	cp $(TB_MEM)/col3.mem           "$(MEM_INIT_DIR)/TOP.core_v_mcu.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem"
 	cp $(TB_MEM)/privateBank0.mem   "$(MEM_INIT_DIR)/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem"
 	cp $(TB_MEM)/privateBank1.mem   "$(MEM_INIT_DIR)/TOP.core_v_mcu.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem"
+	@cd $(MEM_INIT_DIR) && for f in TOP.core_v_mcu.*; do \
+	    newname=$$(echo "$$f" | sed 's/TOP\.core_v_mcu/tb_core_v_mcu.dut/'); \
+	    ln -sf "$$f" "$$newname"; \
+	done
 
-# Build the Verilator simulation executable.
+# Build the Verilator simulation executable (C++ harness, legacy).
 # Requires the model-lib FuseSoC target to have been built first:
 #   ~/venv/core-v-mcu/bin/fusesoc --cores-root .. run --target=model-lib \
 #       --setup --build openhwgroup.org:systems:core-v-mcu
@@ -84,3 +111,25 @@ verilator: mem_init
 	    $(OBJ_DIR)/libverilated.a \
 	    -lpthread \
 	    -o sim_core_v_mcu
+
+# Build the Verilator simulation executable (SystemVerilog testbench).
+# Uses --binary --timing so Verilator compiles everything into one executable.
+# Requires the same FuseSoC model-lib build as the verilator target above.
+VC_FILE := ../build/openhwgroup.org_systems_core-v-mcu_0/model-lib-verilator/openhwgroup.org_systems_core-v-mcu_0.vc
+VC_DIR  := $(abspath $(dir $(VC_FILE)))
+TB_VC   := $(VC_DIR)/tb.vc
+
+# Strip --cc and --top-module from the FuseSoC .vc; our SV top replaces both.
+$(TB_VC): $(VC_FILE)
+	sed '/^--cc$$/d; /^--top-module/d' $< > $@
+
+verilator-sv: $(TB_VC) tb_core_v_mcu.sv
+	@mkdir -p $(MEM_INIT_DIR)
+	cd $(VC_DIR) && verilator --binary --timing -j $(NJOBS) \
+	    --top-module tb_core_v_mcu \
+	    $(WAIVED_VERILATOR_WARNINGS) \
+	    -O2 \
+	    -f tb.vc \
+	    $(mkfile_path)tb_core_v_mcu.sv \
+	    -Mdir obj_dir_sv
+	cp $(VC_DIR)/obj_dir_sv/Vtb_core_v_mcu $(mkfile_path)sim_core_v_mcu

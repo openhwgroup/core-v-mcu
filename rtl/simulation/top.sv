@@ -375,7 +375,7 @@ module top (
 
 
 
-  assign fpgaio_out = (ifpga_out ^ {64'h0, blink, 14'h0});
+  assign fpgaio_out = (ifpga_out ^ {65'h0, blink, 14'h0});
   assign fpgaio_oe = ifpga_oe;
   assign events_o = i_events;
 
@@ -497,12 +497,12 @@ module top (
       m1_m1_cdata <= '0;
       delay <= 0;
       blinker <= 32'h0;
-      blink_cnt <= 16'h0;
+      blink_cnt <= 31'h0;
 
     end // if (RESET[0] == 0)
     else begin
       if (blinker[31] == 1'b1) begin
-        if (blink_cnt == 30'h0) begin
+        if (blink_cnt == 31'h0) begin
           blink <= ~blink;
           blink_cnt <= blinker[30:0];
         end else blink_cnt <= blink_cnt - 1;
@@ -558,7 +558,7 @@ module top (
         end
         2: begin
 
-          if (m0_oper0_we == 1) m0_oper0_waddr <= p0_cnt << 2;
+          if (m0_oper0_we == 1) m0_oper0_waddr <= 12'(p0_cnt) << 2;
           tcdm_req_p0 <= 1;
           if (tcdm_gnt_p0) begin
             p0_cnt <= p0_cnt + 1;
@@ -568,7 +568,7 @@ module top (
         end  // case: 2
         3: begin
           if (tcdm_req_p0 == 1) begin
-            m0_oper0_raddr <= p0_cnt << 2;
+            m0_oper0_raddr <= 12'(p0_cnt) << 2;
             tcdm_addr_p0   <= tcdm_addr_p0 + 4;
           end
           tcdm_req_p0 <= 0;
@@ -609,7 +609,7 @@ module top (
         end
         2: begin
 
-          if (m0_oper1_we == 1) m0_oper1_waddr <= p1_cnt << 2;
+          if (m0_oper1_we == 1) m0_oper1_waddr <= 12'(p1_cnt) << 2;
           tcdm_req_p1 <= 1;
           if (tcdm_gnt_p1) begin
             p1_cnt <= p1_cnt + 1;
@@ -619,7 +619,7 @@ module top (
         end  // case: 2
         3: begin
           if (tcdm_req_p1 == 1) begin
-            m0_oper1_raddr <= p1_cnt << 2;
+            m0_oper1_raddr <= 12'(p1_cnt) << 2;
             tcdm_addr_p1   <= tcdm_addr_p1 + 4;
           end
           tcdm_req_p1 <= 0;
@@ -660,7 +660,7 @@ module top (
         end
         2: begin
 
-          if (m1_oper0_we == 1) m1_oper0_waddr <= p2_cnt << 2;
+          if (m1_oper0_we == 1) m1_oper0_waddr <= 12'(p2_cnt) << 2;
           tcdm_req_p2 <= 1;
           if (tcdm_gnt_p2) begin
             p2_cnt <= p2_cnt + 1;
@@ -710,7 +710,7 @@ module top (
           end else p3_fsm <= 0;
         end
         2: begin
-          if (m1_oper1_we == 1) m1_oper1_waddr <= p3_cnt << 2;
+          if (m1_oper1_we == 1) m1_oper1_waddr <= 12'(p3_cnt) << 2;
           tcdm_req_p3 <= 1;
           if (tcdm_gnt_p3) begin
             p3_cnt <= p3_cnt + 1;
@@ -720,7 +720,7 @@ module top (
         end  // case: 2
         3: begin
           if (tcdm_req_p3 == 1) begin
-            m1_oper1_raddr <= p3_cnt << 2;
+            m1_oper1_raddr <= 12'(p3_cnt) << 2;
             tcdm_addr_p3   <= tcdm_addr_p3 + 4;
           end
           tcdm_req_p3 <= 0;
@@ -816,6 +816,7 @@ module top (
                 8'h04: m1_oper0_raddr <= lint_ADDR[11:0];
                 8'h05: m1_oper1_raddr <= lint_ADDR[11:0];
                 8'h06: m1_coef_raddr <= lint_ADDR[11:0];
+                default: ;
               endcase  // case lint_ADDR
             end  // else: !if(lint_WEN)
           end  // if (lint_REQ)
@@ -1054,7 +1055,7 @@ module top (
             20'h48: lint_RDATA <= {16'b0, ifpga_out[79:64]};
             20'h50: lint_RDATA <= ifpga_oe[31:0];
             20'h54: lint_RDATA <= ifpga_oe[63:32];
-            20'h58: lint_RDATA <= ifpga_oe[79:64];
+            20'h58: lint_RDATA <= {16'h0, ifpga_oe[79:64]};
             20'h60: lint_RDATA <= fpgaio_in[31:0];
             20'h64: lint_RDATA <= fpgaio_in[63:32];
             20'h68: lint_RDATA <= {saved_REQ, cnt5, cnt4, cnt3, cnt2, cnt1, fpgaio_in[79:64]};

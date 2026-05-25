@@ -90,7 +90,11 @@ them in would create duplication and risk the copies going stale. Both are deriv
 ```bash
 cd sim
 
-./sim_core_v_mcu               # 2000 cycles (default)
-./sim_core_v_mcu 1000          # 1000 cycles
-./sim_core_v_mcu 500 trace.vcd # 500 cycles + VCD waveform
+./sim_core_v_mcu                                # 2000 cycles (default)
+./sim_core_v_mcu +cycles=500000                 # 500,000 cycles
+./sim_core_v_mcu +cycles=500000 +trace=out.vcd  # with VCD waveform
 ```
+
+For the complete workflow — building cli-test firmware, generating memory
+initialisation files, and launching the simulation in one step — see the
+[cli_test simulation guide](../../../core-v-mcu-cli-test/claude/cli_test/README.md#verilator-simulation).

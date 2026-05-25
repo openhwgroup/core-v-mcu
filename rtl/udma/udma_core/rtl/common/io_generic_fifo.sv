@@ -116,7 +116,7 @@ module io_generic_fifo
                     // We have some input, increase by 1 the input pointer
                     if (valid_i && !full)
                     begin
-                        if (pointer_in == $unsigned(BUFFER_DEPTH - 1))
+                        if (pointer_in == LOG_BUFFER_DEPTH'(BUFFER_DEPTH - 1))
                                 pointer_in <= 0;
                         else
                                 pointer_in <= pointer_in + 1;
@@ -129,7 +129,7 @@ module io_generic_fifo
                     // We had pushed one flit out, we can try to go for the next one
                     if (ready_i && valid_o)
                     begin
-                        if (pointer_out == $unsigned(BUFFER_DEPTH - 1))
+                        if (pointer_out == LOG_BUFFER_DEPTH'(BUFFER_DEPTH - 1))
                                 pointer_out <= 0;
                         else
                                 pointer_out <= pointer_out + 1;

@@ -1,3 +1,5 @@
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the "License"); you may not use this file except in
@@ -146,6 +148,7 @@ module cv32e40p_alu
           adder_in_b[18] = 1'b1;
           adder_in_b[27] = 1'b1;
         end
+        default: ;
       endcase
 
     end else begin
@@ -160,6 +163,7 @@ module cv32e40p_alu
           adder_in_a[18] = 1'b0;
           adder_in_a[27] = 1'b0;
         end
+        default: ;
       endcase
     end
   end
@@ -758,6 +762,7 @@ module cv32e40p_alu
         if (operand_a_i[31]) ff_input = operand_a_neg_rev;
         else ff_input = operand_a_rev;
       end
+      default: ;
     endcase
   end
 
@@ -984,3 +989,6 @@ module cv32e40p_alu
   assign ready_o = div_ready;
 
 endmodule
+
+/* verilator lint_on WIDTHTRUNC */
+/* verilator lint_on WIDTHEXPAND */

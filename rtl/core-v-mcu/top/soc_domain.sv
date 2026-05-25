@@ -199,6 +199,8 @@ module soc_domain
   logic                                 s_dma_pe_evt;
   logic                                 s_dma_pe_irq;
   logic                                 s_pf_evt;
+  logic                                 pf_evt_ack_o;
+  logic                                 pf_evt_valid_i;
 
   logic                                 s_fc_fetchen;
   logic          [   NrHarts-1:0]       dm_debug_req;
@@ -387,7 +389,9 @@ module soc_domain
       .fetch_en_i       (s_fc_fetchen),
       .l2_data_master   (s_lint_fc_data_bus),
       .l2_instr_master  (s_lint_fc_instr_bus),
+      /* verilator lint_off WIDTHTRUNC */
       .debug_req_i      (dm_debug_req[FC_CORE_MHARTID]),
+      /* verilator lint_on WIDTHTRUNC */
       .stoptimer_o      (s_stoptimer),
       .events_i         (s_fc_events),
       .core_irq_ack_id_o(s_core_irq_ack_id),

@@ -165,6 +165,7 @@ module sdio_txrx_cmd
           s_rsp_crc = 1'b0;
           s_rsp_len = 8'd133;
         end
+        default: ;
       endcase
     end
 
@@ -352,6 +353,7 @@ module sdio_txrx_cmd
             s_state = ST_IDLE;
           end
         end
+        default: ;
       endcase
     end
 

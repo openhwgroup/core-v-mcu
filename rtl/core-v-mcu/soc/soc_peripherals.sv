@@ -187,7 +187,9 @@ module soc_peripherals #(
 
 
   logic s_periph_clk;
+  logic s_fpga_clk;
   logic s_ref_clk;
+  wire  AVDD, AVDD2, AVSS, VDDC, VSSC;
 
 
   assign apb_reset = rst_ni & !s_soft_reset;
