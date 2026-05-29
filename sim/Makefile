@@ -123,7 +123,7 @@ TB_VC   := $(VC_DIR)/tb.vc
 $(TB_VC): $(VC_FILE)
 	sed '/^--cc$$/d; /^--top-module/d' $< > $@
 
-verilator-sv: $(TB_VC) tb_core_v_mcu.sv
+verilator-sv: $(TB_VC) tb_core_v_mcu.sv uart_terminal.cpp
 	@mkdir -p $(MEM_INIT_DIR)
 	cd $(VC_DIR) && verilator --binary --timing -j $(NJOBS) \
 	    --top-module tb_core_v_mcu \
@@ -131,5 +131,6 @@ verilator-sv: $(TB_VC) tb_core_v_mcu.sv
 	    -O2 \
 	    -f tb.vc \
 	    $(mkfile_path)tb_core_v_mcu.sv \
+	    $(mkfile_path)uart_terminal.cpp \
 	    -Mdir obj_dir_sv
 	cp $(VC_DIR)/obj_dir_sv/Vtb_core_v_mcu $(mkfile_path)sim_core_v_mcu
