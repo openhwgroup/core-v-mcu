@@ -204,4 +204,54 @@ module tb_core_v_mcu;
         end
     end
 
+    // TODO: This initial block will be restored in a future version of this testbench
+    //       once the $readmemh calls in a2_bootrom.sv and generic_memory.sv are removed.
+    //       At that point, memory initialization moves here and out of the RTL files.
+    /* initial begin: load_memories
+        string s;
+        integer fd;
+
+        s = "mem_init/boot.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.boot_rom_i.rom_mem_i.value);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.CUTS[0].bank_i.u0.MEM);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.CUTS[1].bank_i.u0.MEM);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.CUTS[2].bank_i.u0.MEM);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.CUTS[3].bank_i.u0.MEM);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.bank_sram_pri0_i.u0.MEM);
+
+        s = "mem_init/tb_core_v_mcu.dut.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.mem";
+        fd = $fopen(s, "r");
+        if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
+        $fclose(fd);
+        $readmemh(s, dut.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.MEM);
+    end */
+
 endmodule

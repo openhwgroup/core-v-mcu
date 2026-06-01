@@ -17,7 +17,8 @@ static void restore_terminal() {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &s_saved);
         s_raw = false;
         // ensure the shell prompt lands on a fresh line after raw mode
-        (void)write(STDOUT_FILENO, "\r\n", 2);
+        // Assign the return value to an unused variable marked with the [[maybe_unused]] attribute.
+	[[maybe_unused]] ssize_t bytes_written = write(STDOUT_FILENO, "\r\n", 2);
     }
 }
 

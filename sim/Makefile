@@ -26,7 +26,7 @@ build-deps:
 	$(MAKE) -C ../rtl/tb/remote_bitbang all
 
 clean-deps:
-	$(MAKE) -C ../rtl/tb/remote_bitbang clean
+	-$(MAKE) -C ../rtl/tb/remote_bitbang clean
 
 sim:
 	$(VSIM) -64 -gui vopt_tb -L models_lib -L vip_lib \
@@ -56,12 +56,14 @@ lib:
 	@make --no-print-directory -f $(mkfile_path)/vcompile/rtl.mk lib
 
 clean: clean-deps
-	@make --no-print-directory -f $(mkfile_path)/vcompile/ips.mk clean
-	@make --no-print-directory -f $(mkfile_path)/vcompile/rtl.mk clean
+	-@make --no-print-directory -f $(mkfile_path)/vcompile/ips.mk clean
+	-@make --no-print-directory -f $(mkfile_path)/vcompile/rtl.mk clean
 	rm -rf $(MEM_INIT_DIR)
 	rm -f  sim_core_v_mcu
 	rm -f  $(TB_VC)
 	rm -rf $(VC_DIR)/obj_dir_sv
+	rm -f  $(GENERIC_MEM_DST)
+	rm -f  $(A2_BOOTROM_DST)
 
 # Copy memory initialisation files from tb/mem_init_files/ to the paths that
 # the RTL $readmem calls expect (relative to the simulation working directory).
@@ -123,7 +125,22 @@ TB_VC   := $(VC_DIR)/tb.vc
 $(TB_VC): $(VC_FILE)
 	sed '/^--cc$$/d; /^--top-module/d' $< > $@
 
-verilator-sv: $(TB_VC) tb_core_v_mcu.sv uart_terminal.cpp
+# RTL sources that FuseSoC copies into the build tree during --setup.
+# Keep the build-tree copies in sync with the source tree so that edits are
+# picked up by verilator-sv without requiring a full FuseSoC re-setup.
+GENERIC_MEM_SRC := ../rtl/vendor/pulp_platform_tech_cells_generic/src/deprecated/generic_memory.sv
+GENERIC_MEM_DST := $(VC_DIR)/src/pulp-platform.org__tech_cells_generic_0/pulp_platform_tech_cells_generic/src/deprecated/generic_memory.sv
+
+$(GENERIC_MEM_DST): $(GENERIC_MEM_SRC)
+	cp $< $@
+
+A2_BOOTROM_SRC := ../rtl/simulation/a2_bootrom.sv
+A2_BOOTROM_DST := $(VC_DIR)/src/openhwgroup.org_systems_core-v-mcu_0/rtl/simulation/a2_bootrom.sv
+
+$(A2_BOOTROM_DST): $(A2_BOOTROM_SRC)
+	cp $< $@
+
+verilator-sv: $(TB_VC) tb_core_v_mcu.sv uart_terminal.cpp $(GENERIC_MEM_DST) $(A2_BOOTROM_DST)
 	@mkdir -p $(MEM_INIT_DIR)
 	cd $(VC_DIR) && verilator --binary --timing -j $(NJOBS) \
 	    --top-module tb_core_v_mcu \

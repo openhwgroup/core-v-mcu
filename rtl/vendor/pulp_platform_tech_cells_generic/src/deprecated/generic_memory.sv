@@ -34,6 +34,8 @@ module generic_memory
    genvar                         i,j;
    string                        s;
 
+   // TODO: This initial block will be removed in a future version when memory
+   //       initialization is migrated to the testbench load_memories block.
    initial begin
       $display("%m");
       s = $sformatf("mem_init/%m.mem");
