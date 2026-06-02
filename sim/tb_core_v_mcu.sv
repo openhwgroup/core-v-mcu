@@ -204,10 +204,8 @@ module tb_core_v_mcu;
         end
     end
 
-    // TODO: This initial block will be restored in a future version of this testbench
-    //       once the $readmemh calls in a2_bootrom.sv and generic_memory.sv are removed.
-    //       At that point, memory initialization moves here and out of the RTL files.
-    /* initial begin: load_memories
+    // Hierarchically initialize all CORE-V-MCU memories from mem_init/ files.
+    initial begin: load_memories
         string s;
         integer fd;
 
@@ -252,6 +250,6 @@ module tb_core_v_mcu;
         if (fd == 0) $fatal(1, "load_memories: expected memory file not found: %s", s);
         $fclose(fd);
         $readmemh(s, dut.i_soc_domain.l2_ram_i.bank_sram_pri1_i.u0.MEM);
-    end */
+    end
 
 endmodule

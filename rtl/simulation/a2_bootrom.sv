@@ -10,11 +10,7 @@ module a2_bootrom #(
   logic [31:0] value[(2**ADDR_WIDTH)-1:0];
   logic [31:0] read_data;
 
-  // TODO: This initial block will be removed in a future version when memory
-  //       initialization is migrated to the testbench load_memories block.
-  initial begin
-    $readmemh("mem_init/boot.mem", value);
-  end
+  // Memory contents are required to be initialized hierarchically by the testbench.
 
   always @(posedge CLK) begin
     if (CEN == 0) begin
