@@ -44,20 +44,14 @@ module PLL18_TOP (
    
 
    
-`ifdef VERILATOR
-   always_comb
-     if (RESETN == 0)
-       CLKO = 0l\;
-     else 
-       CLKO = FREF;
-`else
-   initial clk = 0;
-   initial forever #(1.25) clk = ~clk;
-   always_comb begin
-      CLKO = BYPASS ? FREF : clk;
-   end
-`endif
-   
-   
+initial begin
+   clk = 0;
+   forever #(1.25) clk = ~clk;
+end
+
+always_comb begin
+   CLKO = (BYPASS) ? FREF : clk;
+end
+
    
 endmodule  // PLL18_TOP
