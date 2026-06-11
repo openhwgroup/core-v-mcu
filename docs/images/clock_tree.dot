@@ -1,0 +1,73 @@
+// CORE-V-MCU Clock Tree
+//
+// Copyright (c) 2026 Eclipse Foundation AISBL
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//
+// Source for clock_tree.png.  Render with:
+//   dot -Tpng clock_tree.dot -o clock_tree.png
+//
+// Traces the clock tree from the primary reference-clock input through the
+// SoC clock-generation block to the major subsystems and peripherals.
+
+digraph clock_tree {
+    rankdir=LR;
+    nodesep=0.35;
+    ranksep=0.85;
+    fontname="Helvetica";
+    node  [fontname="Helvetica", fontsize=11];
+    edge  [fontname="Helvetica", fontsize=9];
+
+    // ---- Primary input -------------------------------------------------
+    ref [label="ref_clk_i\n(10 MHz pad)", shape=invhouse, style=filled,
+         fillcolor="#cde8ff"];
+
+    // ---- Clock generation block (soc_clk_rst_gen / clk_gen) ------------
+    subgraph cluster_clkgen {
+        label="Clock Generation  (soc_clk_rst_gen → clk_gen)";
+        style=dashed; color="#888888"; fontsize=11;
+
+        pll_soc [label="PLL i_fll_soc\n(clk_and_control / pPLL02F)",
+                 shape=box, style=filled, fillcolor="#ffe6cc"];
+        pll_per [label="PLL i_fll_per\n(clk_and_control / pPLL02F)",
+                 shape=box, style=filled, fillcolor="#ffe6cc"];
+    }
+
+    // ---- Domain nets ---------------------------------------------------
+    soc_clk  [label="soc_clk",  shape=box, style="filled,rounded",
+              fillcolor="#d5f5d5"];
+    per_clk  [label="per_clk\n(= slow_clk_o)", shape=box,
+              style="filled,rounded", fillcolor="#d5f5d5"];
+
+    // ---- SoC-clock consumers ------------------------------------------
+    core   [label="CV32E40P\nCore Complex", shape=box];
+    interc [label="L2 / TCDM &\nAPB Interconnect", shape=box];
+    socper [label="SoC Peripherals\n& Control / Debug", shape=box];
+    udma   [label="uDMA Subsystem\n(sys_clk + per_clk)", shape=box];
+
+    // ---- Peripheral-clock leaves --------------------------------------
+    gate [label="Per-peripheral\nclock gating\n(udma_ctrl cg_value)",
+          shape=box, style=filled, fillcolor="#f5f0d0"];
+    div  [label="io_clk_gen\ndividers", shape=box, style=filled,
+          fillcolor="#f5f0d0"];
+    leaves [label="UART | SPI/QSPI | I2C\nI2S | SDIO | CAM",
+            shape=box, style="filled", fillcolor="#eeeeee"];
+
+    // ---- Timer reference path -----------------------------------------
+    timers [label="Advanced Timer\n& uS/Watchdog Timer", shape=box];
+
+    // ---- Edges ---------------------------------------------------------
+    ref -> pll_soc;
+    ref -> pll_per;
+    ref -> timers [label="ref_clk\n(divided)", style=dashed];
+
+    pll_soc -> soc_clk;
+    pll_per -> per_clk;
+
+    soc_clk -> core;
+    soc_clk -> interc;
+    soc_clk -> socper;
+    soc_clk -> udma  [label="sys_clk"];
+
+    per_clk -> udma  [label="per_clk"];
+    udma -> gate -> div -> leaves;
+}
