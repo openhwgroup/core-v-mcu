@@ -124,11 +124,15 @@ module fifo_push #(
   // caclulation the size of the FIFO - (write pointer - read pointer)
   //assign next_count = fbytes - (waddr_next - raddr_next);
   //assign count      = fbytes - (waddr - raddr);
+  /* verilator lint_off WIDTHEXPAND */
+  /* verilator lint_off WIDTHTRUNC */
   assign next_count = fbytes - ((waddr_next >= raddr_next) ? (waddr_next - raddr_next) : (~raddr_next + waddr_next +1));
   assign count = fbytes - ((waddr >= raddr) ? (waddr - raddr) : (~raddr + waddr + 1));
+  /* verilator lint_on WIDTHTRUNC */
+  /* verilator lint_on WIDTHEXPAND */
 
-  always @(*) begin
-    fbytes = {1'b1, {A_WIDTH{1'b0}}};
+  initial begin
+    fbytes = {1'b0, 1'b1, {A_WIDTH{1'b0}}};
     paf_thresh = 2;
   end
 
@@ -263,10 +267,8 @@ module fifo_pop #(
   assign count      = (waddr - raddr);
 
 
-  always @(*) begin
+  initial begin
     fbytes = 4;
-  end
-  always @(*) begin
     pae_thresh = 2;
   end
 

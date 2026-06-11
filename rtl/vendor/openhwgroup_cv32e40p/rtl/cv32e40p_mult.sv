@@ -1,3 +1,5 @@
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the "License"); you may not use this file except in
@@ -193,6 +195,7 @@ module cv32e40p_mult
         mulh_ready   = 1'b1;
         if (ex_ready_i) mulh_NS = IDLE_MULT;
       end
+      default: ;
     endcase
   end
 
@@ -385,3 +388,6 @@ module cv32e40p_mult
   }) >> 32)));
 `endif
 endmodule
+
+/* verilator lint_on WIDTHTRUNC */
+/* verilator lint_on WIDTHEXPAND */

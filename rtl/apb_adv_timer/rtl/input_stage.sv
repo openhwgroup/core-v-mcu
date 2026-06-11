@@ -115,7 +115,7 @@ module input_stage #(
         s_int_sig = 0;
         for (int i=0;i<EXTSIG_NUM;i++)
         begin
-            if (r_sel == i)
+            if (r_sel == 8'(i))
                 s_int_sig = signal_i[i];
         end
     end

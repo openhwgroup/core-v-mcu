@@ -156,6 +156,7 @@ module apb_pll # (
               if (PENABLE == 0)
                 state <= IDLE;
            end // case: WRITE
+           default: ;
            READ: begin
               case (PADDR[APB_ADDR_WIDTH-1:0])
                 reg_CTL: PRDATA <= {LOCK,5'b0,PDDP,PD,6'b0,MODE[1:0],
@@ -163,13 +164,15 @@ module apb_pll # (
                 reg_DIV: PRDATA <= {5'b0,DN[10:0],13'b0,DP[2:0]};
                 
                 reg_SS1: PRDATA <= {21'b0,SSRATE[10:0]};
-                reg_SS2:  PRDATA <= {8'b0,SSLOPE[23:0]};
+                reg_SS2:  PRDATA <= {LOCK,7'b0,SSLOPE[23:0]};  // firmware polls bit31 for lock detect
                 reg_FRAC: PRDATA <= {8'b0,FRAC[23:0]};
                 reg_SOC:  PRDATA <= {22'b0,SocDiv[9:0]};
                 reg_PERIPH:  PRDATA <= {22'b0,PeriphDiv[9:0]};
                 reg_CLUSTER: PRDATA <= {22'b0,ClusterDiv[9:0]};
                 reg_REFCLK: PRDATA <= {22'b0,RefDiv[9:0]};
-                default: slverr <= 1;
+                // Any other offset (e.g. FLL2/FLL3 reg4 at 0x30/0x50) returns LOCK in bit31
+                // so the firmware's lock-detect poll loop exits immediately in simulation.
+                default: PRDATA <= {LOCK, 31'b0};
               endcase // case (PADDR[APB_ADDR_WIDTH-1:0])
               ready <= 1;
               if (PENABLE == 0)
@@ -182,6 +185,7 @@ module apb_pll # (
    assign pll_reset_in = ~(PLL_RESET | ~HRESETn);
    assign bypassn = ~BYPASS;
    
+   /* verilator lint_off WIDTHTRUNC */
    PLL18_TOP u0 (
                  .CLKO(CLKO),
                  .CLK(),
@@ -206,6 +210,7 @@ module apb_pll # (
                  .SLOPE(SSLOPE),
                  .SSRATE(SSRATE)
           );
+   /* verilator lint_on WIDTHTRUNC */
 
   clkdv ref_div (
                  .clk_i(ref_clk_i),

@@ -236,6 +236,7 @@ module udma_filter_reg_if
                     end
                 end
             end
+            default: ;
         endcase
     end
 
@@ -427,15 +428,15 @@ module udma_filter_reg_if
                 end
                 `UDMA_FILTER_REG_RX_CH_LEN0:
                 begin
-                    r_filter_rx_len0 <= cfg_data_i[15:0];
+                    r_filter_rx_len0 <= {{(TRANS_SIZE-16){1'b0}}, cfg_data_i[15:0]};
                 end
                 `UDMA_FILTER_REG_RX_CH_LEN1:
                 begin
-                    r_filter_rx_len1 <= cfg_data_i[15:0];
+                    r_filter_rx_len1 <= {{(TRANS_SIZE-16){1'b0}}, cfg_data_i[15:0]};
                 end
                 `UDMA_FILTER_REG_RX_CH_LEN2:
                 begin
-                    r_filter_rx_len2 <= cfg_data_i[15:0];
+                    r_filter_rx_len2 <= {{(TRANS_SIZE-16){1'b0}}, cfg_data_i[15:0]};
                 end
                 `UDMA_FILTER_REG_AU_CFG:
                 begin
@@ -474,6 +475,7 @@ module udma_filter_reg_if
                    if (cfg_data_i[0])
                      r_filter_done <= 1'b0;
                 end
+                default: ;
                 endcase
             end
         end
@@ -510,18 +512,18 @@ module udma_filter_reg_if
         `UDMA_FILTER_REG_TX_CH1_LEN2:
             cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_tx_len2[1];
         `UDMA_FILTER_REG_RX_CH_ADD:
-            cfg_data_o[L2_AWIDTH_NOAL-1:0] = r_commit_filter_rx_start_addr[1];
+            cfg_data_o[L2_AWIDTH_NOAL-1:0] = r_commit_filter_rx_start_addr;
         `UDMA_FILTER_REG_RX_CH_CFG:
         begin
-           cfg_data_o[1:0] = r_commit_filter_rx_datasize[1];
-           cfg_data_o[9:8] = r_commit_filter_rx_mode[1]    ;
+           cfg_data_o[1:0] = r_commit_filter_rx_datasize;
+           cfg_data_o[9:8] = r_commit_filter_rx_mode    ;
         end
         `UDMA_FILTER_REG_RX_CH_LEN0:
-            cfg_data_o[15:0] = r_commit_filter_rx_len0[1];
+            cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_rx_len0;
         `UDMA_FILTER_REG_RX_CH_LEN1:
-            cfg_data_o[15:0] = r_commit_filter_rx_len1[1];
+            cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_rx_len1;
         `UDMA_FILTER_REG_RX_CH_LEN2:
-            cfg_data_o[15:0] = r_commit_filter_rx_len2[1];
+            cfg_data_o[TRANS_SIZE-1:0] = r_commit_filter_rx_len2;
         `UDMA_FILTER_REG_AU_CFG:
         begin
             cfg_data_o[0]     = r_commit_au_use_signed;

@@ -886,6 +886,7 @@ module adv_timer_apb_if #(
 					begin
 						r_clk_en <= PWDATA[3:0];
 					end
+					default: ;
                 endcase // s_apb_addr
             end
             else

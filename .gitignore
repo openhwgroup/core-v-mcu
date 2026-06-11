@@ -20,3 +20,6 @@ emulation/core-v-mcu-nexys/constraints/core-v-mcu-pin-assignment.xdc
 emulation/core-v-mcu-nexys/rtl/*.v
 vivado*
 xmverilog.*
+*.vcd
+sim/mem_init/
+sim/sim_core_v_mcu

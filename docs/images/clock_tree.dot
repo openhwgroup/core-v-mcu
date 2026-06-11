@@ -1,0 +1,105 @@
+// CORE-V-MCU Clock Tree
+//
+// Copyright (c) 2026 Eclipse Foundation AISBL
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+//
+// Source for clock_tree.png.  Render with:
+//   dot -Tpng clock_tree.dot -o clock_tree.png
+//
+// Traces the clock tree from the primary reference-clock input through the
+// live clock-generation block (apb_pll / apb_fll_if_i in soc_peripherals,
+// wrapping the PLL18_TOP macro) to the major subsystems and peripherals.
+
+digraph clock_tree {
+    rankdir=LR;
+    nodesep=0.30;
+    ranksep=0.80;
+    fontname="Helvetica";
+    node  [fontname="Helvetica", fontsize=11];
+    edge  [fontname="Helvetica", fontsize=9];
+
+    // ---- Primary input -------------------------------------------------
+    ref [label="ref_clk_i\n(10 MHz pad)", shape=invhouse, style=filled,
+         fillcolor="#cde8ff"];
+
+    // ---- Clock generation block (apb_pll / apb_fll_if_i) ---------------
+    subgraph cluster_clkgen {
+        label="Clock Generation  (apb_pll  /  apb_fll_if_i  in soc_peripherals)";
+        style=dashed; color="#888888"; fontsize=11;
+
+        pll  [label="PLL18_TOP (u0)\nFREF → CLKO, LOCK", shape=box,
+              style=filled, fillcolor="#ffe6cc"];
+        sdiv [label="clkdv s_div ÷SocDiv\n+ clk_dmux s_mux", shape=box,
+              style=filled, fillcolor="#ffe6cc"];
+        pdiv [label="clkdv p_div ÷PeriphDiv\n+ clk_dmux p_mux", shape=box,
+              style=filled, fillcolor="#ffe6cc"];
+        cdiv [label="clkdv c_div ÷ClusterDiv\n+ clk_dmux c_mux", shape=box,
+              style=filled, fillcolor="#ffe6cc"];
+        rdiv [label="clkdv ref_div\n÷RefDiv (reset = 40)", shape=box,
+              style=filled, fillcolor="#ffd6a8"];
+    }
+
+    // ---- Generated domain nets -----------------------------------------
+    soc_clk  [label="soc_clk",  shape=box, style="filled,rounded",
+              fillcolor="#d5f5d5"];
+    per_clk  [label="per_clk",  shape=box, style="filled,rounded",
+              fillcolor="#d5f5d5"];
+    clu_clk  [label="cluster_clk\n(eFPGA)", shape=box, style="filled,rounded",
+              fillcolor="#d5f5d5"];
+    ref_div_clk [label="ref_clk (divided)\nlow-speed clock",
+              shape=box, style="filled,rounded", fillcolor="#fff2cc"];
+    slow [label="slow_clk_o\n(= ref_clk_i, safe_domain)", shape=box,
+          style="filled,rounded", fillcolor="#eeeeee"];
+
+    // ---- soc_clk consumers ---------------------------------------------
+    core   [label="CV32E40P\nCore Complex", shape=box];
+    interc [label="L2 / TCDM &\nAPB Interconnect", shape=box];
+    socper [label="SoC Peripherals\n& Control / Debug", shape=box];
+    udma   [label="uDMA Subsystem\n(sys_clk + per_clk)", shape=box];
+
+    // ---- per_clk leaves ------------------------------------------------
+    gate [label="Per-peripheral\nclock gating\n(udma_ctrl cg_value)",
+          shape=box, style=filled, fillcolor="#f5f0d0"];
+    div  [label="io_clk_gen\ndividers", shape=box, style=filled,
+          fillcolor="#f5f0d0"];
+    leaves [label="UART | SPI/QSPI | I2C\nI2S | SDIO | CAM",
+            shape=box, style="filled", fillcolor="#eeeeee"];
+
+    // ---- cluster_clk leaf ----------------------------------------------
+    efpga [label="eFPGA Subsystem", shape=box];
+
+    // ---- divided-reference (low-speed) consumers -----------------------
+    lowspeed [label="Advanced Timer | System (uS/WDT) Timer\n"
+                   + "SoC Event Generator | apb_soc_ctrl\n"
+                   + "ref-clk edge sync | eFPGA fpga_clk1",
+              shape=box, style=filled, fillcolor="#fde9d9"];
+
+    // ---- Edges: generation ---------------------------------------------
+    ref -> pll  [label="FREF"];
+    ref -> rdiv;
+    ref -> sdiv [label="bypass", style=dotted, fontsize=8];
+    ref -> pdiv [label="bypass", style=dotted, fontsize=8];
+    ref -> cdiv [label="bypass", style=dotted, fontsize=8];
+    ref -> slow [style=dashed];
+
+    pll -> sdiv [label="CLKO"];
+    pll -> pdiv [label="CLKO"];
+    pll -> cdiv [label="CLKO"];
+
+    sdiv -> soc_clk;
+    pdiv -> per_clk;
+    cdiv -> clu_clk;
+    rdiv -> ref_div_clk;
+
+    // ---- Edges: distribution -------------------------------------------
+    soc_clk -> core;
+    soc_clk -> interc;
+    soc_clk -> socper;
+    soc_clk -> udma [label="sys_clk"];
+
+    per_clk -> udma [label="per_clk"];
+    udma -> gate -> div -> leaves;
+
+    clu_clk -> efpga;
+    ref_div_clk -> lowspeed;
+}

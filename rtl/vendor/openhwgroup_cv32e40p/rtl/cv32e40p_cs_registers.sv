@@ -1,3 +1,5 @@
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the "License"); you may not use this file except in
@@ -1080,6 +1082,7 @@ module cv32e40p_cs_registers
           hwlp_we_o = 3'b100;
           hwlp_regid_o = 1'b1;
         end
+        default: ;
       endcase
 
       // exception controller gets priority over other writes
@@ -1498,7 +1501,9 @@ module cv32e40p_cs_registers
       // minstret is located at index 2
       // Programable HPM counters start at index 3
       if ((cnt_gidx == 1) || (cnt_gidx >= (NUM_MHPMCOUNTERS + 3))) begin : gen_non_implemented
-        always_ff @(posedge clk) mhpmcounter_q[cnt_gidx] <= 'b0;
+        always_ff @(posedge clk, negedge rst_n)
+          if (!rst_n) mhpmcounter_q[cnt_gidx] <= 'b0;
+          else        mhpmcounter_q[cnt_gidx] <= 'b0;
       end else begin : gen_implemented
         always_ff @(posedge clk, negedge rst_n)
           if (!rst_n) begin
@@ -1526,10 +1531,14 @@ module cv32e40p_cs_registers
     for (evt_gidx = 0; evt_gidx < 32; evt_gidx++) begin : gen_mhpmevent
       // programable HPM events start at index3
       if ((evt_gidx < 3) || (evt_gidx >= (NUM_MHPMCOUNTERS + 3))) begin : gen_non_implemented
-        always_ff @(posedge clk) mhpmevent_q[evt_gidx] <= 'b0;
+        always_ff @(posedge clk, negedge rst_n)
+          if (!rst_n) mhpmevent_q[evt_gidx] <= 'b0;
+          else        mhpmevent_q[evt_gidx] <= 'b0;
       end else begin : gen_implemented
         if (NUM_HPM_EVENTS < 32) begin : gen_tie_off
-          always_ff @(posedge clk) mhpmevent_q[evt_gidx][31:NUM_HPM_EVENTS] <= 'b0;
+          always_ff @(posedge clk, negedge rst_n)
+            if (!rst_n) mhpmevent_q[evt_gidx][31:NUM_HPM_EVENTS] <= 'b0;
+            else        mhpmevent_q[evt_gidx][31:NUM_HPM_EVENTS] <= 'b0;
         end
         always_ff @(posedge clk, negedge rst_n)
           if (!rst_n) mhpmevent_q[evt_gidx][NUM_HPM_EVENTS-1:0] <= 'b0;
@@ -1562,7 +1571,9 @@ module cv32e40p_cs_registers
   generate
     for (inh_gidx = 0; inh_gidx < 32; inh_gidx++) begin : gen_mcountinhibit
       if ((inh_gidx == 1) || (inh_gidx >= (NUM_MHPMCOUNTERS + 3))) begin : gen_non_implemented
-        always_ff @(posedge clk) mcountinhibit_q[inh_gidx] <= 'b0;
+        always_ff @(posedge clk, negedge rst_n)
+          if (!rst_n) mcountinhibit_q[inh_gidx] <= 'b0;
+          else        mcountinhibit_q[inh_gidx] <= 'b0;
       end else begin : gen_implemented
         always_ff @(posedge clk, negedge rst_n)
           if (!rst_n) mcountinhibit_q[inh_gidx] <= 'b1;  // default disable
@@ -1585,3 +1596,5 @@ module cv32e40p_cs_registers
 
 endmodule
 
+/* verilator lint_on WIDTHTRUNC */
+/* verilator lint_on WIDTHEXPAND */

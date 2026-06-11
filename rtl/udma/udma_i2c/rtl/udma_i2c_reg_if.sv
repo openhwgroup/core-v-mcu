@@ -168,7 +168,7 @@ module udma_i2c_reg_if #(
                 begin
                     r_do_rst         <= cfg_data_i[0];
                 end
-
+                default: ;
                 endcase
             end
             if(cfg_valid_i && cfg_rwn_i && (s_rd_addr == `I2C_REG_STATUS))
@@ -191,13 +191,13 @@ module udma_i2c_reg_if #(
         cfg_data_o = 32'h0;
         case (s_rd_addr)
         `I2C_REG_RX_SADDR:
-            cfg_data_o = cfg_rx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_rx_curr_addr_i};
         `I2C_REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
         `I2C_REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,3'h0,r_rx_continuous};
         `I2C_REG_TX_SADDR:
-            cfg_data_o = cfg_tx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_tx_curr_addr_i};
         `I2C_REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
         `I2C_REG_TX_CFG:

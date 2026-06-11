@@ -139,12 +139,12 @@ module fc_subsystem #(
       event_b <= event_a;
 
       for (int i = 0; i < 11; i++) begin
-        if (core_irq_ack_o && (core_irq_ack_id_o == i)) r_int[i] <= 0;
+        if (core_irq_ack_o && (core_irq_ack_id_o == 5'(i))) r_int[i] <= 0;
         else r_int[i] <= event_r[i] | r_int[i];
       end
       r_int[11] <= events_i[11];  // special case for event generator no rising edge detect
       for (int i = 12; i < 32; i++) begin
-        if (core_irq_ack_o && (core_irq_ack_id_o == i)) r_int[i] <= 0;
+        if (core_irq_ack_o && (core_irq_ack_id_o == 5'(i))) r_int[i] <= 0;
         else r_int[i] <= event_r[i] | r_int[i];
       end
     end

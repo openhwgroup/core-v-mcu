@@ -163,7 +163,7 @@ module i2c_peripheral_registers (
       if (apb_reg_write_enable && apb_reg_waddr_i[9:2] == 8'h12)
         reg_0x12 <= apb_reg_wdata_i[7:0];
 
-      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 8'h48)
+      if (apb_reg_write_enable && apb_reg_waddr_i[11:0] == 12'h48)
         reg_0x13 <= 1'b1;
       else if (i2c_reg_rd_byte_complete_i && i2c_reg_addr_i == 8'h12)
         reg_0x13 <= 1'b0;
@@ -327,38 +327,38 @@ module i2c_peripheral_registers (
   always @(*)
     if (apb_reg_raddr_i[11:10] == 2'b0)
       case (apb_reg_rd_index)
-        8'h00:   apb_reg_rdata_muxed <= {1'b0, reg_0x00[6:0]};
-        8'h01:   apb_reg_rdata_muxed <= {7'b0, reg_0x01};
-        8'h02:   apb_reg_rdata_muxed <= {reg_0x02[7:0]};
-        8'h03:   apb_reg_rdata_muxed <= {reg_0x03[7:0]};
-        8'h04:   apb_reg_rdata_muxed <= {reg_0x04[7:0]};
+        8'h00:   apb_reg_rdata_muxed = {1'b0, reg_0x00[6:0]};
+        8'h01:   apb_reg_rdata_muxed = {7'b0, reg_0x01};
+        8'h02:   apb_reg_rdata_muxed = {reg_0x02[7:0]};
+        8'h03:   apb_reg_rdata_muxed = {reg_0x03[7:0]};
+        8'h04:   apb_reg_rdata_muxed = {reg_0x04[7:0]};
         8'h10:   begin
-          apb_reg_rdata_muxed <= {reg_0x10[7:0]};
+          apb_reg_rdata_muxed = {reg_0x10[7:0]};
         end
-        8'h11:   apb_reg_rdata_muxed <= {7'b0, reg_0x11};
-        8'h12:   apb_reg_rdata_muxed <= {reg_0x12[7:0]};
-        8'h13:   apb_reg_rdata_muxed <= {7'b0, reg_0x13};
-        8'h20:   apb_reg_rdata_muxed <= {8'h0};
-        8'h21:   apb_reg_rdata_muxed <= {fifo_i2c_to_apb_rddata[7:0]};
-        8'h22:   apb_reg_rdata_muxed <= {7'b0, reg_0x22};
-        8'h23:   apb_reg_rdata_muxed <= {5'b0, reg_0x23[2:0]};
-        8'h24:   apb_reg_rdata_muxed <= {5'b0, reg_0x24[2:0]};
-        8'h30:   apb_reg_rdata_muxed <= {8'h0};
-        8'h31:   apb_reg_rdata_muxed <= {8'h0};
-        8'h32:   apb_reg_rdata_muxed <= {7'b0, reg_0x32};
-        8'h33:   apb_reg_rdata_muxed <= {5'b0, reg_0x33[2:0]};
-        8'h34:   apb_reg_rdata_muxed <= {5'b0, reg_0x34[2:0]};
-        8'h40:   apb_reg_rdata_muxed <= {5'b0, reg_0x40[2:0]};
-        8'h41:   apb_reg_rdata_muxed <= {5'b0, reg_0x41[2:0]};
-        8'h42:   apb_reg_rdata_muxed <= {reg_0x42[7:0]};
-        8'h43:   apb_reg_rdata_muxed <= {reg_0x43[7:0]};
-        8'h50:   apb_reg_rdata_muxed <= {5'b0, reg_0x50[2:0]};
-        8'h51:   apb_reg_rdata_muxed <= {5'b0, reg_0x51[2:0]};
-        8'h52:   apb_reg_rdata_muxed <= {reg_0x52[7:0]};
-        8'h53:   apb_reg_rdata_muxed <= {reg_0x53[7:0]};
-        default: apb_reg_rdata_muxed <= 8'h0;
+        8'h11:   apb_reg_rdata_muxed = {7'b0, reg_0x11};
+        8'h12:   apb_reg_rdata_muxed = {reg_0x12[7:0]};
+        8'h13:   apb_reg_rdata_muxed = {7'b0, reg_0x13};
+        8'h20:   apb_reg_rdata_muxed = {8'h0};
+        8'h21:   apb_reg_rdata_muxed = {fifo_i2c_to_apb_rddata[7:0]};
+        8'h22:   apb_reg_rdata_muxed = {7'b0, reg_0x22};
+        8'h23:   apb_reg_rdata_muxed = {5'b0, reg_0x23[2:0]};
+        8'h24:   apb_reg_rdata_muxed = {5'b0, reg_0x24[2:0]};
+        8'h30:   apb_reg_rdata_muxed = {8'h0};
+        8'h31:   apb_reg_rdata_muxed = {8'h0};
+        8'h32:   apb_reg_rdata_muxed = {7'b0, reg_0x32};
+        8'h33:   apb_reg_rdata_muxed = {5'b0, reg_0x33[2:0]};
+        8'h34:   apb_reg_rdata_muxed = {5'b0, reg_0x34[2:0]};
+        8'h40:   apb_reg_rdata_muxed = {5'b0, reg_0x40[2:0]};
+        8'h41:   apb_reg_rdata_muxed = {5'b0, reg_0x41[2:0]};
+        8'h42:   apb_reg_rdata_muxed = {reg_0x42[7:0]};
+        8'h43:   apb_reg_rdata_muxed = {reg_0x43[7:0]};
+        8'h50:   apb_reg_rdata_muxed = {5'b0, reg_0x50[2:0]};
+        8'h51:   apb_reg_rdata_muxed = {5'b0, reg_0x51[2:0]};
+        8'h52:   apb_reg_rdata_muxed = {reg_0x52[7:0]};
+        8'h53:   apb_reg_rdata_muxed = {reg_0x53[7:0]};
+        default: apb_reg_rdata_muxed = 8'h0;
       endcase
-    else apb_reg_rdata_muxed <= 8'h0;
+    else apb_reg_rdata_muxed = 8'h0;
 
 
   always @(posedge rst or posedge clk)
@@ -372,34 +372,34 @@ module i2c_peripheral_registers (
 
   always @(*)
     case (i2c_reg_addr_i)
-      8'h00:   i2c_reg_rdata_muxed <= {1'b0, reg_0x00[6:0]};
-      8'h01:   i2c_reg_rdata_muxed <= {7'b0, reg_0x01};
-      8'h02:   i2c_reg_rdata_muxed <= {reg_0x02[7:0]};
-      8'h03:   i2c_reg_rdata_muxed <= {reg_0x03[7:0]};
-      8'h04:   i2c_reg_rdata_muxed <= {reg_0x04[7:0]};
-      8'h10:   i2c_reg_rdata_muxed <= {reg_0x10[7:0]};
-      8'h11:   i2c_reg_rdata_muxed <= {7'b0, reg_0x11};
-      8'h12:   i2c_reg_rdata_muxed <= {reg_0x12[7:0]};
-      8'h13:   i2c_reg_rdata_muxed <= {7'b0, reg_0x13};
-      8'h20:   i2c_reg_rdata_muxed <= {8'h0};
-      8'h21:   i2c_reg_rdata_muxed <= {8'h0};
-      8'h22:   i2c_reg_rdata_muxed <= {7'b0, reg_0x22};
-      8'h23:   i2c_reg_rdata_muxed <= {5'b0, reg_0x23[2:0]};
-      8'h24:   i2c_reg_rdata_muxed <= {5'b0, reg_0x24[2:0]};
-      8'h30:   i2c_reg_rdata_muxed <= {8'h0};
-      8'h31:   i2c_reg_rdata_muxed <= {fifo_apb_to_i2c_rddata};
-      8'h32:   i2c_reg_rdata_muxed <= {7'b0, reg_0x32};
-      8'h33:   i2c_reg_rdata_muxed <= {5'b0, reg_0x33[2:0]};
-      8'h34:   i2c_reg_rdata_muxed <= {5'b0, reg_0x34[2:0]};
-      8'h40:   i2c_reg_rdata_muxed <= {5'b0, reg_0x40[2:0]};
-      8'h41:   i2c_reg_rdata_muxed <= {5'b0, reg_0x41[2:0]};
-      8'h42:   i2c_reg_rdata_muxed <= {reg_0x42[7:0]};
-      8'h43:   i2c_reg_rdata_muxed <= {reg_0x43[7:0]};
-      8'h50:   i2c_reg_rdata_muxed <= {5'b0, reg_0x50[2:0]};
-      8'h51:   i2c_reg_rdata_muxed <= {5'b0, reg_0x51[2:0]};
-      8'h52:   i2c_reg_rdata_muxed <= {reg_0x52[7:0]};
-      8'h53:   i2c_reg_rdata_muxed <= {reg_0x53[7:0]};
-      default: i2c_reg_rdata_muxed <= 8'bx;
+      8'h00:   i2c_reg_rdata_muxed = {1'b0, reg_0x00[6:0]};
+      8'h01:   i2c_reg_rdata_muxed = {7'b0, reg_0x01};
+      8'h02:   i2c_reg_rdata_muxed = {reg_0x02[7:0]};
+      8'h03:   i2c_reg_rdata_muxed = {reg_0x03[7:0]};
+      8'h04:   i2c_reg_rdata_muxed = {reg_0x04[7:0]};
+      8'h10:   i2c_reg_rdata_muxed = {reg_0x10[7:0]};
+      8'h11:   i2c_reg_rdata_muxed = {7'b0, reg_0x11};
+      8'h12:   i2c_reg_rdata_muxed = {reg_0x12[7:0]};
+      8'h13:   i2c_reg_rdata_muxed = {7'b0, reg_0x13};
+      8'h20:   i2c_reg_rdata_muxed = {8'h0};
+      8'h21:   i2c_reg_rdata_muxed = {8'h0};
+      8'h22:   i2c_reg_rdata_muxed = {7'b0, reg_0x22};
+      8'h23:   i2c_reg_rdata_muxed = {5'b0, reg_0x23[2:0]};
+      8'h24:   i2c_reg_rdata_muxed = {5'b0, reg_0x24[2:0]};
+      8'h30:   i2c_reg_rdata_muxed = {8'h0};
+      8'h31:   i2c_reg_rdata_muxed = {fifo_apb_to_i2c_rddata};
+      8'h32:   i2c_reg_rdata_muxed = {7'b0, reg_0x32};
+      8'h33:   i2c_reg_rdata_muxed = {5'b0, reg_0x33[2:0]};
+      8'h34:   i2c_reg_rdata_muxed = {5'b0, reg_0x34[2:0]};
+      8'h40:   i2c_reg_rdata_muxed = {5'b0, reg_0x40[2:0]};
+      8'h41:   i2c_reg_rdata_muxed = {5'b0, reg_0x41[2:0]};
+      8'h42:   i2c_reg_rdata_muxed = {reg_0x42[7:0]};
+      8'h43:   i2c_reg_rdata_muxed = {reg_0x43[7:0]};
+      8'h50:   i2c_reg_rdata_muxed = {5'b0, reg_0x50[2:0]};
+      8'h51:   i2c_reg_rdata_muxed = {5'b0, reg_0x51[2:0]};
+      8'h52:   i2c_reg_rdata_muxed = {reg_0x52[7:0]};
+      8'h53:   i2c_reg_rdata_muxed = {reg_0x53[7:0]};
+      default: i2c_reg_rdata_muxed = 8'bx;
     endcase
 
   always @(posedge rst or posedge clk)

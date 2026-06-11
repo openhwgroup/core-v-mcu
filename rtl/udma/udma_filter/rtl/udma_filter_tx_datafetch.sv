@@ -165,7 +165,7 @@ module udma_filter_tx_datafetch
             else
             begin
               s_ptn_buffer_w = r_ptn_buffer_w + 1;
-              s_loc_pointer  = r_loc_pointer + s_datasize_toadd;
+              s_loc_pointer  = L2_AWIDTH_NOAL'(r_loc_pointer + s_datasize_toadd);
               s_sample_loc_pointer  = 1'b1;
               s_sample_ptn_buffer_w = 1'b1;
             end
@@ -192,17 +192,17 @@ module udma_filter_tx_datafetch
               s_sample_ptn_buffer_l = 1'b1;
               s_sample_loc_pointer  = 1'b1;
               s_sample_loc_startaddr = 1'b1;
-              s_loc_startaddr = r_loc_startaddr + s_datasize_toadd;
+              s_loc_startaddr = L2_AWIDTH_NOAL'(r_loc_startaddr + s_datasize_toadd);
               s_ptn_buffer_w = 0;
               s_ptn_buffer_l = r_ptn_buffer_l + 1;
-              s_loc_pointer  = r_loc_startaddr + s_datasize_toadd;
+              s_loc_pointer  = L2_AWIDTH_NOAL'(r_loc_startaddr + s_datasize_toadd);
             end
             else
             begin
               s_sample_ptn_buffer_w = 1'b1;
               s_sample_loc_pointer  = 1'b1;
               s_ptn_buffer_w = r_ptn_buffer_w + 1;
-              s_loc_pointer  = r_loc_pointer + s_datasize_toadd;
+              s_loc_pointer  = L2_AWIDTH_NOAL'(r_loc_pointer + s_datasize_toadd);
             end
           end
         end
@@ -235,7 +235,7 @@ module udma_filter_tx_datafetch
               s_sample_ptn_buffer_w = 1'b1;
               s_sample_loc_pointer  = 1'b1;
               s_ptn_buffer_w = r_ptn_buffer_w + 1;
-              s_loc_pointer  = r_loc_pointer + s_datasize_toadd;
+              s_loc_pointer  = L2_AWIDTH_NOAL'(r_loc_pointer + s_datasize_toadd);
             end
           end
         end
@@ -260,7 +260,7 @@ module udma_filter_tx_datafetch
               s_sample_loc_startaddr = 1'b1;
               s_ptn_buffer_w = 0;
               s_ptn_buffer_l = r_ptn_buffer_l + 1;
-              s_loc_pointer   = r_loc_startaddr + cfg_len2_i;
+              s_loc_pointer   = L2_AWIDTH_NOAL'(r_loc_startaddr + cfg_len2_i);
               s_loc_startaddr = s_loc_pointer;
             end
             else
@@ -268,7 +268,7 @@ module udma_filter_tx_datafetch
               s_sample_ptn_buffer_w = 1'b1;
               s_sample_loc_pointer  = 1'b1;
               s_ptn_buffer_w = r_ptn_buffer_w + 1;
-              s_loc_pointer  = r_loc_pointer + s_datasize_toadd;
+              s_loc_pointer  = L2_AWIDTH_NOAL'(r_loc_pointer + s_datasize_toadd);
             end
           end
         end
@@ -311,6 +311,7 @@ module udma_filter_tx_datafetch
             s_state = ST_IDLE;
           end
         end
+        default: ;
       endcase // r_state
     end
 

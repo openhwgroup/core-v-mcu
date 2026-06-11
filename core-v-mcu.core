@@ -285,6 +285,7 @@ targets:
         - -Wno-fatal
         - -O3
         - --trace
+        - --no-timing
         - --CFLAGS -fPIC -DVL_TIME_CONTEXT
 
   lint:

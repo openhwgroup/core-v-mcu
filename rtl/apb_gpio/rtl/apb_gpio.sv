@@ -79,7 +79,7 @@ module apb_gpiov2 #(
 
   genvar i;
 
-  assign gpio_in_sync = r_gpio_in[`N_GPIO-1];
+  assign gpio_in_sync = r_gpio_in[`N_GPIO-1:0];
   assign PSLVERR = 1'b0;
 
 
@@ -114,6 +114,7 @@ module apb_gpiov2 #(
         if (PWRITE) begin
           if (PREADY == 0) begin
             PREADY <= 1;
+            /* verilator lint_off WIDTHTRUNC */
             case (PADDR[11:0])
               `REG_SETSEL: begin
                 r_gpio_select <= PWDATA[NG_BITS:0];
@@ -146,14 +147,16 @@ module apb_gpiov2 #(
               `REG_INTACK: begin
                 s_block_int[PWDATA[7:0]] <= 0;
               end
-
+              default: ;
             endcase  // case (PADDR[11:0])
+            /* verilator lint_on WIDTHTRUNC */
           end
 
         end else begin  // APB READ
           if (PREADY == 0) begin
             PREADY <= 1;
             PRDATA <= 0;
+            /* verilator lint_off WIDTHTRUNC */
             case (PADDR[11:0])
               `REG_RDSTAT: begin
                 PRDATA[25:24] <= r_gpio_dir[r_gpio_select];
@@ -169,7 +172,9 @@ module apb_gpiov2 #(
               `REG_PIN0: begin
                 PRDATA[31:0] <= r_gpio_in[31:0];
               end
+              default: ;
            endcase  // case (PADDR[11:0]])
+           /* verilator lint_on WIDTHTRUNC */
           end
         end  // else: !if(PWRITE)
       end  // if (PSEL && PENABLE)
@@ -184,9 +189,9 @@ module apb_gpiov2 #(
     end else begin
       r_gpio_sync0 <= gpio_in[`N_GPIO-1:0];
       r_gpio_sync1 <= r_gpio_sync0;
-      r_gpio_in    <= r_gpio_sync1;
-      r_gpio_rise  <= ~r_gpio_in  & r_gpio_sync1;
-      r_gpio_fall  <= r_gpio_in &  ~r_gpio_sync1;
+      r_gpio_in    <= {1'b0, r_gpio_sync1};
+      r_gpio_rise  <= ~r_gpio_in[`N_GPIO-1:0]  & r_gpio_sync1;
+      r_gpio_fall  <= r_gpio_in[`N_GPIO-1:0] &  ~r_gpio_sync1;
     end
   end  // always_ff @ (posedge HCLK or negedge HRESETn)
 

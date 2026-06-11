@@ -171,13 +171,13 @@ module udma_ch_addrgen
           s_ch_en     =  1'b0;
           s_event     =  1'b0;
           s_sot       =  1'b0;
-          s_stream    =  1'b0;
+          s_stream    =  2'b0;
       end
       else
       begin
         if (int_not_stall_i && r_en && int_ch_grant_i) //if granted and channel enabled then
         begin
-          if (s_compare) //if this is last transfer for the channel 
+          if (s_compare) //if this is last transfer for the channel
           begin
             s_event     =  1'b1;
             if (!cfg_continuous_i && !r_pending_en && !cfg_en_i)
@@ -186,7 +186,7 @@ module udma_ch_addrgen
               s_ch_en = 1'b0;
               s_counters  = '0;
               s_addresses = '0;
-              s_stream    = 1'b0;
+              s_stream    = 2'b0;
               s_sot       = 1'b0;
             end
             else
@@ -206,7 +206,7 @@ module udma_ch_addrgen
             s_sot       = 1'b0;
             s_ch_en     = 1'b1;
             s_counters  = r_counters - s_datasize_toadd;  //decrement the remaining bytes of the channel
-            s_addresses = r_addresses + s_datasize_toadd; //increment the address
+            s_addresses = L2_AWIDTH_NOAL'(r_addresses + s_datasize_toadd); //increment the address
           end
         end
         else
@@ -226,7 +226,7 @@ module udma_ch_addrgen
         r_ch_en      <= 1'b0;
         r_event      <= 1'b0;
         r_pending_en <= 1'b0;
-        r_stream     <= 1'b0;
+        r_stream     <= 2'b0;
         r_stream_id  <=  'h0;
         r_sot        <= 1'b0;
       end else 

@@ -177,7 +177,7 @@ module udma_i2c_control
     always_comb begin : proc_s_event
         s_event = 1'b0;
         for(int i=0;i<4;i++)
-            if(r_ev_sel == i)
+            if(r_ev_sel == 2'(i))
                 s_event = ext_events_i[i];
     end
 
@@ -375,7 +375,7 @@ module udma_i2c_control
 						end
 						else
 						begin
-	        				s_rpt_num       = data_tx_i - 1;
+	        				s_rpt_num       = 7'(data_tx_i - 1);
 							NS = ST_WAIT_IN_CMD;
 	        			end
 					end

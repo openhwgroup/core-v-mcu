@@ -140,7 +140,8 @@ module apb_timer_unit
 	       
 	       `TIMER_RESET_HI:
 		 s_reset_timer_hi   = 1'b1;
-	       
+
+	       default: ;
              endcase
           end
 	
@@ -232,7 +233,8 @@ module apb_timer_unit
 	       
 	       `TIMER_CMP_HI:
                  PRDATA = s_timer_cmp_hi_reg;
-	       
+
+	       default: ;
              endcase
 	     
           end

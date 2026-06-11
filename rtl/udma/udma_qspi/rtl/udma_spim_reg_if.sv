@@ -248,7 +248,7 @@ module udma_spim_reg_if #(
                     r_tx_datasize    <= cfg_data_i[2:1];
                     r_tx_continuous  <= cfg_data_i[0];
                 end
-
+                default: ;
                 endcase
             end
         end
@@ -259,19 +259,19 @@ module udma_spim_reg_if #(
         cfg_data_o = 32'h0;
         case (s_rd_addr)
         `REG_CMD_SADDR:
-            cfg_data_o = cfg_cmd_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_cmd_curr_addr_i};
         `REG_CMD_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_cmd_bytes_left_i;
         `REG_CMD_CFG:
             cfg_data_o = {26'h0,cfg_cmd_pending_i,cfg_cmd_en_i,1'b0,2'b10,r_cmd_continuous};
         `REG_RX_SADDR:
-            cfg_data_o = cfg_rx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_rx_curr_addr_i};
         `REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
         `REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,1'b0,r_rx_datasize,r_rx_continuous};
         `REG_TX_SADDR:
-            cfg_data_o = cfg_tx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_tx_curr_addr_i};
         `REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
         `REG_TX_CFG:

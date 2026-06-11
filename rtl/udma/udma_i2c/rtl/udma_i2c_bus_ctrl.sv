@@ -502,9 +502,9 @@ module udma_i2c_bus_ctrl
                     begin
                       if (clk_en)
                         CS <= S_RD_PHASE3;
-                        scl_oen <= 1'b1; // set SCL high
-                        sda_oen <= 1'b1; // keep SDA tri-stated
-                        sda_chk <= 1'b0; // don't check SDA output
+                      scl_oen <= 1'b1; // set SCL high
+                      sda_oen <= 1'b1; // keep SDA tri-stated
+                      sda_chk <= 1'b0; // don't check SDA output
                       cmd_ack_o <= 1'b0;    // default no command acknowledge
                     end
 

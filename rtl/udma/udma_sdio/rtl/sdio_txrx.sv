@@ -162,6 +162,7 @@ module sdio_txrx
           s_state = ST_CMD_ONLY;
         end
       end
+      default: ;
     endcase // r_state
   end
 

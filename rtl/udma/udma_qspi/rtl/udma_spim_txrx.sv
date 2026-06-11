@@ -479,6 +479,7 @@ module udma_spim_txrx
   					s_tx_shift_reg   = tx_data_i;
   				end
     		end
+    		default: ;
     	endcase // tx_state
     
     end
@@ -584,8 +585,9 @@ module udma_spim_txrx
     			    end
                 end
     		end
+    		default: ;
     	endcase // rx_state
-    
+
     end
 
     always_ff @(posedge clk_i, negedge rstn_i)

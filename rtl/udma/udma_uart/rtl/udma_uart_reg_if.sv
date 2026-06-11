@@ -266,6 +266,7 @@ module udma_uart_reg_if #(
                     r_uart_err_irq_en <= cfg_data_i[1];
                     r_uart_rx_irq_en  <= cfg_data_i[0];
                   end
+                default: ;
                 endcase
             end
         end
@@ -280,13 +281,13 @@ module udma_uart_reg_if #(
 
         case (s_rd_addr)
         `UART_REG_RX_SADDR:
-            cfg_data_o = cfg_rx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_rx_curr_addr_i};
         `UART_REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
         `UART_REG_RX_CFG:
             cfg_data_o = {26'h0,cfg_rx_pending_i,cfg_rx_en_i,3'h0,r_rx_continuous};
         `UART_REG_TX_SADDR:
-            cfg_data_o = cfg_tx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_tx_curr_addr_i};
         `UART_REG_TX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_tx_bytes_left_i;
         `UART_REG_TX_CFG:
