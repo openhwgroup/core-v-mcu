@@ -29,17 +29,28 @@ Overview
 --------
 The CORE-V-MCU is driven by a single primary reference clock, ``ref_clk_i``,
 which is assumed to be **10 MHz**.  From this reference the on-chip clock
-generation block synthesizes two independent clock domains:
+generation block — a single ``apb_pll`` instance wrapping the ``PLL18_TOP`` PLL
+macro — synthesizes one high-speed clock and derives the following clock domains
+from it with independent programmable post-dividers:
 
 - **SoC clock** (``soc_clk``) drives the CV32E40P core complex, the L2/TCDM and
   APB interconnects, the SoC peripherals and control logic, the debug subsystem,
   and the system-clock side of the uDMA subsystem.
 - **Peripheral clock** (``per_clk``) is the source clock for the uDMA subsystem,
   from which the individual peripheral clocks (UART, SPI/QSPI, I2C, I2S, SDIO,
-  CAM) are derived.  ``per_clk`` is also exported as ``slow_clk_o``.
+  CAM) are derived.
+- **Cluster / eFPGA clock** (``cluster_clk``) is supplied to the eFPGA subsystem.
 
-In addition, the reference clock itself is routed (after division) to the timer
-resources so that timekeeping is independent of the PLL-synthesized domains.
+Because all three domains are derived from the same PLL output (``CLKO``) by
+separate post-dividers, their frequencies are programmable but harmonically
+related to a common synthesized clock; they are *not* produced by independent
+PLLs.
+
+In addition, the reference clock is divided down by a dedicated divider to
+produce a low-speed reference clock that is routed to the timer and event
+resources, so that timekeeping is independent of the high-speed synthesized
+domains.  Separately, the device's ``slow_clk_o`` output is driven directly from
+``ref_clk_i`` (the undivided reference) in ``safe_domain``.
 
 :ref:`Clock Tree Diagram` shows the complete clock tree from the primary
 input to the major subsystems and peripherals.
@@ -54,41 +65,62 @@ input to the major subsystems and peripherals.
 Reference Clock Input
 ---------------------
 The primary reference clock enters the device on the ``ref_clk_i`` pad and is
-passed into the SoC domain (``soc_domain``), where it is presented to the clock
-and reset generation block ``soc_clk_rst_gen``.  The same reference clock is
-also distributed directly to the SoC peripherals (``soc_peripherals``) for use
-by the timer blocks (see :ref:`peripheral_clocking`).
+passed into the SoC domain (``soc_domain``) and on into the SoC peripherals
+block (``soc_peripherals``), where it drives the clock generation block
+``apb_pll`` (instance ``apb_fll_if_i``).  The same reference clock is the
+``FREF`` input to the PLL macro and the input to all of the clock dividers.
 
 The reference clock is expected to be a clean 10 MHz source.  All higher
-frequencies used inside the device are synthesized from this input by the PLLs;
+frequencies used inside the device are synthesized from this input by the PLL;
 no other external clock is required for normal operation.
 
 Clock Generation Block
 ----------------------
-The clock generation hierarchy is:
+The live clock generation block is a single ``apb_pll`` instance,
+``apb_fll_if_i``, instantiated in ``soc_peripherals``
+(``rtl/apb_fll_if/apb_pll.sv``).  It contains:
 
-``soc_clk_rst_gen`` → ``clk_gen`` → ``clk_and_control`` (PLL)
+- one PLL macro, ``PLL18_TOP`` (instance ``u0``), whose ``FREF`` input is
+  ``ref_clk_i`` and whose ``CLKO`` output is the single high-speed synthesized
+  clock.  ``PLL18_TOP`` also drives the ``LOCK`` status used by firmware;
+- four programmable clock dividers (``clkdv``) and three bypass multiplexers
+  (``clk_dmux``) that derive the output clocks from ``CLKO`` (or, when bypassed,
+  directly from ``ref_clk_i``):
 
-``soc_clk_rst_gen`` instantiates ``clk_gen`` and provides the reset
-synchronization for the generated domains.  ``clk_gen`` instantiates the PLL
-blocks, one per generated domain:
+  - ``s_div`` / ``s_mux``  → ``soc_clk_o``    (= ``CLKO`` ÷ ``SocDiv``);
+  - ``p_div`` / ``p_mux``  → ``periph_clk_o`` (= ``CLKO`` ÷ ``PeriphDiv``);
+  - ``c_div`` / ``c_mux``  → ``cluster_clk_o``(= ``CLKO`` ÷ ``ClusterDiv``);
+  - ``ref_div``            → ``ref_clk_o``    (= ``ref_clk_i`` ÷ ``RefDiv``);
 
-- ``i_fll_soc``  produces ``soc_clk``.
-- ``i_fll_per``  produces ``per_clk`` (which ``soc_clk_rst_gen`` also drives out
-  as ``slow_clk_o``).
+- the APB-accessible configuration register file used to program the PLL macro
+  and the dividers (see :ref:`pll_configuration`).
 
-Each PLL is an instance of ``clk_and_control``, which wraps the ``pPLL02F`` PLL
-macro and the APB-accessible configuration register file used to program it.
-The PLLs are configured independently, so the SoC and peripheral domains may run
-at different frequencies.
+Because the three high-speed outputs share the single ``CLKO`` and differ only
+in their post-divider value, the SoC, peripheral and cluster/eFPGA domains are
+programmable but harmonically related; there is one PLL, not one per domain.
 
-Reset synchronization
-~~~~~~~~~~~~~~~~~~~~~~~
-``soc_clk_rst_gen`` uses ``rstgen`` to synchronize the global reset
-(``rstn_glob_i``) into the SoC clock domain, producing ``rstn_soc_sync_o`` for
-logic clocked by ``soc_clk``.  When the design is built for FPGA emulation
-(``PULP_FPGA_EMUL``) the reset synchronizer is bypassed and the global reset is
-used directly.
+.. note::
+
+   An alternative clock-generation hierarchy
+   (``soc_clk_rst_gen`` → ``clk_gen`` → ``clk_and_control`` wrapping the
+   ``pPLL02F`` macro, with separate ``i_fll_soc`` / ``i_fll_per`` PLLs) is
+   present in the source tree but is **not instantiated** in the current
+   ``claude`` branch.  The description above reflects the RTL that is actually
+   elaborated.
+
+Reset
+~~~~~
+The current design does not use a dedicated clock-domain reset synchronizer in
+the clock generation block.  In ``soc_domain`` the SoC reset is formed
+combinationally as
+
+``s_soc_rstn = !(!rstn_glob_i | s_wd_expired | s_periph_rst)``
+
+i.e. the global reset ``rstn_glob_i`` gated by a watchdog-timeout
+(``s_wd_expired``) and by the debug module's non-debug reset
+(``s_periph_rst``, from ``ndmreset_o``).  Within ``apb_pll`` the PLL macro has
+its own reset, ``pll_reset_in = ~(PLL_RESET | ~HRESETn)``, combining the
+software ``PLL_RESET`` control bit with the APB reset.
 
 Clock Domains and Distribution
 ------------------------------
@@ -106,11 +138,21 @@ SoC clock domain
 
 Peripheral clock domain
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-``per_clk`` is supplied to the uDMA subsystem as ``periph_clk_i``.  Inside the
-uDMA it becomes the source from which each peripheral's interface clock is
-derived (see :ref:`peripheral_clocking`).  Because ``per_clk`` is generated by a
-dedicated PLL, the peripheral interfaces can be clocked at a rate appropriate to
-the attached devices, independent of the core frequency.
+``per_clk`` (the ``periph_clk_o`` output of ``apb_pll``, carried as
+``s_periph_clk``) is supplied to the uDMA subsystem as ``periph_clk_i``.  Inside
+the uDMA it becomes the source from which each peripheral's interface clock is
+derived (see :ref:`peripheral_clocking`).  Because ``per_clk`` has its own
+post-divider (``PeriphDiv``), the peripheral interfaces can be clocked at a rate
+appropriate to the attached devices, subject to the relationship to ``CLKO``
+described above.
+
+Cluster / eFPGA clock domain
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``cluster_clk`` (the ``cluster_clk_o`` output of ``apb_pll``, carried as
+``s_fpga_clk``) is supplied to the eFPGA subsystem as ``fpga_clk0_i``.  It is
+derived from ``CLKO`` by the ``ClusterDiv`` post-divider.  The eFPGA subsystem
+also receives ``per_clk`` (on ``fpga_clk2_i``) and the divided reference clock
+(on ``fpga_clk1_i``).
 
 .. _peripheral_clocking:
 
@@ -141,110 +183,161 @@ stages:
    configuration registers, so each interface — UART, SPI/QSPI, I2C, I2S, SDIO
    and CAM — can be clocked at its required frequency.
 
-Timer reference clock
-~~~~~~~~~~~~~~~~~~~~~~~
-The Advanced Timer and the microsecond/watchdog timer in the SoC peripherals
-block are clocked from the reference clock rather than from a PLL-synthesized
-domain.  The reference clock is synchronized and divided before being presented
-to the timers, keeping timekeeping stable and independent of changes to the SoC
-or peripheral PLL settings.
+Divided reference (low-speed) clock
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``ref_div`` divider produces ``ref_clk_o`` = ``ref_clk_i`` ÷ ``RefDiv``
+(``RefDiv`` resets to 40, giving 250 kHz from a 10 MHz reference).  This
+low-speed clock, carried as ``s_ref_clk`` in ``soc_peripherals``, is distributed
+to the timing and event resources that must run independently of the high-speed
+synthesized domains:
+
+- the **Advanced Timer** (``apb_adv_timer``, on ``low_speed_clk_i``);
+- the **system timer** (``apb_timer_unit`` — the microsecond / watchdog / MTIME
+  timer, on ``ref_clk_i``).  This block re-synchronizes the low-speed clock into
+  the ``soc_clk`` domain with a small flip-flop chain and counts its edges; it
+  does not divide it further;
+- the **SoC event generator** (``soc_event_generator``, on ``low_speed_clk_i``),
+  which produces the ``timer_event_lo``/``timer_event_hi`` events;
+- the **SoC control** block (``apb_soc_ctrl``, on ``ref_clk_i``);
+- a reference-clock **edge synchronizer** (``pulp_sync_wedge``,
+  ``i_ref_clk_sync``) that generates rising/falling ``ref_clk`` events in the
+  ``soc_clk`` domain;
+- the **eFPGA subsystem** (on ``fpga_clk1_i``).
+
+Keeping these resources on the divided reference clock keeps timekeeping stable
+and independent of changes to the PLL or to the SoC/peripheral post-dividers.
 
 .. _pll_configuration:
 
 PLL Configuration
 -----------------
-Each PLL is programmed through the ``clk_and_control`` register file over its
-APB configuration port (``CFGREQ``/``CFGACK``/``CFGAD``/``CFGD``/``CFGQ``/
-``CFGWEB``).  The register file holds the divider, multiplier and mode controls
-for the ``pPLL02F`` macro.  The principal fields are:
+The PLL and the clock dividers are programmed through the ``apb_pll`` register
+file over the block's APB port (clocked by ``soc_clk``).  The registers are at
+the following byte offsets:
 
-.. list-table:: ``clk_and_control`` PLL configuration registers
+.. list-table:: ``apb_pll`` clock-generation registers
    :name: pll_config_registers
-   :widths: 12 18 70
+   :widths: 10 14 16 60
    :header-rows: 1
 
-   * - Address
+   * - Offset
+     - Name
      - Field(s)
      - Description
    * - 0x00
-     - ``PS0_L1``, ``PS0_L2``, ``PS0_EN``, ``PS0_BYPASS``
-     - Post-divider 0 controls and the PLL software reset
-       (``config0[2]`` gates ``pll_rstn``).
+     - ``ControlReg``
+     - ``PDDP`` [25], ``PD`` [24], ``MODE`` [17:16], ``DM`` [13:8],
+       ``PLL_RESET`` [1], ``BYPASS`` [0]
+     - PLL control: post-divider power-down, PLL power-down, mode select
+       (00 = integer, 01 = fractional, 10 = spread-spectrum), reference input
+       divider ``DM``, software PLL reset, and global bypass.  Reads return the
+       live ``LOCK`` status in bit 31.  Reset value ``0x03000103`` (powered
+       down, in reset and bypassed).
    * - 0x04
-     - ``PS1_L1``, ``PS1_L2``, ``PS1_EN``, ``PS1_BYPASS``
-     - Post-divider 1 controls (second PLL output).
+     - ``DivisorReg``
+     - ``DN`` [26:16], ``DP`` [2:0]
+     - Feedback divider ``DN`` and output divider ``DP`` of the PLL macro.
+       Reset value ``0x00A00004`` (``DN`` = 160, ``DP`` = 4 → ~400 MHz from a
+       10 MHz reference).
    * - 0x08
-     - ``MUL_INT``, ``MUL_FRAC``, ``INTEGER_MODE``, ``PRESCALE``
-     - Feedback multiplier (integer and fractional parts), integer/fraction
-       mode select, and the reference prescaler.
+     - ``FracReg``
+     - ``FRAC`` [23:0]
+     - Fractional portion of the feedback divider (used in fractional mode).
    * - 0x0C
-     - ``SSC_EN``, ``SSC_STEP``, ``SSC_PERIOD``
-     - Spread-spectrum clocking enable, step and period.
+     - ``Spread1Reg``
+     - ``SSRATE`` [10:0]
+     - Spread-spectrum modulation rate.
    * - 0x10
-     - ``LDET_CONFIG`` (+ ``LOCK`` on read)
-     - Lock-detector configuration; reading this register returns the live
-       ``LOCK`` status in the most-significant bit.
+     - ``Spread2Reg``
+     - ``SSLOPE`` [23:0]
+     - Spread-spectrum modulation slope.  Reads return the live ``LOCK`` status
+       in bit 31 (firmware polls this bit for lock detection).
    * - 0x14
-     - ``LF_CONFIG``
-     - Loop-filter configuration.
+     - ``SocDiv``
+     - ``SocDiv`` [9:0]
+     - ``soc_clk`` post-divider (``clkdv s_div``).
+   * - 0x18
+     - ``PeriphDiv``
+     - ``PeriphDiv`` [9:0]
+     - ``per_clk`` post-divider (``clkdv p_div``).
+   * - 0x1C
+     - ``ClusterDiv``
+     - ``ClusterDiv`` [9:0]
+     - ``cluster_clk`` post-divider (``clkdv c_div``).
+   * - 0x20
+     - ``RefDiv``
+     - ``RefDiv`` [9:0]
+     - Reference-clock divider (``clkdv ref_div``).  Reset value 40.
 
-At reset the registers are loaded with the default values defined in
-``clk_and_control`` (integer mode, output post-divider in bypass), so the PLL
-starts in a safe pass-through state until software programs and locks it.  The
-``LOCK`` output indicates when the PLL has achieved lock and its output may be
-used as a clock source.
+The ``clkdv`` dividers pass the input clock through unchanged when their divide
+value is 0 or 1, divide by two for a value of 2, and otherwise generate a
+roughly 50 % duty-cycle clock at the programmed ratio.
+
+At reset ``ControlReg`` selects bypass with the PLL powered down and held in
+reset, so every synthesized domain initially runs directly from ``ref_clk_i``.
+To bring the PLL up, firmware programs ``DivisorReg`` (and ``FracReg``/spread
+registers as needed) and the per-domain post-dividers, releases ``PLL_RESET``,
+clears ``BYPASS``, and waits for ``LOCK`` (bit 31 of ``ControlReg`` /
+``Spread2Reg``) before relying on the synthesized clocks.
 
 FPGA Implementation Requirements
 --------------------------------
-For FPGA targets (for example the Digilent Nexys A7), the ``pPLL02F`` hard-macro
-PLL is not available and is replaced by an FPGA clock-management primitive.  The
-``xilinx_pll`` wrapper (``rtl/generic_FLL/fe/fpga/xilinx_pll.sv``) is the
-integration point for a Xilinx MMCM/PLL that synthesizes ``soc_clk`` and
-``per_clk`` from the board reference clock.
+For FPGA targets (for example the Digilent Nexys A7), the ``PLL18_TOP`` hard-macro
+PLL is not available and must be replaced by an FPGA clock-management primitive.
+A ``xilinx_pll`` wrapper (``rtl/generic_FLL/fe/fpga/xilinx_pll.sv``) exists as the
+intended integration point for a Xilinx MMCM/PLL, but it is currently an empty
+stub and is **not** instantiated in the elaborated design.
 
 FPGA implementations must therefore:
 
 - provide a board reference clock and feed it to ``ref_clk_i`` (the on-board
   oscillator frequency may differ from the nominal 10 MHz and must be accounted
   for in the MMCM/PLL multiply/divide settings);
-- configure the MMCM/PLL multiply and divide factors so that the synthesized
+- replace the ``PLL18_TOP`` macro in ``apb_pll`` with an MMCM/PLL instance,
+  configuring its multiply and divide factors so that the synthesized
   ``soc_clk`` does not exceed the timing closure achieved for the core complex
   and interconnect on the target device;
-- expose a lock indication equivalent to the ASIC PLL ``LOCK`` so that
-  downstream reset release is qualified by clock stability.
+- expose a lock indication equivalent to the macro's ``LOCK`` so that downstream
+  reset release is qualified by clock stability.
 
-The ``xilinx_pll`` module is currently a wrapper stub; a project targeting
-silicon-class FPGA frequencies must populate it with an MMCM/PLL instance
-parameterized for the chosen board and target frequency.
+A project targeting silicon-class FPGA frequencies must populate ``xilinx_pll``
+(or an equivalent macro replacement) with an MMCM/PLL instance parameterized for
+the chosen board and target frequency, and wire it in place of ``PLL18_TOP``.
 
 ASIC Implementation Requirements
 --------------------------------
-For ASIC targets the clock sources are the ``pPLL02F`` PLL macros instantiated
-through ``clk_and_control``.  Each PLL converts the reference clock into a
-high-speed clock under the control of the configuration registers described in
+For ASIC targets the clock source is the ``PLL18_TOP`` macro instantiated inside
+``apb_pll``.  It converts the reference clock into the single high-speed clock
+``CLKO`` under the control of the configuration registers described in
 :ref:`pll_configuration`.  The implementation requirements are:
 
 - a stable reference clock at the nominal 10 MHz on ``ref_clk_i``;
-- per-domain programming of the reference prescaler (``PRESCALE``), the feedback
-  multiplier (``MUL_INT`` / ``MUL_FRAC``, with ``INTEGER_MODE`` selecting
-  integer or fractional operation) and the output post-divider (``PS0_*``) to
-  reach the target ``soc_clk`` and ``per_clk`` frequencies;
-- de-assertion of the PLL software reset (``config0[2]``) and a wait for
-  ``LOCK`` before the PLL output is relied upon;
-- optional spread-spectrum modulation via ``SSC_EN`` / ``SSC_STEP`` /
-  ``SSC_PERIOD`` where EMI reduction is required.
+- programming of the reference input divider (``DM``), the feedback divider
+  (``DN`` plus ``FRAC``, with ``MODE`` selecting integer or fractional
+  operation) and the macro output divider (``DP``) to reach the target ``CLKO``
+  frequency, followed by per-domain programming of ``SocDiv`` / ``PeriphDiv`` /
+  ``ClusterDiv`` to set each domain frequency;
+- de-assertion of the software PLL reset (``PLL_RESET``), clearing of ``BYPASS``,
+  and a wait for ``LOCK`` before the PLL output is relied upon;
+- optional spread-spectrum modulation (``MODE`` = 10 with ``SSRATE`` / ``SSLOPE``)
+  where EMI reduction is required.
 
-The PLL also provides power-down (``PWD``), retention (``RET``) and bypass
-controls for low-power and bring-up scenarios; in bypass the reference clock is
-passed through directly.
+The macro also provides power-down (``PD``), post-divider power-down (``PDDP``)
+and bypass (``BYPASS``) controls for low-power and bring-up scenarios; in bypass
+the reference clock is passed through directly to all domains.
 
 Simulation Behaviour
 --------------------
-In simulation the PLL macros are not modelled with real frequency synthesis.
-The FLL stub (``rtl/generic_FLL/fe/model/fll_stub.sv``) drives ``FLLCLK``
-directly from ``REFCLK`` and reports ``LOCK`` asserted.  As a result, the SoC
-and peripheral clocks track the simulation reference clock one-for-one, and the
-PLL configuration registers have no effect on the simulated clock frequency.
-This is sufficient for functional verification, but means that the relative
-frequency relationships between domains seen in silicon are not reproduced in
-simulation.
+In simulation the PLL macro is not modelled with real frequency synthesis.  The
+simulation model ``rtl/simulation/PLL18_TOP.sv`` ties ``LOCK`` high and, under
+Verilator, drives ``CLKO`` directly from ``FREF`` (the reference clock) so no
+multiplication occurs.  The ``clkdv`` post-dividers are ordinary RTL counters
+and *do* operate in simulation, so each domain runs at the reference clock
+divided by its programmed value (``SocDiv`` / ``PeriphDiv`` / ``ClusterDiv`` /
+``RefDiv``) rather than at a synthesized multiple of the reference.  Out of
+reset the block is in bypass, so all domains initially equal the reference
+clock.
+
+This is sufficient for functional verification — firmware that polls ``LOCK``
+proceeds immediately — but means the multiplied frequency relationships between
+domains seen in silicon are not reproduced in simulation.
