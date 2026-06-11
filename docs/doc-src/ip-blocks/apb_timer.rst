@@ -71,10 +71,10 @@ The figure below is a high-level block diagram of a 32 bit APB Timer:
    :align: center
    :alt: 
 
-.. _Prescaler:
+.. _Timer_lo_Prescaler:
 
-Prescaler
-^^^^^^^^^
+Timer_lo Prescaler
+^^^^^^^^^^^^^^^^^^
 Prescaler's main objective is to scale down the frequency of the input clock with the PRESCALER_COMP amount of times. Where PRESCALER_COMP is the bitfield of CFG_REG_LO CSR.
 Prescaler generates prescaler_lo_target_reached event after PRESCALER_COMP number of clock cycles. 
 
@@ -116,7 +116,7 @@ Prescaler is disabled, if any of the below conditions is satisfied:
 - When ENABLE_BIT of CFG_REG_LO is '0'.
 - When the input signal stoptimer_i is '1'.
 
-Timer Counter 
+Timer Counter
 ^^^^^^^^^^^^^
 
 Timer counter generates the output interrupt irq_lo_o for the Core complex. 
@@ -164,18 +164,11 @@ Timer counter is disabled, if any of the below conditions is satisfied:
 32 bit Timer_hi Timer
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Timer_hi is designed using a prescaller and Timer counters
-The figure below is a high-level block diagram of a 32 bit APB Timer:
+Timer_hi is designed using a prescaller and Timer counters.
+The high-level block diagram of the 32 bit Timer_hi Timer matches the Timer_lo block diagram above.
 
-.. figure:: 32_bit_apb_timer.png
-   :name: 32_bit_apb_timer
-   :align: center
-   :alt: 
-
-.. _Prescaler:
-
-Prescaler
-^^^^^^^^^
+Timer_hi Prescaler
+^^^^^^^^^^^^^^^^^^
 Prescaler's main objective is to scale down the frequency of the input clock with the PRESCALER_COMP amount of times. Where PRESCALER_COMP is the bitfield of CFG_REG_HI CSR.
 Prescaler generates prescaler_hi_target_reached event after PRESCALER_COMP number of clock cycles. 
 
@@ -279,14 +272,14 @@ Like 32 bit timers, 64-bit timer is also designed using a prescaller and Timer c
    :align: center
    :alt: 
 
-Prescaler
-^^^^^^^^^
+64-bit Prescaler
+^^^^^^^^^^^^^^^^
 Only the prescaler of Timer_lo is used in 64 bit Timer. The working of the prescaler in 64 bit Timer is exactly the same as of the prescaler in 32 bit timer.
-Please refer to the Timer_lo Prescaler_ for more information.  
+Please refer to the Timer_lo Timer_lo_Prescaler_ for more information.
 
 .. _Counter:
 
-64 bit Timer Counter 
+64 bit Timer Counter
 ^^^^^^^^^^^^^^^^^^^^
 The 64-bit Timer counter is formed by combining two 32-bit timer counters of Timer_lo and Timer_hi.
 Timer counter of Timer_lo maintains a counter (i.e counter_lo) whose initial value is TIMER_VAL_LO CSR. Timer counter of Timer_hi maintains a counter (i.e counter_hi) whose initial value is TIMER_VAL_HI CSR.

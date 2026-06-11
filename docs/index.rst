@@ -23,6 +23,7 @@ CORE-V-MCU User Manual
     :caption: CORE-V-MCU Introduction:
     :maxdepth: 1
 
+    preface.rst
     doc-src/overview.rst
     doc-src/terminology.rst
     doc-src/open-source-development-at-openhw.rst

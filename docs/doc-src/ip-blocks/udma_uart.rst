@@ -60,7 +60,7 @@ uDMA UART uses the Tx channel interface to read the data from the interleaved (L
 Refer to `uDMA subsystem <https://github.com/openhwgroup/core-v-mcu/blob/master/docs/doc-src/udma_subsystem.rst>`_ for more information about the Tx and Rx channel functionality of uDMA Core.
 
 Dual-clock (DC) TX and RX FIFO
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The uDMA core operates using the system clock, while the uDMA UART operates using both the system clock and the peripheral clock. To ensure the uDMA UART and core are properly synchronized, dual-clock FIFOs are used in the uDMA UART.
 These are 4-depth FIFOs and can store 8-bit wide data. It is implemented using circular FIFO.
@@ -602,7 +602,7 @@ uDMA UART interface to generate interrupt
 Overflow and parity errors are generated over the err_event_o interface. The receive data event will be generated over the rx_char_event_o interface.
 
 uDMA UART interface to read-write CSRs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following interfaces are used to read and write to UART CSRs. These interfaces are managed by uDMA Core:
 
 - cfg_data_i
