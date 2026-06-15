@@ -39,7 +39,7 @@ pdf:
 				rm -f doc-src/allimages.rst
 				for f in `egrep doc-src index.rst`; do cat "$$f" >> doc-src/all.rst; echo "\n\n" >> doc-src/all.rst; done
 				(cat doc-src/all.rst | sed 's/..\/images/images/g' | sed 's/..\/images/images/g' > doc-src/allimages.rst)
-				(pandoc -t latex -o CORE-V-MCU_User_Manual.pdf doc-src/allimages.rst)
+				(pandoc -t latex --include-in-header=pandoc-listdepth.tex -o CORE-V-MCU_User_Manual.pdf doc-src/allimages.rst)
 
 install:
 				cp -r sphinx-source/_build/html ${INSTALL_DIR}

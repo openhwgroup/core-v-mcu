@@ -29,8 +29,8 @@ Overview
 --------
 The CORE-V-MCU is driven by a single primary reference clock, ``ref_clk_i``,
 which is assumed to be **10 MHz**.  From this reference the on-chip clock
-generation block — a single ``apb_pll`` instance wrapping the ``PLL18_TOP`` PLL
-macro — synthesizes one high-speed clock and derives the following clock domains
+generation block - a single ``apb_pll`` instance wrapping the ``PLL18_TOP`` PLL
+macro - synthesizes one high-speed clock and derives the following clock domains
 from it with independent programmable post-dividers:
 
 - **SoC clock** (``soc_clk``) drives the CV32E40P core complex, the L2/TCDM and
@@ -67,8 +67,14 @@ Reference Clock Input
 The primary reference clock enters the device on the ``ref_clk_i`` pad and is
 passed into the SoC domain (``soc_domain``) and on into the SoC peripherals
 block (``soc_peripherals``), where it drives the clock generation block
-``apb_pll`` (instance ``apb_fll_if_i``).  The same reference clock is the
-``FREF`` input to the PLL macro and the input to all of the clock dividers.
+``apb_pll`` (instance ``apb_fll_if_i``).  Inside ``apb_pll`` the reference clock
+is the ``FREF`` input to the ``PLL18_TOP`` macro and the input clock to the
+``ref_div`` divider that produces the low-speed reference clock.  It
+additionally feeds the bypass input of the three output multiplexers
+(``s_mux`` / ``p_mux`` / ``c_mux``), so that when a domain is bypassed it runs
+directly from ``ref_clk_i``.  The SoC, peripheral and cluster dividers
+(``s_div`` / ``p_div`` / ``c_div``) themselves are clocked by the PLL's
+``CLKO`` output, not by ``ref_clk_i``.
 
 The reference clock is expected to be a clean 10 MHz source.  All higher
 frequencies used inside the device are synthesized from this input by the PLL;
@@ -83,15 +89,19 @@ The live clock generation block is a single ``apb_pll`` instance,
 - one PLL macro, ``PLL18_TOP`` (instance ``u0``), whose ``FREF`` input is
   ``ref_clk_i`` and whose ``CLKO`` output is the single high-speed synthesized
   clock.  ``PLL18_TOP`` also drives the ``LOCK`` status used by firmware;
-- four programmable clock dividers (``clkdv``) and three bypass multiplexers
-  (``clk_dmux``) that derive the output clocks from ``CLKO`` (or, when bypassed,
-  directly from ``ref_clk_i``):
+- three high-speed output paths, each formed by a ``clkdv`` post-divider
+  clocked by ``CLKO`` followed by a ``clk_dmux`` 2:1 bypass multiplexer.  Each
+  multiplexer selects between the divided ``CLKO`` and ``ref_clk_i`` under
+  control of the ``BYPASS`` bit (``ControlReg[0] | PLL_RESET``); when bypassed
+  the domain runs directly from ``ref_clk_i``:
 
-  - ``s_div`` / ``s_mux``  → ``soc_clk_o``    (= ``CLKO`` ÷ ``SocDiv``);
-  - ``p_div`` / ``p_mux``  → ``periph_clk_o`` (= ``CLKO`` ÷ ``PeriphDiv``);
-  - ``c_div`` / ``c_mux``  → ``cluster_clk_o``(= ``CLKO`` ÷ ``ClusterDiv``);
-  - ``ref_div``            → ``ref_clk_o``    (= ``ref_clk_i`` ÷ ``RefDiv``);
+  - ``s_div`` / ``s_mux``  -> ``soc_clk_o``     (``CLKO`` / ``SocDiv``);
+  - ``p_div`` / ``p_mux``  -> ``periph_clk_o``  (``CLKO`` / ``PeriphDiv``);
+  - ``c_div`` / ``c_mux``  -> ``cluster_clk_o`` (``CLKO`` / ``ClusterDiv``);
 
+- a fourth ``clkdv`` divider, ``ref_div``, clocked directly by ``ref_clk_i``
+  (not ``CLKO``) and with no bypass multiplexer, producing the low-speed
+  reference clock ``ref_clk_o`` (``ref_clk_i`` / ``RefDiv``);
 - the APB-accessible configuration register file used to program the PLL macro
   and the dividers (see :ref:`pll_configuration`).
 
@@ -102,7 +112,7 @@ programmable but harmonically related; there is one PLL, not one per domain.
 .. note::
 
    An alternative clock-generation hierarchy
-   (``soc_clk_rst_gen`` → ``clk_gen`` → ``clk_and_control`` wrapping the
+   (``soc_clk_rst_gen`` -> ``clk_gen`` -> ``clk_and_control`` wrapping the
    ``pPLL02F`` macro, with separate ``i_fll_soc`` / ``i_fll_per`` PLLs) is
    present in the source tree but is **not instantiated** in the current
    ``claude`` branch.  The description above reflects the RTL that is actually
@@ -168,9 +178,9 @@ stages:
    the uDMA APB configuration interface.  For each peripheral *i* the uDMA
    produces two gated clocks:
 
-   - ``periph_sys_clk_o[i]`` — the SoC clock (``sys_clk``) gated by
+   - ``periph_sys_clk_o[i]`` - the SoC clock (``sys_clk``) gated by
      ``cg_value[i]``;
-   - ``periph_per_clk_o[i]`` — the peripheral clock (``per_clk``) gated by
+   - ``periph_per_clk_o[i]`` - the peripheral clock (``per_clk``) gated by
      ``cg_value[i]``.
 
    Gating an unused peripheral's clocks reduces dynamic power.  A top-level
@@ -180,19 +190,19 @@ stages:
    further divided by an ``io_clk_gen`` programmable divider to produce the
    line-rate clock for the interface (for example the UART baud clock or the
    SPI/QSPI SCK).  The divide ratio is taken from that peripheral's own
-   configuration registers, so each interface — UART, SPI/QSPI, I2C, I2S, SDIO
-   and CAM — can be clocked at its required frequency.
+   configuration registers, so each interface - UART, SPI/QSPI, I2C, I2S, SDIO
+   and CAM - can be clocked at its required frequency.
 
 Divided reference (low-speed) clock
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``ref_div`` divider produces ``ref_clk_o`` = ``ref_clk_i`` ÷ ``RefDiv``
+The ``ref_div`` divider produces ``ref_clk_o`` = ``ref_clk_i`` / ``RefDiv``
 (``RefDiv`` resets to 40, giving 250 kHz from a 10 MHz reference).  This
 low-speed clock, carried as ``s_ref_clk`` in ``soc_peripherals``, is distributed
 to the timing and event resources that must run independently of the high-speed
 synthesized domains:
 
 - the **Advanced Timer** (``apb_adv_timer``, on ``low_speed_clk_i``);
-- the **system timer** (``apb_timer_unit`` — the microsecond / watchdog / MTIME
+- the **system timer** (``apb_timer_unit`` - the microsecond / watchdog / MTIME
   timer, on ``ref_clk_i``).  This block re-synchronizes the low-speed clock into
   the ``soc_clk`` domain with a small flip-flop chain and counts its edges; it
   does not divide it further;
@@ -237,7 +247,7 @@ the following byte offsets:
      - ``DivisorReg``
      - ``DN`` [26:16], ``DP`` [2:0]
      - Feedback divider ``DN`` and output divider ``DP`` of the PLL macro.
-       Reset value ``0x00A00004`` (``DN`` = 160, ``DP`` = 4 → ~400 MHz from a
+       Reset value ``0x00A00004`` (``DN`` = 160, ``DP`` = 4 -> ~400 MHz from a
        10 MHz reference).
    * - 0x08
      - ``FracReg``
@@ -338,6 +348,6 @@ divided by its programmed value (``SocDiv`` / ``PeriphDiv`` / ``ClusterDiv`` /
 reset the block is in bypass, so all domains initially equal the reference
 clock.
 
-This is sufficient for functional verification — firmware that polls ``LOCK``
-proceeds immediately — but means the multiplied frequency relationships between
+This is sufficient for functional verification - firmware that polls ``LOCK``
+proceeds immediately - but means the multiplied frequency relationships between
 domains seen in silicon are not reproduced in simulation.
