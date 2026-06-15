@@ -1,3 +1,4 @@
+/* verilator lint_off WIDTHEXPAND */
 // Copyright 2020 Silicon Labs, Inc.
 //
 // This file, and derivatives thereof are licensed under the
@@ -361,3 +362,5 @@ module cv32e40p_prefetch_controller #(
   end
 
 endmodule  // cv32e40p_prefetch_controller
+
+/* verilator lint_on WIDTHEXPAND */

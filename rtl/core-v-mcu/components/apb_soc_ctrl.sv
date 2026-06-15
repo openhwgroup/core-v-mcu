@@ -134,7 +134,7 @@ module apb_soc_ctrl #(
   logic [              5:0]                   r_sel_clk_dc_fifo_onehot;
   logic                                       r_clk_gating_dc_fifo;
   logic [              3:0]                   r_reset_type1_efpga;
-  logic [              5:0]                   r_enable_inout_efpga;
+  logic [              6:0]                   r_enable_inout_efpga;
 
   logic                                       s_apb_write;
 
@@ -163,10 +163,10 @@ module apb_soc_ctrl #(
   assign {enable_udma_efpga_o, enable_events_efpga_o,
           enable_apb_efpga_o, enable_tcdm3_efpga_o,
           enable_tcdm2_efpga_o, enable_tcdm1_efpga_o,
-          enable_tcdm0_efpga_o} = r_enable_inout_efpga[5:0];
+          enable_tcdm0_efpga_o} = r_enable_inout_efpga[6:0];
 
-  assign n_cores = NB_CORES;
-  assign n_clusters = NB_CLUSTERS;
+  assign n_cores = 16'(NB_CORES);
+  assign n_clusters = 16'(NB_CLUSTERS);
 
 
   always_ff @(posedge ref_clk_i or negedge rstpin_ni) begin
@@ -191,9 +191,9 @@ module apb_soc_ctrl #(
   end  // always_ff @ (posedge ref_clk_i, negedge HRESETn)
 
   always_latch begin
-    if (rstpin_ni == 0) reset_reason <= 2'b01;
-    else if (wd_expired_o == 1) reset_reason <= 2'b10;
-    else if (reset_reason_clear == 1) reset_reason <= 2'b00;
+    if (rstpin_ni == 0) reset_reason = 2'b01;
+    else if (wd_expired_o == 1) reset_reason = 2'b10;
+    else if (reset_reason_clear == 1) reset_reason = 2'b00;
   end
 
 
@@ -246,6 +246,7 @@ module apb_soc_ctrl #(
         FSM_WAIT: begin
           casex (PADDR[11:0])
             `REG_RESET_REASON: reset_reason_clear <= 1;
+            default: ;
           endcase
           PREADY  <= 0;
           APB_fsm <= FSM_IDLE;
@@ -282,9 +283,9 @@ module apb_soc_ctrl #(
               end
             end
             `RTO_PERIPHERAL: periph_rto_reg <= 32'h0;
-            `RTO_COUNT: rto_count_reg <= {PWDATA[19:4], 4'hf};
+            `RTO_COUNT: rto_count_reg <= {12'h0, PWDATA[19:4], 4'hf};
             `RESET_TYPE1_EFPGA: r_reset_type1_efpga <= PWDATA[3:0];
-            `ENABLE_IN_OUT_EFPGA: r_enable_inout_efpga <= PWDATA[5:0];
+            `ENABLE_IN_OUT_EFPGA: r_enable_inout_efpga <= PWDATA[6:0];
             `EFPGA_CONTROL: control_in <= PWDATA;
             `SOFT_RESET: begin
               soft_reset_o         <= 1;
@@ -302,9 +303,9 @@ module apb_soc_ctrl #(
             end
             12'h4??: begin
               if (PADDR[9:2] < `N_IO) begin
-                r_io_pad <= PADDR[9:2];
-                pad_cfg_o[PADDR[9:2]] <= PWDATA[8+:`NBIT_PADCFG];
-                r_padmux[PADDR[9:2]] <= PWDATA[0+:`NBIT_PADMUX];
+                r_io_pad <= PADDR[2+:IDX_WIDTH];
+                pad_cfg_o[PADDR[2+:IDX_WIDTH]] <= PWDATA[8+:`NBIT_PADCFG];
+                r_padmux[PADDR[2+:IDX_WIDTH]] <= PWDATA[0+:`NBIT_PADMUX];
               end
             end
             default: begin
@@ -312,6 +313,7 @@ module apb_soc_ctrl #(
             end
           endcase
         end  // case: FSM_WRITE
+        default: ;
         FSM_READ: begin  // READ
           PREADY  <= 1;
           PRDATA  <= '0;
@@ -341,7 +343,7 @@ module apb_soc_ctrl #(
             `RTO_PERIPHERAL: PRDATA <= periph_rto_reg;
             `RTO_COUNT: PRDATA <= rto_count_reg;
             `RESET_TYPE1_EFPGA: PRDATA <= {28'b0, r_reset_type1_efpga};
-            `ENABLE_IN_OUT_EFPGA: PRDATA <= {26'b0, r_enable_inout_efpga};
+            `ENABLE_IN_OUT_EFPGA: PRDATA <= {25'b0, r_enable_inout_efpga};
             `EFPGA_CONTROL: PRDATA <= control_in;
             `EFPGA_STATUS: PRDATA <= status_out;
             `EFPGA_VERSION: PRDATA[7:0] <= version;

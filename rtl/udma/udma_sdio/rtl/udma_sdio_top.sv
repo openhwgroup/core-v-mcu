@@ -123,7 +123,7 @@ module udma_sdio_top #(
 
     assign s_clkdiv_en = 1'b1;
 
-   assign s_err = s_status ? 1'b1 : 1'b0;
+   assign s_err = |s_status ? 1'b1 : 1'b0;
 
     pulp_sync_wedge error_int_sync
      (

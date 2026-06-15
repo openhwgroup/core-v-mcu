@@ -197,7 +197,7 @@ module soc_event_generator #(
 
   always_comb begin : proc_data_o
     s_event_data = 'h0;
-    for (int i = 0; i < EVNT_NUM; i++) if (s_grant[i]) s_event_data = i;
+    for (int i = 0; i < EVNT_NUM; i++) if (s_grant[i]) s_event_data = EVNT_WIDTH'(i);
   end
 
   always @(posedge HCLK or negedge HRESETn) begin
@@ -300,6 +300,7 @@ module soc_event_generator #(
           `REG_TIMER1_SEL_HI: begin
             r_timer_sel_hi <= PWDATA[7:0];
           end
+          default: ;
         endcase  // s_apb_addr
       end else if (PSEL && PENABLE && ~PWRITE) begin
         case (s_apb_addr)
@@ -311,6 +312,7 @@ module soc_event_generator #(
           `REG_ERR_5: r_err[191:160] = 'h0;
           `REG_ERR_6: r_err[223:192] = 'h0;
           `REG_ERR_7: r_err[255:224] = 'h0;
+          default: ;
         endcase  // s_apb_addr
       end
     end

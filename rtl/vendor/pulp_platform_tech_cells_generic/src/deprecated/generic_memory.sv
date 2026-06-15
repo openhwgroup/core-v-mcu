@@ -32,13 +32,8 @@ module generic_memory
    logic [DATA_WIDTH-1:0]                   MEM [NUM_WORDS-1:0];
    logic [DATA_WIDTH-1:0]                   M;
    genvar                         i,j;
-   string                        s;
 
-   initial begin
-      $display("%m");
-      s = $sformatf("mem_init/%m.mem");
-      $readmemh(s, MEM);
-   end
+   // Memory contents are required to be initialized hierarchically by the testbench.
 
    generate
       for (i=0; i<BE_WIDTH; i++)

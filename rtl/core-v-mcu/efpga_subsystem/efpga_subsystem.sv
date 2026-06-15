@@ -239,13 +239,13 @@ module efpga_subsystem #(
 
 `ifndef SYNTHESIS
       assign #1 l2_efpga_tcdm[g_tcdm].req   = tcdm_req_fpga_gated[g_tcdm];
-      assign #1 l2_efpga_tcdm[g_tcdm].add   = tcdm_addr_fpga[g_tcdm];
+      assign #1 l2_efpga_tcdm[g_tcdm].add   = {12'h0, tcdm_addr_fpga[g_tcdm]};
       assign #1 l2_efpga_tcdm[g_tcdm].wen   = tcdm_wen_fpga[g_tcdm];
       assign #1 l2_efpga_tcdm[g_tcdm].wdata = tcdm_wdata_fpga[g_tcdm];
       assign #1 l2_efpga_tcdm[g_tcdm].be    = tcdm_be_fpga[g_tcdm];
 `else
       assign l2_efpga_tcdm[g_tcdm].req   = tcdm_req_fpga_gated[g_tcdm];
-      assign l2_efpga_tcdm[g_tcdm].add   = tcdm_addr_fpga[g_tcdm];
+      assign l2_efpga_tcdm[g_tcdm].add   = {12'h0, tcdm_addr_fpga[g_tcdm]};
       assign l2_efpga_tcdm[g_tcdm].wen   = tcdm_wen_fpga[g_tcdm];
       assign l2_efpga_tcdm[g_tcdm].wdata = tcdm_wdata_fpga[g_tcdm];
       assign l2_efpga_tcdm[g_tcdm].be    = tcdm_be_fpga[g_tcdm];

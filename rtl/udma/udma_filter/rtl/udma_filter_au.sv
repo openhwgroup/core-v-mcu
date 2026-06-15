@@ -107,20 +107,22 @@ module udma_filter_au
       s_in_opa = operanda_data_i;
       case(operanda_datasize_i)
         2'b00:
-          s_in_opa = $signed({operanda_data_i[7] & cfg_use_signed_i,operanda_data_i[7:0]});
+          s_in_opa = {{24{operanda_data_i[7] & cfg_use_signed_i}}, operanda_data_i[7:0]};
         2'b01:
-          s_in_opa = $signed({operanda_data_i[15] & cfg_use_signed_i,operanda_data_i[15:0]});
+          s_in_opa = {{16{operanda_data_i[15] & cfg_use_signed_i}}, operanda_data_i[15:0]};
+        default: ;
       endcase // operanda_datasize_i
     end
 
-    always_comb 
+    always_comb
     begin
       s_in_opb = operandb_data_i;
       case(operandb_datasize_i)
         2'b00:
-          s_in_opb = $signed({operandb_data_i[7] & cfg_use_signed_i,operandb_data_i[7:0]});
+          s_in_opb = {{24{operandb_data_i[7] & cfg_use_signed_i}}, operandb_data_i[7:0]};
         2'b01:
-          s_in_opb = $signed({operandb_data_i[15] & cfg_use_signed_i,operandb_data_i[15:0]});
+          s_in_opb = {{16{operandb_data_i[15] & cfg_use_signed_i}}, operandb_data_i[15:0]};
+        default: ;
       endcase // operanda_datasize_i
     end
 
@@ -129,7 +131,9 @@ module udma_filter_au
     assign output_valid_o = s_sum_acc ? r_accoutvalid : r_sample_out;
     assign output_datasize_o = operanda_datasize_i;
 
+    /* verilator lint_off WIDTHEXPAND */
     assign s_mac = $signed(s_opa)*$signed(s_opb) + $signed({s_sum[31] & cfg_use_signed_i,s_sum});
+    /* verilator lint_on WIDTHEXPAND */
 
     assign s_sample_opa = output_ready_i & (operanda_valid_i & (cfg_bypass_i | !s_en_opb | (s_en_opb & operandb_valid_i)));
     assign s_sample_opb = output_ready_i & (operanda_valid_i &                             (s_en_opb & operandb_valid_i));

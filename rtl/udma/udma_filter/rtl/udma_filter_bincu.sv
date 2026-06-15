@@ -78,9 +78,10 @@ module udma_filter_bincu
 		s_input_data = input_data_i;
 		case(cfg_datasize_i)
 			2'b00:
-				s_input_data = $signed({input_data_i[7] & cfg_use_signed_i,input_data_i[7:0]});
+				s_input_data = {{24{input_data_i[7] & cfg_use_signed_i}}, input_data_i[7:0]};
 			2'b01:
-				s_input_data = $signed({input_data_i[15] & cfg_use_signed_i,input_data_i[15:0]});
+				s_input_data = {{16{input_data_i[15] & cfg_use_signed_i}}, input_data_i[15:0]};
+			default: ;
 		endcase // input_datasize_i
 	end
 

@@ -252,6 +252,7 @@ module camera_if
                 s_yuv_pix = {r_data_msb[7:0], cam_data_i[7:0]};
             `BYPASS_BIGEND:
                 s_yuv_pix = {cam_data_i[7:0], r_data_msb[7:0]};
+            default: ;
         endcase // r_format
     end
 

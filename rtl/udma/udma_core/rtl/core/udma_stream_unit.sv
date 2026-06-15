@@ -62,15 +62,15 @@ module udma_stream_unit
      logic                  s_fifo_in_ready ;
 
      logic                  s_req;
-     logic                  s_rd_ptr_next;
+     logic [L2_AWIDTH_NOAL-1:0] s_rd_ptr_next;
      logic                  r_do_jump;
      logic                  s_sample_rd;
      logic                  s_sample_wr;
      logic                  s_sample_wr_start;
      logic                  r_err;
      logic                  s_stream_buf_en;
-     logic                  s_int_datasize;
-     logic                  s_wr_ptr_guess;
+     logic            [1:0] s_int_datasize;
+     logic [L2_AWIDTH_NOAL-1:0] s_wr_ptr_guess;
      logic                  s_is_jump;
      enum logic [1:0] {ST_IDLE,ST_BUF_TRAN,ST_BUF_WAIT,ST_STREAM} s_state,r_state;
 

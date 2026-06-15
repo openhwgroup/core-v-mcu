@@ -137,7 +137,7 @@ module udma_tx_channels
 
     enum logic {TX_IDLE,TX_NON_ALIGNED} r_tx_state,s_tx_state_next;
 
-    assign lin_curr_addr_o = s_curr_addr;
+    assign lin_curr_addr_o = s_curr_addr[N_LIN_CHANNELS-1:0];
     assign lin_en_o = s_ch_en;
     assign s_fifoin = {r_in_dest,s_grant_log,r_in_size,s_addr[L2_AWIDTH_NOAL-1:0]};
 
@@ -256,7 +256,7 @@ module udma_tx_channels
       s_grant_log = 0;
       for(int i=0;i<N_CHANNELS_TX;i++)
         if(r_grant[i])
-          s_grant_log = i;    
+          s_grant_log = LOG_N_CHANNELS'(i);
     end
 
     always_comb 
@@ -301,7 +301,7 @@ module udma_tx_channels
     begin: demux_data
       for(int i=0;i<N_LIN_CHANNELS;i++)
       begin
-        if(r_resp_dly == i)
+        if(r_resp_dly == LOG_N_CHANNELS'(i))
         begin
           lin_valid_o[i] = r_valid;
           lin_data_o[i]  = r_data;
@@ -314,7 +314,7 @@ module udma_tx_channels
       end
       for(int i=0;i<N_EXT_CHANNELS;i++)
       begin
-        if(r_resp_dly == (N_LIN_CHANNELS+i))
+        if(r_resp_dly == LOG_N_CHANNELS'(N_LIN_CHANNELS+i))
         begin
           ext_valid_o[i] = r_valid;
           ext_data_o[i]  = r_data;
@@ -331,7 +331,8 @@ module udma_tx_channels
     assign s_ch_ready[N_CHANNELS_TX-1:N_LIN_CHANNELS] = ext_ready_i;
 
     //this may happen only in burst mode when multiple reads are pipelined
-    assign s_stall = |(~s_ch_ready & r_resp) & r_valid;    
+    // TODO: review pull-request #370 (suggested by Copilot).
+    assign s_stall = |(~s_ch_ready & r_resp) & r_valid;
 
     always_ff @(posedge clk_i or negedge rstn_i) 
     begin : ff_data
@@ -415,7 +416,8 @@ module udma_tx_channels
             begin
                if     (s_fifo_addr_lsb[0] || s_fifo_addr_lsb[1]) s_detect_na = 1'b1;
             end
-      endcase 
+      default: ;
+      endcase
     end
 
     generate

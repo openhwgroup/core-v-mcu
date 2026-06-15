@@ -468,7 +468,7 @@ module sdio_txrx_data
           s_state = ST_TX_SHIFT;
           s_cnt_start = 1'b1;  // starts counting
           s_cnt_byte  = 1'b1;  // counting bytes not cycles
-          s_cnt_target = data_block_size_i;// shifts buffer size
+          s_cnt_target = 9'(data_block_size_i);// shifts buffer size
           s_in_data_ready = 1'b1;
         end
         ST_TX_SHIFT:
@@ -483,7 +483,7 @@ module sdio_txrx_data
             s_in_data_ready = 1'b0;
             s_state = ST_TX_CRC;
             s_cnt_start  = 1'b1;  // starts counting
-            s_cnt_target = 8'd15; // shifts 16bits CRC out/channel
+            s_cnt_target = 9'd15; // shifts 16bits CRC out/channel
           end
         end
         ST_TX_CRC:
@@ -505,7 +505,7 @@ module sdio_txrx_data
           s_crc_en     = 1'b0; // crc is not calculated but shifted
           s_state      = ST_TX_CRCSTAT;
           s_cnt_start  = 1'b1; // starts counting
-          s_cnt_target = 8'd7; // waits 8 cycles
+          s_cnt_target = 9'd7; // waits 8 cycles
         end
         ST_TX_CRCSTAT:
         begin
@@ -556,7 +556,7 @@ module sdio_txrx_data
           begin
             s_cnt_start = 1'b1;  // starts counting
             s_cnt_byte  = 1'b1;  // counting bytes not cycles
-            s_cnt_target = data_block_size_i;// shifts buffer size
+            s_cnt_target = 9'(data_block_size_i);// shifts buffer size
             s_state = ST_RX_SHIFT;
           end
           else if(s_cnt_done)
@@ -576,7 +576,7 @@ module sdio_txrx_data
           begin
               s_state = ST_RX_CRC;
               s_cnt_start = 1'b1;  // starts counting
-              s_cnt_target = 8'd15;// shifts 8 bits
+              s_cnt_target = 9'd15;// shifts 8 bits
           end
         end
         ST_RX_CRC:
@@ -607,6 +607,7 @@ module sdio_txrx_data
             s_state = ST_IDLE;
           end
         end
+        default: ;
       endcase
     end
 

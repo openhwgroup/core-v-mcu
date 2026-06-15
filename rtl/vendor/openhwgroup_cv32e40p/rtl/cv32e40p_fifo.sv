@@ -1,3 +1,4 @@
+/* verilator lint_off WIDTHEXPAND */
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the "License"); you may not use this file except in
@@ -166,3 +167,5 @@ module cv32e40p_fifo #(
 `endif
 
 endmodule  // cv32e40p_fifo
+
+/* verilator lint_on WIDTHEXPAND */

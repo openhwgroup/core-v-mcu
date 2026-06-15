@@ -61,19 +61,19 @@ module udma_apb_if
         PREADY = 1'b0;
         for (int i=0;i<N_PERIPHS;i++)
         begin
-            if (s_periph_sel == i)
+            if (s_periph_sel == 5'(i))
             begin
                 PRDATA = periph_data_i[i];
                 PREADY = periph_ready_i[i];
             end
         end
     end
-    
+
     always_comb begin : proc_periph_valid
         periph_valid_o = 'h0;
         for(int i=0;i<N_PERIPHS;i++)
         begin
-            if(s_periph_valid && (s_periph_sel == i))
+            if(s_periph_valid && (s_periph_sel == 5'(i)))
                 periph_valid_o[i] = 1'b1;
         end
     end

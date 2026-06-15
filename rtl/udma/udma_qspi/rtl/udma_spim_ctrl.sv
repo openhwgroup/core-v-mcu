@@ -314,6 +314,7 @@ module udma_spim_ctrl
           s_cnt_next = r_cnt + 1;
         end
       end
+      default: ;
     endcase // r_cnt_state
   end
 
@@ -363,13 +364,14 @@ module udma_spim_ctrl
                 is_cmd_uca  = 1'b1;
             `SPI_CMD_SETUP_UCS:
                 is_cmd_ucs  = 1'b1;
+            default: ;
         endcase
     end
 
     always_comb begin : proc_s_event
         s_event = 1'b0;
         for(int i=0;i<4;i++)
-            if(r_evt_sel == i)
+            if(r_evt_sel == 2'(i))
                 s_event = event_i[i];
     end
 

@@ -35,7 +35,7 @@ CORE-V-MCU User Manual
     doc-src/startup.rst
     doc-src/mmap.rst
     doc-src/interrupts.rst
-    doc-src/clock_domains.rst
+    doc-src/clocking_architecture.rst
     doc-src/debug_approach.rst
     doc-src/evaluation_kits.rst
     doc-src/software_support.rst

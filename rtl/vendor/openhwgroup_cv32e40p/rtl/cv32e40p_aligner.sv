@@ -187,6 +187,7 @@ module cv32e40p_aligner (
       end
 
 
+      default: ;
       BRANCH_MISALIGNED: begin
         //we jumped to a misaligned location, so now we received {TARGET, XXXX}
         if (fetch_rdata_i[17:16] == 2'b11) begin

@@ -25,7 +25,7 @@ module fifo_ram #(
     if (ren == 1) latched_raddr <= raddr;
   end
   always @(*) begin
-    rdata <= data_ram[latched_raddr];
+    rdata = data_ram[latched_raddr];
   end
 
 

@@ -155,6 +155,7 @@ module camera_reg_if #(
                     r_cam_cfg_filter        <=  cfg_data_i;
                 `REG_CAM_VSYNC_POLARITY:
                     r_cam_vsync_polarity    <=  cfg_data_i[0];
+                default: ;
                 endcase
             end
         end
@@ -165,7 +166,7 @@ module camera_reg_if #(
         cfg_data_o = 32'h0;
         case (s_rd_addr)
         `REG_RX_SADDR:
-            cfg_data_o = cfg_rx_curr_addr_i;
+            cfg_data_o = {{(32-L2_AWIDTH_NOAL){1'b0}}, cfg_rx_curr_addr_i};
         `REG_RX_SIZE:
             cfg_data_o[TRANS_SIZE-1:0] = cfg_rx_bytes_left_i;
         `REG_RX_CFG:
