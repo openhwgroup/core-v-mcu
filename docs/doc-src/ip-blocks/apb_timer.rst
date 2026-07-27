@@ -20,7 +20,9 @@
 APB Timer
 =========
 
-APB Timer generates interrupts to the Core complex or CPU subsystem with a finite configurable delay. It manages the interrupt generation through various configurations of prescaler, reference clock and timer counters. 
+APB Timer generates interrupts to the Core complex or CPU subsystem with a finite configurable delay. It manages the interrupt generation through various configurations of prescaler, reference clock and timer counters.
+
+One of the intended use-cases of the APB Timer is to implement the RISC-V machine timer, that is the ``mtime`` and ``mtimecmp`` platform registers (commonly referred to as MTIME). The block is run as a single 64-bit timer with MTIME mode enabled: the 64-bit counter serves as ``mtime`` and the 64-bit compare value serves as ``mtimecmp``, so a machine timer interrupt is raised whenever ``mtime`` is greater than or equal to ``mtimecmp``. The programming sequence for this use-case is described in :ref:`apb_timer_mtime` under Firmware Guidelines.
 
 Features
 ---------
@@ -35,6 +37,8 @@ Features
 -  Supports one-shot and compare-clear modes.
 
 -  Configurable control operations of timer: (Start, Stop and Reset)
+
+-  Can implement the RISC-V machine timer (the ``mtime`` and ``mtimecmp`` platform registers, commonly referred to as MTIME) using the 64-bit timer with MTIME mode enabled.
 
 
 Block Architecture
@@ -712,6 +716,34 @@ Interrupt generation:
 ~~~~~~~~~~~~~~~~~~~~~
 - If the IRQ_BIT of  CFG_REG_LO is '1' , irq_lo_o will be asserted when the counter value of Timer_lo reaches the TIMER_CMP_LO.
 - If the IRQ_BIT of  CFG_REG_HI is '1' , irq_hi_o will be asserted when the counter value of Timer_hi reaches the TIMER_CMP_HI.
+
+.. _apb_timer_mtime:
+
+Implementing MTIME (the RISC-V machine timer):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The RISC-V privileged architecture defines a machine timer made up of two 64-bit registers: a free running real time counter ``mtime`` and a comparator ``mtimecmp``. A machine timer interrupt becomes pending whenever ``mtime`` is greater than or equal to ``mtimecmp``. The APB Timer implements this contract when it is run as a 64-bit timer with MTIME mode enabled:
+
+- The cascaded 64-bit counter **{TIMER_VAL_HI, TIMER_VAL_LO}** acts as ``mtime``.
+- The 64-bit compare value **{TIMER_CMP_HI, TIMER_CMP_LO}** acts as ``mtimecmp``.
+- With MODE_MTIME_BIT set, irq_lo_o is asserted whenever the 64-bit count is greater than or equal to the 64-bit compare value, independent of the IRQ_BIT. This greater-than-or-equal, always-on comparison is what distinguishes machine timer behaviour from the ordinary equality interrupt.
+
+To program the APB Timer as MTIME:
+
+- Configure CFG_REG_LO with MODE_64_BIT = '1' (bit 31), MODE_MTIME_BIT = '1' (bit 30) and ENABLE_BIT = '1' (bit 0). Leave CMP_CLR_BIT and ONE_SHOT_BIT at '0' so that the counter free runs and stays monotonic like ``mtime`` (it is not cleared when it matches the compare value).
+
+- Read ``mtime`` by reading TIMER_VAL_HI and TIMER_VAL_LO. To obtain a coherent 64-bit value, read TIMER_VAL_HI, then TIMER_VAL_LO, then TIMER_VAL_HI again; if the high word changed, repeat the sequence. This guards against the low word rolling over between the two reads.
+
+- Schedule the next tick by writing the target 64-bit value into ``mtimecmp``. Because the interrupt condition is count greater than or equal to compare, updating the two 32-bit halves one at a time can momentarily leave ``mtimecmp`` at an intermediate value that is already less than or equal to the current ``mtime``, which raises a spurious machine timer interrupt while the write is in progress. To avoid this, use the standard three step sequence for a split compare register:
+
+   - Write TIMER_CMP_HI to 0xFFFFFFFF. This pushes the 64-bit compare value far into the future so that no intermediate match can occur while the low word is updated.
+   - Write the new TIMER_CMP_LO (the final low word).
+   - Write the final TIMER_CMP_HI (the intended high word).
+
+  After the final high word is written, the interrupt is raised only when ``mtime`` reaches the intended 64-bit compare value, without needing to set IRQ_BIT.
+
+- In the machine timer interrupt handler, advance ``mtimecmp`` to a new, larger value for the next tick, using the same three step sequence. Moving the compare value ahead of the current count de-asserts the pending interrupt and schedules the following one, matching the standard RISC-V machine timer usage.
+
+Do not enable Compare Clear mode (CMP_CLR_BIT) or One Shot mode (ONE_SHOT_BIT) when implementing MTIME: ``mtime`` must keep counting while firmware advances ``mtimecmp``, and MODE_MTIME_BIT already provides the greater-than-or-equal interrupt without requiring IRQ_BIT.
 
 
 Pin Diagram
