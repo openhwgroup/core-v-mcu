@@ -733,9 +733,15 @@ To program the APB Timer as MTIME:
 
 - Read ``mtime`` by reading TIMER_VAL_HI and TIMER_VAL_LO. To obtain a coherent 64-bit value, read TIMER_VAL_HI, then TIMER_VAL_LO, then TIMER_VAL_HI again; if the high word changed, repeat the sequence. This guards against the low word rolling over between the two reads.
 
-- Schedule the next tick by writing the target 64-bit value into ``mtimecmp``, that is TIMER_CMP_HI followed by TIMER_CMP_LO. Because the interrupt condition is count greater than or equal to compare, the interrupt is raised once ``mtime`` reaches the new compare value, without needing to set IRQ_BIT.
+- Schedule the next tick by writing the target 64-bit value into ``mtimecmp``. Because the interrupt condition is count greater than or equal to compare, updating the two 32-bit halves one at a time can momentarily leave ``mtimecmp`` at an intermediate value that is already less than or equal to the current ``mtime``, which raises a spurious machine timer interrupt while the write is in progress. To avoid this, use the standard three step sequence for a split compare register:
 
-- In the machine timer interrupt handler, advance ``mtimecmp`` to a new, larger value for the next tick. Moving the compare value ahead of the current count de-asserts the pending interrupt and schedules the following one, matching the standard RISC-V machine timer usage.
+   - Write TIMER_CMP_HI to 0xFFFFFFFF. This pushes the 64-bit compare value far into the future so that no intermediate match can occur while the low word is updated.
+   - Write the new TIMER_CMP_LO (the final low word).
+   - Write the final TIMER_CMP_HI (the intended high word).
+
+  After the final high word is written, the interrupt is raised only when ``mtime`` reaches the intended 64-bit compare value, without needing to set IRQ_BIT.
+
+- In the machine timer interrupt handler, advance ``mtimecmp`` to a new, larger value for the next tick, using the same three step sequence. Moving the compare value ahead of the current count de-asserts the pending interrupt and schedules the following one, matching the standard RISC-V machine timer usage.
 
 Do not enable Compare Clear mode (CMP_CLR_BIT) or One Shot mode (ONE_SHOT_BIT) when implementing MTIME: ``mtime`` must keep counting while firmware advances ``mtimecmp``, and MODE_MTIME_BIT already provides the greater-than-or-equal interrupt without requiring IRQ_BIT.
 
