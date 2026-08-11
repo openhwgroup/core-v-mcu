@@ -564,7 +564,7 @@ module udma_subsystem #(
       assign s_events[4*(PER_ID_I2C+g_i2c)+0] = s_rx_ch_events[CH_ID_RX_I2C+g_i2c];
       assign s_events[4*(PER_ID_I2C+g_i2c)+1] = s_tx_ch_events[CH_ID_TX_I2C+g_i2c];
       assign s_events[4*(PER_ID_I2C+g_i2c)+2] = 1'b0;
-      assign s_events[4*(PER_ID_I2C+g_i2c)+3] = 1'b0;
+      assign s_events[4*(PER_ID_I2C+g_i2c)+3] = s_i2c_evt[g_i2c];
 
       assign s_rx_cfg_stream[CH_ID_RX_I2C+g_i2c] = 'h0;
       assign s_rx_cfg_stream_id[CH_ID_RX_I2C+g_i2c] = 'h0;

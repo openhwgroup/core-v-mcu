@@ -454,15 +454,17 @@ STATUS
 - Offset: 0x20
 - Type  : Volatile
 
-+------------+-------+------+------------+-------------------------------------------------------------+
-| Field      |  Bits | Type | Default    | Description                                                 |
-+============+=======+======+============+=============================================================+
-| AL         |   1:1 |   RO |   0x0      | Always returns 0                                            |
-+------------+-------+------+------------+-------------------------------------------------------------+
-| BUSY       |   0:0 |   RO |   0x0      | Always returns 0                                            |
-+------------+-------+------+------------+-------------------------------------------------------------+
++------------+-------+------+------------+------------------------------------------------------------------------------------------+
+| Field      |  Bits | Type | Default    | Description                                                                              |
++============+=======+======+============+==========================================================================================+
+| AL         |   1:1 |   RO |   0x0      | Sticky arbitration-lost indication. Set when arbitration loss is detected.               |
++------------+-------+------+------------+------------------------------------------------------------------------------------------+
+| BUSY       |   0:0 |   RO |   0x0      | Sticky bus-start indication. Set when BUSY changes from 0 to 1 after a START condition.  |
++------------+-------+------+------------+------------------------------------------------------------------------------------------+
 
-**NOTE:** No functionality is implemented in RTL and always returns 0x0.
+Reading STATUS returns and clears both bits. A condition detected in the same cycle as the
+read remains set, so software cannot lose a new status indication. BUSY records the rising
+edge of the internal bus-busy state; it is not the current level of that state.
 
 SETUP
 ~~~~~
@@ -610,8 +612,13 @@ uDMA core triggers these events based on specific conditions. The I2C will only 
 
 - ``ext_events_i [3:0]``: Input external events.
 
-uDMA I2C interface to generate error
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- err_o
+uDMA I2C status event interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- ``err_o``: One ``sys_clk_i`` cycle pulse when BUSY or AL becomes set. The legacy signal
+  name is retained for interface compatibility, although a normal START condition can
+  generate the event through BUSY. Read STATUS to determine the cause.
 
-``**Note**:: As of commit #30e3c8b, the err_o signal is left unconnected.``
+For I2C 0 and I2C 1, ``err_o`` is routed to peripheral event IDs 19 and 23 respectively.
+These event IDs were previously reserved. Existing RX and TX event IDs are unchanged, and
+all event-controller masks reset to 1 (masked). Software must explicitly unmask the new
+event ID before it can reach an event-controller destination.

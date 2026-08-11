@@ -176,13 +176,13 @@ module udma_i2c_reg_if #(
                 r_busy <= 0;
                 r_al   <= 0;
             end
-            else
-            begin
-                if (status_busy_i)
-                    r_busy <= 1'b1;
-                if (status_al_i)
-                    r_al   <= 1'b1;
-            end
+
+            // A new condition must not be lost when STATUS is read in the
+            // same cycle. Set therefore has priority over clear-on-read.
+            if (status_busy_i)
+                r_busy <= 1'b1;
+            if (status_al_i)
+                r_al   <= 1'b1;
         end
     end //always
 
