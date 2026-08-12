@@ -86,8 +86,26 @@ module udma_i2c_top #(
 
     logic       s_do_rst;
 
+    logic       s_i2c_busy_periph;
+    logic       s_i2c_al_periph;
+    logic       s_i2c_event_periph;
+    logic       s_i2c_busy_sys;
+    logic       s_i2c_al_sys;
+
     assign data_tx_datasize_o = 2'b00;
     assign data_rx_datasize_o = 2'b00;
+
+    udma_i2c_status_ep i_status_ep (
+        .periph_clk_i ( periph_clk_i       ),
+        .sys_clk_i    ( sys_clk_i          ),
+        .rstn_i       ( rstn_i             ),
+        .busy_i       ( s_i2c_busy_periph  ),
+        .al_i         ( s_i2c_al_periph    ),
+        .event_i      ( s_i2c_event_periph ),
+        .busy_o       ( s_i2c_busy_sys     ),
+        .al_o         ( s_i2c_al_sys       ),
+        .event_o      ( err_o              )
+    );
 
     udma_i2c_reg_if #(
         .L2_AWIDTH_NOAL(L2_AWIDTH_NOAL),
@@ -125,8 +143,8 @@ module udma_i2c_top #(
 
         .cfg_do_rst_o       ( s_do_rst ),
 
-        .status_busy_i      ( 1'b0  ),
-        .status_al_i        ( 1'b0  )
+        .status_busy_i      ( s_i2c_busy_sys ),
+        .status_al_i        ( s_i2c_al_sys   )
     );
 
     io_tx_fifo #(
@@ -192,7 +210,9 @@ module udma_i2c_top #(
 
         .sw_rst_i        ( s_do_rst ),
 
-		.err_o           ( ),
+        .busy_o          ( s_i2c_busy_periph  ),
+        .al_o            ( s_i2c_al_periph    ),
+        .err_o           ( s_i2c_event_periph ),
 
 		.scl_i           ( scl_i  ),
 		.scl_o           ( scl_o  ),
