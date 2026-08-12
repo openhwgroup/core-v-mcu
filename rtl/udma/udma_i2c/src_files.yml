@@ -3,6 +3,7 @@ udma_i2c:
     rtl/udma_i2c_reg_if.sv,
     rtl/udma_i2c_bus_ctrl.sv,
     rtl/udma_i2c_control.sv,
+    rtl/udma_i2c_status_ep.sv,
     rtl/udma_i2c_top.sv,
   ]
 

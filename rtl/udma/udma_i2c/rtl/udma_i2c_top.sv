@@ -95,7 +95,7 @@ module udma_i2c_top #(
     assign data_tx_datasize_o = 2'b00;
     assign data_rx_datasize_o = 2'b00;
 
-    udma_i2c_status i_status (
+    udma_i2c_status_ep i_status_ep (
         .periph_clk_i ( periph_clk_i       ),
         .sys_clk_i    ( sys_clk_i          ),
         .rstn_i       ( rstn_i             ),

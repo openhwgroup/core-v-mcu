@@ -1,8 +1,15 @@
-// Copyright 2026 OpenHW Group
+// Copyright 2026 Shivam Tiwari
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
-module udma_i2c_status (
+// The I2C controller generates one-cycle BUSY-rise, arbitration-lost, and
+// combined status-event pulses in the periph_clk_i domain. The register
+// interface and err_o consume those pulses in the asynchronous sys_clk_i
+// domain. This module uses acknowledged edge propagators so short source
+// pulses are transferred safely without being missed. BUSY and AL remain
+// separate for the STATUS fields, while event_i preserves the legacy
+// combined-event behavior when both causes occur together.
+module udma_i2c_status_ep (
     input  logic periph_clk_i,
     input  logic sys_clk_i,
     input  logic rstn_i,

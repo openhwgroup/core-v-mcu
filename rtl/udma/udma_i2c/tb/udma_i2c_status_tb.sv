@@ -1,4 +1,4 @@
-// Copyright 2026 OpenHW Group
+// Copyright 2026 Shivam Tiwari
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 
@@ -32,7 +32,7 @@ module udma_i2c_status_tb;
     always #5 sys_clk = ~sys_clk;
     always #7 periph_clk = ~periph_clk;
 
-    udma_i2c_status i_status (
+    udma_i2c_status_ep i_status_ep (
         .periph_clk_i (periph_clk),
         .sys_clk_i    (sys_clk),
         .rstn_i       (rstn),

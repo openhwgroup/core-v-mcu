@@ -13,7 +13,7 @@ filesets:
     - rtl/udma_i2c_reg_if.sv
     - rtl/udma_i2c_bus_ctrl.sv
     - rtl/udma_i2c_control.sv
-    - rtl/udma_i2c_status.sv
+    - rtl/udma_i2c_status_ep.sv
     - rtl/udma_i2c_top.sv
     file_type: systemVerilogSource
   files_status_test:
@@ -22,7 +22,7 @@ filesets:
     - pulp-platform.org::tech_cells_generic
     files:
     - rtl/udma_i2c_reg_if.sv
-    - rtl/udma_i2c_status.sv
+    - rtl/udma_i2c_status_ep.sv
     - tb/udma_i2c_status_tb.sv
     file_type: systemVerilogSource
   files_control_status_test:
