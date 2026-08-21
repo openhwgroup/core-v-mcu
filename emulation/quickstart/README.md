@@ -12,6 +12,17 @@ The following assumes you are running on a Linux platform and has been tested un
 
 ## Software Requirements:
 
+### CORE-V GCC Toolchain
+
+The Quick Start Guide uses the pre-built `cli_test.srec` supplied in this
+directory, so a compiler toolchain is not required to run the pre-built
+software.
+
+If you want to build or modify `cli_test` from source, install the CORE-V GCC
+toolchain. The software sources and toolchain setup instructions are maintained
+in the [core-v-mcu-cli-test](https://github.com/openhwgroup/core-v-mcu-cli-test)
+repository.
+
 ### Python Modules
 ```
 $ pip3 install pyserial
