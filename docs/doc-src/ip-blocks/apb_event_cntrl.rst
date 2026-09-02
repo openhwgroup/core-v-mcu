@@ -299,17 +299,25 @@ APB event controller routes events to the following ouput channels:
 
 - **FC Channel (Fabric Controller / Core Complex):**
 
-FC Channel is responsible to communicate events to the Fabric Controller.
-The APB event controller use following approach to notify events to the Fabric Controller:
+  FC Channel is responsible for communicating events to the Fabric Controller.
+  The APB event controller has the following event notification paths:
 
-  - Pin based high priority event notification: Routes high-priority events to the Fabric Controller through fc_events_o pin. This feature is not implemented in the current version hence out of scope for this manual.
-  - FIFO based event notification: Events are accumulated in FIFO and event_fifo_valid_o signal is raised to notify events to Fabric Controller. 
+    - Pin-based high-priority event notification: ``fc_events_o[1:0]`` directly mirrors
+      ``per_events_i[8:7]``. In CORE-V-MCU, this output is connected to the otherwise
+      unused ``s_fc_hp_events`` signal, so the direct notification path is not implemented.
+    - FIFO-based event notification: Unmasked events are accumulated in the FC FIFO,
+      and ``event_fifo_valid_o`` raises CPU interrupt 11. This path includes events 7 and 8.
 
-Whenever a valid event is present for FC channel, it is pushed onto the FC FIFO. The FC FIFO is a 4-entry queue that holds events until they are read by the Fabric Controller.
-When an event is available is the FC FIFO, the APB event controller raises event_fifo_valid_o signal to the Fabric Controller. In response to the signal,  Fabric Controller can read the event ID through the FIFO CSR.
-Once the event is read, the Fabric Controller can acknowledge it by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
-The event is then popped from the FC FIFO and next event is placed on the FIFO CSR.
-The event_fifo_valid_o signal is deasserted once the FC FIFO is empty.
+  Whenever a valid event is present for the FC channel, it is pushed onto the FC FIFO.
+  The FC FIFO is a 4-entry queue that holds events until the CPU acknowledges interrupt 11.
+  When an event is available in the FC FIFO, the APB event controller asserts
+  ``event_fifo_valid_o``, which drives CPU interrupt 11.
+  When the CPU accepts interrupt 11, it acknowledges the interrupt by asserting
+  ``core_irq_ack_i`` with ``core_irq_ack_id_i`` set to 11.
+  The event controller then copies the event ID at the head of the FIFO into the FIFO CSR
+  and pops that entry.
+  Software can read the captured event ID from the FIFO CSR in the interrupt service routine.
+  The ``event_fifo_valid_o`` signal is deasserted once the FC FIFO is empty.
 
 - **CL Channel (Cluster / eFPGA):**
 
@@ -381,10 +389,10 @@ Push Operation
 
 Pop Operation
 ^^^^^^^^^^^^^
-  - The FIFO valid signal ``event_fifo_valid_o`` is asserted when there is at least one event in the FIFO, indicating that the Fabric Controller can read the event.
-  - The events in the FIFO are exposed to the Fabric Controller through the FIFO CSR.
-  - The Fabric Controller must first acknowledge the interrupt by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``. This signals readiness to process the interrupt.
-  - Once the acknowledgment is received, the event on the top of the FIFO is placed on the FIFO CSR and popped from the FIFO.
+  - The FIFO valid signal ``event_fifo_valid_o`` is asserted when there is at least one event in the FIFO, raising CPU interrupt 11.
+  - The CPU acknowledges the interrupt by asserting ``core_irq_ack_i = 1`` and setting ``core_irq_ack_id_i = 11``.
+  - Once the acknowledgment is received, the event at the head of the FIFO is copied to the FIFO CSR and popped from the FIFO.
+  - Software reads the captured event ID from the FIFO CSR in the interrupt service routine.
   - If the FIFO was previously full, deassertion of ``grant_o`` prevents new events from being written. After the event is acknowledged and popped, space becomes available, and ``grant_o`` is asserted again.
   - The ``event_fifo_valid_o`` signal is deasserted when the FIFO becomes empty, indicating there are no more events to read.
 
@@ -1104,7 +1112,11 @@ Peripheral Event Interface
 
 Fabric Controller Event Interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  - fc_events_o[1:0]: Fabric control event output, directly connected to per_events_i[8:7] (Not connected in current implementation).
+  - fc_events_o[1:0]: Direct event output that mirrors ``per_events_i[8:7]``
+    without applying the FC masks or adding an event ID to the FIFO. It is connected
+    to the unused ``s_fc_hp_events`` signal and does not drive a CPU interrupt in
+    CORE-V-MCU. Events 7 and 8 remain available through the FIFO-based IRQ 11 path
+    when their FC mask bits are cleared.
   - core_irq_ack_id_i[4:0]: Core interrupt acknowledge ID input; provided by the Fabric Controller
   - core_irq_ack_i:  Core interrupt acknowledge input; provided by the Fabric Controller
   - event_fifo_valid_o: Event FIFO valid output, indicating the presence of an event in the FIFO; connected to Fabric Controller

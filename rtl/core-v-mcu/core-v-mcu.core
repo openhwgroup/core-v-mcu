@@ -12,6 +12,7 @@ filesets:
     depend:
     - pulp-platform.org::axi
     - pulp-platform.org::common_cells
+    - openhwgroup.org:ip:soc_event_generator
     - pulp-platform.org::riscv_dbg
     - pulp-platform.org::tech_cells_generic
     - pulp-platform.org::fpnew
@@ -57,9 +58,6 @@ filesets:
     - soc/lint_jtag_wrap.sv
     - soc/periph_bus_wrap.sv
     - soc/soc_clk_rst_gen.sv
-    - soc/soc_event_arbiter.sv
-    - soc/soc_event_generator.sv
-    - soc/soc_event_queue.sv
     - soc/tcdm_error_slave.sv
     - soc/soc_interconnect.sv
     - soc/soc_interconnect_wrap.sv

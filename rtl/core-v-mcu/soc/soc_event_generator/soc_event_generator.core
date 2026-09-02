@@ -1,0 +1,47 @@
+CAPI=2:
+
+# Copyright (c) 2026 Shivam Tiwari
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+name: openhwgroup.org:ip:soc_event_generator
+description: CORE-V-MCU SoC event generator
+
+filesets:
+  files_rtl:
+    depend:
+    - pulp-platform.org::common_cells
+    files:
+    - rtl/soc_event_queue.sv
+    - rtl/soc_event_arbiter.sv
+    - rtl/soc_event_generator.sv
+    file_type: systemVerilogSource
+  files_event_generator_test:
+    files:
+    - tb/soc_event_generator_tb.sv
+    file_type: systemVerilogSource
+
+parameters:
+  PULP_FPGA_EMUL:
+    datatype: bool
+    paramtype: vlogdefine
+    default: true
+
+targets:
+  default:
+    filesets:
+    - files_rtl
+  event-generator-test:
+    default_tool: verilator
+    filesets:
+    - files_rtl
+    - files_event_generator_test
+    parameters:
+    - PULP_FPGA_EMUL=true
+    toplevel: soc_event_generator_tb
+    tools:
+      verilator:
+        mode: binary
+        verilator_options:
+        - -Wno-fatal
+        - --timing
