@@ -1,9 +1,12 @@
 name: aws
-on: [push]
+on:
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   aws:
     name: AWS Pipeline (private)
+    if: ${{ github.event.review.state == 'approved' && (github.actor == 'davideschiavone' || github.actor == 'MikeOpenHWGroup' || github.actor == 'zarubaf') }}
     runs-on: ubuntu-latest
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
@@ -16,7 +19,7 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: eu-west-1
     - name: Run AWS Pipeline
-      uses: zarubaf/aws-codebuild-run-build@master
+      uses: openhwgroup/aws-codebuild-run-build@master
       with:
         project-name: core-v-mcu
         hide-log: true
