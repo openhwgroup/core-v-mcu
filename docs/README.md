@@ -9,6 +9,7 @@ requirements in `../python-requirements.txt`).
 pip3 install --user recommonmark
 pip3 install --user sphinx_markdown_tables
 pip3 install --user sphinx_rtd_theme
+pip3 install --user sphinx_github_changelog
 ```
 
 ## Build the documentation
