@@ -99,8 +99,8 @@ module udma_i2c_control
     logic [15:0] s_div_num;
     logic [15:0] r_div_num;
 
-    logic [6:0] s_rpt_num;
-    logic [6:0] r_rpt_num;
+    logic [7:0] s_rpt_num;
+    logic [7:0] r_rpt_num;
 
     logic [7:0] s_data;
     logic [7:0] r_data;
