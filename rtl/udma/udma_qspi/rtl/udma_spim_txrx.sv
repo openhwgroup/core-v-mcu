@@ -246,10 +246,10 @@ module udma_spim_txrx
         begin
             if(r_lsbfirst)
             begin
-                s_data_rx[s_bit_index]   = spi_sdi0_i;
-                s_data_rx[s_bit_index+1] = spi_sdi1_i;
-                s_data_rx[s_bit_index+2] = spi_sdi2_i;
-                s_data_rx[s_bit_index+3] = spi_sdi3_i;
+                s_data_rx[s_bit_index-3] = spi_sdi0_i;
+                s_data_rx[s_bit_index-2] = spi_sdi1_i;
+                s_data_rx[s_bit_index-1] = spi_sdi2_i;
+                s_data_rx[s_bit_index]   = spi_sdi3_i;
             end
             else
             begin
