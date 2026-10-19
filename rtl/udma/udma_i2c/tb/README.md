@@ -1,4 +1,4 @@
-# uDMA I2C status tests
+# uDMA I2C tests
 
 The focused tests for the uDMA I2C status path use Icarus Verilog through
 FuseSoC. From the repository root, register this checkout once and run both
@@ -19,3 +19,13 @@ to check the arbitration-lost event.
 transfer, the composite event, sticky BUSY and arbitration-lost STATUS bits,
 clear-on-read behavior, and set priority when a condition and STATUS read occur
 in the same cycle.
+
+The repeat-count regression uses the same Icarus Verilog flow:
+
+```sh
+fusesoc run --target=repeat-test openhwgroup.org:ip:udma_i2c
+```
+
+`repeat-test` reads 1, 2, 128, 129, 130, 255 and 256 bytes from a slave model
+that returns `0xff`. It checks the received data, byte count and bus clock
+count, covering zero, one, the seven-bit boundary and maximum repeat counts.

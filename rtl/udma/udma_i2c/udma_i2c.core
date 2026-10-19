@@ -31,6 +31,12 @@ filesets:
     - rtl/udma_i2c_control.sv
     - tb/udma_i2c_control_status_tb.sv
     file_type: systemVerilogSource
+  files_repeat_test:
+    files:
+    - rtl/udma_i2c_bus_ctrl.sv
+    - rtl/udma_i2c_control.sv
+    - tb/udma_i2c_repeat_tb.sv
+    file_type: systemVerilogSource
 
 targets:
   default:
@@ -50,6 +56,15 @@ targets:
     filesets:
     - files_control_status_test
     toplevel: udma_i2c_control_status_tb
+    tools:
+      icarus:
+        iverilog_options:
+        - -g2012
+  repeat-test:
+    default_tool: icarus
+    filesets:
+    - files_repeat_test
+    toplevel: udma_i2c_repeat_tb
     tools:
       icarus:
         iverilog_options:
