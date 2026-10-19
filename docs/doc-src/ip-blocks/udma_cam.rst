@@ -453,7 +453,7 @@ REG_CAM_VSYNC_POLARITY
 | VSYNC_POLARITY |   0:0 |   RW   |    0x0     | Set vsync polarit               |
 |                |       |        |            |                                 |
 |                |       |        |            |- 0x0: Active low                |
-|                |       |        |            |- 0x0: Active high               |
+|                |       |        |            |- 0x1: Active high               |
 |                |       |        |            |                                 |
 +----------------+-------+--------+------------+---------------------------------+
 

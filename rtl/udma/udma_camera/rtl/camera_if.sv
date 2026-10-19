@@ -150,7 +150,7 @@ module camera_if
     assign s_cfg_g_coeff        = s_cfg_filter[15:8];
     assign s_cfg_b_coeff        = s_cfg_filter[7:0];
 
-    assign s_cam_vsync = s_cam_vsync_polarity ? ~cam_vsync_i : cam_vsync_i;
+    assign s_cam_vsync = s_cam_vsync_polarity ? cam_vsync_i : ~cam_vsync_i;
     assign s_sof = ~r_vsync &  s_cam_vsync;
 
     assign s_framevalid = (r_framecounter == 0);

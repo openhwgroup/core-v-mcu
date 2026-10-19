@@ -13,8 +13,32 @@ filesets:
     - rtl/camera_reg_if.sv
     - rtl/camera_if.sv
     file_type: systemVerilogSource
+  files_vsync_test:
+    depend:
+    - openhwgroup.org:ip:udma_core
+    - openhwgroup.org:ip:logint_dc_fifo_xbar
+    files:
+    - ../../vendor/pulp_platform_common_cells/src/onehot_to_bin.sv
+    - tb/camera_vsync_tb.sv
+    file_type: systemVerilogSource
 
 targets:
   default:
     filesets:
     - files_rtl
+  vsync-test:
+    default_tool: icarus
+    filesets:
+    - files_rtl
+    - files_vsync_test
+    toplevel: camera_vsync_tb
+    tools:
+      icarus:
+        iverilog_options:
+        - -g2012
+        - -gsupported-assertions
+      verilator:
+        mode: binary
+        verilator_options:
+        - -Wno-fatal
+        - --timing
