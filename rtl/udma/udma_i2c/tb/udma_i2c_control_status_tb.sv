@@ -165,6 +165,11 @@ module udma_i2c_control_status_tb;
         rstn = 1'b1;
         repeat (4) @(posedge clk);
 
+        send_byte(8'hC0);
+        send_byte(8'hFF);
+        if (i_control.r_rpt_num !== 8'hFE)
+            $fatal(1, "RPT FF repeat count was %02h, expected FE", i_control.r_rpt_num);
+
         external_start();
         wait_for_count(BUSY_COUNTER, 1);
         wait_for_count(EVENT_COUNTER, 1);
@@ -187,11 +192,6 @@ module udma_i2c_control_status_tb;
 
         if (data_rx_valid)
             $fatal(1, "status testing must not create RX data");
-
-        send_byte(8'hC0);
-        send_byte(8'hFF);
-        if (i_control.r_rpt_num !== 8'hFE)
-            $fatal(1, "RPT FF repeat count was %02h, expected FE", i_control.r_rpt_num);
 
         $display("PASS: uDMA I2C BUSY/arbitration-lost status sources");
         $finish;
