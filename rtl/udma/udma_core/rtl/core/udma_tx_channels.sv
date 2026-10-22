@@ -331,7 +331,7 @@ module udma_tx_channels
     assign s_ch_ready[N_CHANNELS_TX-1:N_LIN_CHANNELS] = ext_ready_i;
 
     //this may happen only in burst mode when multiple reads are pipelined
-    assign s_stall = |(~s_ch_ready & r_resp) & r_valid;    
+    assign s_stall = ~s_ch_ready[r_resp] & r_valid;
 
     always_ff @(posedge clk_i or negedge rstn_i) 
     begin : ff_data
